@@ -1,0 +1,23 @@
+﻿<Window x:Class="DeleteNewline.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DeleteNewline"
+        mc:Ignorable="d"
+        Title="DeleteNewline" Height="720" Width="1280" Background="#1e1f22">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <TextBox x:Name="TextBox_Main" TextWrapping="Wrap" Margin="10" Background="#2b2d31" Grid.Row="0" Foreground="White" AcceptsReturn="True" KeyUp="TextBox_Main_KeyUp" VerticalScrollBarVisibility="Auto">
+            <TextBox.ContextMenu>
+                <ContextMenu Name ="TextBox_Main_ContextMenu">
+                    <MenuItem Name="MenuItem_TopMost" Header="TopMost" IsCheckable="True" Checked="MenuItem_TopMost_Checked" Unchecked="MenuItem_TopMost_Unchecked"/>
+                    <MenuItem Name="MenuItem_Paste" Header="Paste" Click="MenuItem_Paste_Click"/>
+                </ContextMenu> 
+            </TextBox.ContextMenu>
+        </TextBox>
+    </Grid>
+    
+</Window>
