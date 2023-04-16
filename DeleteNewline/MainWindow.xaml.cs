@@ -60,6 +60,7 @@ namespace DeleteNewline
             TextBox_Main.AppendText(" ========================================================\r\n");
             TextBox_Main.AppendText(" ================== Only text form can be entered =================\r\n");
             TextBox_Main.AppendText(" ========================================================\r\n");
+            TextBox_Main.ScrollToEnd();
         }
 
 
