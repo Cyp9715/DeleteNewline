@@ -28,7 +28,7 @@ namespace RemovePdfNewline
 
         private void TextBox_Main_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.V)
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
                 string text = TextBox_Main.Text;
                 string removeNewline = text.Replace("\r\n", " ");
