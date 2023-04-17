@@ -27,8 +27,16 @@ namespace DeleteNewline
         public MainWindow()
         {
             InitializeComponent();
-            mainWindow = (MainWindow)Application.Current.MainWindow;
+            InitalizeSettings();
         }
+
+        private void InitalizeSettings()
+        {
+            mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.Width = Settings.Default.mainWindowSize_width;
+            mainWindow.Height = Settings.Default.mainWindowSize_height;
+        }
+
 
         private bool CheckDataForm()
         {
@@ -63,6 +71,17 @@ namespace DeleteNewline
             TextBox_Main.ScrollToEnd();
         }
 
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Settings.Default.mainWindowSize_width = e.NewSize.Width;
+            Settings.Default.mainWindowSize_height = e.NewSize.Height;
+        }
+
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Settings.Default.Save();
+        }
 
         private void TextBox_Main_KeyUp(object sender, KeyEventArgs e)
         {
