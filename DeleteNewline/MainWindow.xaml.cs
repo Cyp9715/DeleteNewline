@@ -27,10 +27,10 @@ namespace DeleteNewline
         public MainWindow()
         {
             InitializeComponent();
-            InitalizeSettings();
+            InitializeSettings();
         }
 
-        private void InitalizeSettings()
+        private void InitializeSettings()
         {
             mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.Width = Settings.Default.mainWindowSize_width;
