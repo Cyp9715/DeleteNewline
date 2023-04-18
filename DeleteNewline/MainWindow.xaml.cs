@@ -133,7 +133,12 @@ namespace DeleteNewline
 
         private void GlobalHook_Executation()
         {
-            if(CheckDataForm() == true)
+            //VirtualInput.Mouse.MoveTo(new System.Drawing.Point(100, 100));
+            //VirtualInput.Mouse.Click(MouseButton.Right);
+            //VirtualInput.Keyboard.Type(Key.L);
+            //VirtualInput.Keyboard.Release(Key.LWin);
+
+            if (CheckDataForm() == true)
             {
                 DeleteNewline();
             }
