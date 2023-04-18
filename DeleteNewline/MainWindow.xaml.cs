@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Media.Animation;
 
+using GlobalHook;
+
 namespace DeleteNewline
 {
     /// <summary>
@@ -21,8 +23,9 @@ namespace DeleteNewline
     /// </summary>
     public partial class MainWindow : Window
     {
-        MainWindow mainWindow;
-        IDataObject idata;
+        MainWindow? mainWindow;
+        IDataObject? idata;
+        HookImplement hookImplement = new HookImplement();
 
         public MainWindow()
         {
@@ -35,6 +38,8 @@ namespace DeleteNewline
             mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.Width = Settings.Default.mainWindowSize_width;
             mainWindow.Height = Settings.Default.mainWindowSize_height;
+
+            hookImplement.InstallGlobalHook(GlobalHook_Executation);
         }
 
 
@@ -57,9 +62,12 @@ namespace DeleteNewline
                 return;
             }
 
-            string text = (string)idata.GetData(DataFormats.Text);
-            string deleteNewline = text.Replace("\r\n", " ");
-            Clipboard.SetDataObject(deleteNewline);
+            if(idata is not null)
+            {
+                string text = (string)idata.GetData(DataFormats.Text);
+                string deleteNewline = text.Replace("\r\n", " ");
+                Clipboard.SetDataObject(deleteNewline);
+            }
         }
 
         private void AddAlertMsg()
@@ -93,12 +101,18 @@ namespace DeleteNewline
 
         private void MenuItem_TopMost_Checked(object sender, RoutedEventArgs e)
         {
-            mainWindow.Topmost = true;
+            if(mainWindow is not null)
+            {
+                mainWindow.Topmost = true;
+            }
         }
 
         private void MenuItem_TopMost_Unchecked(object sender, RoutedEventArgs e)
         {
-            mainWindow.Topmost = false;
+            if(mainWindow is not null)
+            {
+                mainWindow.Topmost = false;
+            }
         }
 
         private void MenuItem_Paste_Click(object sender, RoutedEventArgs e)
@@ -110,8 +124,19 @@ namespace DeleteNewline
                 return;
             }
 
-            TextBox_Main.AppendText((string)idata.GetData(DataFormats.Text));
+            if(idata is not null)
+            {
+                TextBox_Main.AppendText((string)idata.GetData(DataFormats.Text));
+            }
             DeleteNewline();
+        }
+
+        private void GlobalHook_Executation()
+        {
+            if(CheckDataForm() == true)
+            {
+                DeleteNewline();
+            }
         }
     }
 }
