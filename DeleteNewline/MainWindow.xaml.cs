@@ -55,13 +55,7 @@ namespace DeleteNewline
         }
 
         private void DeleteNewline()
-        {
-            if (CheckDataForm() == false)
-            {
-                AddAlertMsg();
-                return;
-            }
-
+        { 
             if(idata is not null)
             {
                 string text = (string)idata.GetData(DataFormats.Text);
@@ -95,7 +89,15 @@ namespace DeleteNewline
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
-                DeleteNewline();
+                if (CheckDataForm() == false)
+                {
+                    AddAlertMsg();
+                    return;
+                }
+                else
+                {
+                    DeleteNewline();
+                }
             }
         }
 
@@ -117,27 +119,26 @@ namespace DeleteNewline
 
         private void MenuItem_Paste_Click(object sender, RoutedEventArgs e)
         {
-            // To add text to textbox.
-            if(CheckDataForm() == false)
+            string originalText = String.Empty;
+
+            if (CheckDataForm() == false)
             {
                 AddAlertMsg();
                 return;
             }
-
-            if(idata is not null)
+            else
             {
-                TextBox_Main.AppendText((string)idata.GetData(DataFormats.Text));
+                if (idata is not null)
+                {
+                    originalText = (string)idata.GetData(DataFormats.Text);
+                }
+                DeleteNewline();
+                TextBox_Main.AppendText(originalText);
             }
-            DeleteNewline();
         }
 
         private void GlobalHook_Executation()
         {
-            //VirtualInput.Mouse.MoveTo(new System.Drawing.Point(100, 100));
-            //VirtualInput.Mouse.Click(MouseButton.Right);
-            //VirtualInput.Keyboard.Type(Key.L);
-            //VirtualInput.Keyboard.Release(Key.LWin);
-
             if (CheckDataForm() == true)
             {
                 DeleteNewline();
