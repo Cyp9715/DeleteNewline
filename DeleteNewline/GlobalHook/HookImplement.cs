@@ -15,37 +15,54 @@ namespace GlobalHook
         {
             globalKeyHook = new GlobalKeyHook();
             // globalKeyHook.OnKeyPressed += GlobalKeyHook_OnKeyPressed;
-            // globalKeyHook.OnKeyUp += GlobalKeyHook_OnKeyUp;
+            globalKeyHook.OnKeyUp += GlobalKeyHook_OnKeyUp;
             globalKeyHook.OnKeyDown += GlobalKeyHook_OnKeyDown;
             
             action_execute = executeFunc;
         }
 
-        bool key_ctrl = false;
-        bool key_space = false;
+        VirtualKeycodes key1 = VirtualKeycodes.LeftAlt;
+        VirtualKeycodes key2 = VirtualKeycodes.F1;
+
+        bool isPressedKey1 = false; 
+        bool isPressedKey2 = false;
 
         private void GlobalKeyHook_OnKeyDown(object? sender, GlobalKeyEventArgs e)
         {
-            if(e.Control == GlobalHook.ModifierKeySide.Left)
+            if(e.KeyCode == key1)
             {
-                key_ctrl = true;
+                isPressedKey1 = true;
             }
 
-            if(e.KeyCode == VirtualKeycodes.Space)
+            if(e.KeyCode == key2)
             {
-                key_space = true;
+                isPressedKey2 = true;
             }
+        }
 
-            if (key_ctrl == true && key_space == true)
+        private void GlobalKeyHook_OnKeyUp(object? sender, GlobalKeyEventArgs e)
+        {
+            if (isPressedKey1 == true && isPressedKey2 == true)
             {
-                if(action_execute is not null)
+                if (action_execute is not null)
                 {
                     action_execute();
                 }
 
-                key_ctrl = false;
-                key_space = false;
+                isPressedKey1 = false;
+                isPressedKey2 = false;
             }
+
+            if (e.KeyCode == key1)
+            {
+                isPressedKey1 = false;
+            }
+
+            if (e.KeyCode == key2)
+            {
+                isPressedKey2 = false;
+            }
+
         }
     }
 }

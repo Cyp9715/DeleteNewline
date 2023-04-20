@@ -79,7 +79,6 @@ namespace DeleteNewline
             Settings.Default.mainWindowSize_height = e.NewSize.Height;
         }
 
-
         private void Window_Closed(object sender, EventArgs e)
         {
             Settings.Default.Save();
@@ -132,8 +131,8 @@ namespace DeleteNewline
                 {
                     originalText = (string)idata.GetData(DataFormats.Text);
                 }
-                DeleteNewline();
                 TextBox_Main.AppendText(originalText);
+                DeleteNewline();
             }
         }
 
