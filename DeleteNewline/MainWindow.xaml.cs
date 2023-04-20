@@ -138,7 +138,12 @@ namespace DeleteNewline
 
         private void GlobalHook_Executation()
         {
-            if (CheckDataForm() == true)
+            if (CheckDataForm() == false)
+            {
+                AddAlertMsg();
+                return;
+            }
+            else
             {
                 DeleteNewline();
             }
