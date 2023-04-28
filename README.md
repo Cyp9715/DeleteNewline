@@ -4,6 +4,13 @@ If you paste text with newlines, the text with the newlines deleted is automatic
 It is often necessary to insert the PDF text into a translator unless the paper is written in your language.  
 Unfortunately, however, PDFs often have newlines, which are not well recognized by translators. Because of this, I often have to delete newline characters one by one. This project was created to reduce this hassle.
 
+## How to Use?
+* Copy the text and copy it to the appropriate application window.  
+* Copy the text, right-click on the appropriate program window, and then click the Paste button.  
+* Scroll (drag) the text and press the Alt + F2 button.  
+
+Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
+
 ## Why do you use this way?
 Input the text itself into a translator to process it nicely. Take a paper as an example, and each paper has a different form.  
 there are times when the distinction of Newline is ambiguous.  
