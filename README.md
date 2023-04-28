@@ -1,7 +1,7 @@
 If you paste text with newlines, the text with the newlines deleted is automatically copied to the clipboard.
 
 ## Introduce
-It is often necessary to insert the PDF text into a translator unless the paper is written in your language.  
+It is often necessary to insert the PDF text into a translator unless the research paper is written in your language.  
 Unfortunately, however, PDFs often have newlines, which are not well recognized by translators. Because of this, I often have to delete newline characters one by one. This project was created to reduce this hassle.
 
 ## How to Use?
@@ -13,8 +13,7 @@ Text with Newline removed is located on your 'clipboard'. You can check it by us
 
 ## Why do you use this way?
 Take a research paper as an example, and each paper has a different form.  
-there are times when the distinction of Newline is ambiguous. therefore, rather than creating a program that handles all of these processes,  
-I used this method to achieve maximum efficiency in some sections through these simple programs, reducing user fatigue.
+there are times when the distinction of Newline is ambiguous. therefore, rather than creating a program that handles all of these processes, I used this method to achieve maximum efficiency in some sections through these simple programs, reducing user fatigue.
 
 ## direction of development
 I also thought about whether to perform the translation process itself through the app through API Key (Azure, Google) that each user has.  
