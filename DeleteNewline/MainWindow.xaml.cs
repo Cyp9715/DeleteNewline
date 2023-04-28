@@ -44,9 +44,7 @@ namespace DeleteNewline
 
             if (mainWindow is not null)
             {
-                mainWindow.Visibility = Visibility.Hidden;
-
-                notifyIcon.Icon = new System.Drawing.Icon("../../../Resource/favicon.ico");
+                notifyIcon.Icon = new System.Drawing.Icon("./Resource/favicon.ico");
                 notifyIcon.Text = "DeleteNewline";
 
                 notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
@@ -83,7 +81,6 @@ namespace DeleteNewline
             }
         }
 
-
         private bool CheckDataForm()
         {
             idata = Clipboard.GetDataObject();
@@ -113,7 +110,6 @@ namespace DeleteNewline
             TextBox_Main.AppendText(" ========================================================\r\n");
             TextBox_Main.ScrollToEnd();
         }
-
 
         private void GlobalHook_Executation()
         {
