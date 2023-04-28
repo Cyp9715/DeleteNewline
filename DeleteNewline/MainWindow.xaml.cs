@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Input;
 using GlobalHook;
-
 using WinForms = System.Windows.Forms;
 
 namespace DeleteNewline
@@ -35,8 +34,25 @@ namespace DeleteNewline
 
             // Init Tray Icon
             SetNotifyIcon();
+            SetContextMenu();
         }
 
+        private void ContextMenu_Action_Exit(object? sender, EventArgs e)
+        {
+            if (mainWindow is not null)
+            {
+                mainWindow.Close();
+            }
+        }
+
+        private void SetContextMenu()
+        {
+            if(notifyIcon is not null)
+            {
+                notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+                notifyIcon.ContextMenuStrip.Items.Add("Exit", null, ContextMenu_Action_Exit);
+            }
+        }
 
         private void SetNotifyIcon()
         {
@@ -47,7 +63,7 @@ namespace DeleteNewline
                 notifyIcon.Icon = new System.Drawing.Icon("./Resource/favicon.ico");
                 notifyIcon.Text = "DeleteNewline";
 
-                notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
+                notifyIcon.DoubleClick += delegate(object? sender, EventArgs eventArgs)
                 {
                     mainWindow.Show();
                     mainWindow.WindowState = WindowState.Normal;
@@ -61,15 +77,6 @@ namespace DeleteNewline
             {
                 mainWindow!.Visibility = Visibility.Hidden;
                 notifyIcon.Visible = true;
-                notifyIcon.Icon = new System.Drawing.Icon("../../../Resource/favicon.ico");
-
-                notifyIcon.Text = "DeleteNewline";
-
-                notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
-                {
-                    mainWindow.Show();
-                    mainWindow.WindowState = WindowState.Normal;
-                };
             }
         }
 
