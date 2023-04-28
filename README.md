@@ -10,8 +10,7 @@ there are times when the distinction of Newline is ambiguous.
 therefore, rather than creating a program that handles all of these processes, I used this method to achieve maximum efficiency in some sections through these simple programs, reducing user fatigue.
 
 ## direction of development
-I also thought about whether to perform the translation process itself through the app through API Key (Azure, Google) that each user has.  
-On reflection, I thought it was inappropriate for this program to perform so many functions.  
+I also thought about whether to perform the translation process itself through the app through API Key (Azure, Google) that each user has. but on reflection, I thought it was inappropriate for this program to perform so many functions.  
 In conclusion, I actually don't know the direction. If you have any good opinions, please feel free to leave your comments.  
 
 ## Environment
