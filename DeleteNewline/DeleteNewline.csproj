@@ -5,7 +5,16 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="android-chrome-512x512.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="android-chrome-512x512.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Settings.Designer.cs">

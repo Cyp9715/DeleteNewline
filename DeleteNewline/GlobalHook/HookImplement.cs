@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,11 +47,10 @@ namespace GlobalHook
             {
                 if (action_execute is not null)
                 {
+                    isPressedKey1 = false;
+                    isPressedKey2 = false;
                     action_execute();
                 }
-
-                isPressedKey1 = false;
-                isPressedKey2 = false;
             }
 
             if (e.KeyCode == key1)
@@ -62,7 +62,6 @@ namespace GlobalHook
             {
                 isPressedKey2 = false;
             }
-
         }
     }
 }

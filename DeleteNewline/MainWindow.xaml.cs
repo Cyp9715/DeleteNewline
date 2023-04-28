@@ -1,20 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Media.Animation;
-
 using GlobalHook;
+
+using WinForms = System.Windows.Forms;
 
 namespace DeleteNewline
 {
@@ -26,6 +15,7 @@ namespace DeleteNewline
         MainWindow? mainWindow;
         IDataObject? idata;
         HookImplement hookImplement = new HookImplement();
+        WinForms.NotifyIcon? notifyIcon;
 
         public MainWindow()
         {
@@ -35,11 +25,62 @@ namespace DeleteNewline
 
         private void InitializeSettings()
         {
+            // Init Window Setting.
             mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.Width = Settings.Default.mainWindowSize_width;
             mainWindow.Height = Settings.Default.mainWindowSize_height;
 
+            // Init GlobalHook
             hookImplement.InstallGlobalHook(GlobalHook_Executation);
+
+            // Init Tray Icon
+            SetNotifyIcon();
+        }
+
+
+        private void SetNotifyIcon()
+        {
+            notifyIcon = new WinForms.NotifyIcon();
+
+            if (mainWindow is not null)
+            {
+                mainWindow.Visibility = Visibility.Hidden;
+
+                notifyIcon.Icon = new System.Drawing.Icon("../../../Resource/favicon.ico");
+                notifyIcon.Text = "DeleteNewline";
+
+                notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
+                {
+                    mainWindow.Show();
+                    mainWindow.WindowState = WindowState.Normal;
+                };
+            }
+        }
+
+        private void WindowToTray()
+        {
+            if(notifyIcon is not null)
+            {
+                mainWindow!.Visibility = Visibility.Hidden;
+                notifyIcon.Visible = true;
+                notifyIcon.Icon = new System.Drawing.Icon("../../../Resource/favicon.ico");
+
+                notifyIcon.Text = "DeleteNewline";
+
+                notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
+                {
+                    mainWindow.Show();
+                    mainWindow.WindowState = WindowState.Normal;
+                };
+            }
+        }
+
+        private void TrayToWindow()
+        {
+            if(notifyIcon is not null)
+            {
+                notifyIcon.Visible = false;
+            }
         }
 
 
@@ -72,6 +113,23 @@ namespace DeleteNewline
             TextBox_Main.AppendText(" ========================================================\r\n");
             TextBox_Main.ScrollToEnd();
         }
+
+
+        private void GlobalHook_Executation()
+        {
+            VirtualInput.InputImplement.PressKeyboard_Copy();
+
+            if (CheckDataForm() == false)
+            {
+                AddAlertMsg();
+                return;
+            }
+            else
+            {
+                DeleteNewline();
+            }
+        }
+
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -136,17 +194,21 @@ namespace DeleteNewline
             }
         }
 
-        private void GlobalHook_Executation()
+        private void Window_StateChanged(object sender, EventArgs e)
         {
-            if (CheckDataForm() == false)
+            if(mainWindow is not null)
             {
-                AddAlertMsg();
-                return;
-            }
-            else
-            {
-                DeleteNewline();
-            }
+                switch (mainWindow.WindowState)
+                {
+                    case WindowState.Minimized:
+                        WindowToTray();
+                        break;
+
+                    case WindowState.Normal:
+                        TrayToWindow();
+                        break;
+                }
+            } 
         }
     }
 }
