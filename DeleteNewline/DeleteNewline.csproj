@@ -2,20 +2,19 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
      <UseWindowsForms>true</UseWindowsForms>
+     <ApplicationIcon>Resource\favicon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="favicon.ico" />
-    <None Remove="logo_512x512.png" />
+    <Content Include="Resource\favicon.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="favicon.ico" />
-    <Resource Include="logo_512x512.png" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,5 +31,4 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
 </Project>
