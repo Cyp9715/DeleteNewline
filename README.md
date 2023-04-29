@@ -11,7 +11,7 @@ OS : Windows / x64
 ## How to Use?
 * Copy the text and copy it to the appropriate application window.  
 * Copy the text, right-click on the appropriate program window, and then click the Paste button.  
-* Scroll (drag) the text and press the Alt + F2 button.  
+* Scroll (drag) the text and press the Alt + F1 button.  
 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
 
@@ -22,4 +22,3 @@ there are times when the distinction of Newline is ambiguous. therefore, rather 
 ## direction of development
 I also thought about whether to perform the translation process itself through the app through API Key (Azure, Google) that each user has.  
 but on reflection, I thought it was inappropriate for this program to perform so many functions.  
-In conclusion, I actually don't know the direction. If you have any good opinions, please feel free to leave your comments.  
