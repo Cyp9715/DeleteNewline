@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -44,7 +42,7 @@ namespace DeleteNewline
 
         private void ContextMenu_Action_Exit(object? sender, EventArgs e)
         {
-            mainWindow!.Close();
+            mainWindow.Close();
         }
 
         private void SetContextMenu()
@@ -70,29 +68,27 @@ namespace DeleteNewline
 
             notifyIcon.DoubleClick += delegate(object? sender, EventArgs eventArgs)
             {
-                mainWindow!.Show();
+                mainWindow.Show();
                 mainWindow.WindowState = WindowState.Normal;
             };
         }
 
         private void WindowToTray()
         {
-            mainWindow!.Visibility = Visibility.Hidden;
-            notifyIcon!.Visible = true;
+            mainWindow.Visibility = Visibility.Hidden;
+            notifyIcon.Visible = true;
         }
 
         private void TrayToWindow()
         {
-            notifyIcon!.Visible = false;
+            notifyIcon.Visible = false;
         }
 
-
-
-        private bool IsTextClipboardData()
+        private bool GetClipboardData_Text(ref IDataObject idata)
         {
             idata = Clipboard.GetDataObject();
 
-            if (idata!.GetDataPresent(DataFormats.Text) == false)
+            if (idata.GetDataPresent(DataFormats.Text) == false)
             {
                 return false;
             }
@@ -100,42 +96,30 @@ namespace DeleteNewline
             return true;
         }
 
-        private StringBuilder DeleteNewline_ALL()
+        private StringBuilder DeleteNewline(bool splitPeriod = false)
         {
             StringBuilder stringBuilder;
 
-            if (IsTextClipboardData() == false)
+            if (GetClipboardData_Text(ref idata) == false)
             {
                 AddAlertMsg();
                 return new StringBuilder("Error");
             }
             else
             {
-                string clipboardText = (string)idata!.GetData(DataFormats.Text);
+                string clipboardText = (string)idata.GetData(DataFormats.Text);
                 stringBuilder = new StringBuilder(clipboardText);
-                stringBuilder.Replace("\r\n", " ");
-                Clipboard.SetDataObject(stringBuilder);
 
-                return stringBuilder;
-            }
-        }
-
-        private StringBuilder DeleteNewline_splitPeriod()
-        {
-            StringBuilder stringBuilder;
-
-            if(IsTextClipboardData() == false)
-            {
-                AddAlertMsg();
-                return new StringBuilder("Error");
-            }
-            else
-            {
-                string clipboardText = (string)idata!.GetData(DataFormats.Text);
-                stringBuilder = new StringBuilder(clipboardText);
-                stringBuilder.Replace("\r\n", " ");
-                stringBuilder.Replace(". ", ".\r\n");
-                Clipboard.SetDataObject(stringBuilder);
+                if(splitPeriod == false)
+                {
+                    stringBuilder.Replace("\r\n", " ");
+                }
+                else
+                {
+                    stringBuilder.Replace("\r\n", " ");
+                    stringBuilder.Replace(". ", ".\r\n");
+                }
+                Clipboard.SetDataObject(stringBuilder.ToString());
 
                 return stringBuilder;
             }
@@ -153,9 +137,9 @@ namespace DeleteNewline
 
         private void GlobalHook_Executation()
         {
-            VirtualInput.InputImplement.PressKeyboard_Copy(delayTime_ms: 200);
+            VirtualInput.InputImplement.PressKeyboard_Copy();
 
-            string deletedText = DeleteNewline_splitPeriod().ToString();
+            string deletedText = DeleteNewline().ToString();
             string lenLimitText = String.Empty;
             int limitLen = 100;
 
@@ -185,28 +169,28 @@ namespace DeleteNewline
 
         private void MenuItem_TopMost_Checked(object sender, RoutedEventArgs e)
         {
-            mainWindow!.Topmost = true;
+            mainWindow.Topmost = true;
         }
 
         private void MenuItem_TopMost_Unchecked(object sender, RoutedEventArgs e)
         {
-            mainWindow!.Topmost = false;
+            mainWindow.Topmost = false;
         }
 
         private void MenuItem_Paste_Click(object sender, RoutedEventArgs e)
         {
             string originalText = String.Empty;
 
-            originalText = (string)idata!.GetData(DataFormats.Text);
+            originalText = (string)idata.GetData(DataFormats.Text);
             TextBox_Main.AppendText(originalText);
-            DeleteNewline_ALL();
+            DeleteNewline();
         }
 
         private void TextBox_Main_KeyUp(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
-                DeleteNewline_ALL();
+                DeleteNewline();
             }
         }
 
