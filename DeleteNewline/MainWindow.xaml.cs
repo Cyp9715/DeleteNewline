@@ -17,7 +17,7 @@ namespace DeleteNewline
         MainWindow? mainWindow;
         WinForms.NotifyIcon? notifyIcon;
         HookImplement hookImplement = new HookImplement();
-        IDataObject? idata;
+        IDataObject? idataObj;
 
         public MainWindow()
         {
@@ -47,11 +47,8 @@ namespace DeleteNewline
 
         private void SetContextMenu()
         {
-            if(notifyIcon is not null)
-            {
-                notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-                notifyIcon.ContextMenuStrip.Items.Add("Exit", null, ContextMenu_Action_Exit);
-            }
+            notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            notifyIcon.ContextMenuStrip.Items.Add("Exit", null, ContextMenu_Action_Exit);
         }
 
         private void SetNotifyIcon()
@@ -139,11 +136,11 @@ namespace DeleteNewline
 
             VirtualInput.InputImplement.PressKeyboard_Copy();
 
-            if (GetClipboardData_Text(ref idata) == true)
+            if (GetClipboardData_Text(ref idataObj) == true)
             {
                 notifyHeader = "[SUCCESS]";
 
-                string deletedText = DeleteClipboardNewline(ref idata).ToString();
+                string deletedText = DeleteClipboardNewline(ref idataObj).ToString();
                 Clipboard.SetDataObject(deletedText);
 
                 if (deletedText.Length > limitLen)
@@ -190,11 +187,11 @@ namespace DeleteNewline
         {
             string originalText = String.Empty;
 
-            if(GetClipboardData_Text(ref idata) == true)
+            if(GetClipboardData_Text(ref idataObj) == true)
             {
-                originalText = (string)idata.GetData(DataFormats.Text);
+                originalText = (string)idataObj.GetData(DataFormats.Text);
                 TextBox_Main.AppendText(originalText);
-                Clipboard.SetDataObject(DeleteClipboardNewline(ref idata).ToString());
+                Clipboard.SetDataObject(DeleteClipboardNewline(ref idataObj).ToString());
             }
             else
             {
@@ -207,9 +204,9 @@ namespace DeleteNewline
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
-                if(GetClipboardData_Text(ref idata) == true)
+                if(GetClipboardData_Text(ref idataObj) == true)
                 {
-                    Clipboard.SetDataObject(DeleteClipboardNewline(ref idata).ToString());
+                    Clipboard.SetDataObject(DeleteClipboardNewline(ref idataObj).ToString());
                 }
                 else
                 {
