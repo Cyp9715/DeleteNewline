@@ -63,6 +63,11 @@ namespace DeleteNewline
             {
                 notifyIcon.Icon = new System.Drawing.Icon(iconPath);
             }
+            else
+            {
+                // 해당 메세지 발생시 TrayIcon 에 들어가지 않는 문제 발생.
+                MessageBox.Show("Can't find : " + iconPath + "\r\n");
+            }
 
             notifyIcon.Text = "DeleteNewline";
 
