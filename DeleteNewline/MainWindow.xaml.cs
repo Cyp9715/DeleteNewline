@@ -101,36 +101,27 @@ namespace DeleteNewline
             return true;
         }
 
-        private StringBuilder DeleteNewline(bool splitPeriod = false)
+        private StringBuilder DeleteClipboardNewline(ref IDataObject idata, bool splitPeriod = false)
         {
             StringBuilder stringBuilder;
 
-            if (GetClipboardData_Text(ref idata) == false)
+            string clipboardText = (string)idata.GetData(DataFormats.Text);
+            stringBuilder = new StringBuilder(clipboardText);
+
+            if(splitPeriod == false)
             {
-                AddAlertMsg();
-                return new StringBuilder("Error");
+                stringBuilder.Replace("\r\n", " ");
             }
             else
             {
-                string clipboardText = (string)idata.GetData(DataFormats.Text);
-                stringBuilder = new StringBuilder(clipboardText);
-
-                if(splitPeriod == false)
-                {
-                    stringBuilder.Replace("\r\n", " ");
-                }
-                else
-                {
-                    stringBuilder.Replace("\r\n", " ");
-                    stringBuilder.Replace(". ", ".\r\n");
-                }
-                Clipboard.SetDataObject(stringBuilder.ToString());
-
-                return stringBuilder;
+                stringBuilder.Replace("\r\n", " ");
+                stringBuilder.Replace(". ", ".\r\n");
             }
+
+            return stringBuilder;
         }
 
-        private void AddAlertMsg()
+        private void AddAlertMessageInTextBox()
         {
             TextBox_Main.AppendText("\r\n");
             TextBox_Main.AppendText(" ========================================================\r\n");
@@ -142,22 +133,35 @@ namespace DeleteNewline
 
         private void GlobalHook_Executation()
         {
-            VirtualInput.InputImplement.PressKeyboard_Copy();
-
-            string deletedText = DeleteNewline().ToString();
-            string lenLimitText = String.Empty;
+            string notifyHeader = String.Empty;
+            string notifyContent = String.Empty;
             int limitLen = 100;
 
-            if(deletedText.Length > limitLen) 
+            VirtualInput.InputImplement.PressKeyboard_Copy();
+
+            if (GetClipboardData_Text(ref idata) == true)
             {
-                lenLimitText = deletedText.Substring(0, limitLen) + " ...";
+                notifyHeader = "[SUCCESS]";
+
+                string deletedText = DeleteClipboardNewline(ref idata).ToString();
+                Clipboard.SetDataObject(deletedText);
+
+                if (deletedText.Length > limitLen)
+                {
+                    notifyContent = deletedText.Substring(0, limitLen) + " ...";
+                }
+                else
+                {
+                    notifyContent = deletedText;
+                }
             }
             else
             {
-                lenLimitText = deletedText;
+                notifyHeader = "[ERROR]";
+                notifyContent = "CLIPBOARD FORM IS NOT TEXT";
             }
 
-            Notification.Send("Successfully deleted newline!", lenLimitText);
+            Notification.Send("Successfully deleted newline!", notifyContent);
         }
 
 
@@ -186,16 +190,32 @@ namespace DeleteNewline
         {
             string originalText = String.Empty;
 
-            originalText = (string)idata.GetData(DataFormats.Text);
-            TextBox_Main.AppendText(originalText);
-            DeleteNewline();
+            if(GetClipboardData_Text(ref idata) == true)
+            {
+                originalText = (string)idata.GetData(DataFormats.Text);
+                TextBox_Main.AppendText(originalText);
+                Clipboard.SetDataObject(DeleteClipboardNewline(ref idata).ToString());
+            }
+            else
+            {
+                AddAlertMessageInTextBox();
+                return;
+            }
         }
 
         private void TextBox_Main_KeyUp(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
-                DeleteNewline();
+                if(GetClipboardData_Text(ref idata) == true)
+                {
+                    Clipboard.SetDataObject(DeleteClipboardNewline(ref idata).ToString());
+                }
+                else
+                {
+                    AddAlertMessageInTextBox();
+                    return;
+                }
             }
         }
 
