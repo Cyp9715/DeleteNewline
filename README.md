@@ -7,8 +7,7 @@ because of this, I often have to delete newline characters one by one. This proj
 
 you can use other programs or websites, but this program is the best for the convenience of the features it provides.
 
-## Environment
-OS : Windows / x64  
+## Development environment
 .NET : 6.0 LTS
 
 ## How to Use?
