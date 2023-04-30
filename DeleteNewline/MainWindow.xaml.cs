@@ -138,7 +138,7 @@ namespace DeleteNewline
 
             if (GetClipboardData_Text(ref idataObj) == true)
             {
-                notifyHeader = "[SUCCESS]";
+                notifyHeader = "SUCCESS";
 
                 string deletedText = DeleteClipboardNewline(ref idataObj).ToString();
                 Clipboard.SetDataObject(deletedText);
@@ -154,11 +154,11 @@ namespace DeleteNewline
             }
             else
             {
-                notifyHeader = "[ERROR]";
+                notifyHeader = "ERROR";
                 notifyContent = "CLIPBOARD FORM IS NOT TEXT";
             }
 
-            Notification.Send("Successfully deleted newline!", notifyContent);
+            Notification.Send(notifyHeader, notifyContent);
         }
 
 
