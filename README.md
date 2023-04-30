@@ -16,11 +16,3 @@ you can use other programs or websites, but this program is the best for the con
 * Drag the text and press the **Alt + F1** button.
 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
-
-## Why develop this way?
-In the case of research papers, it was difficult to find a program for all these forms of the PDF itself. For this reason, we have created a program that can support the maximum convenience so that the user can erase the Newline characters.
-
-## direction of development
-I thought about whether to perform the translation process itself through the app through the API key (Azure, Google) that each user has But I thought it was inappropriate for this program to perform too many functions.
-
-if you think there is a feature you need, please contribute.
