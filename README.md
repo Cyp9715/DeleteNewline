@@ -18,12 +18,9 @@ you can use other programs or websites, but this program is the best for the con
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
 
 ## Why develop this way?
-Take a research paper as an example, and each paper has a different form. there are times when the distinction of Newline is ambiguous.  
-therefore, rather than creating a program that handles all of these processes, I used this method to achieve maximum efficiency in some sections through these simple programs, reducing user fatigue.
+In the case of research papers, it was difficult to find a program for all these forms of the PDF itself. For this reason, we have created a program that can support the maximum convenience so that the user can erase the Newline characters.
 
 ## direction of development
-I also thought about whether to perform the translation process itself through the app through API Key (Azure, Google) that each user has.  
-but on reflection, I thought it was inappropriate for this program to perform so many functions.  
-if necessary later, the OCR function can be added. There are currently no plans.
+I thought about whether to perform the translation process itself through the app through the API key (Azure, Google) that each user has But I thought it was inappropriate for this program to perform too many functions.
 
 if you think there is a feature you need, please contribute.
