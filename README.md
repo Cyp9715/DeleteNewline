@@ -2,8 +2,10 @@ If you paste text with newlines, the text with the newlines deleted is automatic
 
 ## Introduce
 It is often necessary to insert the PDF text into a translator unless the research paper is written in your language.  
-Unfortunately, however, PDFs often have newlines, which are not well recognized by translators.  
-Because of this, I often have to delete newline characters one by one. This project was created to reduce this hassle.
+unfortunately, however, PDFs often have newlines, which are not well recognized by translators.  
+because of this, I often have to delete newline characters one by one. This project was created to reduce this hassle.
+
+You can use other programs or websites, but this program is probably the best for the convenience of the features it provides.
 
 ## Environment
 OS : Windows / x64  
@@ -23,6 +25,6 @@ therefore, rather than creating a program that handles all of these processes, I
 ## direction of development
 I also thought about whether to perform the translation process itself through the app through API Key (Azure, Google) that each user has.  
 but on reflection, I thought it was inappropriate for this program to perform so many functions.  
-If necessary later, the OCR function can be added. There are currently no plans.
+if necessary later, the OCR function can be added. There are currently no plans.
 
-If you think there is a feature you need, please contribute.
+if you think there is a feature you need, please contribute.
