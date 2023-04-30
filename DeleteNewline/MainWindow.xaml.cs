@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using GlobalHook;
@@ -14,9 +15,10 @@ namespace DeleteNewline
     /// </summary>
     public partial class MainWindow : Window
     {
-        MainWindow? mainWindow;
-        WinForms.NotifyIcon? notifyIcon;
+        System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
         HookImplement hookImplement = new HookImplement();
+        WinForms.NotifyIcon? notifyIcon;
+        MainWindow? mainWindow;
         IDataObject? idataObj;
 
         public MainWindow()
@@ -27,6 +29,9 @@ namespace DeleteNewline
 
         private void InitializeSettings()
         {
+            // Prevent multiple run.
+            PreventMultipleRun();
+
             // Init Window Setting.
             mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.Width = Settings.Default.mainWindowSize_width;
@@ -35,7 +40,7 @@ namespace DeleteNewline
             // Init GlobalHook
             hookImplement.InstallGlobalHook(GlobalHook_Executation);
 
-            // Init Tray Icon
+            // Init tray
             SetNotifyIcon();
             SetContextMenu();
         }
@@ -127,7 +132,6 @@ namespace DeleteNewline
             TextBox_Main.ScrollToEnd();
         }
 
-
         private void GlobalHook_Executation()
         {
             string notifyHeader = String.Empty;
@@ -159,6 +163,15 @@ namespace DeleteNewline
             }
 
             Notification.Send(notifyHeader, notifyContent);
+        }
+
+        private void PreventMultipleRun()
+        {
+            if (!singleton.WaitOne(TimeSpan.Zero, true))
+            {
+                MessageBox.Show("Already run DeleteNewline!");
+                mainWindow.Close();
+            }
         }
 
 
