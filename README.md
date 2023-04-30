@@ -5,7 +5,7 @@ It is often necessary to insert the PDF text into a translator unless the resear
 unfortunately, however, PDFs often have newlines, which are not well recognized by translators.  
 because of this, I often have to delete newline characters one by one. This project was created to reduce this hassle.
 
-can use other programs or websites, but this program is probably the best for the convenience of the features it provides.
+you can use other programs or websites, but this program is the best for the convenience of the features it provides.
 
 ## Environment
 OS : Windows / x64  
