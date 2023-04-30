@@ -15,10 +15,13 @@ OS : Windows / x64
 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
 
-## Why do you use this way?
-Take a research paper as an example, and each paper has a different form.  
-there are times when the distinction of Newline is ambiguous. therefore, rather than creating a program that handles all of these processes, I used this method to achieve maximum efficiency in some sections through these simple programs, reducing user fatigue.
+## Why develop this way?
+Take a research paper as an example, and each paper has a different form. there are times when the distinction of Newline is ambiguous.  
+therefore, rather than creating a program that handles all of these processes, I used this method to achieve maximum efficiency in some sections through these simple programs, reducing user fatigue.
 
 ## direction of development
 I also thought about whether to perform the translation process itself through the app through API Key (Azure, Google) that each user has.  
 but on reflection, I thought it was inappropriate for this program to perform so many functions.  
+If necessary later, the OCR function can be added. There are currently no plans.
+
+If you think there is a feature you need, please contribute.
