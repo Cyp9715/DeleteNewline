@@ -1,7 +1,7 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Threading.Tasks;
 
-namespace WindowNotification
+namespace Windows
 {
     static class Notification
     {

@@ -5,8 +5,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using GlobalHook;
-using WindowNotification;
 using WinForms = System.Windows.Forms;
+using Windows;
 
 namespace DeleteNewline
 {
@@ -59,18 +59,8 @@ namespace DeleteNewline
         private void SetNotifyIcon()
         {
             notifyIcon = new WinForms.NotifyIcon();
-
-            string iconPath = "./Resource/favicon.ico";
-            if (File.Exists(iconPath) == true)
-            {
-                notifyIcon.Icon = new System.Drawing.Icon(iconPath);
-            }
-            else
-            {
-                // 해당 메세지 발생시 TrayIcon 에 들어가지 않는 문제 발생.
-                MessageBox.Show("Can't find : " + iconPath + "\r\n");
-            }
-
+            
+            notifyIcon.Icon = Resource.favicon;
             notifyIcon.Text = "DeleteNewline";
 
             notifyIcon.DoubleClick += delegate(object? sender, EventArgs eventArgs)
