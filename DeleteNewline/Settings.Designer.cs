@@ -46,5 +46,17 @@ namespace DeleteNewline {
                 this["mainWindowSize_height"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool topMost {
+            get {
+                return ((bool)(this["topMost"]));
+            }
+            set {
+                this["topMost"] = value;
+            }
+        }
     }
 }

@@ -24,5 +24,37 @@ namespace DeleteNewline.Page
         {
             InitializeComponent();
         }
+
+        bool topMost_origin = Settings.Default.topMost;
+
+
+        private void OK_Click(object sender, RoutedEventArgs e)
+        {
+            if (CheckBox_TopMost.IsChecked != null)
+            {
+                Settings.Default.topMost = (bool)CheckBox_TopMost.IsChecked;
+
+                if (CheckBox_TopMost.IsChecked == true)
+                {
+                    DeleteNewline.MainWindow.mainWindow.Topmost = true;
+                }
+                else
+                {
+                    DeleteNewline.MainWindow.mainWindow.Topmost = false;
+                }
+            }
+        }
+
+        private void Button_Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            if(Settings.Default.topMost == true) 
+            {
+                CheckBox_TopMost.IsChecked = true;
+            }
+            else
+            {
+                CheckBox_TopMost.IsChecked = false;
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ using GlobalHook;
 using WinForms = System.Windows.Forms;
 using Windows;
 using System.Windows.Controls;
+using DeleteNewline.Page;
 
 namespace DeleteNewline
 {
@@ -19,11 +20,11 @@ namespace DeleteNewline
         System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
         HookImplement hookImplement = new HookImplement();
 
-        MainWindow? mainWindow;
+        internal static MainWindow? mainWindow;
         WinForms.NotifyIcon? notifyIcon;
         Page_InputText page_inputText = new Page_InputText();
+        Page_Setting Page_setting = new Page_Setting();
 
-        IDataObject? idataObj;
         bool completelyExit = false;
 
 
@@ -127,7 +128,7 @@ namespace DeleteNewline
         {
             if (args.IsSettingsInvoked)
             {
-                
+                Frame_main.Content = Page_setting;
             }
             else
             {
@@ -135,10 +136,6 @@ namespace DeleteNewline
                 {
                     case 0:
                         Frame_main.Content = page_inputText;
-                        break;
-
-                    case 1:
-                        //MessageBox.Show("1");
                         break;
                 }
             }

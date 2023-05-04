@@ -8,5 +8,8 @@
     <Setting Name="mainWindowSize_height" Type="System.Double" Scope="User">
       <Value Profile="(Default)">720</Value>
     </Setting>
+    <Setting Name="topMost" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

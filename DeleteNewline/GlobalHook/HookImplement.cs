@@ -13,7 +13,6 @@ namespace GlobalHook
     class HookImplement
     { 
         GlobalKeyHook? globalKeyHook;
-        Action? action_execute;
         ClipboardManager cbManager = new ClipboardManager();
         IDataObject? idataObj;
 

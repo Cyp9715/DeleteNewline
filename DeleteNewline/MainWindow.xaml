@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="DeleteNewline" Height="720" Width="1280" SizeChanged="Window_SizeChanged" Closed="Window_Closed" Closing="Window_Closing">
+        Title="DeleteNewline" Height="720" Width="1280" SizeChanged="Window_SizeChanged" Closed="Window_Closed" Closing="Window_Closing" MinWidth="600" MinHeight="450">
 
     <Grid>
         <Grid.RowDefinitions>

@@ -9,8 +9,27 @@
       Title="Page_Setting">
 
     <Grid>
-        <StackPanel>
-            <Label/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="50,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal" Height="42">
+            <Label Margin="0,15,0,0" Content="TopMost" VerticalAlignment="Top"/>
+            <CheckBox Name="CheckBox_TopMost" Margin="20,8,0,0" VerticalAlignment="Top"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="300,20,0,0" Grid.ColumnSpan="2" VerticalAlignment="Top" Orientation="Horizontal" Height="42" >
+            <Label Margin="0,15,0,0" Content="Keybind" VerticalAlignment="Top"/>
+            <TextBox Margin="20,8,0,0" Width="89" Height="20" VerticalAlignment="Top" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="999"  Grid.RowSpan="2" Margin="0,0,20,20" HorizontalAlignment="Right" VerticalAlignment="Bottom" >
+            <Button Name="Button_OK" Content="OK" Width="85" Height="40" Margin="0,0,0,0" Click="OK_Click"/>
+            <Button Name="Button_Cancel" Content="Cancel" Width="85" Height="40" Margin="20,0,0,0" Click="Button_Cancel_Click" />
         </StackPanel>
     </Grid>
 </Page>
