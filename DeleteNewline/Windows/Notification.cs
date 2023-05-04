@@ -8,7 +8,7 @@ namespace Windows
 {
     static class Notification
     {
-        public static void Send(string title, string content, int expirationTime = 30)
+        public static void Send(string title, string content, int expirationTime = 0)
         {
             Task task_notify = new Task(() =>
             {

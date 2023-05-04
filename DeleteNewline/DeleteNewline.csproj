@@ -7,6 +7,8 @@
     <UseWPF>true</UseWPF>
      <UseWindowsForms>true</UseWindowsForms>
      <ApplicationIcon>Resources\favicon.ico</ApplicationIcon>
+     <PlatformTarget>AnyCPU</PlatformTarget>
+     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,6 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
   </ItemGroup>
 
   <ItemGroup>

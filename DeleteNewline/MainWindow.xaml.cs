@@ -20,6 +20,7 @@ namespace DeleteNewline
         WinForms.NotifyIcon? notifyIcon;
         MainWindow? mainWindow;
         IDataObject? idataObj;
+        bool completelyExit = false;
 
         public MainWindow()
         {
@@ -47,6 +48,7 @@ namespace DeleteNewline
 
         private void ContextMenu_Action_Exit(object? sender, EventArgs e)
         {
+            completelyExit = true;
             mainWindow.Close();
         }
 
@@ -68,17 +70,8 @@ namespace DeleteNewline
                 mainWindow.Show();
                 mainWindow.WindowState = WindowState.Normal;
             };
-        }
 
-        private void WindowToTray()
-        {
-            mainWindow.Visibility = Visibility.Hidden;
             notifyIcon.Visible = true;
-        }
-
-        private void TrayToWindow()
-        {
-            notifyIcon.Visible = false;
         }
 
         private bool GetClipboardData_Text(ref IDataObject idata)
@@ -171,11 +164,6 @@ namespace DeleteNewline
             Settings.Default.mainWindowSize_height = e.NewSize.Height;
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            Settings.Default.Save();
-        }
-
         private void MenuItem_TopMost_Checked(object sender, RoutedEventArgs e)
         {
             mainWindow.Topmost = true;
@@ -219,21 +207,18 @@ namespace DeleteNewline
             }
         }
 
-        private void Window_StateChanged(object sender, EventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(mainWindow is not null)
+            if(completelyExit == false)
             {
-                switch (mainWindow.WindowState)
-                {
-                    case WindowState.Minimized:
-                        WindowToTray();
-                        break;
+                e.Cancel = true;
+                mainWindow.Visibility = Visibility.Hidden;
+            }
+        }
 
-                    case WindowState.Normal:
-                        TrayToWindow();
-                        break;
-                }
-            } 
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Settings.Default.Save();
         }
     }
 }
