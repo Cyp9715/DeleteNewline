@@ -63,9 +63,9 @@ namespace DeleteNewline {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap copy_text_black {
+        internal static System.Drawing.Bitmap copy_black {
             get {
-                object obj = ResourceManager.GetObject("copy_text_black", resourceCulture);
+                object obj = ResourceManager.GetObject("copy_black", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace DeleteNewline {
         /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
-        internal static System.Drawing.Bitmap copy_text_white {
+        internal static System.Drawing.Bitmap copy_white {
             get {
-                object obj = ResourceManager.GetObject("copy_text_white", resourceCulture);
+                object obj = ResourceManager.GetObject("copy_white", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -87,6 +87,46 @@ namespace DeleteNewline {
             get {
                 object obj = ResourceManager.GetObject("favicon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap paste_black {
+            get {
+                object obj = ResourceManager.GetObject("paste_black", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap paste_white {
+            get {
+                object obj = ResourceManager.GetObject("paste_white", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap reset_black {
+            get {
+                object obj = ResourceManager.GetObject("reset_black", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap reset_white {
+            get {
+                object obj = ResourceManager.GetObject("reset_white", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }
