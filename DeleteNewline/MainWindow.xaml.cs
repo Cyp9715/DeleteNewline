@@ -7,6 +7,7 @@ using System.Windows.Input;
 using GlobalHook;
 using WinForms = System.Windows.Forms;
 using Windows;
+using System.Windows.Controls;
 
 namespace DeleteNewline
 {
@@ -219,6 +220,37 @@ namespace DeleteNewline
         private void Window_Closed(object sender, EventArgs e)
         {
             Settings.Default.Save();
+        }
+
+        private void NavigationView_PaneOpening(ModernWpf.Controls.NavigationView sender, object args)
+        {
+            Column_0.Width = new GridLength(300);
+        }
+
+        private void NavigationView_PaneClosing(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewPaneClosingEventArgs args)
+        {
+            Column_0.Width = new GridLength(40);
+        }
+
+        private void NavigationView_ItemInvoked(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewItemInvokedEventArgs args)
+        {
+            if (args.IsSettingsInvoked)
+            {
+                
+            }
+            else
+            {
+                switch (sender.MenuItems.IndexOf(args.InvokedItemContainer))
+                {
+                    case 0:
+                        //MessageBox.Show("0");
+                        break;
+
+                    case 1:
+                        //MessageBox.Show("1");
+                        break;
+                }
+            }
         }
     }
 }

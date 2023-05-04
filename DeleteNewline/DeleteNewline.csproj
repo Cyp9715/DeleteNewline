@@ -20,6 +20,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\copy-text_black.png" />
+    <None Remove="Resources\copy-text_white.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <Resource Include="Resources\copy-text_black.png" />
+	  <Resource Include="Resources\copy-text_white.png" />
 	  <Resource Include="Resources\favicon.ico" />
   </ItemGroup>
 
