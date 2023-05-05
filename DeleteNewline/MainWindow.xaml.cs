@@ -18,14 +18,13 @@ namespace DeleteNewline
     public partial class MainWindow : Window
     {
         System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
-        HookImplement hookImplement = new HookImplement();
 
         internal static MainWindow? mainWindow;
         WinForms.NotifyIcon? notifyIcon;
         Page_InputText page_inputText = new Page_InputText();
-        Page_Setting Page_setting = new Page_Setting();
+        Page_Setting page_setting = new Page_Setting();
 
-        bool completelyExit = false;
+        bool shutdown = false;
 
 
         public MainWindow()
@@ -45,20 +44,23 @@ namespace DeleteNewline
             mainWindow.Height = Settings.Default.mainWindowSize_height;
 
             // Init GlobalHook
-            hookImplement.InstallGlobalHook();
+            HookImplement.InstallGlobalHook();
 
             // Init tray
             SetNotifyIcon();
             SetContextMenu();
 
             // Init NavigationView selection
-            NavigationView.SelectedItem = NavigationViewItem_InputText;
-            Frame_main.Content = page_inputText;
+            navigationView_side.SelectedItem = NavigationViewItem_InputText;
+            frame_main.Content = page_inputText;
+
+            // Init User Settings.
+            page_setting.InitializationDefaultPage();
         }
 
         private void ContextMenu_Action_Exit(object? sender, EventArgs e)
         {
-            completelyExit = true;
+            shutdown = true;
             mainWindow.Close();
         }
 
@@ -102,7 +104,7 @@ namespace DeleteNewline
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(completelyExit == false)
+            if(shutdown == false)
             {
                 e.Cancel = true;
                 mainWindow.Visibility = Visibility.Hidden;
@@ -116,26 +118,29 @@ namespace DeleteNewline
 
         private void NavigationView_PaneOpening(ModernWpf.Controls.NavigationView sender, object args)
         {
-            Column_0.Width = new GridLength(300);
+            ColumnDefinition_mainWindow_0.Width = new GridLength(300);
         }
 
         private void NavigationView_PaneClosing(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewPaneClosingEventArgs args)
         {
-            Column_0.Width = new GridLength(40);
+            ColumnDefinition_mainWindow_0.Width = new GridLength(40);
         }
 
         private void NavigationView_ItemInvoked(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewItemInvokedEventArgs args)
         {
             if (args.IsSettingsInvoked)
             {
-                Frame_main.Content = Page_setting;
+                frame_main.Content = page_setting;
+                HookImplement.UnInstallGlobalHook();
+                Windows.Notification.Send("Enter the settings page", "GlobalHooks have been removed.");
             }
             else
             {
                 switch (sender.MenuItems.IndexOf(args.InvokedItemContainer))
                 {
                     case 0:
-                        Frame_main.Content = page_inputText;
+                        HookImplement.InstallGlobalHook();
+                        frame_main.Content = page_inputText;
                         break;
                 }
             }

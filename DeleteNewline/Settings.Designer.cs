@@ -58,5 +58,29 @@ namespace DeleteNewline {
                 this["topMost"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("120")]
+        public int bindKey_1 {
+            get {
+                return ((int)(this["bindKey_1"]));
+            }
+            set {
+                this["bindKey_1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int bindKey_2 {
+            get {
+                return ((int)(this["bindKey_2"]));
+            }
+            set {
+                this["bindKey_2"] = value;
+            }
+        }
     }
 }

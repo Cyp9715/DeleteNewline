@@ -7,7 +7,10 @@
         mc:Ignorable="d"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="DeleteNewline" Height="720" Width="1280" SizeChanged="Window_SizeChanged" Closed="Window_Closed" Closing="Window_Closing" MinWidth="600" MinHeight="450">
+        KeyboardNavigation.TabNavigation="None"
+        Title="DeleteNewline" Height="720" Width="1280" 
+        SizeChanged="Window_SizeChanged" Closed="Window_Closed" 
+        Closing="Window_Closing" MinWidth="600" MinHeight="450">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -15,13 +18,13 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Name="Column_0" Width="40"/>
-            <ColumnDefinition Name="Column_1" Width="1*"/>
+            <ColumnDefinition Name="ColumnDefinition_mainWindow_0" Width="40"/>
+            <ColumnDefinition Name="ColumnDefinition_mainWindow_1" Width="1*"/>
         </Grid.ColumnDefinitions>
 
-        <Frame Name="Frame_main" Grid.Column="2" NavigationUIVisibility="Hidden"/>
+        <Frame Name="frame_main" Grid.Column="2" NavigationUIVisibility="Hidden"/>
 
-        <ui:NavigationView x:Name="NavigationView" IsBackButtonVisible="Collapsed" PaneOpening="NavigationView_PaneOpening" PaneClosing="NavigationView_PaneClosing" PaneDisplayMode="LeftCompact" ItemInvoked="NavigationView_ItemInvoked">
+        <ui:NavigationView x:Name="navigationView_side" IsBackButtonVisible="Collapsed" PaneOpening="NavigationView_PaneOpening" PaneClosing="NavigationView_PaneClosing" PaneDisplayMode="LeftCompact" ItemInvoked="NavigationView_ItemInvoked">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Name="NavigationViewItem_InputText">
                     <StackPanel Orientation="Horizontal" Margin="-15,0,0,0">

@@ -1,36 +1,56 @@
 ﻿using DeleteNewline;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Windows;
 
 namespace GlobalHook
 {
-    class HookImplement
-    { 
-        GlobalKeyHook? globalKeyHook;
-        ClipboardManager cbManager = new ClipboardManager();
-        IDataObject? idataObj;
+    static class HookImplement
+    {
+        static GlobalKeyHook? globalKeyHook;
+        static ClipboardManager cbManager = new ClipboardManager();
+        static IDataObject? idataObj;
+        static bool isSet = false;
 
-        public void InstallGlobalHook()
+        public static void InstallGlobalHook()
         {
+            if(globalKeyHook == null) 
+            { 
             globalKeyHook = new GlobalKeyHook();
-            // globalKeyHook.OnKeyPressed += GlobalKeyHook_OnKeyPressed;
-            globalKeyHook.OnKeyUp += GlobalKeyHook_OnKeyUp;
-            globalKeyHook.OnKeyDown += GlobalKeyHook_OnKeyDown;
+            }
+
+            if(isSet == false)
+            {
+                // globalKeyHook.OnKeyPressed += GlobalKeyHook_OnKeyPressed;
+                globalKeyHook.OnKeyUp += GlobalKeyHook_OnKeyUp;
+                globalKeyHook.OnKeyDown += GlobalKeyHook_OnKeyDown;
+                isSet = true;
+            }
         }
 
-        VirtualKeycodes key1 = VirtualKeycodes.LeftAlt;
-        VirtualKeycodes key2 = VirtualKeycodes.F1;
+        public static void UnInstallGlobalHook()
+        {
+            if(isSet == true)
+            {
+                globalKeyHook.OnKeyUp -= GlobalKeyHook_OnKeyUp;
+                globalKeyHook.OnKeyDown -= GlobalKeyHook_OnKeyDown;
+                isSet = false;
+            }
+        }
 
-        bool isPressedKey1 = false; 
-        bool isPressedKey2 = false;
+        static VirtualKeycodes key1 = VirtualKeycodes.LeftAlt;
+        static VirtualKeycodes key2 = VirtualKeycodes.F1;
 
-        private void GlobalKeyHook_OnKeyDown(object? sender, GlobalKeyEventArgs e)
+        static bool isPressedKey1 = false;
+        static bool isPressedKey2 = false;
+
+        public static void SetKeys(VirtualKeycodes key1_, VirtualKeycodes key2_)
+        {
+            key1 = key1_;
+            key2 = key2_;
+        }
+
+        private static void GlobalKeyHook_OnKeyDown(object? sender, GlobalKeyEventArgs e)
         {
             if(e.KeyCode == key1)
             {
@@ -43,7 +63,7 @@ namespace GlobalHook
             }
         }
 
-        private void ShortcutSetClipboard()
+        private static void ShortcutSetClipboard()
         {
             string notifyHeader = String.Empty;
             string notifyContent = String.Empty;
@@ -76,7 +96,7 @@ namespace GlobalHook
             Notification.Send(notifyHeader, notifyContent);
         }
 
-        private void GlobalKeyHook_OnKeyUp(object? sender, GlobalKeyEventArgs e)
+        private static void GlobalKeyHook_OnKeyUp(object? sender, GlobalKeyEventArgs e)
         {
             if (isPressedKey1 == true && isPressedKey2 == true)
             {

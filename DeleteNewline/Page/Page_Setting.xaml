@@ -6,7 +6,8 @@
       xmlns:local="clr-namespace:DeleteNewline.Page"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Page_Setting">
+      Title="Page_Setting"
+      KeyboardNavigation.TabNavigation="None">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -22,13 +23,14 @@
             <CheckBox Name="CheckBox_TopMost" Margin="20,8,0,0" VerticalAlignment="Top"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Grid.Column="1" Margin="300,20,0,0" Grid.ColumnSpan="2" VerticalAlignment="Top" Orientation="Horizontal" Height="42" >
-            <Label Margin="0,15,0,0" Content="Keybind" VerticalAlignment="Top"/>
-            <TextBox Margin="20,8,0,0" Width="89" Height="20" VerticalAlignment="Top" />
+        <StackPanel Margin="300,20,10,0" VerticalAlignment="Top" Orientation="Horizontal" >
+            <Label Margin="0,15,0,0" Content="Keybind" VerticalAlignment="Top" AutomationProperties.HelpText="Only two combinations can be entered."/>
+            <TextBox x:Name="TextBox_bindKey" Margin="20,8,0,0" Width="200" Height="20" VerticalAlignment="Top" 
+                     KeyDown="TextBox_bindKey_KeyDown" IsReadOnly="True" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" AutomationProperties.HelpText="Only two combinations can be entered." />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="999"  Grid.RowSpan="2" Margin="0,0,20,20" HorizontalAlignment="Right" VerticalAlignment="Bottom" >
-            <Button Name="Button_OK" Content="OK" Width="85" Height="40" Margin="0,0,0,0" Click="OK_Click"/>
+            <Button Name="Button_OK" Content="OK" Width="85" Height="40" Margin="0,0,0,0" Click="Button_OK_Click"/>
             <Button Name="Button_Cancel" Content="Cancel" Width="85" Height="40" Margin="20,0,0,0" Click="Button_Cancel_Click" />
         </StackPanel>
     </Grid>
