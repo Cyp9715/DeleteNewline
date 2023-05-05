@@ -145,5 +145,24 @@ namespace DeleteNewline
                 }
             }
         }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            switch (this.WindowState)
+            {
+                case WindowState.Maximized:
+                    if (Settings.Default.topMost == true)
+                    {
+                        mainWindow.Topmost = true;
+                    }
+                    break;
+                case WindowState.Normal:
+                    if (Settings.Default.topMost == true)
+                    {
+                        mainWindow.Topmost = true;
+                    }
+                    break;
+            }
+        }
     }
 }

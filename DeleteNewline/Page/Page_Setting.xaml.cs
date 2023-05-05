@@ -50,8 +50,6 @@ namespace DeleteNewline.Page
                     MainWindow.mainWindow.Topmost = false;
                 }
             }
-
-            Settings.Default.Save();
         }
 
         private void SaveSettings_KeyBind()
