@@ -103,6 +103,7 @@ namespace DeleteNewline.Page
         {
             SaveSettings_TopMost();
             SaveSettings_KeyBind();
+            SetTopMost();
             SetHook_KeyBind();
         }
 

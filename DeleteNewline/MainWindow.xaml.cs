@@ -91,7 +91,7 @@ namespace DeleteNewline
             if (!singleton.WaitOne(TimeSpan.Zero, true))
             {
                 MessageBox.Show("Already run DeleteNewline!");
-                mainWindow.Close();
+                Application.Current.Shutdown();
             }
         }
 
