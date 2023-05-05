@@ -117,6 +117,8 @@ namespace DeleteNewline.Page
                 CheckBox_TopMost.IsChecked = false;
             }
 
+            key1 = (Key)Settings.Default.bindKey_1;
+            key2 = (Key)Settings.Default.bindKey_2;
             SetKeyBindTextBox((Key)Settings.Default.bindKey_1, (Key)Settings.Default.bindKey_2);
         }
 
