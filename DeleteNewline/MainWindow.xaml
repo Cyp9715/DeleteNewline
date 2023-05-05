@@ -9,7 +9,7 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         KeyboardNavigation.TabNavigation="None"
         Title="DeleteNewline" Height="720" Width="1280" 
-        Siz eChanged="Window_SizeChanged" Closed="Window_Closed" 
+        SizeChanged="Window_SizeChanged" Closed="Window_Closed" 
         Closing="Window_Closing" MinWidth="700" MinHeight="450" StateChanged="Window_StateChanged">
 
     <Grid>
