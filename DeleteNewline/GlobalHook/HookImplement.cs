@@ -16,7 +16,7 @@ namespace GlobalHook
         {
             if(globalKeyHook == null) 
             { 
-            globalKeyHook = new GlobalKeyHook();
+                globalKeyHook = new GlobalKeyHook();
             }
 
             if(isSet == false)
