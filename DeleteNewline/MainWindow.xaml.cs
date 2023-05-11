@@ -19,7 +19,6 @@ namespace DeleteNewline
         WinForms.NotifyIcon? notifyIcon;
         Page_InputText page_inputText = new Page_InputText();
         Page_Setting page_setting = new Page_Setting();
-
         bool shutdown = false;
 
 
