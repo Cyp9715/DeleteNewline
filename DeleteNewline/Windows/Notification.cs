@@ -12,14 +12,29 @@ namespace Windows
         {
             Task task_notify = new Task(() =>
             {
-                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-                new ToastContentBuilder()
-                .AddText(title)
-                .AddText(content)
-                .Show(toast =>
+                try
                 {
-                    toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);
-                });
+                    // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
+                    new ToastContentBuilder()
+                    .AddText(title)
+                    .AddText(content)
+                    .Show(toast =>
+                    {
+                        toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);
+                    });
+                } 
+                
+                catch (ArgumentException e) 
+                {
+                    new ToastContentBuilder()
+                    .AddText("SUCCESS... BUT")
+                    .AddText("CONTENT INCLUDE [include invalid character]")
+                    .Show(toast =>
+                    {
+                        toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);
+                    });
+                }
+
             });
 
             task_notify.Start();
