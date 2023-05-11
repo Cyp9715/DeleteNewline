@@ -24,7 +24,7 @@ namespace Windows
                     });
                 } 
                 
-                catch (ArgumentException e) 
+                catch (ArgumentException) 
                 {
                     new ToastContentBuilder()
                     .AddText("SUCCESS... BUT")
