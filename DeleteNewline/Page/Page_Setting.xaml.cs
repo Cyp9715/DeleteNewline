@@ -14,8 +14,6 @@ namespace DeleteNewline.Page
     {
         KeyConverter keyConverter = new KeyConverter();
 
-        bool topMost_origin = Settings.Default.topMost;
-
         public Page_Setting()
         {
             InitializeComponent();
@@ -23,45 +21,35 @@ namespace DeleteNewline.Page
 
         public void InitializationDefaultPage()
         {
-            SetTopMost();
-            SetHook_KeyBind();
+            InitUI();
+            ApplySettings();
         }
 
-        private void SaveSettings_TopMost()
+        private void InitUI()
         {
-            if (CheckBox_TopMost.IsChecked is not null)
-            {
-                Settings.Default.topMost = (bool)CheckBox_TopMost.IsChecked;
-            }
-
-            Settings.Default.Save();
+            CheckBox_TopMost.IsChecked = Settings.Default.topMost;
+            CheckBox_Notification.IsChecked = Settings.Default.notification;
+            UpdateUI_Keybind((Key)Settings.Default.bindKey_1, (Key)Settings.Default.bindKey_2);
         }
 
-        private void SetTopMost()
+        private void ApplySettings()
         {
-            if (CheckBox_TopMost.IsChecked != null)
-            {
-                if (CheckBox_TopMost.IsChecked == true)
-                {
-                    MainWindow.mainWindow.Topmost = true;
-                }
-                else
-                {
-                    MainWindow.mainWindow.Topmost = false;
-                }
-            }
+            Apply_CheckBox();
+            Apply_Keybind();
         }
 
-        private void SaveSettings_KeyBind()
+        private void SaveSettings()
         {
-            // None 일경우 (사용자가 아무것도 지정하지 않은경우)
-            // 문제를 방지하는 기능이 있음.
-            if(key1 != Key.None)
+            Settings.Default.topMost = (bool)CheckBox_TopMost.IsChecked!;
+            Settings.Default.notification = (bool)CheckBox_Notification.IsChecked!;
+
+            // None 일경우 (사용자가 아무것도 지정하지 않은경우) 문제 방지 기능이 있음.
+            if (key1 != Key.None)
             {
                 Settings.Default.bindKey_1 = (int)key1;
             }
 
-            if(key2 != Key.None)
+            if (key2 != Key.None)
             {
                 Settings.Default.bindKey_2 = (int)key2;
             }
@@ -69,12 +57,26 @@ namespace DeleteNewline.Page
             Settings.Default.Save();
         }
 
-        private void SetHook_KeyBind()
+        private void Apply_CheckBox()
+        {
+            MainWindow.mainWindow.Topmost = (bool)CheckBox_TopMost.IsChecked!;
+
+            if (CheckBox_Notification.IsChecked == true)
+            {
+                HookImplement.startDeleteNewline = HookImplement.StartDeleteNewline_WithNotifier;
+            }
+            else
+            {
+                HookImplement.startDeleteNewline = HookImplement.StartDeleteNewline_WithoutNotifier;
+            }
+        }
+
+        private void Apply_Keybind()
         {
             key1 = (Key)Settings.Default.bindKey_1;
             key2 = (Key)Settings.Default.bindKey_2;
 
-            SetKeyBindTextBox(key1, key2);
+            UpdateUI_Keybind(key1, key2);
 
             var Virtual_Key1 = KeyInterop.VirtualKeyFromKey(key1);
             var Virtual_Key2 = KeyInterop.VirtualKeyFromKey(key2);
@@ -82,7 +84,7 @@ namespace DeleteNewline.Page
             HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
         }
 
-        private void SetKeyBindTextBox(Key key1, Key key2)
+        private void UpdateUI_Keybind(Key key1, Key key2)
         {
             if (key2 == Key.None)
             {
@@ -99,10 +101,8 @@ namespace DeleteNewline.Page
 
         private void Button_OK_Click(object sender, RoutedEventArgs e)
         {
-            SaveSettings_TopMost();
-            SaveSettings_KeyBind();
-            SetTopMost();
-            SetHook_KeyBind();
+            SaveSettings();
+            ApplySettings();
         }
 
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)
@@ -116,9 +116,18 @@ namespace DeleteNewline.Page
                 CheckBox_TopMost.IsChecked = false;
             }
 
+            if(Settings.Default.notification == true)
+            {
+                CheckBox_Notification.IsChecked = true;
+            }
+            else
+            {
+                CheckBox_Notification.IsChecked = false;
+            }
+
             key1 = (Key)Settings.Default.bindKey_1;
             key2 = (Key)Settings.Default.bindKey_2;
-            SetKeyBindTextBox((Key)Settings.Default.bindKey_1, (Key)Settings.Default.bindKey_2);
+            UpdateUI_Keybind((Key)Settings.Default.bindKey_1, (Key)Settings.Default.bindKey_2);
         }
 
         Key key1 = Key.None;
@@ -156,7 +165,7 @@ namespace DeleteNewline.Page
                 key2_text = keyConverter.ConvertToString(key2);
             }
 
-            SetKeyBindTextBox(key1, key2);
+            UpdateUI_Keybind(key1, key2);
         }
 
         private void TextBox_bindKey_KeyUp(object sender, KeyEventArgs e)

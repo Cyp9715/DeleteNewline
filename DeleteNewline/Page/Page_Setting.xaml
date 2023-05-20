@@ -18,24 +18,28 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="50,20,0,0" 
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="50,20,0,0" 
             HorizontalAlignment="Left" VerticalAlignment="Top">
-            
-            <Label Margin="0,15,0,0" Content="TopMost" VerticalAlignment="Top"/>
-            <CheckBox Name="CheckBox_TopMost" Margin="20,8,0,0" VerticalAlignment="Top"/>
+                <Label Width="100" Margin="0,15,0,0" Content="TopMost" VerticalAlignment="Top"/>
+                <CheckBox Name="CheckBox_TopMost" Margin="0,8,0,0" VerticalAlignment="Top"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="50,0,0,0" 
+            HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Label Width="100" Margin="0,15,0,0" Content="Notification" VerticalAlignment="Top"/>
+                <CheckBox Name="CheckBox_Notification" Margin="0,8,0,0" VerticalAlignment="Top" IsChecked="True"/>
+            </StackPanel>
         </StackPanel>
 
-        <StackPanel Margin="300,20,0,0" VerticalAlignment="Top" Orientation="Horizontal" >
-            
+        <StackPanel Margin="250,20,0,0" VerticalAlignment="Top" Orientation="Horizontal">
             <Label Margin="0,15,0,0" Content="Keybind" VerticalAlignment="Top"/>
-            <TextBox x:Name="TextBox_bindKey" Margin="20,8,0,0" Width="200" Height="20"
+            <TextBox x:Name="TextBox_bindKey" Margin="20,8,0,0" Width="175" Height="20"
                      VerticalAlignment="Top" IsReadOnly="True"
                      KeyDown="TextBox_bindKey_KeyDown" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" />
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="999" Grid.RowSpan="2" 
-                    Margin="0,0,20,20" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            
+        <StackPanel Orientation="Horizontal" Margin="0,0,20,20" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <Button Name="Button_OK" Content="OK" Width="85" Height="40" Click="Button_OK_Click"/>
             <Button Name="Button_Cancel" Content="Cancel" Width="85" Height="40" Margin="20,0,0,0" Click="Button_Cancel_Click" />
         </StackPanel>

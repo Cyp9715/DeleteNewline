@@ -10,7 +10,8 @@ namespace GlobalHook
         static GlobalKeyHook? globalKeyHook;
         static ClipboardManager cbManager = new ClipboardManager();
         static IDataObject? idataObj;
-        static bool isSet = false;
+        static bool isSetHook = false;
+        public static Action startDeleteNewline = StartDeleteNewline_WithNotifier;
 
         public static void InstallGlobalHook()
         {
@@ -19,22 +20,22 @@ namespace GlobalHook
                 globalKeyHook = new GlobalKeyHook();
             }
 
-            if(isSet == false)
+            if(isSetHook == false)
             {
                 // globalKeyHook.OnKeyPressed += GlobalKeyHook_OnKeyPressed;
                 globalKeyHook.OnKeyUp += GlobalKeyHook_OnKeyUp;
                 globalKeyHook.OnKeyDown += GlobalKeyHook_OnKeyDown;
-                isSet = true;
+                isSetHook = true;
             }
         }
 
         public static void UnInstallGlobalHook()
         {
-            if(isSet == true)
+            if(isSetHook == true)
             {
                 globalKeyHook.OnKeyUp -= GlobalKeyHook_OnKeyUp;
                 globalKeyHook.OnKeyDown -= GlobalKeyHook_OnKeyDown;
-                isSet = false;
+                isSetHook = false;
             }
         }
 
@@ -63,7 +64,7 @@ namespace GlobalHook
             }
         }
 
-        private static void ShortcutSetClipboard()
+        public static void StartDeleteNewline_WithNotifier()
         {
             string notifyHeader = String.Empty;
             string notifyContent = String.Empty;
@@ -96,13 +97,24 @@ namespace GlobalHook
             Notification.Send(notifyHeader, notifyContent);
         }
 
+        public static void StartDeleteNewline_WithoutNotifier()
+        {
+            VirtualInput.InputImplement.PressKeyboard_Copy();
+
+            if (cbManager.GetClipboardData_Text(ref idataObj) == true)
+            {
+                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj).ToString();
+                Clipboard.SetDataObject(deletedText);
+            }
+        }
+
         private static void GlobalKeyHook_OnKeyUp(object? sender, GlobalKeyEventArgs e)
         {
             if (isPressedKey1 == true && isPressedKey2 == true)
             {
                 isPressedKey1 = false;
                 isPressedKey2 = false;
-                ShortcutSetClipboard();
+                startDeleteNewline();
             }
 
             if (e.KeyCode == key1)

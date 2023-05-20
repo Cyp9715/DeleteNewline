@@ -8,7 +8,7 @@ namespace Windows
 {
     static class Notification
     {
-        public static void Send(string title, string content, int expirationTime = 0)
+        public static void Send(string title, string content, int expirationTime = 5)
         {
             Task task_notify = new Task(() =>
             {
@@ -23,12 +23,11 @@ namespace Windows
                         toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);
                     });
                 } 
-                
                 catch (ArgumentException) 
                 {
                     new ToastContentBuilder()
                     .AddText("SUCCESS... BUT")
-                    .AddText("CONTENT INCLUDE [include invalid character]")
+                    .AddText("INCLUDE INVALID CHARACTER.")
                     .Show(toast =>
                     {
                         toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);
