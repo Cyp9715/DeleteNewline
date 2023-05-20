@@ -5,8 +5,8 @@ If you paste text with newlines, the text with the newlines deleted is automatic
 <img src=https://i.imgur.com/B5RI2uF.png>
 
 It is often necessary to insert the PDF text into a translator unless the research paper is written in your language.  
-unfortunately, however, PDFs often have newlines, which are not well recognized by translators.  
-because of this often have to delete newline characters one by one. This project was created to reduce this hassle.
+Unfortunately, PDFs have newlines that prevent translators from recognizing the text.  
+this project was created to easily delete these newline characters.
 
 you can use other programs or websites, but probably this program is the best for the convenience of the features it provides.
 
