@@ -8,7 +8,7 @@ It is often necessary to insert the PDF text into a translator unless the resear
 Unfortunately, PDFs have newlines that prevent translators from recognizing the text.  
 this project was created to easily delete these newline characters.
 
-you can use other programs or websites, but probably this program is the best for the convenience of the features it provides.
+You can use other programs or websites, but the convenience provided by DeleteNewline will be the best.
 
 ## Development environment
 .NET : 6.0 LTS
