@@ -22,5 +22,5 @@ perhaps the last function is most useful.
 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
 
-## matter under consideration.
+## atter under consideration.
 If there are no problems outside of development(Rule), willing to connect translators such as Google, Papago, and Bing directly to the program. (Probably not the way to implement it using the API.)
