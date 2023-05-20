@@ -5,7 +5,7 @@ If you paste text with newlines, the text with the newlines deleted is automatic
 <img src=https://i.imgur.com/B5RI2uF.png>
 
 It is often necessary to insert the PDF text into a translator unless the research paper is written in your language.  
-Unfortunately, PDFs have newlines that prevent translators from recognizing the text.  
+Unfortunately, PDFs have newlines that prevent translator from recognizing the text.  
 this project was created to easily delete these newline characters.
 
 You can use other programs or websites, but the convenience provided by DeleteNewline will be the best.
@@ -23,4 +23,4 @@ perhaps the last function is most useful.
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
 
 ## Matter under consideration.
-If there are no problems outside of development(Rule), willing to connect translators such as Google, Papago, and Bing directly to the program. (Probably not the way to implement it using the API.)
+If there are no problems outside of development(Rule), willing to connect translator such as Google, Papago, and Bing directly to the program. (Probably not the way to implement it using the API.)
