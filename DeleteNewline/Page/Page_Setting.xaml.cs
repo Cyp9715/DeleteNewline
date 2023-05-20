@@ -44,6 +44,7 @@ namespace DeleteNewline.Page
             Settings.Default.notification = (bool)CheckBox_Notification.IsChecked!;
 
             // None 일경우 (사용자가 아무것도 지정하지 않은경우) 문제 방지 기능이 있음.
+            // 갱신되지 않을경우 기본셋팅코드로 리셋.
             if (key1 != Key.None)
             {
                 Settings.Default.bindKey_1 = (int)key1;
@@ -107,23 +108,8 @@ namespace DeleteNewline.Page
 
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)
         {
-            if(Settings.Default.topMost == true) 
-            {
-                CheckBox_TopMost.IsChecked = true;
-            }
-            else
-            {
-                CheckBox_TopMost.IsChecked = false;
-            }
-
-            if(Settings.Default.notification == true)
-            {
-                CheckBox_Notification.IsChecked = true;
-            }
-            else
-            {
-                CheckBox_Notification.IsChecked = false;
-            }
+            CheckBox_TopMost.IsChecked = Settings.Default.topMost;
+            CheckBox_Notification.IsChecked = Settings.Default.notification;
 
             key1 = (Key)Settings.Default.bindKey_1;
             key2 = (Key)Settings.Default.bindKey_2;
