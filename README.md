@@ -5,10 +5,10 @@ If you paste text with newlines, the text with the newlines deleted is automatic
 <img src=https://i.imgur.com/B5RI2uF.png>
 
 It is often necessary to insert the PDF text into a translator unless the research paper is written in your language.  
-unfortunately, however, PDFs often have newlines, which are not well recognized by translators.  
-because of this often have to delete newline characters one by one. This project was created to reduce this hassle.
+Unfortunately, PDFs have newlines that prevent translator from recognizing the text.  
+this project was created to easily delete these newline characters.
 
-you can use other programs or websites, but probably this program is the best for the convenience of the features it provides.
+You can use other programs or websites, but the convenience provided by DeleteNewline will be the best.
 
 ## Development environment
 .NET : 6.0 LTS
@@ -21,3 +21,6 @@ you can use other programs or websites, but probably this program is the best fo
 perhaps the last function is most useful.
 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
+
+## Matter under consideration.
+If there are no problems outside of development(Rule), I willing to connect translator such as Google, Papago, and Bing directly to the DeleteNewline. (Probably not the way to implement it using the API.)
