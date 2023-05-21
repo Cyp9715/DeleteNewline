@@ -21,24 +21,24 @@ namespace DeleteNewline.Page
 
         public void InitializationDefaultPage()
         {
-            InitUI();
-            ApplySettings();
+            SetUI();
+            SetSettings();
         }
 
-        private void InitUI()
+        private void SetUI()
         {
             CheckBox_TopMost.IsChecked = Settings.Default.topMost;
             CheckBox_Notification.IsChecked = Settings.Default.notification;
             UpdateUI_Keybind((Key)Settings.Default.bindKey_1, (Key)Settings.Default.bindKey_2);
         }
 
-        private void ApplySettings()
+        private void SetSettings()
         {
-            Apply_CheckBox();
-            Apply_Keybind();
+            Set_CheckBox();
+            Set_Keybind();
         }
 
-        private void SaveSettings()
+        private void SaveDefaultSettings()
         {
             Settings.Default.topMost = (bool)CheckBox_TopMost.IsChecked!;
             Settings.Default.notification = (bool)CheckBox_Notification.IsChecked!;
@@ -58,7 +58,7 @@ namespace DeleteNewline.Page
             Settings.Default.Save();
         }
 
-        private void Apply_CheckBox()
+        private void Set_CheckBox()
         {
             MainWindow.mainWindow.Topmost = (bool)CheckBox_TopMost.IsChecked!;
 
@@ -72,7 +72,7 @@ namespace DeleteNewline.Page
             }
         }
 
-        private void Apply_Keybind()
+        private void Set_Keybind()
         {
             key1 = (Key)Settings.Default.bindKey_1;
             key2 = (Key)Settings.Default.bindKey_2;
@@ -102,8 +102,8 @@ namespace DeleteNewline.Page
 
         private void Button_OK_Click(object sender, RoutedEventArgs e)
         {
-            SaveSettings();
-            ApplySettings();
+            SaveDefaultSettings();
+            SetSettings();
         }
 
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)
