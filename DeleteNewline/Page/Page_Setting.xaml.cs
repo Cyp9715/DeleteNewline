@@ -1,9 +1,8 @@
 ﻿using GlobalHook;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Windows;
-using Windows.System;
 
 namespace DeleteNewline.Page
 {
@@ -13,6 +12,7 @@ namespace DeleteNewline.Page
     public partial class Page_Setting
     {
         KeyConverter keyConverter = new KeyConverter();
+        DeleteNewline.Settings appdata = Settings.Default;
 
         public Page_Setting()
         {
@@ -21,71 +21,71 @@ namespace DeleteNewline.Page
 
         public void InitializationDefaultPage()
         {
-            SetUI();
-            SetSettings();
+            SetUI_fromAppdata();
+            SetSettings_fromUI();
         }
 
-        private void SetUI()
+        private void SetUI_fromAppdata()
         {
-            CheckBox_TopMost.IsChecked = Settings.Default.topMost;
-            CheckBox_Notification.IsChecked = Settings.Default.notification;
-            UpdateUI_Keybind((Key)Settings.Default.bindKey_1, (Key)Settings.Default.bindKey_2);
+            CheckBox_TopMost.IsChecked = appdata.topMost;
+            CheckBox_Notification.IsChecked = appdata.notification;
+            UpdateUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
         }
 
-        private void SetSettings()
+        private void SetSettings_fromUI()
         {
-            Set_CheckBox();
-            Set_Keybind();
+            Action setCheckbox = () =>
+            {
+                MainWindow.mainWindow.Topmost = (bool)CheckBox_TopMost.IsChecked!;
+
+                if (CheckBox_Notification.IsChecked == true)
+                {
+                    HookImplement.startDeleteNewline = HookImplement.StartDeleteNewline_WithNotifier;
+                }
+                else
+                {
+                    HookImplement.startDeleteNewline = HookImplement.StartDeleteNewline_WithoutNotifier;
+                }
+            };
+
+            Action setKeybind = () =>
+            {
+                key1 = (Key)appdata.bindKey_1;
+                key2 = (Key)appdata.bindKey_2;
+
+                UpdateUI_keybind(key1, key2);
+
+                var Virtual_Key1 = KeyInterop.VirtualKeyFromKey(key1);
+                var Virtual_Key2 = KeyInterop.VirtualKeyFromKey(key2);
+
+                HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
+            };
+
+            setCheckbox();
+            setKeybind();
         }
 
-        private void SaveDefaultSettings()
+        private void SaveAppdata()
         {
-            Settings.Default.topMost = (bool)CheckBox_TopMost.IsChecked!;
-            Settings.Default.notification = (bool)CheckBox_Notification.IsChecked!;
+            appdata.topMost = (bool)CheckBox_TopMost.IsChecked!;
+            appdata.notification = (bool)CheckBox_Notification.IsChecked!;
 
             // None 일경우 (사용자가 아무것도 지정하지 않은경우) 문제 방지 기능이 있음.
             // 갱신되지 않을경우 기본셋팅코드로 리셋.
             if (key1 != Key.None)
             {
-                Settings.Default.bindKey_1 = (int)key1;
+                appdata.bindKey_1 = (int)key1;
             }
 
             if (key2 != Key.None)
             {
-                Settings.Default.bindKey_2 = (int)key2;
+                appdata.bindKey_2 = (int)key2;
             }
 
             Settings.Default.Save();
         }
 
-        private void Set_CheckBox()
-        {
-            MainWindow.mainWindow.Topmost = (bool)CheckBox_TopMost.IsChecked!;
-
-            if (CheckBox_Notification.IsChecked == true)
-            {
-                HookImplement.startDeleteNewline = HookImplement.StartDeleteNewline_WithNotifier;
-            }
-            else
-            {
-                HookImplement.startDeleteNewline = HookImplement.StartDeleteNewline_WithoutNotifier;
-            }
-        }
-
-        private void Set_Keybind()
-        {
-            key1 = (Key)Settings.Default.bindKey_1;
-            key2 = (Key)Settings.Default.bindKey_2;
-
-            UpdateUI_Keybind(key1, key2);
-
-            var Virtual_Key1 = KeyInterop.VirtualKeyFromKey(key1);
-            var Virtual_Key2 = KeyInterop.VirtualKeyFromKey(key2);
-
-            HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
-        }
-
-        private void UpdateUI_Keybind(Key key1, Key key2)
+        private void UpdateUI_keybind(Key key1, Key key2)
         {
             if (key2 == Key.None)
             {
@@ -102,18 +102,18 @@ namespace DeleteNewline.Page
 
         private void Button_OK_Click(object sender, RoutedEventArgs e)
         {
-            SaveDefaultSettings();
-            SetSettings();
+            SaveAppdata();
+            SetSettings_fromUI();
         }
 
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)
         {
-            CheckBox_TopMost.IsChecked = Settings.Default.topMost;
-            CheckBox_Notification.IsChecked = Settings.Default.notification;
+            CheckBox_TopMost.IsChecked = appdata.topMost;
+            CheckBox_Notification.IsChecked = appdata.notification;
 
-            key1 = (Key)Settings.Default.bindKey_1;
-            key2 = (Key)Settings.Default.bindKey_2;
-            UpdateUI_Keybind((Key)Settings.Default.bindKey_1, (Key)Settings.Default.bindKey_2);
+            key1 = (Key)appdata.bindKey_1;
+            key2 = (Key)appdata.bindKey_2;
+            UpdateUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
         }
 
         Key key1 = Key.None;
@@ -151,7 +151,7 @@ namespace DeleteNewline.Page
                 key2_text = keyConverter.ConvertToString(key2);
             }
 
-            UpdateUI_Keybind(key1, key2);
+            UpdateUI_keybind(key1, key2);
         }
 
         private void TextBox_bindKey_KeyUp(object sender, KeyEventArgs e)
