@@ -2,8 +2,9 @@
 using System.Threading;
 using System.Windows;
 using GlobalHook;
-using WinForms = System.Windows.Forms;
 using DeleteNewline.Page;
+
+using WinForms = System.Windows.Forms;
 
 namespace DeleteNewline
 {
@@ -16,11 +17,9 @@ namespace DeleteNewline
         System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
 
         internal static MainWindow? mainWindow;
-        WinForms.NotifyIcon? notifyIcon;
+        WinForms.NotifyIcon notifyIcon = new WinForms.NotifyIcon();
         Page_InputText page_inputText = new Page_InputText();
         Page_Setting page_setting = new Page_Setting();
-        bool shutdown = false;
-
 
         public MainWindow()
         {
@@ -55,8 +54,7 @@ namespace DeleteNewline
 
         private void ContextMenu_Action_Exit(object? sender, EventArgs e)
         {
-            shutdown = true;
-            mainWindow.Close();
+            System.Environment.Exit(0);
         }
 
         private void SetContextMenu()
@@ -67,8 +65,6 @@ namespace DeleteNewline
 
         private void SetNotifyIcon()
         {
-            notifyIcon = new WinForms.NotifyIcon();
-            
             notifyIcon.Icon = Resource.favicon;
             notifyIcon.Text = "DeleteNewline";
 
@@ -99,11 +95,8 @@ namespace DeleteNewline
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(shutdown == false)
-            {
-                e.Cancel = true;
-                mainWindow.Visibility = Visibility.Hidden;
-            }
+            e.Cancel = true;
+            mainWindow.Visibility = Visibility.Hidden;
         }
 
         private void Window_Closed(object sender, EventArgs e)

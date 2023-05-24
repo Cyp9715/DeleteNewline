@@ -22,17 +22,17 @@ namespace DeleteNewline.Page
         public void InitializationDefaultPage()
         {
             SetUI_fromAppdata();
-            SetSettings_fromUI();
+            SetBackendSettings_fromUI();
         }
 
         private void SetUI_fromAppdata()
         {
             CheckBox_TopMost.IsChecked = appdata.topMost;
             CheckBox_Notification.IsChecked = appdata.notification;
-            UpdateUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
+            SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
         }
 
-        private void SetSettings_fromUI()
+        private void SetBackendSettings_fromUI()
         {
             Action setCheckbox = () =>
             {
@@ -53,7 +53,7 @@ namespace DeleteNewline.Page
                 key1 = (Key)appdata.bindKey_1;
                 key2 = (Key)appdata.bindKey_2;
 
-                UpdateUI_keybind(key1, key2);
+                SetUI_keybind(key1, key2);
 
                 var Virtual_Key1 = KeyInterop.VirtualKeyFromKey(key1);
                 var Virtual_Key2 = KeyInterop.VirtualKeyFromKey(key2);
@@ -85,7 +85,7 @@ namespace DeleteNewline.Page
             Settings.Default.Save();
         }
 
-        private void UpdateUI_keybind(Key key1, Key key2)
+        private void SetUI_keybind(Key key1, Key key2)
         {
             if (key2 == Key.None)
             {
@@ -103,7 +103,7 @@ namespace DeleteNewline.Page
         private void Button_OK_Click(object sender, RoutedEventArgs e)
         {
             SaveAppdata();
-            SetSettings_fromUI();
+            SetBackendSettings_fromUI();
         }
 
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)
@@ -113,7 +113,7 @@ namespace DeleteNewline.Page
 
             key1 = (Key)appdata.bindKey_1;
             key2 = (Key)appdata.bindKey_2;
-            UpdateUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
+            SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
         }
 
         Key key1 = Key.None;
@@ -151,7 +151,7 @@ namespace DeleteNewline.Page
                 key2_text = keyConverter.ConvertToString(key2);
             }
 
-            UpdateUI_keybind(key1, key2);
+            SetUI_keybind(key1, key2);
         }
 
         private void TextBox_bindKey_KeyUp(object sender, KeyEventArgs e)
