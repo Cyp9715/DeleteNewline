@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows;
-using appdata = DeleteNewline.Settings;
 
 namespace DeleteNewline
 {
@@ -12,7 +11,7 @@ namespace DeleteNewline
             
             clipboardText = Regex.Replace(clipboardText, @"\r\n", "");
 
-            if (appdata.Default.deleteMultipleSpace == true)
+            if (Settings.Default.deleteMultipleSpace == true)
             {
                 clipboardText = Regex.Replace(clipboardText, @"\s+", " ");
             }

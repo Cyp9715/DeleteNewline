@@ -12,7 +12,7 @@ namespace DeleteNewline
     public partial class Page_Setting
     {
         KeyConverter keyConverter = new KeyConverter();
-        Settings appdata = Settings.Default;
+        Settings appdata = DeleteNewline.Settings.Default;
 
         public Page_Setting()
         {
