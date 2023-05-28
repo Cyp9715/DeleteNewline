@@ -94,5 +94,17 @@ namespace DeleteNewline {
                 this["topMost"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool deleteMultipleSpace {
+            get {
+                return ((bool)(this["deleteMultipleSpace"]));
+            }
+            set {
+                this["deleteMultipleSpace"] = value;
+            }
+        }
     }
 }

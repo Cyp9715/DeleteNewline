@@ -1,32 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
+using appdata = DeleteNewline.Settings;
 
 namespace DeleteNewline
 {
     class ClipboardManager
     {
-        public StringBuilder DeleteClipboardNewline(ref IDataObject idata, bool splitPeriod = false)
+        public string DeleteClipboardNewline(ref IDataObject idata)
         {
-            StringBuilder stringBuilder;
-
             string clipboardText = (string)idata.GetData(DataFormats.Text);
-            stringBuilder = new StringBuilder(clipboardText);
+            
+            clipboardText = Regex.Replace(clipboardText, @"\r\n", "");
 
-            if (splitPeriod == false)
+            if (appdata.Default.deleteMultipleSpace == true)
             {
-                stringBuilder.Replace("\r\n", " ");
-            }
-            else
-            {
-                stringBuilder.Replace("\r\n", " ");
-                stringBuilder.Replace(". ", ".\r\n");
+                clipboardText = Regex.Replace(clipboardText, @"\s+", " ");
             }
 
-            return stringBuilder;
+            return clipboardText;
         }
 
         public bool GetClipboardData_Text(ref IDataObject idata)
@@ -40,7 +31,5 @@ namespace DeleteNewline
 
             return true;
         }
-
-
     }
 }

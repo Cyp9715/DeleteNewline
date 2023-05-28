@@ -27,8 +27,9 @@ namespace DeleteNewline.Page
 
         private void SetUI_fromAppdata()
         {
-            CheckBox_TopMost.IsChecked = appdata.topMost;
-            CheckBox_Notification.IsChecked = appdata.notification;
+            CheckBox_topMost.IsChecked = appdata.topMost;
+            CheckBox_notification.IsChecked = appdata.notification;
+            CheckBox_deleteMultipleSpace.IsChecked = appdata.deleteMultipleSpace;
             SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
         }
 
@@ -36,16 +37,12 @@ namespace DeleteNewline.Page
         {
             Action setCheckbox = () =>
             {
-                MainWindow.mainWindow.Topmost = (bool)CheckBox_TopMost.IsChecked!;
+                MainWindow.mainWindow.Topmost = (bool)CheckBox_topMost.IsChecked!;
 
-                if (CheckBox_Notification.IsChecked == true)
-                {
-                    HookImplement.startDeleteNewline = HookImplement.StartDeleteNewline_WithNotifier;
-                }
-                else
-                {
-                    HookImplement.startDeleteNewline = HookImplement.StartDeleteNewline_WithoutNotifier;
-                }
+                HookImplement.startDeleteNewline = CheckBox_notification.IsChecked == true ? 
+                    HookImplement.StartDeleteNewline_WithNotifier : HookImplement.StartDeleteNewline_WithoutNotifier;
+
+                // removeMultiSpace Settings 는 appdata 를 그대로 참조함...
             };
 
             Action setKeybind = () =>
@@ -67,8 +64,9 @@ namespace DeleteNewline.Page
 
         private void SaveAppdata()
         {
-            appdata.topMost = (bool)CheckBox_TopMost.IsChecked!;
-            appdata.notification = (bool)CheckBox_Notification.IsChecked!;
+            appdata.topMost = (bool)CheckBox_topMost.IsChecked!;
+            appdata.notification = (bool)CheckBox_notification.IsChecked!;
+            appdata.deleteMultipleSpace = (bool)CheckBox_deleteMultipleSpace.IsChecked!;
 
             // None 일경우 (사용자가 아무것도 지정하지 않은경우) 문제 방지 기능이 있음.
             // 갱신되지 않을경우 기본셋팅코드로 리셋.
@@ -108,8 +106,9 @@ namespace DeleteNewline.Page
 
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)
         {
-            CheckBox_TopMost.IsChecked = appdata.topMost;
-            CheckBox_Notification.IsChecked = appdata.notification;
+            CheckBox_topMost.IsChecked = appdata.topMost;
+            CheckBox_notification.IsChecked = appdata.notification;
+            CheckBox_deleteMultipleSpace.IsChecked = appdata.deleteMultipleSpace;
 
             key1 = (Key)appdata.bindKey_1;
             key2 = (Key)appdata.bindKey_2;
