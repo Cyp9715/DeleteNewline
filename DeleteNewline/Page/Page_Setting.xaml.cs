@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace DeleteNewline.Page
+namespace DeleteNewline
 {
     /// <summary>
     /// Page_Setting.xaml에 대한 상호 작용 논리
@@ -12,7 +12,7 @@ namespace DeleteNewline.Page
     public partial class Page_Setting
     {
         KeyConverter keyConverter = new KeyConverter();
-        DeleteNewline.Settings appdata = Settings.Default;
+        Settings appdata = Settings.Default;
 
         public Page_Setting()
         {
@@ -39,8 +39,8 @@ namespace DeleteNewline.Page
             {
                 MainWindow.mainWindow.Topmost = (bool)CheckBox_topMost.IsChecked!;
 
-                HookImplement.startDeleteNewline = CheckBox_notification.IsChecked == true ? 
-                    HookImplement.StartDeleteNewline_WithNotifier : HookImplement.StartDeleteNewline_WithoutNotifier;
+                HookImplement.execute = (CheckBox_notification.IsChecked == true) ? 
+                    Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
 
                 // removeMultiSpace Settings 는 appdata 를 그대로 참조함...
             };
@@ -125,27 +125,13 @@ namespace DeleteNewline.Page
         {
             if(key1 == Key.None)
             {
-                if (e.Key == Key.System)
-                {
-                    key1 = e.SystemKey;
-                }
-                else
-                {
-                    key1 = e.Key;
-                }
+                key1 = (e.Key == Key.System) ? e.SystemKey : e.Key;
 
                 key1_text = keyConverter.ConvertToString(key1);
             }
             else
             {
-                if (e.Key == Key.System)
-                {
-                    key2 = e.SystemKey;
-                }
-                else
-                {
-                    key2 = e.Key;
-                }
+                key2 = (e.Key == Key.System) ? e.SystemKey : e.Key;
 
                 key2_text = keyConverter.ConvertToString(key2);
             }

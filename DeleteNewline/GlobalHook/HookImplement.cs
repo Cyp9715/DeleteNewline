@@ -1,17 +1,13 @@
 ﻿using DeleteNewline;
 using System;
 using System.Windows;
-using Windows;
-
 namespace GlobalHook
 {
     static class HookImplement
     {
         static GlobalKeyHook? globalKeyHook;
-        static ClipboardManager cbManager = new ClipboardManager();
-        static IDataObject? idataObj;
+        public static Action? execute;
         static bool isSetHook = false;
-        public static Action startDeleteNewline = StartDeleteNewline_WithNotifier;
 
         public static void InstallGlobalHook()
         {
@@ -64,59 +60,13 @@ namespace GlobalHook
             }
         }
 
-        // 코드 이동 필요함. 여기에 해당 코드가 존재하는것은 매우 부자연스러움.
-
-        public static void StartDeleteNewline_WithNotifier()
-        {
-            string notifyHeader = String.Empty;
-            string notifyContent = String.Empty;
-            int limitLen = 100;
-
-            VirtualInput.InputImplement.PressKeyboard_Copy();
-
-            if (cbManager.GetClipboardData_Text(ref idataObj) == true)
-            {
-                notifyHeader = "SUCCESS";
-
-                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj).ToString();
-                Clipboard.SetDataObject(deletedText);
-
-                if (deletedText.Length > limitLen)
-                {
-                    notifyContent = deletedText.Substring(0, limitLen) + " ...";
-                }
-                else
-                {
-                    notifyContent = deletedText;
-                }
-            }
-            else
-            {
-                notifyHeader = "ERROR";
-                notifyContent = "CLIPBOARD FORM IS NOT TEXT";
-            }
-
-            Notification.Send(notifyHeader, notifyContent);
-        }
-
-        public static void StartDeleteNewline_WithoutNotifier()
-        {
-            VirtualInput.InputImplement.PressKeyboard_Copy();
-
-            if (cbManager.GetClipboardData_Text(ref idataObj) == true)
-            {
-                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj).ToString();
-                Clipboard.SetDataObject(deletedText);
-            }
-        }
-
         private static void GlobalKeyHook_OnKeyUp(object? sender, GlobalKeyEventArgs e)
         {
             if (isPressedKey1 == true && isPressedKey2 == true)
             {
                 isPressedKey1 = false;
                 isPressedKey2 = false;
-                startDeleteNewline();
+                execute();
             }
 
             if (e.KeyCode == key1)

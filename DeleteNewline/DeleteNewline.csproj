@@ -28,13 +28,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="NewFolder\**" />
-    <EmbeddedResource Remove="NewFolder\**" />
-    <None Remove="NewFolder\**" />
-    <Page Remove="NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Resources\copy_black.png" />
     <None Remove="Resources\copy_white.png" />
     <None Remove="Resources\paste_black.png" />

@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Windows;
 using GlobalHook;
-using DeleteNewline.Page;
 
 using WinForms = System.Windows.Forms;
 
@@ -11,7 +10,7 @@ namespace DeleteNewline
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    /// </summary>Page_InputText
     public partial class MainWindow
     {
         System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
