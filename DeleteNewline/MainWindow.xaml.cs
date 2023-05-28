@@ -10,7 +10,7 @@ namespace DeleteNewline
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
-    /// </summary>Page_InputText
+    /// </summary>
     public partial class MainWindow
     {
         System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
