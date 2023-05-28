@@ -64,6 +64,8 @@ namespace GlobalHook
             }
         }
 
+        // 코드 이동 필요함. 여기에 해당 코드가 존재하는것은 매우 부자연스러움.
+
         public static void StartDeleteNewline_WithNotifier()
         {
             string notifyHeader = String.Empty;
