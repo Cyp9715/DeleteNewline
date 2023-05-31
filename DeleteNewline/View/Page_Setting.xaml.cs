@@ -1,4 +1,7 @@
-﻿using GlobalHook;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using DeleteNewline.ViewModel;
+using GlobalHook;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +20,7 @@ namespace DeleteNewline
         public Page_Setting()
         {
             InitializeComponent();
+            this.DataContext = new VM_Page_Setting();
         }
 
         public void InitializationDefaultPage()
