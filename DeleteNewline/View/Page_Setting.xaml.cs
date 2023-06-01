@@ -46,6 +46,7 @@ namespace DeleteNewline
             }
         }
 
+        // 키를 누르는것에 따라 UI를 지정함. (여기서 지정되는 UI_Key 는 사용자 반응성을 위한것으로 임시적임)
         private void TextBox_bindKey_KeyDown(object sender, KeyEventArgs e)
         {
             if(key1 == Key.None)
@@ -60,6 +61,7 @@ namespace DeleteNewline
             SetKeybindUI(key1, key2);
         }
 
+        // 키를 해제할경우 해당 키값을 셋팅에 이관.
         private void TextBox_bindKey_KeyUp(object sender, KeyEventArgs e)
         {
             vm_setting.key1 = key1;
@@ -67,13 +69,11 @@ namespace DeleteNewline
             vm_setting.key1_text = key1_text;
             vm_setting.key2_text = key2_text;
 
-            vm_setting.SaveKeyBindSettings();
-            vm_setting.SetHookImplement();
-
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope((TextBox)sender), null);
             Keyboard.ClearFocus();
         }
 
+        // 포커스를 다시 얻었을 경우 각종 키 임시변수 값들과 텍스트박스를 초기화함.
         private void TextBox_bindKey_GotFocus(object sender, RoutedEventArgs e)
         {
             key1_text = string.Empty;
@@ -85,12 +85,13 @@ namespace DeleteNewline
             TextBox_bindKey.Text = string.Empty;
         }
 
+        // 포커스를 잃어버릴경우 appdata 기반으로 키를 설정하고 UI를 재지정함.
         private void TextBox_bindKey_LostFocus(object sender, RoutedEventArgs e)
         {
-            SetKeybindUI((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
-
             vm_setting.SaveKeyBindSettings();
             vm_setting.SetHookImplement();
+
+            SetKeybindUI((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
         }
     }
 }

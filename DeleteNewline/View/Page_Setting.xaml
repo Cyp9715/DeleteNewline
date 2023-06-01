@@ -3,6 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+      
       xmlns:local="clr-namespace:DeleteNewline"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -53,7 +55,9 @@
                     <Label Content="Keybind" VerticalAlignment="Top" Margin="{StaticResource margin_label}"/>
                     <TextBox x:Name="TextBox_bindKey" Margin="40,0,0,0" Width="175" Height="20" VerticalAlignment="Top" IsReadOnly="True"
                          KeyDown="TextBox_bindKey_KeyDown" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" 
-                             Text="{Binding content_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus"/>
+                             Text="{Binding content_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus">
+                        <i:Interaction.Trigger></i:Interaction.Trigger>
+                    </TextBox>
                 </StackPanel>
             </StackPanel>
         </StackPanel>

@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit;
+
 using GlobalHook;
 using System;
 using System.Windows.Forms;
@@ -14,7 +16,7 @@ namespace DeleteNewline.ViewModel
         bool _isChecked_checkBox_notification;
         bool _ischecked_checkBox_deleteMultipleSpace;
 
-        string _content_textBox_keybind;
+        string _content_textBox_keybind = String.Empty;
 
         public ViewModel_Page_Setting()
         {
@@ -32,18 +34,20 @@ namespace DeleteNewline.ViewModel
             set
             {
                 appdata.topMost = value;
-                Settings.Default.Save();
+                appdata.Save();
+
                 _isChecked_checkBox_topMost = value;
             }
         }
 
+        // 해당변수가 변경될 때 지정된 값에 따라 HookImplement.execute 의 Action 값을 치환해 줌.
         public bool isChecked_checkBox_notification
         {
             get =>_isChecked_checkBox_notification;
             set
             {
                 appdata.notification = value!;
-                Settings.Default.Save();
+                appdata.Save();
 
                 HookImplement.execute = (value == true) ?
                     Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
@@ -58,7 +62,7 @@ namespace DeleteNewline.ViewModel
             set
             {
                 appdata.deleteMultipleSpace = value;
-                Settings.Default.Save();
+                appdata.Save();
 
                 _ischecked_checkBox_deleteMultipleSpace = value;
             }
@@ -113,6 +117,16 @@ namespace DeleteNewline.ViewModel
             }
 
             return output;
+        }
+
+        public EventToCommandBehaviorPage()
+        {
+            Content = new Button()
+            .Behaviors(new EventToCommandBehavior
+            {
+                EventName = nameof(Button.Clicked),
+                Command = new MyCustomCommand()
+            });
         }
 
 
