@@ -42,9 +42,9 @@
                             Margin="{StaticResource margin_stackPanel}" Width="{StaticResource width_stackPanel}">
                     <Label Content="Delete Multiple Space" VerticalAlignment="Top" Width="{StaticResource width_label}" Margin="{StaticResource margin_label}" />
                     <CheckBox Name="CheckBox_deleteMultipleSpace" VerticalAlignment="Top" 
-                              Margin="{StaticResource margin_checkBox}" IsChecked="{Binding _ischecked_checkBox_deleteMultipleSpace}" 
-                              Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
-                              MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"/>
+                              Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
+                              MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
+                                IsChecked="{Binding isChecked_checkBox_deleteMultipleSpace}"/>
                 </StackPanel>
             </StackPanel>
 
@@ -53,9 +53,7 @@
                     <Label Content="Keybind" VerticalAlignment="Top" Margin="{StaticResource margin_label}"/>
                     <TextBox x:Name="TextBox_bindKey" Margin="40,0,0,0" Width="175" Height="20" VerticalAlignment="Top" IsReadOnly="True"
                          KeyDown="TextBox_bindKey_KeyDown" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" 
-                             Text="{Binding content_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus">
-                        <i:Interaction.Trigger></i:Interaction.Trigger>
-                    </TextBox>
+                             Text="{Binding text_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>

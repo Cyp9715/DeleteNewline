@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Threading;
 using System.Windows;
-using System.Windows.Input;
 using GlobalHook;
-using Windows.Storage;
 using WinForms = System.Windows.Forms;
 
 namespace DeleteNewline
 {
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow
     {
-        System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790"); 
+        System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
 
-        internal static MainWindow? mainWindow;
+        static MainWindow? mainWindow;
         WinForms.NotifyIcon notifyIcon = new WinForms.NotifyIcon();
         Page_InputText page_inputText = new Page_InputText();
         Page_Setting page_setting = new Page_Setting();
@@ -38,6 +35,7 @@ namespace DeleteNewline
             mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.Width = Settings.Default.mainWindowSize_width;
             mainWindow.Height = Settings.Default.mainWindowSize_height;
+            mainWindow.Topmost = appdata.topMost;
 
             // Init GlobalHook
             HookImplement.InstallGlobalHook();
@@ -85,6 +83,13 @@ namespace DeleteNewline
             }
         }
 
+        public static void SetTopmost(bool topMost)
+        {
+            if(mainWindow != null)
+            {
+                mainWindow.Topmost = topMost;
+            }
+        }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -96,8 +101,6 @@ namespace DeleteNewline
         {
             e.Cancel = true;
             mainWindow.Visibility = Visibility.Hidden;
-
-            
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -132,25 +135,6 @@ namespace DeleteNewline
                         frame_main.Content = page_inputText;
                         break;
                 }
-            }
-        }
-
-        private void Window_StateChanged(object sender, EventArgs e)
-        {
-            switch (this.WindowState)
-            {
-                case WindowState.Maximized:
-                    if (Settings.Default.topMost == true)
-                    {
-                        mainWindow.Topmost = true;
-                    }
-                    break;
-                case WindowState.Normal:
-                    if (Settings.Default.topMost == true)
-                    {
-                        mainWindow.Topmost = true;
-                    }
-                    break;
             }
         }
     }

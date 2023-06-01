@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit;
 
 using GlobalHook;
 using System;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace DeleteNewline.ViewModel
@@ -16,7 +14,7 @@ namespace DeleteNewline.ViewModel
         bool _isChecked_checkBox_notification;
         bool _ischecked_checkBox_deleteMultipleSpace;
 
-        string _content_textBox_keybind = String.Empty;
+        string _text_textBox_keybind = String.Empty;
 
         public ViewModel_Page_Setting()
         {
@@ -24,8 +22,8 @@ namespace DeleteNewline.ViewModel
             isChecked_checkBox_notification = appdata.notification;
             isChecked_checkBox_deleteMultipleSpace = appdata.deleteMultipleSpace;
 
-            content_textBox_keybind = GetKeybindText((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
-            SetHookImplement();
+            SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
+            SetHookKeys();
         }
 
         public bool isChecked_checkBox_topMost
@@ -33,10 +31,11 @@ namespace DeleteNewline.ViewModel
             get => _isChecked_checkBox_topMost;
             set
             {
+                SetProperty(ref _isChecked_checkBox_topMost, value);
+
+                MainWindow.SetTopmost(value);
                 appdata.topMost = value;
                 appdata.Save();
-
-                _isChecked_checkBox_topMost = value;
             }
         }
 
@@ -46,13 +45,13 @@ namespace DeleteNewline.ViewModel
             get =>_isChecked_checkBox_notification;
             set
             {
-                appdata.notification = value!;
-                appdata.Save();
+                SetProperty(ref _isChecked_checkBox_notification, value);
 
                 HookImplement.execute = (value == true) ?
                     Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
 
-                _isChecked_checkBox_notification = value;
+                appdata.notification = value;
+                appdata.Save();
             }
         }
 
@@ -61,23 +60,31 @@ namespace DeleteNewline.ViewModel
             get =>_ischecked_checkBox_deleteMultipleSpace;
             set
             {
+                SetProperty(ref _ischecked_checkBox_deleteMultipleSpace, value);
+
                 appdata.deleteMultipleSpace = value;
                 appdata.Save();
-
-                _ischecked_checkBox_deleteMultipleSpace = value;
             }
         }
 
-        public string content_textBox_keybind
+        public string text_textBox_keybind
         {
-            get => _content_textBox_keybind;
+            get => _text_textBox_keybind;
+
+            // SetProperty 는 변경되었을 경우만 OnPropertyChanged 를 발생시키기에 수동으로 추가함.
+            // (아무것도 입력하지 않고 textBox_bindKey Focus 벗어날 시 문제발생)
             set
             {
-                _content_textBox_keybind = value;
+                OnPropertyChanging();
+                _text_textBox_keybind = value;
+                OnPropertyChanged();
             }
         }
 
-        public void SaveKeyBindSettings()
+        public Key key1 = Key.None;
+        public Key key2 = Key.None;
+
+        public void SaveKeyBind()
         {
             // None 일경우 (사용자가 아무것도 지정하지 않은경우) 문제 방지 기능이 있음.
             // 갱신되지 않을경우 기본셋팅코드로 리셋.
@@ -94,65 +101,32 @@ namespace DeleteNewline.ViewModel
             Settings.Default.Save();
         }
 
+        public void SetHookKeys()
+        {
+            var Virtual_Key1 = KeyInterop.VirtualKeyFromKey((Key)appdata.bindKey_1);
+            var Virtual_Key2 = KeyInterop.VirtualKeyFromKey((Key)appdata.bindKey_2);
+
+            HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
+        }
 
         KeyConverter keyConverter = new KeyConverter();
 
-        public string GetKeybindText(Key key1, Key key2)
+        public void SetUI_keybind(Key key1, Key key2)
         {
-            string key1_text = string.Empty;
-            string key2_text = string.Empty;
-
-            string output = string.Empty;
+            string key1_text = String.Empty;
+            string key2_text = String.Empty;
 
             if (key2 == Key.None)
             {
                 key1_text = keyConverter.ConvertToString(key1)!;
-                output = key1_text;
+                text_textBox_keybind = key1_text;
             }
             else
             {
                 key1_text = keyConverter.ConvertToString(key1)!;
                 key2_text = keyConverter.ConvertToString(key2)!;
-                output = key1_text + " + " + key2_text;
+                text_textBox_keybind = key1_text + " + " + key2_text;
             }
-
-            return output;
         }
-
-        public EventToCommandBehaviorPage()
-        {
-            Content = new Button()
-            .Behaviors(new EventToCommandBehavior
-            {
-                EventName = nameof(Button.Clicked),
-                Command = new MyCustomCommand()
-            });
-        }
-
-
-        public Key key1 = Key.None;
-        public Key key2 = Key.None;
-
-        public string key1_text = string.Empty;
-        public string key2_text = string.Empty;
-
-        public void SetHookImplement()
-        {
-            Action setKeybind = () =>
-            {
-                key1 = (Key)appdata.bindKey_1;
-                key2 = (Key)appdata.bindKey_2;
-
-                content_textBox_keybind = GetKeybindText(key1, key2);
-
-                var Virtual_Key1 = KeyInterop.VirtualKeyFromKey(key1);
-                var Virtual_Key2 = KeyInterop.VirtualKeyFromKey(key2);
-
-                HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
-            };
-
-            setKeybind();
-        }
-
     }
 }
