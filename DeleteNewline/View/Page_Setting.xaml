@@ -19,47 +19,43 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Vertical" Margin="40,30,0,0">
+                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"
+                            Margin="{StaticResource margin_stackPanel}" Width="{StaticResource width_stackPanel}">
+                    <Label Content="TopMost" VerticalAlignment="Top" Width="{StaticResource width_label}" Margin="{StaticResource margin_label}" />
+                    <CheckBox Name="CheckBox_topMost" VerticalAlignment="Top"
+                              Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
+                              MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
+                                IsChecked="{Binding isChecked_checkBox_topMost}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"
+                            Margin="{StaticResource margin_stackPanel}" Width="{StaticResource width_stackPanel}">
+                    <Label Content="Notification" VerticalAlignment="Top" Width="{StaticResource width_label}" Margin="{StaticResource margin_label}" />
+                    <CheckBox Name="CheckBox_notification" VerticalAlignment="Top"  
+                              Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
+                              MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
+                                IsChecked="{Binding isChecked_checkBox_notification}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                            Margin="{StaticResource margin_stackPanel}" Width="{StaticResource width_stackPanel}">
+                    <Label Content="Delete Multiple Space" VerticalAlignment="Top" Width="{StaticResource width_label}" Margin="{StaticResource margin_label}" />
+                    <CheckBox Name="CheckBox_deleteMultipleSpace" VerticalAlignment="Top" 
+                              Margin="{StaticResource margin_checkBox}" IsChecked="{Binding _ischecked_checkBox_deleteMultipleSpace}" 
+                              Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
+                              MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"/>
+                </StackPanel>
+            </StackPanel>
+
             <StackPanel Orientation="Vertical" Margin="0,30,0,0">
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="{DynamicResource margin_stackPanel}" Width="230px"
-                HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Label Width="155" Margin="{DynamicResource margin_label}" Content="TopMost" VerticalAlignment="Top"/>
-                    <CheckBox Name="CheckBox_topMost" Margin="{DynamicResource margin_checkBox}" VerticalAlignment="Top"
-                              IsChecked="{Binding Path=isChecked_checkBox_topMost}"
-                              Width="{DynamicResource width_checkBox}" Height="{DynamicResource height_checkBox}" 
-                              MinHeight="{DynamicResource minHeight_checkBox}" MinWidth="{DynamicResource minWidth_checkBox}"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="{DynamicResource margin_stackPanel}" Width="230px"
-                HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Label Width="155" Margin="{DynamicResource margin_label}" Content="Notification" VerticalAlignment="Top"/>
-                    <CheckBox Name="CheckBox_notification" Margin="{DynamicResource margin_checkBox}" VerticalAlignment="Top" 
-                              IsChecked="{Binding Path=isChecked_checkBox_notification}"
-                              Width="{DynamicResource width_checkBox}" Height="{DynamicResource height_checkBox}" 
-                              MinHeight="{DynamicResource minHeight_checkBox}" MinWidth="{DynamicResource minWidth_checkBox}"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="{DynamicResource margin_stackPanel}" Width="230px" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Label Width="155" Margin="{DynamicResource margin_label}" Content="Delete Multiple Space" VerticalAlignment="Top"/>
-                    <CheckBox Name="CheckBox_deleteMultipleSpace" Margin="{DynamicResource margin_checkBox}" VerticalAlignment="Top" 
-                              IsChecked="{Binding _ischecked_checkBox_deleteMultipleSpace}" 
-                              Width="{DynamicResource width_checkBox}" Height="{DynamicResource height_checkBox}" 
-                              MinHeight="{DynamicResource minHeight_checkBox}" MinWidth="{DynamicResource minWidth_checkBox}"/>
+                <StackPanel VerticalAlignment="Top" Orientation="Horizontal"  Margin="{StaticResource margin_stackPanel}">
+                    <Label Content="Keybind" VerticalAlignment="Top" Margin="{StaticResource margin_label}"/>
+                    <TextBox x:Name="TextBox_bindKey" Margin="40,0,0,0" Width="175" Height="20" VerticalAlignment="Top" IsReadOnly="True"
+                         KeyDown="TextBox_bindKey_KeyDown" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" 
+                             Text="{Binding content_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus"/>
                 </StackPanel>
             </StackPanel>
-
-            <StackPanel Orientation="Vertical">
-                <StackPanel Margin="30,40,0,0"  VerticalAlignment="Top" Orientation="Horizontal">
-                    <Label Margin="{DynamicResource margin_label}" Content="Keybind" VerticalAlignment="Top"/>
-                    <TextBox x:Name="TextBox_bindKey" Margin="40,0,0,0" Width="175" Height="20"
-                         VerticalAlignment="Top" IsReadOnly="True"
-                         KeyDown="TextBox_bindKey_KeyDown" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" />
-                </StackPanel>
-            </StackPanel>
-        </StackPanel>
-
-        <StackPanel Orientation="Horizontal" Margin="0,0,15,15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1">
-            <Button Name="Button_ok" Content="OK" Width="85" Height="40" Click="Button_OK_Click"/>
-            <Button Name="Button_cancel" Content="Cancel" Width="85" Height="40" Margin="20,0,0,0" Click="Button_Cancel_Click" />
         </StackPanel>
     </Grid>
 </Page>

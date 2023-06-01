@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Windows;
+using System.Windows.Input;
 using GlobalHook;
-
+using Windows.Storage;
 using WinForms = System.Windows.Forms;
 
 namespace DeleteNewline
@@ -13,12 +14,14 @@ namespace DeleteNewline
     /// </summary>
     public partial class MainWindow
     {
-        System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
+        System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790"); 
 
         internal static MainWindow? mainWindow;
         WinForms.NotifyIcon notifyIcon = new WinForms.NotifyIcon();
         Page_InputText page_inputText = new Page_InputText();
         Page_Setting page_setting = new Page_Setting();
+
+        Settings appdata = Settings.Default;
 
         public MainWindow()
         {
@@ -46,9 +49,6 @@ namespace DeleteNewline
             // Init NavigationView selection
             navigationView_side.SelectedItem = NavigationViewItem_InputText;
             frame_main.Content = page_inputText;
-
-            // Init User Settings.
-            page_setting.InitializationDefaultPage();
         }
 
         private void ContextMenu_Action_Exit(object? sender, EventArgs e)
@@ -96,6 +96,8 @@ namespace DeleteNewline
         {
             e.Cancel = true;
             mainWindow.Visibility = Visibility.Hidden;
+
+            
         }
 
         private void Window_Closed(object sender, EventArgs e)
