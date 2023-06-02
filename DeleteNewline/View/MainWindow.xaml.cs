@@ -17,7 +17,6 @@ namespace DeleteNewline
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = vm_mainWindow;
             mainWindow = (MainWindow)Application.Current.MainWindow;
             vm_mainWindow = new ViewModel_MainWindow(mainWindow);
             DataContext = vm_mainWindow;

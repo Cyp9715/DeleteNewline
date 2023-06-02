@@ -28,21 +28,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\copy_black.png" />
     <None Remove="Resources\copy_white.png" />
-    <None Remove="Resources\paste_black.png" />
     <None Remove="Resources\paste_white.png" />
-    <None Remove="Resources\reset_black.png" />
     <None Remove="Resources\reset_white.png" />
   </ItemGroup>
 
   <ItemGroup>
-	  <Resource Include="Resources\copy_black.png" />
 	  <Resource Include="Resources\copy_white.png" />
 	  <Resource Include="Resources\favicon.ico" />
-	  <Resource Include="Resources\paste_black.png" />
 	  <Resource Include="Resources\paste_white.png" />
-	  <Resource Include="Resources\reset_black.png" />
 	  <Resource Include="Resources\reset_white.png" />
   </ItemGroup>
 
