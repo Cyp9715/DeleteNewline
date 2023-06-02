@@ -16,9 +16,8 @@ namespace DeleteNewline
         {
             InitializeComponent();
             instance = this;
-
             vm_setting = new ViewModel_Page_Setting();
-            this.DataContext = vm_setting;
+            DataContext = vm_setting;
         }
 
 

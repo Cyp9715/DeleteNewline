@@ -12,13 +12,15 @@ namespace DeleteNewline
     {
         public static MainWindow? mainWindow;
         Settings appdata = Settings.Default;
-        ViewModel_MainWindow viewModel_mainWindow;
+        ViewModel_MainWindow vm_mainWindow;
 
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = vm_mainWindow;
             mainWindow = (MainWindow)Application.Current.MainWindow;
-            viewModel_mainWindow = new ViewModel_MainWindow(mainWindow);
+            vm_mainWindow = new ViewModel_MainWindow(mainWindow);
+            DataContext = vm_mainWindow;
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

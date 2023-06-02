@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DeleteNewline.ViewModel;
+using System;
 using System.Windows;
 using System.Windows.Input;
 
@@ -7,11 +8,14 @@ namespace DeleteNewline
     public partial class Page_InputText
     {
         public static Page_InputText? instance;
+        ViewModel_Page_InputText vm_Input;
 
         public Page_InputText()
         {
             InitializeComponent();
             instance = this;
+            vm_Input = new ViewModel_Page_InputText();
+            DataContext = vm_Input;
         }
 
         ClipboardManager cbManager = new ClipboardManager();
@@ -30,18 +34,9 @@ namespace DeleteNewline
             }
             else
             {
-                AddAlertMessageInTextBox();
+                vm_Input.AddAlertMessage(ref TextBox_Main);
                 return;
             }
-        }
-
-        private void AddAlertMessageInTextBox()
-        {
-            TextBox_Main.AppendText("\r\n");
-            TextBox_Main.AppendText(" ========================================================\r\n");
-            TextBox_Main.AppendText(" ================== Only text form can be entered =================\r\n");
-            TextBox_Main.AppendText(" ========================================================\r\n");
-            TextBox_Main.ScrollToEnd();
         }
 
         private void TextBox_Main_KeyUp(object sender, KeyEventArgs e)
@@ -55,7 +50,7 @@ namespace DeleteNewline
                 }
                 else
                 {
-                    AddAlertMessageInTextBox();
+                    vm_Input.AddAlertMessage(ref TextBox_Main);
                     return;
                 }
             }
