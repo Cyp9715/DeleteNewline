@@ -11,7 +11,7 @@ this project was created to easily delete these newline characters.
 You can use other programs or websites, but the convenience provided by DeleteNewline will be the best.
 
 ## Development environment
-OS : Windows
+OS : Windows  
 .NET : 6.0 LTS
 
 ## How to Use?
