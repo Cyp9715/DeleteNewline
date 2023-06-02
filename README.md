@@ -10,8 +10,11 @@ this project was created to easily delete these newline characters.
 
 You can use other programs or websites, but the convenience provided by DeleteNewline will be the best.
 
-## Development environment
+## Release environment
+OS : Windows  
 .NET : 6.0 LTS
+
+Currently, my personal use environment stays in Windows, so there is no plan to support MAC environment.
 
 ## How to Use?
 * Copy the text and copy it to the appropriate application window.  
