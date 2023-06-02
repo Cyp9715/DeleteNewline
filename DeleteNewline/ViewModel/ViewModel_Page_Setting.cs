@@ -33,7 +33,7 @@ namespace DeleteNewline.ViewModel
             {
                 SetProperty(ref _isChecked_checkBox_topMost, value);
 
-                MainWindow.SetTopmost(value);
+                MainWindow.mainWindow.Topmost = value;
                 appdata.topMost = value;
                 appdata.Save();
             }

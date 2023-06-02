@@ -1,26 +1,26 @@
 ﻿using DeleteNewline.ViewModel;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DeleteNewline
 {
-    /// <summary>
-    /// Page_Setting.xaml에 대한 상호 작용 논리
-    /// </summary>
     public partial class Page_Setting
     {
-        KeyConverter keyConverter = new KeyConverter();
         Settings appdata = DeleteNewline.Settings.Default;
         ViewModel_Page_Setting vm_setting;
 
-        public Page_Setting()
+        public static Page_Setting? instance;
+
+        public Page_Setting() 
         {
             InitializeComponent();
+            instance = this;
+
             vm_setting = new ViewModel_Page_Setting();
             this.DataContext = vm_setting;
         }
+
 
         Key key1 = Key.None;
         Key key2 = Key.None;

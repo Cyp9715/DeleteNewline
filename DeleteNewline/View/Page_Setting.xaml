@@ -48,7 +48,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Orientation="Vertical" Margin="0,30,0,0">
+            <StackPanel Orientation="Vertical" Margin="50,30,0,0">
                 <StackPanel VerticalAlignment="Top" Orientation="Horizontal"  Margin="{StaticResource margin_stackPanel}">
                     <Label Content="Keybind" VerticalAlignment="Top" Margin="{StaticResource margin_label}"/>
                     <TextBox x:Name="TextBox_bindKey" Margin="40,0,0,0" Width="175" Height="20" VerticalAlignment="Top" IsReadOnly="True"

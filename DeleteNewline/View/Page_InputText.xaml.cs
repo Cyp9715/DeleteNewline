@@ -1,22 +1,21 @@
-﻿
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
 
 namespace DeleteNewline
 {
-    /// <summary>
-    /// Page_InputText.xaml에 대한 상호 작용 논리
-    /// </summary>
     public partial class Page_InputText
     {
-        ClipboardManager cbManager = new ClipboardManager();
-        IDataObject? idataObj;
+        public static Page_InputText? instance;
 
         public Page_InputText()
         {
             InitializeComponent();
+            instance = this;
         }
+
+        ClipboardManager cbManager = new ClipboardManager();
+        IDataObject? idataObj;
 
         private void MenuItem_Paste_Click(object sender, RoutedEventArgs e)
         {

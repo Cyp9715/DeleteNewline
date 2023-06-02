@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Threading;
 using System.Windows;
+using DeleteNewline.ViewModel;
 using GlobalHook;
-using WinForms = System.Windows.Forms;
 
 namespace DeleteNewline
 {
@@ -11,90 +10,21 @@ namespace DeleteNewline
     /// </summary>
     public partial class MainWindow
     {
-        System.Threading.Mutex singleton = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
-
-        static MainWindow? mainWindow;
-        WinForms.NotifyIcon notifyIcon = new WinForms.NotifyIcon();
-        Page_InputText page_inputText = new Page_InputText();
-        Page_Setting page_setting = new Page_Setting();
-
+        public static MainWindow? mainWindow;
         Settings appdata = Settings.Default;
+        ViewModel_MainWindow viewModel_mainWindow;
 
         public MainWindow()
         {
             InitializeComponent();
-            InitializeSettings();
-        }
-
-        private void InitializeSettings()
-        {
-            // Prevent multiple run.
-            PreventMultipleRun();
-
-            // Init Window Setting.
             mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.Width = Settings.Default.mainWindowSize_width;
-            mainWindow.Height = Settings.Default.mainWindowSize_height;
-            mainWindow.Topmost = appdata.topMost;
-
-            // Init GlobalHook
-            HookImplement.InstallGlobalHook();
-
-            // Init tray
-            SetNotifyIcon();
-            SetContextMenu();
-
-            // Init NavigationView selection
-            navigationView_side.SelectedItem = NavigationViewItem_InputText;
-            frame_main.Content = page_inputText;
-        }
-
-        private void ContextMenu_Action_Exit(object? sender, EventArgs e)
-        {
-            System.Environment.Exit(0);
-        }
-
-        private void SetContextMenu()
-        {
-            notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            notifyIcon.ContextMenuStrip.Items.Add("Exit", null, ContextMenu_Action_Exit);
-        }
-
-        private void SetNotifyIcon()
-        {
-            notifyIcon.Icon = Resource.favicon;
-            notifyIcon.Text = "DeleteNewline";
-
-            notifyIcon.DoubleClick += delegate(object? sender, EventArgs eventArgs)
-            {
-                mainWindow.Show();
-                mainWindow.WindowState = WindowState.Normal;
-            };
-
-            notifyIcon.Visible = true;
-        }
-
-        private void PreventMultipleRun()
-        {
-            if (!singleton.WaitOne(TimeSpan.Zero, true))
-            {
-                MessageBox.Show("Already run DeleteNewline!");
-                Application.Current.Shutdown();
-            }
-        }
-
-        public static void SetTopmost(bool topMost)
-        {
-            if(mainWindow != null)
-            {
-                mainWindow.Topmost = topMost;
-            }
+            viewModel_mainWindow = new ViewModel_MainWindow(mainWindow);
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Settings.Default.mainWindowSize_width = e.NewSize.Width;
-            Settings.Default.mainWindowSize_height = e.NewSize.Height;
+            appdata.mainWindowSize_width = e.NewSize.Width;
+            appdata.mainWindowSize_height = e.NewSize.Height;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -122,7 +52,7 @@ namespace DeleteNewline
         {
             if (args.IsSettingsInvoked)
             {
-                frame_main.Content = page_setting;
+                frame_main.Content = Page_Setting.instance;
                 HookImplement.UnInstallGlobalHook();
                 Windows.Notification.Send("Enter the settings page", "GlobalHooks have been removed.");
             }
@@ -132,7 +62,7 @@ namespace DeleteNewline
                 {
                     case 0:
                         HookImplement.InstallGlobalHook();
-                        frame_main.Content = page_inputText;
+                        frame_main.Content = Page_InputText.instance;
                         break;
                 }
             }
