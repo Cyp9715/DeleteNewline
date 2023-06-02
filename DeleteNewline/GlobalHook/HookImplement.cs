@@ -54,7 +54,9 @@ namespace GlobalHook
                 isPressedKey1 = true;
             }
 
-            if(e.KeyCode == key2)
+            // 순서제한, LeftAlt → F1 순서는 가능
+            // F1 → LeftAlt 순서는 불가능
+            if(e.KeyCode == key2 && isPressedKey1 == true)
             {
                 isPressedKey2 = true;
             }

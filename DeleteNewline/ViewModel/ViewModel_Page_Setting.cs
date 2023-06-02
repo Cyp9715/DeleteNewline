@@ -72,7 +72,7 @@ namespace DeleteNewline.ViewModel
             get => _text_textBox_keybind;
 
             // SetProperty 는 변경되었을 경우만 OnPropertyChanged 를 발생시키기에 수동으로 추가함.
-            // (아무것도 입력하지 않고 textBox_bindKey Focus 벗어날 시 문제발생)
+            // 아무것도 입력하지 않고 textBox_bindKey Focus 벗어날 시 문제발생
             set
             {
                 OnPropertyChanging();
