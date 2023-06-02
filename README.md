@@ -24,6 +24,3 @@ Currently, my personal use environment stays in Windows, so there is no plan to 
 perhaps the last function is most useful.
 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
-
-## Matter under consideration.
-If there are no problems outside of development(Rule), I willing to connect translator such as Google, Papago, and Bing directly to the DeleteNewline. (Probably not the way to implement it using the API.)
