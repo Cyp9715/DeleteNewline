@@ -5,13 +5,13 @@ namespace DeleteNewline
 {
     class ClipboardManager
     {
-        public string DeleteClipboardNewline(ref IDataObject idata)
+        public string DeleteClipboardNewline(ref IDataObject idata, bool deleteMultipleSpace = false)
         {
             string clipboardText = (string)idata.GetData(DataFormats.Text);
             
             clipboardText = Regex.Replace(clipboardText, @"\r\n", "");
 
-            if (Settings.Default.deleteMultipleSpace == true)
+            if (deleteMultipleSpace == true)
             {
                 clipboardText = Regex.Replace(clipboardText, @"\s+", " ");
             }

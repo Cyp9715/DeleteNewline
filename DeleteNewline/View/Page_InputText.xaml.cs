@@ -25,7 +25,8 @@ namespace DeleteNewline
             {
                 originalText = (string)idataObj.GetData(DataFormats.Text);
                 TextBox_Main.AppendText(originalText);
-                Clipboard.SetDataObject(cbManager.DeleteClipboardNewline(ref idataObj).ToString());
+                Clipboard.SetDataObject(cbManager.DeleteClipboardNewline(ref idataObj).ToString(),
+                    Settings.Default.deleteMultipleSpace);
             }
             else
             {
@@ -49,7 +50,8 @@ namespace DeleteNewline
             {
                 if (cbManager.GetClipboardData_Text(ref idataObj) == true)
                 {
-                    Clipboard.SetDataObject(cbManager.DeleteClipboardNewline(ref idataObj).ToString());
+                    Clipboard.SetDataObject(cbManager.DeleteClipboardNewline(ref idataObj).ToString(), 
+                        Settings.Default.deleteMultipleSpace);
                 }
                 else
                 {

@@ -21,7 +21,7 @@ namespace DeleteNewline
             {
                 notifyHeader = "SUCCESS";
 
-                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj).ToString();
+                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj, Settings.Default.deleteMultipleSpace).ToString();
                 Clipboard.SetDataObject(deletedText);
 
                 if (deletedText.Length > limitLen)
@@ -48,7 +48,8 @@ namespace DeleteNewline
 
             if (cbManager.GetClipboardData_Text(ref idataObj) == true)
             {
-                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj).ToString();
+                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj, 
+                    Settings.Default.deleteMultipleSpace).ToString();
                 Clipboard.SetDataObject(deletedText);
             }
         }
