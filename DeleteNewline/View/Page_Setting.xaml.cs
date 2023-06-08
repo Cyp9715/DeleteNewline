@@ -24,7 +24,7 @@ namespace DeleteNewline
         Key key1 = Key.None;
         Key key2 = Key.None;
 
-        // 키를 누르는것에 따라 UI를 지정함. (여기서 지정되는 UI_Key 는 사용자 반응성을 위한것으로 임시적임)
+        // 키를 누르는것에 따라 UI를 지정함. (여기서 지정되는 Key 는 사용자 반응성을 위한것으로 임시적임)
         private void TextBox_bindKey_KeyDown(object sender, KeyEventArgs e)
         {
             if(key1 == Key.None)
