@@ -41,7 +41,7 @@ namespace DeleteNewline
 
         private void NavigationView_PaneOpening(ModernWpf.Controls.NavigationView sender, object args)
         {
-            ColumnDefinition_mainWindow_0.Width = new GridLength(300);
+            ColumnDefinition_mainWindow_0.Width = new GridLength(navigationView_side.OpenPaneLength - 20);
         }
 
         private void NavigationView_PaneClosing(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewPaneClosingEventArgs args)
