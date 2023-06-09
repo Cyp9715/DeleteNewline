@@ -33,7 +33,11 @@ namespace DeleteNewline
             }
             else
             {
-                key2 = (e.Key == Key.System) ? e.SystemKey : e.Key;
+                // 만약 key1과 key2가 같은 입력값이라면 key2 에 할당하지 않음 (Press 동작 방지)
+                if(e.Key != key1)
+                {
+                    key2 = (e.Key == Key.System) ? e.SystemKey : e.Key;
+                }
             }
 
             vm_setting.SetUI_keybind(key1, key2);

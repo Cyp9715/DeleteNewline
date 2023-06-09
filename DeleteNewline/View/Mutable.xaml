@@ -16,5 +16,12 @@
     <bcl:Double x:Key="height_checkBox">20</bcl:Double>
     <bcl:Double x:Key="minWidth_checkBox">0</bcl:Double>
     <bcl:Double x:Key="minHeight_checkBox">0</bcl:Double>
+
+    <!-- ToolTips -->
+    <bcl:String x:Key="toolTipText_NavigationItem_InputTextPage">When you paste a string into the Input Text Page, the string with newlines removed is copied to your clipboard. (But perhaps the Bindkey function would be more useful)</bcl:String>
     
+    <bcl:String x:Key="toolTipText_topMost">DeleteNewline is always at the top.</bcl:String>
+    <bcl:String x:Key="toolTipText_keyBind">Drag a specific string anywhere and press the Keybind to send the string with newline removed to your clipboard! [You must combine the two keys.]</bcl:String>
+    <bcl:String x:Key="toolTipText_notification">Activate Windows notification according to Keybind operation.</bcl:String>
+    <bcl:String x:Key="toolTipText_deleteMultipleSpace">Replace multiple spaces with a single space.</bcl:String>
 </ResourceDictionary>

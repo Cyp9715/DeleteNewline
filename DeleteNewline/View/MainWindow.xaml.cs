@@ -55,7 +55,7 @@ namespace DeleteNewline
             {
                 frame_main.Content = Page_Setting.instance;
                 HookImplement.UnInstallGlobalHook();
-                Windows.Notification.Send("Enter the settings page", "GlobalHooks have been removed.");
+                Windows.Notification.Send("Enter the settings page", "To use keyBind, go to TextInput page.");
             }
             else
             {
