@@ -46,7 +46,7 @@ namespace DeleteNewline
         {
             if (!singleton.WaitOne(TimeSpan.Zero, true))
             {
-                MessageBox.Show("Already run DeleteNewline!");
+                MessageBox.Show("Already run Delete Newline!");
                 Application.Current.Shutdown();
             }
         }
@@ -54,7 +54,7 @@ namespace DeleteNewline
         private void SetNotifyIcon()
         {
             notifyIcon.Icon = Resource.favicon;
-            notifyIcon.Text = "DeleteNewline";
+            notifyIcon.Text = "Delete Newline";
 
             notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
             {

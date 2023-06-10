@@ -9,6 +9,9 @@
      <ApplicationIcon>Resources\favicon.ico</ApplicationIcon>
      <PlatformTarget>AnyCPU</PlatformTarget>
      <Platforms>AnyCPU;x86</Platforms>
+     <NeutralLanguage>en</NeutralLanguage>
+     <AssemblyVersion>1.2.7</AssemblyVersion>
+     <AssemblyName>Delete Newline</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
