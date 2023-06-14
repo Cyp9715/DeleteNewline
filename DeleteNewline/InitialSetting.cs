@@ -26,8 +26,8 @@ namespace DeleteNewline
             mainWindow = mainWindow_;
 
             // Init Window Setting.
-            mainWindow.Width = Settings.Default.mainWindowSize_width;
-            mainWindow.Height = Settings.Default.mainWindowSize_height;
+            mainWindow.Width = appdata.mainWindowSize_width;
+            mainWindow.Height = appdata.mainWindowSize_height;
             mainWindow.Topmost = appdata.topMost;
 
             // Init GlobalHook
@@ -73,6 +73,9 @@ namespace DeleteNewline
 
         private void Action_ContextMenu_Exit(object? sender, EventArgs e)
         {
+            appdata.mainWindowSize_width = mainWindow.Width;
+            appdata.mainWindowSize_height = mainWindow.Height;
+            appdata.Save();
             System.Environment.Exit(0);
         }
     }
