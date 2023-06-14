@@ -24,3 +24,8 @@ Currently, my personal use environment stays in Windows, so there is no plan to 
 perhaps the last function is most useful.
 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
+
+## Download
+
+The executable file of Delete Newline is provided from the [MS Store](https://www.microsoft.com/store/apps/9NC17SL0VV5S) from version 1.2.8.  
+Github Release only provides up to version 1.2.7.
