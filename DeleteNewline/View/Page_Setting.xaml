@@ -17,12 +17,12 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="550"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Vertical" Grid.Column="1" Margin="0,20,0,0">
-                <Label Content="Default" FontSize="18" FontWeight="Bold"/>
+                <Label Content="Default" FontSize="18" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
                 <DockPanel ToolTip="{StaticResource toolTipText_topMost}"
                                 Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
@@ -50,15 +50,15 @@
                                      Text="{Binding text_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus" TextAlignment="Center" Height="20"/>
                 </DockPanel>
 
-                <DockPanel Margin="{StaticResource margin_internalPanel}">
+                <DockPanel Margin="0,35,0,0">
                     <Rectangle Width="400" Height="1" Fill="Gray" />
                 </DockPanel>
 
-                <Label Margin="0,20,0,0" Content="Regex" FontSize="18" FontWeight="Bold"/>
+                <Label Content="Regex" FontSize="18" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
                 <DockPanel ToolTip="{StaticResource toolTipText_deleteMultipleSpace}"
                                 Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
-                    <Label Content="Delete Multiple Space" Width="{StaticResource width_label}"/>
+                    <Label Content="Delete Multiple Space" Width="{StaticResource width_label}" />
                     <CheckBox Name="CheckBox_deleteMultipleSpace"  HorizontalAlignment="Right"
                                   Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
                                   MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
@@ -69,6 +69,19 @@
                     <Label Content="Regex Expression" VerticalAlignment="Center"/>
                     <TextBox x:Name="TextBox_Regex" Width="275" HorizontalAlignment="Right" TextAlignment="Center"/>
                 </DockPanel>
+
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width=" 1*"/>
+                        <ColumnDefinition Width=" 1*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBox x:Name="TextBox_regexInput" Grid.Column="0" Height="250" Margin="10,10,5,10"/>
+                    <TextBox x:Name="TextBox_regexResult" Grid.Column="1" Height="250" Margin="5,10,10,10" 
+                             IsReadOnly="True" Focusable="False"/>
+                </Grid>
+                <StackPanel Orientation="Horizontal">
+                </StackPanel>
             </StackPanel>
 
 

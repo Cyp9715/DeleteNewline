@@ -3,7 +3,8 @@
                     xmlns:bcl="clr-namespace:System;assembly=mscorlib">
     
     <!-- Page_Setting -->
-    <Thickness x:Key="margin_checkBox" Left="0" Top="00" Right="0" Bottom="0"/>
+    <Thickness x:Key="margin_checkBox" Left="0" Top="0" Right="0" Bottom="0"/>
+    <Thickness x:Key="margin_mainCategory" Left="0" Top="20" Right="0" Bottom="0"/>
     <Thickness x:Key="margin_internalPanel" Left="0" Top="20" Right="0" Bottom="0"/>
 
 	
