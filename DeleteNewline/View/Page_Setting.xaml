@@ -8,55 +8,75 @@
       Title="Page_Setting"
       KeyboardNavigation.TabNavigation="None">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10*"/>
+                <RowDefinition Height="1.25*"/>
+            </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
 
-        <StackPanel Orientation="Horizontal">
-            <StackPanel Orientation="Vertical" Margin="40,30,0,0">
-                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="{StaticResource toolTipText_topMost}"
-                            Margin="{StaticResource margin_stackPanel}" Width="{StaticResource width_stackPanel}">
-                    <Label Content="TopMost" VerticalAlignment="Top" Width="{StaticResource width_label}" Margin="{StaticResource margin_label}" />
-                    <CheckBox Name="CheckBox_topMost" VerticalAlignment="Top"
-                              Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
-                              MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
-                                IsChecked="{Binding isChecked_checkBox_topMost}"/>
-                </StackPanel>
+            <StackPanel Orientation="Vertical" Grid.Column="1" Margin="0,20,0,0">
+                <Label Content="Default" FontSize="18" FontWeight="Bold"/>
 
-                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="{StaticResource toolTipText_notification}"
-                            Margin="{StaticResource margin_stackPanel}" Width="{StaticResource width_stackPanel}">
-                    <Label Content="Notification" VerticalAlignment="Top" Width="{StaticResource width_label}" Margin="{StaticResource margin_label}" />
-                    <CheckBox Name="CheckBox_notification" VerticalAlignment="Top"  
-                              Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
-                              MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
-                                IsChecked="{Binding isChecked_checkBox_notification}"/>
-                </StackPanel>
+                <DockPanel ToolTip="{StaticResource toolTipText_topMost}"
+                                Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
+                    <Label Content="TopMost" Width="{StaticResource width_label}"/>
+                    <CheckBox Name="CheckBox_topMost" HorizontalAlignment="Right"
+                                  Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
+                                  MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
+                                    IsChecked="{Binding isChecked_checkBox_topMost}"/>
+                </DockPanel>
 
-                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="{StaticResource toolTipText_deleteMultipleSpace}"
-                            Margin="{StaticResource margin_stackPanel}" Width="{StaticResource width_stackPanel}">
-                    <Label Content="Delete Multiple Space" VerticalAlignment="Top" Width="{StaticResource width_label}" Margin="{StaticResource margin_label}" />
-                    <CheckBox Name="CheckBox_deleteMultipleSpace" VerticalAlignment="Top" 
-                              Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
-                              MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
-                                IsChecked="{Binding isChecked_checkBox_deleteMultipleSpace}"/>
-                </StackPanel>
+                <DockPanel ToolTip="{StaticResource toolTipText_notification}"
+                                Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
+                    <Label Content="Notification" Width="{StaticResource width_label}"/>
+                    <CheckBox Name="CheckBox_notification"  HorizontalAlignment="Right"
+                                Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
+                                MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
+                                    IsChecked="{Binding isChecked_checkBox_notification}"/>
+                </DockPanel>
+
+                <DockPanel Margin="0,13,0,0" 
+                                    ToolTip="{StaticResource toolTipText_keyBind}" Width="{StaticResource width_dockPanel}">
+                    <Label Content="Keybind" VerticalAlignment="Center"/>
+                    <TextBox x:Name="TextBox_bindKey" Width="275" IsReadOnly="True" HorizontalAlignment="Right"
+                                 KeyDown="TextBox_bindKey_KeyDown" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" 
+                                     Text="{Binding text_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus" TextAlignment="Center" Height="20"/>
+                </DockPanel>
+
+                <DockPanel Margin="{StaticResource margin_internalPanel}">
+                    <Rectangle Width="400" Height="1" Fill="Gray" />
+                </DockPanel>
+
+                <Label Margin="0,20,0,0" Content="Regex" FontSize="18" FontWeight="Bold"/>
+
+                <DockPanel ToolTip="{StaticResource toolTipText_deleteMultipleSpace}"
+                                Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
+                    <Label Content="Delete Multiple Space" Width="{StaticResource width_label}"/>
+                    <CheckBox Name="CheckBox_deleteMultipleSpace"  HorizontalAlignment="Right"
+                                  Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
+                                  MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
+                                    IsChecked="{Binding isChecked_checkBox_deleteMultipleSpace}"/>
+                </DockPanel>
+
+                <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}">
+                    <Label Content="Regex Expression" VerticalAlignment="Center"/>
+                    <TextBox x:Name="TextBox_Regex" Width="275" HorizontalAlignment="Right" TextAlignment="Center"/>
+                </DockPanel>
             </StackPanel>
 
-            <StackPanel Orientation="Vertical" Margin="30,30,0,0">
-                <StackPanel VerticalAlignment="Top" Orientation="Horizontal"  Margin="{StaticResource margin_stackPanel}" ToolTip="{StaticResource toolTipText_keyBind}">
-                    <Label Content="Keybind" VerticalAlignment="Top" Margin="{StaticResource margin_label}"/>
-                    <TextBox x:Name="TextBox_bindKey" Margin="40,0,0,0" Width="150" Height="20" VerticalAlignment="Top" IsReadOnly="True"
-                         KeyDown="TextBox_bindKey_KeyDown" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" 
-                             Text="{Binding text_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus"/>
-                </StackPanel>
-            </StackPanel>
-        </StackPanel>
 
-        <Label x:Name="TextBox_version" FontSize="11" Content="Delete Newline 1.2.7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20"/>
-    </Grid>
+            <Label Grid.Row="1" Grid.Column="1" x:Name="TextBox_version" FontSize="11" Content="Delete Newline 1.2.8"
+                 UseLayoutRounding="True" Foreground="LightGray" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"/>
+        </Grid>
+
+    </ScrollViewer>
+
+
 </Page>

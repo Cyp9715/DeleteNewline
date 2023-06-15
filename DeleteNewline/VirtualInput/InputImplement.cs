@@ -10,7 +10,7 @@ namespace VirtualInput
 {
     class InputImplement
     {
-        public static void PressKeyboard_Copy()
+        public static void TypeKeyboard_Copy()
         {
             /*
              * [COM 객체 Thread 문제로 인한 STA Thread 분기.]

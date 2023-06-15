@@ -15,7 +15,7 @@ namespace DeleteNewline
             string notifyContent = String.Empty;
             int limitLen = 100;
 
-            VirtualInput.InputImplement.PressKeyboard_Copy();
+            VirtualInput.InputImplement.TypeKeyboard_Copy();
 
             if (cbManager.GetClipboardData_Text(ref idataObj) == true)
             {
@@ -44,7 +44,7 @@ namespace DeleteNewline
 
         public static void DeleteNewline_WithoutNotifier()
         {
-            VirtualInput.InputImplement.PressKeyboard_Copy();
+            VirtualInput.InputImplement.TypeKeyboard_Copy();
 
             if (cbManager.GetClipboardData_Text(ref idataObj) == true)
             {

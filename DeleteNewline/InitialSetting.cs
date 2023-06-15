@@ -76,6 +76,7 @@ namespace DeleteNewline
             appdata.mainWindowSize_width = mainWindow.Width;
             appdata.mainWindowSize_height = mainWindow.Height;
             appdata.Save();
+
             System.Environment.Exit(0);
         }
     }

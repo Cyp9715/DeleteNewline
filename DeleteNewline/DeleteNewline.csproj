@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <None Remove="Resources\copy_white.png" />
+    <None Remove="Resources\grayLine.png" />
     <None Remove="Resources\paste_white.png" />
     <None Remove="Resources\reset_white.png" />
   </ItemGroup>
