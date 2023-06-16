@@ -9,7 +9,7 @@ namespace DeleteNewline
         static ClipboardManager cbManager = new ClipboardManager();
         static IDataObject? idataObj;
 
-        public static void DeleteNewline_WithNotifier()
+        public static void DeleteNewline_WithNotifier(string regex, string replace)
         {
             string notifyHeader = String.Empty;
             string notifyContent = String.Empty;
@@ -21,7 +21,7 @@ namespace DeleteNewline
             {
                 notifyHeader = "SUCCESS";
 
-                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj, Settings.Default.deleteMultipleSpace).ToString();
+                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj, regex, replace);
                 Clipboard.SetDataObject(deletedText);
 
                 if (deletedText.Length > limitLen)
@@ -42,14 +42,13 @@ namespace DeleteNewline
             Notification.Send(notifyHeader, notifyContent);
         }
 
-        public static void DeleteNewline_WithoutNotifier()
+        public static void DeleteNewline_WithoutNotifier(string regex, string replace)
         {
             VirtualInput.InputImplement.TypeKeyboard_Copy();
 
             if (cbManager.GetClipboardData_Text(ref idataObj) == true)
             {
-                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj, 
-                    Settings.Default.deleteMultipleSpace).ToString();
+                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj, regex, replace);
                 Clipboard.SetDataObject(deletedText);
             }
         }

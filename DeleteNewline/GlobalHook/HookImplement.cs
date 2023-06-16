@@ -1,13 +1,15 @@
-﻿using DeleteNewline;
-using System;
-using System.Windows;
+﻿using System;
+using DeleteNewline.ViewModel;
+
 namespace GlobalHook
 {
     static class HookImplement
     {
         static GlobalKeyHook? globalKeyHook;
-        public static Action? execute;
+        static ViewModel_Page_Setting setting = ViewModel_Page_Setting.page_settings;
         static bool isSetHook = false;
+        
+        public static Action<string, string>? execute;
 
         public static void InstallGlobalHook()
         {
@@ -68,7 +70,7 @@ namespace GlobalHook
             {
                 isPressedKey1 = false;
                 isPressedKey2 = false;
-                execute();
+                execute(setting.text_textBox_regexExpression, setting.text_textBox_regexReplace);
             }
 
             if (e.KeyCode == key1)

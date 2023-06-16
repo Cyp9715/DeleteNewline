@@ -12,7 +12,7 @@ namespace DeleteNewline {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -104,6 +104,42 @@ namespace DeleteNewline {
             }
             set {
                 this["deleteMultipleSpace"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\r\\n")]
+        public string regexExpression {
+            get {
+                return ((string)(this["regexExpression"]));
+            }
+            set {
+                this["regexExpression"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string regexReplace {
+            get {
+                return ((string)(this["regexReplace"]));
+            }
+            set {
+                this["regexReplace"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("If you can’t explain it simply,\r\nyou don’t understand \r\nit well enough. ")]
+        public string inputRegexExample {
+            get {
+                return ((string)(this["inputRegexExample"]));
+            }
+            set {
+                this["inputRegexExample"] = value;
             }
         }
     }

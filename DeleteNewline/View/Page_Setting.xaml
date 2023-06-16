@@ -4,15 +4,15 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="680" d:DesignWidth="800"
       Title="Page_Setting"
       KeyboardNavigation.TabNavigation="None">
+
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="10*"/>
-                <RowDefinition Height="1.25*"/>
+                <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -21,8 +21,8 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Vertical" Grid.Column="1" Margin="0,20,0,0">
-                <Label Content="Default" FontSize="18" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
+            <StackPanel Orientation="Vertical" Grid.Column="1" Margin="0,20,0,0" VerticalAlignment="Top">
+                <Label Content="Basic" FontSize="18" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
                 <DockPanel ToolTip="{StaticResource toolTipText_topMost}"
                                 Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
@@ -67,25 +67,59 @@
 
                 <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}">
                     <Label Content="Regex Expression" VerticalAlignment="Center"/>
-                    <TextBox x:Name="TextBox_Regex" Width="275" HorizontalAlignment="Right" TextAlignment="Center"/>
+                    <TextBox x:Name="TextBox_Regex"  Text="{Binding text_textBox_regexExpression}"
+                             Width="275" HorizontalAlignment="Right" TextAlignment="Center"/>
                 </DockPanel>
 
-                <Grid Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width=" 1*"/>
-                        <ColumnDefinition Width=" 1*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBox x:Name="TextBox_regexInput" Grid.Column="0" Height="250" Margin="10,10,5,10"/>
-                    <TextBox x:Name="TextBox_regexResult" Grid.Column="1" Height="250" Margin="5,10,10,10" 
-                             IsReadOnly="True" Focusable="False"/>
+                <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}">
+                    <Label Content="Replace" VerticalAlignment="Center"/>
+                    <TextBox x:Name="TextBox_RegexReplace"  Text="{Binding text_textBox_regexReplace}"
+                             Width="275" HorizontalAlignment="Right" TextAlignment="Center"
+                             Foreground="Yellow"/>
+                </DockPanel>
+
+                <Grid Margin="40,20,40,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=" 1*"/>
+                        <RowDefinition Height=" 1*"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Content="input" Margin="0,0,10,0" Foreground="LightGray" FontSize="12" HorizontalAlignment="Right"/>
+
+                    <TextBox x:Name="TextBox_regexInput" Grid.Row="0" Margin="10,15,10,10" Height="100" AcceptsReturn="True" 
+                             Text="{Binding text_textBox_inputRegexExample}"/>
+
+                    <TextBlock IsHitTestVisible="False" Text="{StaticResource waterMark_inputRegex}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="DarkGray">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=TextBox_regexInput}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+
+                    <Label Grid.Row="1" Content="output" Margin="0,0,10,0" Foreground="LightGray" FontSize="12" HorizontalAlignment="Right"/>
+
+                    <TextBox x:Name="TextBox_regexOutput" Grid.Row="1" Margin="10,15,10,10" Height="100" IsReadOnly="True"
+                             Text="{Binding text_textBox_outputRegexExample}"/>
                 </Grid>
-                <StackPanel Orientation="Horizontal">
-                </StackPanel>
+
+                <Button x:Name="button_RegexDefault" Content="Default Regex Settings" Width="450" HorizontalAlignment="Center" Click="button_RegexDefault_Click">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="100"/>
+                        </Style>
+                    </Button.Resources>
+
+                </Button>
             </StackPanel>
 
-
-            <Label Grid.Row="1" Grid.Column="1" x:Name="TextBox_version" FontSize="11" Content="Delete Newline 1.2.8"
+            <Label Grid.Row="1" Grid.Column="1" x:Name="TextBox_version" FontSize="11" Content="{StaticResource text_versionInfomation}"
                  UseLayoutRounding="True" Foreground="LightGray" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"/>
         </Grid>
 

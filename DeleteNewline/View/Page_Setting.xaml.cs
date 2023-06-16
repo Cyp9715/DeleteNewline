@@ -70,5 +70,13 @@ namespace DeleteNewline
 
             vm_setting.SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
         }
+
+        private void button_RegexDefault_Click(object sender, RoutedEventArgs e)
+        {
+            vm_setting.text_textBox_regexExpression = "\\r\\n";
+            vm_setting.text_textBox_regexReplace = " ";
+
+            vm_setting.isChecked_checkBox_deleteMultipleSpace = false;
+        }
     }
 }
