@@ -27,8 +27,13 @@
     <bcl:String x:Key="toolTipText_notification">Activate Windows notification according to Keybind operation.</bcl:String>
     <bcl:String x:Key="toolTipText_deleteMultipleSpace">Replace multiple spaces with a single space.</bcl:String>
 
+    <bcl:String x:Key="toolTipText_regexExpression">Input Regex expression.</bcl:String>
+    <bcl:String x:Key="toolTipText_regexReplace">Matching Regex expressions are replaced with that string!</bcl:String>
+
     <bcl:String x:Key="toolTipText_inputRegex">Input the source string to test the Regex on.</bcl:String>
     <bcl:String x:Key="toolTipText_outputRegex">Displays Regex test result.</bcl:String>
+
+    <bcl:String x:Key="toolTipText_defaultRegexSettings">delete Newline!</bcl:String>
 
     <!-- TextBlock water mark -->
     <bcl:String x:Key="waterMark_inputRegex">Input the source string to test Regex.</bcl:String>

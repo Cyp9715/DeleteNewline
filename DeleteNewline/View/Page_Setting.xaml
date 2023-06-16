@@ -21,7 +21,7 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Vertical" Grid.Column="1" VerticalAlignment="Top" Margin="0,0,0,30">
+            <StackPanel Orientation="Vertical" Grid.Column="1" VerticalAlignment="Top" Margin="0,0,0,40">
                 
                 <!-- BASIC -->
                 
@@ -62,13 +62,13 @@
 
                 <Label Content="Regex" FontSize="{StaticResource size_mainCategoryFont}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
-                <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}">
+                <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}" ToolTip="{StaticResource toolTipText_regexExpression}">
                     <Label Content="Regex Expression" VerticalAlignment="Center"/>
                     <TextBox x:Name="TextBox_regexExpression"  Text="{Binding text_textBox_regexExpression}"
                              Width="275" HorizontalAlignment="Right" TextAlignment="Center" KeyUp="TextBox_regexExpression_KeyUp"/>
                 </DockPanel>
 
-                <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}">
+                <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}" ToolTip="{StaticResource toolTipText_regexReplace}">
                     <Label Content="Replace" VerticalAlignment="Center"/>
                     <TextBox x:Name="TextBox_regexReplace"  Text="{Binding text_textBox_regexReplace}"
                              Width="275" HorizontalAlignment="Right" TextAlignment="Center"
@@ -117,7 +117,7 @@
 
                     <Button x:Name="button_RegexDefault" Grid.Row="4" Width="{Binding Path=Width, ElementName=Grid_RegexExample}" 
                             Content="Default Regex Settings" HorizontalAlignment="Center" 
-                            Click="button_RegexDefault_Click">
+                            Click="button_RegexDefault_Click" ToolTip="{StaticResource toolTipText_defaultRegexSettings}">
                         <Button.Resources>
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius" Value="10"/>

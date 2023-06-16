@@ -130,7 +130,7 @@ namespace DeleteNewline.ViewModel
         public void Update_regexOutput(TextBox? textBox_regexExpression = null, TextBox? textBox_regexReplace = null, TextBox ? textBox_regexInput = null)
         {
             // realtime update
-            if(textBox_regexInput != null)
+            if (textBox_regexInput != null)
             {
                 text_textBox_inputRegex = textBox_regexInput.Text;
             }
@@ -146,7 +146,8 @@ namespace DeleteNewline.ViewModel
             }
 
             OnPropertyChanging("text_textBox_outputRegexExample");
-            text_textBox_outputRegex = regexManager.Replace(text_textBox_inputRegex, text_textBox_regexExpression, text_textBox_regexReplace);
+            (var success, text_textBox_outputRegex) = regexManager.Replace(text_textBox_inputRegex, 
+                                                    text_textBox_regexExpression, text_textBox_regexReplace);
             OnPropertyChanged("text_textBox_outputRegexExample");
         }
 

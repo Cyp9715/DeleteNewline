@@ -1,11 +1,12 @@
 ﻿using System;
+using System.DirectoryServices.ActiveDirectory;
 using System.Text.RegularExpressions;
 
 namespace DeleteNewline
 {
     public class RegexManager
     {
-        public string Replace(string text, string regex, string replace)
+        public (bool,string) Replace(string text, string regex, string replace)
         {
             try
             {
@@ -13,10 +14,10 @@ namespace DeleteNewline
             }
             catch (Exception)
             {
-                return "Invalid Regex";
+                return (false, "INVALID REGEX");
             }
 
-            return text;
+            return (true, text);
         }
     }
 }

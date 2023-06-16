@@ -26,11 +26,11 @@ namespace DeleteNewline
         {
             string originalText = String.Empty;
 
-            if (clipboardManager.GetClipboardData_Text(ref idataObj) == true)
+            if (clipboardManager.GetClipboardText(ref idataObj) == true)
             {
                 originalText = (string)idataObj.GetData(DataFormats.Text);
                 TextBox_Main.AppendText(originalText);
-                Clipboard.SetDataObject(clipboardManager.DeleteClipboardNewline(ref idataObj,
+                Clipboard.SetDataObject(clipboardManager.applyRegex(ref idataObj,
                         settings.text_textBox_regexExpression, settings.text_textBox_regexReplace).ToString());
             }
             else
@@ -44,9 +44,9 @@ namespace DeleteNewline
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
-                if (clipboardManager.GetClipboardData_Text(ref idataObj) == true)
+                if (clipboardManager.GetClipboardText(ref idataObj) == true)
                 {
-                    Clipboard.SetDataObject(clipboardManager.DeleteClipboardNewline(ref idataObj,
+                    Clipboard.SetDataObject(clipboardManager.applyRegex(ref idataObj,
                             settings.text_textBox_regexExpression, settings.text_textBox_regexReplace).ToString());
                 }
                 else

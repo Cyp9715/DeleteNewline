@@ -6,37 +6,54 @@ namespace DeleteNewline
 {
     static class Execute
     {
-        static ClipboardManager cbManager = new ClipboardManager();
+        static ClipboardManager clipboardManager = new ClipboardManager();
         static IDataObject? idataObj;
 
         public static void DeleteNewline_WithNotifier(string regex, string replace)
         {
             string notifyHeader = String.Empty;
             string notifyContent = String.Empty;
-            int limitLen = 100;
+            
+            bool isTextForm = false;
+            bool isCorrectRegex = false;
+
+            string replacedText = String.Empty;
 
             VirtualInput.InputImplement.TypeKeyboard_Copy();
 
-            if (cbManager.GetClipboardData_Text(ref idataObj) == true)
+            if (clipboardManager.GetClipboardText(ref idataObj) == true)
             {
-                notifyHeader = "SUCCESS";
+                isTextForm = true;
 
-                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj, regex, replace);
-                Clipboard.SetDataObject(deletedText);
+                (isCorrectRegex, replacedText) = clipboardManager.applyRegex(ref idataObj, regex, replace);
+                Clipboard.SetDataObject(replacedText);
+                
 
-                if (deletedText.Length > limitLen)
+                int limitLen = 100;
+
+                if (replacedText.Length > limitLen)
                 {
-                    notifyContent = deletedText.Substring(0, limitLen) + " ...";
+                    notifyContent = replacedText.Substring(0, limitLen) + " ...";
                 }
                 else
                 {
-                    notifyContent = deletedText;
+                    notifyContent = replacedText;
                 }
             }
-            else
+
+            if(isTextForm == false)
             {
                 notifyHeader = "ERROR";
                 notifyContent = "CLIPBOARD FORM IS NOT TEXT";
+            }
+            else if(isCorrectRegex == false)
+            {
+                notifyHeader = "ERROR";
+                notifyContent = replacedText;
+            }
+            else
+            {
+                notifyHeader = "SUCCESS";
             }
 
             Notification.Send(notifyHeader, notifyContent);
@@ -46,10 +63,10 @@ namespace DeleteNewline
         {
             VirtualInput.InputImplement.TypeKeyboard_Copy();
 
-            if (cbManager.GetClipboardData_Text(ref idataObj) == true)
+            if (clipboardManager.GetClipboardText(ref idataObj) == true)
             {
-                string deletedText = cbManager.DeleteClipboardNewline(ref idataObj, regex, replace);
-                Clipboard.SetDataObject(deletedText);
+                (var success, var replacedText) = clipboardManager.applyRegex(ref idataObj, regex, replace);
+                Clipboard.SetDataObject(replacedText);
             }
         }
     }
