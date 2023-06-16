@@ -27,7 +27,7 @@ namespace DeleteNewline.ViewModel
                 text_textBox_regexExpression = appdata.regexExpression == setting_space ? " " : appdata.regexExpression;
                 text_textBox_regexReplace = appdata.regexReplace == setting_space ? " " : appdata.regexReplace;
                 text_textBox_inputRegex = appdata.regexInput;
-                UpdateOutputRegexExample();
+                Update_regexOutput();
 
                 SetHookKeys();
             }
@@ -127,7 +127,7 @@ namespace DeleteNewline.ViewModel
             }
         }
 
-        public void UpdateOutputRegexExample(TextBox? textBox_regexExpression = null, TextBox? textBox_regexReplace = null, TextBox ? textBox_regexInput = null)
+        public void Update_regexOutput(TextBox? textBox_regexExpression = null, TextBox? textBox_regexReplace = null, TextBox ? textBox_regexInput = null)
         {
             // realtime update
             if(textBox_regexInput != null)

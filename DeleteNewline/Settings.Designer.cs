@@ -25,7 +25,7 @@ namespace DeleteNewline {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1280")]
+        [global::System.Configuration.DefaultSettingValueAttribute("650")]
         public double mainWindowSize_width {
             get {
                 return ((double)(this["mainWindowSize_width"]));
@@ -37,7 +37,7 @@ namespace DeleteNewline {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("720")]
+        [global::System.Configuration.DefaultSettingValueAttribute("735")]
         public double mainWindowSize_height {
             get {
                 return ((double)(this["mainWindowSize_height"]));

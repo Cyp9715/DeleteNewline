@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="mainWindowSize_width" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1280</Value>
+      <Value Profile="(Default)">650</Value>
     </Setting>
     <Setting Name="mainWindowSize_height" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">720</Value>
+      <Value Profile="(Default)">735</Value>
     </Setting>
     <Setting Name="bindKey_1" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">120</Value>
