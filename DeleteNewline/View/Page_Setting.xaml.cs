@@ -76,7 +76,22 @@ namespace DeleteNewline
             vm_setting.text_textBox_regexExpression = "\\r\\n";
             vm_setting.text_textBox_regexReplace = " ";
 
-            vm_setting.isChecked_checkBox_deleteMultipleSpace = false;
+            vm_setting.UpdateOutputRegexExample();
+        }
+
+        private void TextBox_regexInput_KeyUp(object sender, KeyEventArgs e)
+        {
+            vm_setting.UpdateOutputRegexExample(textBox_regexInput:TextBox_regexInput);
+        }
+
+        private void TextBox_RegexReplace_KeyUp(object sender, KeyEventArgs e)
+        {
+            vm_setting.UpdateOutputRegexExample(textBox_regexReplace:TextBox_regexReplace);
+        }
+
+        private void TextBox_regexExpression_KeyUp(object sender, KeyEventArgs e)
+        {
+            vm_setting.UpdateOutputRegexExample(textBox_regexExpression:TextBox_regexExpression);
         }
     }
 }

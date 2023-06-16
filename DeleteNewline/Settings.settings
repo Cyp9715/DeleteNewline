@@ -20,16 +20,13 @@
     <Setting Name="topMost" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="deleteMultipleSpace" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="regexExpression" Type="System.String" Scope="User">
       <Value Profile="(Default)">\r\n</Value>
     </Setting>
     <Setting Name="regexReplace" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">`space`</Value>
     </Setting>
-    <Setting Name="inputRegexExample" Type="System.String" Scope="User">
+    <Setting Name="regexInput" Type="System.String" Scope="User">
       <Value Profile="(Default)">If you can’t explain it simply,
 you don’t understand 
 it well enough. </Value>

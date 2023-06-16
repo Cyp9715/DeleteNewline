@@ -2,13 +2,17 @@
 using System;
 using System.Windows.Input;
 using GlobalHook;
+using System.Windows.Controls;
 
 namespace DeleteNewline.ViewModel
 {
     class ViewModel_Page_Setting : ObservableObject
     {
         public static ViewModel_Page_Setting? page_settings;
-        ClipboardManager clipboardManager = new ClipboardManager();
+        RegexManager regexManager = new RegexManager();
+
+        Settings appdata = DeleteNewline.Settings.Default;
+        readonly string setting_space = "`space`";
 
         public ViewModel_Page_Setting()
         {
@@ -18,32 +22,26 @@ namespace DeleteNewline.ViewModel
 
                 isChecked_checkBox_topMost = appdata.topMost;
                 isChecked_checkBox_notification = appdata.notification;
-                isChecked_checkBox_deleteMultipleSpace = appdata.deleteMultipleSpace;
-
                 SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
                 
-                text_textBox_regexExpression = appdata.regexExpression;
-                text_textBox_regexReplace = appdata.regexReplace == "" ? " " : appdata.regexReplace; // 문제될거 같은데(Settings 파일의 문제) 일단 유지.
-
-                text_textBox_inputRegexExample = appdata.inputRegexExample;
+                text_textBox_regexExpression = appdata.regexExpression == setting_space ? " " : appdata.regexExpression;
+                text_textBox_regexReplace = appdata.regexReplace == setting_space ? " " : appdata.regexReplace;
+                text_textBox_inputRegex = appdata.regexInput;
                 UpdateOutputRegexExample();
 
                 SetHookKeys();
             }
         }
 
-        Settings appdata = DeleteNewline.Settings.Default;
-
         bool _isChecked_checkBox_topMost;
         bool _isChecked_checkBox_notification;
-        bool _ischecked_checkBox_deleteMultipleSpace;
 
         string _text_textBox_keybind = String.Empty;
         string _text_textBox_regexExpression = String.Empty;
         string _text_textBox_regexReplace = String.Empty;
 
-        string _text_textBox_inputRegexExample = String.Empty;
-        string _text_textBox_outputRegexExample = String.Empty;
+        string _text_textBox_inputRegex = String.Empty;
+        string _text_textBox_outputRegex = String.Empty;
 
         public bool isChecked_checkBox_topMost
         {
@@ -54,7 +52,6 @@ namespace DeleteNewline.ViewModel
 
                 MainWindow.mainWindow.Topmost = value;
                 appdata.topMost = value;
-                appdata.Save();
             }
         }
 
@@ -70,30 +67,6 @@ namespace DeleteNewline.ViewModel
                     Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
 
                 appdata.notification = value;
-                appdata.Save();
-            }
-        }
-
-        public bool isChecked_checkBox_deleteMultipleSpace
-        {
-            get =>_ischecked_checkBox_deleteMultipleSpace;
-            set
-            {
-                SetProperty(ref _ischecked_checkBox_deleteMultipleSpace, value);
-
-                if(value == true)
-                {
-                    text_textBox_regexExpression = "\\s+";
-                    text_textBox_regexReplace = " ";
-                }
-                else
-                {
-                    text_textBox_regexExpression = "\\r\\n";
-                    text_textBox_regexReplace = " ";
-                }
-
-                appdata.deleteMultipleSpace = value;
-                appdata.Save();
             }
         }
 
@@ -105,9 +78,9 @@ namespace DeleteNewline.ViewModel
             // 아무것도 입력하지 않고 textBox_bindKey Focus 벗어날 시 문제발생
             set
             {
-                OnPropertyChanging();
+                OnPropertyChanging("text_textBox_keybind");
                 _text_textBox_keybind = value;
-                OnPropertyChanged();
+                OnPropertyChanged("text_textBox_keybind");
             }
         }
 
@@ -118,11 +91,7 @@ namespace DeleteNewline.ViewModel
             set
             {
                 SetProperty(ref _text_textBox_regexExpression, value);
-
-                UpdateOutputRegexExample();
-
-                appdata.regexExpression = value;
-                appdata.Save();
+                appdata.regexExpression = value == " " ? setting_space : value;
             }
         }
 
@@ -133,44 +102,53 @@ namespace DeleteNewline.ViewModel
             set
             {
                 SetProperty(ref _text_textBox_regexReplace, value);
-
-                UpdateOutputRegexExample();
-
-                appdata.regexReplace = value == " " ? "" : value; // 역시 문제됨. 진짜로 "" 형식을 쓰고 싶을경우, 불러올 때 문제되므로 해당 로직을 생각해야 될 필요 있음.
-                appdata.Save();
+                appdata.regexReplace = value == " " ? setting_space : value;
             }
         }
 
-        public string text_textBox_inputRegexExample
+        public string text_textBox_inputRegex
         {
-            get => _text_textBox_inputRegexExample;
+            get => _text_textBox_inputRegex;
 
             set
             {
-                SetProperty(ref _text_textBox_inputRegexExample, value);
-
-                UpdateOutputRegexExample();
-
-                appdata.inputRegexExample = value;
-                appdata.Save();
+                SetProperty(ref _text_textBox_inputRegex, value);
+                appdata.regexInput = value;
             }
         }
 
-        public string text_textBox_outputRegexExample
+        public string text_textBox_outputRegex
         {
-            get => _text_textBox_outputRegexExample;
+            get => _text_textBox_outputRegex;
         
             set
             {
-                SetProperty(ref _text_textBox_outputRegexExample, value);
+                SetProperty(ref _text_textBox_outputRegex, value);
             }
         }
 
-        public void UpdateOutputRegexExample()
+        public void UpdateOutputRegexExample(TextBox? textBox_regexExpression = null, TextBox? textBox_regexReplace = null, TextBox ? textBox_regexInput = null)
         {
-            text_textBox_outputRegexExample = clipboardManager.DeleteClipboardNewline(text_textBox_inputRegexExample, text_textBox_regexExpression, text_textBox_regexReplace);
-        }
+            // realtime update
+            if(textBox_regexInput != null)
+            {
+                text_textBox_inputRegex = textBox_regexInput.Text;
+            }
 
+            if (textBox_regexExpression != null)
+            {
+                text_textBox_regexExpression = textBox_regexExpression.Text;
+            }
+
+            if (textBox_regexReplace != null)
+            {
+                text_textBox_regexReplace = textBox_regexReplace.Text;
+            }
+
+            OnPropertyChanging("text_textBox_outputRegexExample");
+            text_textBox_outputRegex = regexManager.Replace(text_textBox_inputRegex, text_textBox_regexExpression, text_textBox_regexReplace);
+            OnPropertyChanged("text_textBox_outputRegexExample");
+        }
 
 
         public Key key1 = Key.None;
@@ -190,7 +168,7 @@ namespace DeleteNewline.ViewModel
                 appdata.bindKey_2 = (int)key2;
             }
 
-            Settings.Default.Save();
+            appdata.Save();
         }
 
         public void SetHookKeys()

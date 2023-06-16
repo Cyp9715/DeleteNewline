@@ -30,13 +30,9 @@ namespace DeleteNewline
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            appdata.Save();
             e.Cancel = true;
             mainWindow.Visibility = Visibility.Hidden;
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            Settings.Default.Save();
         }
 
         private void NavigationView_PaneOpening(ModernWpf.Controls.NavigationView sender, object args)

@@ -19,20 +19,19 @@ namespace DeleteNewline
             DataContext = vm_Input;
         }
 
-        ClipboardManager cbManager = new ClipboardManager();
+        ClipboardManager clipboardManager = new ClipboardManager();
         IDataObject? idataObj;
 
         private void MenuItem_Paste_Click(object sender, RoutedEventArgs e)
         {
             string originalText = String.Empty;
 
-            if (cbManager.GetClipboardData_Text(ref idataObj) == true)
+            if (clipboardManager.GetClipboardData_Text(ref idataObj) == true)
             {
                 originalText = (string)idataObj.GetData(DataFormats.Text);
                 TextBox_Main.AppendText(originalText);
-                Clipboard.SetDataObject(cbManager.DeleteClipboardNewline(ref idataObj,
-                        settings.text_textBox_regexExpression, settings.text_textBox_regexReplace).ToString(),
-                    Settings.Default.deleteMultipleSpace);
+                Clipboard.SetDataObject(clipboardManager.DeleteClipboardNewline(ref idataObj,
+                        settings.text_textBox_regexExpression, settings.text_textBox_regexReplace).ToString());
             }
             else
             {
@@ -45,11 +44,10 @@ namespace DeleteNewline
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
-                if (cbManager.GetClipboardData_Text(ref idataObj) == true)
+                if (clipboardManager.GetClipboardData_Text(ref idataObj) == true)
                 {
-                    Clipboard.SetDataObject(cbManager.DeleteClipboardNewline(ref idataObj,
-                            settings.text_textBox_regexExpression, settings.text_textBox_regexReplace).ToString(),
-                        Settings.Default.deleteMultipleSpace);
+                    Clipboard.SetDataObject(clipboardManager.DeleteClipboardNewline(ref idataObj,
+                            settings.text_textBox_regexExpression, settings.text_textBox_regexReplace).ToString());
                 }
                 else
                 {

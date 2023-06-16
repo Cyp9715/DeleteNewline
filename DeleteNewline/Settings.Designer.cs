@@ -97,18 +97,6 @@ namespace DeleteNewline {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool deleteMultipleSpace {
-            get {
-                return ((bool)(this["deleteMultipleSpace"]));
-            }
-            set {
-                this["deleteMultipleSpace"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("\\r\\n")]
         public string regexExpression {
             get {
@@ -121,7 +109,7 @@ namespace DeleteNewline {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("`space`")]
         public string regexReplace {
             get {
                 return ((string)(this["regexReplace"]));
@@ -134,12 +122,12 @@ namespace DeleteNewline {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("If you can’t explain it simply,\r\nyou don’t understand \r\nit well enough. ")]
-        public string inputRegexExample {
+        public string regexInput {
             get {
-                return ((string)(this["inputRegexExample"]));
+                return ((string)(this["regexInput"]));
             }
             set {
-                this["inputRegexExample"] = value;
+                this["regexInput"] = value;
             }
         }
     }

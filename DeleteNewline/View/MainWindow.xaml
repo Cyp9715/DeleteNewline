@@ -8,7 +8,7 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         KeyboardNavigation.TabNavigation="None"
         Title="Delete Newline" Height="720" Width="1280" 
-        SizeChanged="Window_SizeChanged" Closed="Window_Closed" 
+        SizeChanged="Window_SizeChanged" 
         Closing="Window_Closing" MinWidth="650" MinHeight="365">
 
     <Grid>
