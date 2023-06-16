@@ -28,4 +28,4 @@ Text with Newline removed is located on your 'clipboard'. You can check it by us
 ## Download
 
 The executable file (exe) of Delete Newline is provided only up to version 1.2.7.  
-Starting from version 1.3.0, it can be downloaded using the [MS Store](https://www.microsoft.com/store/apps/9NC17SL0VV5S).
+Starting from version 1.3.0, it can be downloaded using the [MS Store]([https://www.microsoft.com/store/apps/9NC17SL0VV5S](https://apps.microsoft.com/store/detail/delete-newline/9NC17SL0VV5S)https://apps.microsoft.com/store/detail/delete-newline/9NC17SL0VV5S).
