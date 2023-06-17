@@ -6,7 +6,6 @@ namespace DeleteNewline
 {
     static class Execute
     {
-        static ClipboardManager clipboardManager = new ClipboardManager();
         static IDataObject? idataObj;
 
         public static void DeleteNewline_WithNotifier(string regex, string replace)
@@ -15,19 +14,17 @@ namespace DeleteNewline
             string notifyContent = String.Empty;
             
             bool isTextForm = false;
-            bool isCorrectRegex = false;
+            bool success = false;
 
             string replacedText = String.Empty;
 
             VirtualInput.InputImplement.TypeKeyboard_Copy();
 
-            if (clipboardManager.GetClipboardText(ref idataObj) == true)
+            if (ClipboardManager.GetText(ref idataObj) == true)
             {
                 isTextForm = true;
 
-                (isCorrectRegex, replacedText) = clipboardManager.applyRegex(ref idataObj, regex, replace);
-                Clipboard.SetDataObject(replacedText);
-                
+                (success, replacedText) = ClipboardManager.ReplaceText(ref idataObj, regex, replace);                
 
                 int limitLen = 100;
 
@@ -46,7 +43,7 @@ namespace DeleteNewline
                 notifyHeader = "ERROR";
                 notifyContent = "CLIPBOARD FORM IS NOT TEXT";
             }
-            else if(isCorrectRegex == false)
+            else if(success == false)
             {
                 notifyHeader = "ERROR";
                 notifyContent = replacedText;
@@ -63,10 +60,9 @@ namespace DeleteNewline
         {
             VirtualInput.InputImplement.TypeKeyboard_Copy();
 
-            if (clipboardManager.GetClipboardText(ref idataObj) == true)
+            if (ClipboardManager.GetText(ref idataObj) == true)
             {
-                (var success, var replacedText) = clipboardManager.applyRegex(ref idataObj, regex, replace);
-                Clipboard.SetDataObject(replacedText);
+                ClipboardManager.ReplaceText(ref idataObj, regex, replace);
             }
         }
     }

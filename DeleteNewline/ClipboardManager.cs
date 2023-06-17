@@ -2,26 +2,36 @@
 
 namespace DeleteNewline
 {
-    class ClipboardManager
+    static class ClipboardManager
     {
-        RegexManager regexManager = new RegexManager();
+        static RegexManager regexManager = new RegexManager();
+        static private object lockClipboard = new object();
 
-        public (bool, string) applyRegex(ref IDataObject idata, string regex, string replace)
+        public static (bool, string) ReplaceText(ref IDataObject idata, string regex, string replace)
         {
-            string clipboardText = (string)idata.GetData(DataFormats.Text);
-            return regexManager.Replace(clipboardText, regex, replace);
+            lock(lockClipboard)
+            {
+                string clipboardText = (string)idata.GetData(DataFormats.Text);
+                (bool success, clipboardText) = regexManager.Replace(clipboardText, regex, replace);
+                Clipboard.SetDataObject(clipboardText);
+
+                return (success, clipboardText);
+            }
         }
 
-        public bool GetClipboardText(ref IDataObject idata)
+        public static bool GetText(ref IDataObject idata)
         {
-            idata = Clipboard.GetDataObject();
-
-            if (idata.GetDataPresent(DataFormats.Text) == false)
+            lock (lockClipboard)
             {
-                return false;
-            }
+                idata = Clipboard.GetDataObject();
 
-            return true;
+                if (idata.GetDataPresent(DataFormats.Text) == false)
+                {
+                    return false;
+                }
+
+                return true;
+            }
         }
     }
 }
