@@ -21,16 +21,21 @@ namespace DeleteNewline
 
         public static bool GetText(ref IDataObject idata)
         {
+            IDataObject temp_idata;
+
             lock (lockClipboard)
             {
-                idata = Clipboard.GetDataObject();
+                temp_idata = Clipboard.GetDataObject();
 
-                if (idata.GetDataPresent(DataFormats.Text) == false)
+                if (temp_idata.GetDataPresent(DataFormats.Text) == false)
                 {
                     return false;
                 }
-
-                return true;
+                else
+                {
+                    idata = temp_idata;
+                    return true;
+                }
             }
         }
     }
