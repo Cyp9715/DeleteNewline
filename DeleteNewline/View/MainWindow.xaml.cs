@@ -11,8 +11,8 @@ namespace DeleteNewline
     public partial class MainWindow
     {
         public static MainWindow? mainWindow;
-        Settings appdata = Settings.Default;
         ViewModel_MainWindow vm_mainWindow;
+        Settings appdata = DeleteNewline.Settings.Default;
 
         public MainWindow()
         {

@@ -9,7 +9,7 @@ namespace DeleteNewline.ViewModel
     class ViewModel_Page_Setting : ObservableObject
     {
         public static ViewModel_Page_Setting? page_settings;
-        RegexManager regexManager = new RegexManager();
+        RegexManager regexManager;
 
         Settings appdata = DeleteNewline.Settings.Default;
         readonly string setting_space = "`space`";
@@ -19,6 +19,7 @@ namespace DeleteNewline.ViewModel
             if(page_settings == null)
             {
                 page_settings = this;
+                regexManager = new RegexManager();
 
                 isChecked_checkBox_topMost = appdata.topMost;
                 isChecked_checkBox_notification = appdata.notification;
@@ -27,7 +28,7 @@ namespace DeleteNewline.ViewModel
                 text_textBox_regexExpression = appdata.regexExpression == setting_space ? " " : appdata.regexExpression;
                 text_textBox_regexReplace = appdata.regexReplace == setting_space ? " " : appdata.regexReplace;
                 text_textBox_inputRegex = appdata.regexInput;
-                Update_regexOutput();
+                UpdateTextBox_RegexOutput();
 
                 SetHookKeys();
             }
@@ -127,7 +128,7 @@ namespace DeleteNewline.ViewModel
             }
         }
 
-        public void Update_regexOutput(TextBox? textBox_regexExpression = null, TextBox? textBox_regexReplace = null, TextBox ? textBox_regexInput = null)
+        public void UpdateTextBox_RegexOutput(TextBox? textBox_regexExpression = null, TextBox? textBox_regexReplace = null, TextBox ? textBox_regexInput = null)
         {
             // realtime update
             if (textBox_regexInput != null)
