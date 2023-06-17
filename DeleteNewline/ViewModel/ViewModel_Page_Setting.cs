@@ -9,7 +9,7 @@ namespace DeleteNewline.ViewModel
     class ViewModel_Page_Setting : ObservableObject
     {
         public static ViewModel_Page_Setting? page_settings;
-        RegexManager regexManager;
+        RegexManager regexManager = new RegexManager();
 
         Settings appdata = DeleteNewline.Settings.Default;
         readonly string setting_space = "`space`";
@@ -19,7 +19,7 @@ namespace DeleteNewline.ViewModel
             if(page_settings == null)
             {
                 page_settings = this;
-                regexManager = new RegexManager();
+                
 
                 isChecked_checkBox_topMost = appdata.topMost;
                 isChecked_checkBox_notification = appdata.notification;
