@@ -15,7 +15,6 @@ namespace DeleteNewline
             
             bool isTextForm = false;
             bool success = false;
-
             string replacedText = String.Empty;
 
             VirtualInput.InputImplement.TypeKeyboard_Copy();

@@ -8,7 +8,7 @@ namespace DeleteNewline.ViewModel
 {
     class ViewModel_Page_Setting : ObservableObject
     {
-        public static ViewModel_Page_Setting? page_settings;
+        public static ViewModel_Page_Setting? vm_settings;
         RegexManager regexManager = new RegexManager();
 
         Settings appdata = DeleteNewline.Settings.Default;
@@ -16,11 +16,10 @@ namespace DeleteNewline.ViewModel
 
         public ViewModel_Page_Setting()
         {
-            if(page_settings == null)
+            if(vm_settings == null)
             {
-                page_settings = this;
+                vm_settings = this;
                 
-
                 isChecked_checkBox_topMost = appdata.topMost;
                 isChecked_checkBox_notification = appdata.notification;
                 SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
@@ -147,8 +146,7 @@ namespace DeleteNewline.ViewModel
             }
 
             OnPropertyChanging("text_textBox_outputRegexExample");
-            (var success, text_textBox_outputRegex) = regexManager.Replace(text_textBox_inputRegex, 
-                                                    text_textBox_regexExpression, text_textBox_regexReplace);
+            (var success, text_textBox_outputRegex) = regexManager.Replace(text_textBox_inputRegex, text_textBox_regexExpression, text_textBox_regexReplace);
             OnPropertyChanged("text_textBox_outputRegexExample");
         }
 

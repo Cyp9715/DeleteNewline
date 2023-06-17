@@ -29,9 +29,10 @@ namespace DeleteNewline
                 originalText = (string)idataObj.GetData(DataFormats.Text);
                 TextBox_Main.AppendText(originalText);
 
-                ClipboardManager.ReplaceText(ref idataObj,
-                        ViewModel_Page_Setting.page_settings.text_textBox_regexExpression, 
-                        ViewModel_Page_Setting.page_settings.text_textBox_regexReplace);
+                string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
+                string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
+
+                ClipboardManager.ReplaceText(ref idataObj, regexExpression, regexReplace);
             }
             else
             {
@@ -46,9 +47,10 @@ namespace DeleteNewline
             {
                 if (ClipboardManager.GetText(ref idataObj) == true)
                 {
-                    ClipboardManager.ReplaceText(ref idataObj,
-                            ViewModel_Page_Setting.page_settings.text_textBox_regexExpression,
-                            ViewModel_Page_Setting.page_settings.text_textBox_regexReplace);
+                    string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
+                    string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
+
+                    ClipboardManager.ReplaceText(ref idataObj, regexExpression, regexReplace);
                 }
                 else
                 {

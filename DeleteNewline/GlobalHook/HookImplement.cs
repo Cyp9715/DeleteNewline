@@ -6,7 +6,6 @@ namespace GlobalHook
     static class HookImplement
     {
         static GlobalKeyHook? globalKeyHook;
-        static ViewModel_Page_Setting setting = ViewModel_Page_Setting.page_settings;
         static bool isSetHook = false;
         
         public static Action<string, string>? execute;
@@ -70,7 +69,11 @@ namespace GlobalHook
             {
                 isPressedKey1 = false;
                 isPressedKey2 = false;
-                execute(setting.text_textBox_regexExpression, setting.text_textBox_regexReplace);
+
+                string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
+                string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
+
+                execute(regexExpression, regexReplace);
             }
 
             if (e.KeyCode == key1)
