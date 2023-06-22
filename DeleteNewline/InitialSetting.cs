@@ -40,8 +40,6 @@ namespace DeleteNewline
             // Init Content
             mainWindow.navigationView_side.SelectedItem = mainWindow.NavigationViewItem_InputText;
             mainWindow.frame_main.Content = page_inputText;
-
-            Windows.Startup.Unregistered();
         }
 
         private void PreventMultipleRun()
