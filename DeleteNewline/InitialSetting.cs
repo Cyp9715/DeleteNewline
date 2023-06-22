@@ -40,13 +40,16 @@ namespace DeleteNewline
             // Init Content
             mainWindow.navigationView_side.SelectedItem = mainWindow.NavigationViewItem_InputText;
             mainWindow.frame_main.Content = page_inputText;
+
+            Windows.Startup.Unregistered();
         }
 
         private void PreventMultipleRun()
         {
             if (!singleton.WaitOne(TimeSpan.Zero, true))
             {
-                MessageBox.Show("Already run Delete Newline!");
+                string alertMsg = "Already run " + Global.programName + "!";
+                MessageBox.Show(alertMsg);
                 Application.Current.Shutdown();
             }
         }
@@ -54,7 +57,7 @@ namespace DeleteNewline
         private void SetNotifyIcon()
         {
             notifyIcon.Icon = Resource.favicon;
-            notifyIcon.Text = "Delete Newline";
+            notifyIcon.Text = Global.programName;
 
             notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
             {
