@@ -76,22 +76,22 @@ namespace DeleteNewline
             vm_setting.text_textBox_regexExpression = "\\r\\n";
             vm_setting.text_textBox_regexReplace = " ";
 
-            vm_setting.UpdateTextBox_RegexOutput();
+            vm_setting.UpdateTextBox_regexOutput();
         }
 
         private void TextBox_regexInput_KeyUp(object sender, KeyEventArgs e)
         {
-            vm_setting.UpdateTextBox_RegexOutput(textBox_regexInput:TextBox_regexInput);
+            vm_setting.UpdateTextBox_regexOutput(textBox_regexInput:TextBox_regexInput);
         }
 
         private void TextBox_RegexReplace_KeyUp(object sender, KeyEventArgs e)
         {
-            vm_setting.UpdateTextBox_RegexOutput(textBox_regexReplace:TextBox_regexReplace);
+            vm_setting.UpdateTextBox_regexOutput(textBox_regexReplace:TextBox_regexReplace);
         }
 
         private void TextBox_regexExpression_KeyUp(object sender, KeyEventArgs e)
         {
-            vm_setting.UpdateTextBox_RegexOutput(textBox_regexExpression:TextBox_regexExpression);
+            vm_setting.UpdateTextBox_regexOutput(textBox_regexExpression:TextBox_regexExpression);
         }
     }
 }
