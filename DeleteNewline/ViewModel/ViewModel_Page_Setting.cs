@@ -56,13 +56,13 @@ namespace DeleteNewline.ViewModel
                 if(value == true)
                 {
                     Windows.Startup.Registered();
-                    appdata.startup = true;
                 }
                 else
                 {
                     Windows.Startup.Unregistered();
-                    appdata.startup = false;
                 }
+
+                appdata.startup = value;
             }
         }
 

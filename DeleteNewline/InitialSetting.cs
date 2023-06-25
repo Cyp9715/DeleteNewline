@@ -59,7 +59,7 @@ namespace DeleteNewline
 
             notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
             {
-                mainWindow.Show();
+                mainWindow.Visibility = Visibility.Visible;
                 mainWindow.WindowState = WindowState.Normal;
             };
 
