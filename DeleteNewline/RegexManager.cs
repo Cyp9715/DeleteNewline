@@ -10,11 +10,11 @@ namespace DeleteNewline
         {
             try
             {
-                text = Regex.Replace(text, @regex, replace);
+                text = Regex.Replace(text, @regex, @replace);
             }
             catch (Exception)
             {
-                return (false, "INVALID REGEX");
+                return (false, "[INVALID REGEX]");
             }
 
             return (true, text);

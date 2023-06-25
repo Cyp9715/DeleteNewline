@@ -22,15 +22,12 @@ namespace DeleteNewline
             DataContext = vm_mainWindow;
         }
 
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            appdata.mainWindowSize_width = e.NewSize.Width;
-            appdata.mainWindowSize_height = e.NewSize.Height;
-        }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            appdata.mainWindowSize_width = mainWindow.Width;
+            appdata.mainWindowSize_height = mainWindow.Height;
             appdata.Save();
+
             e.Cancel = true;
             mainWindow.Visibility = Visibility.Hidden;
         }

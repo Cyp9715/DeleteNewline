@@ -4,10 +4,9 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       mc:Ignorable="d" 
-      d:DesignHeight="690" d:DesignWidth="800"
+      d:DesignHeight="780" d:DesignWidth="800"
       Title="Page_Setting"
       KeyboardNavigation.TabNavigation="None">
-
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
         <Grid>
@@ -26,6 +25,15 @@
                 <!-- BASIC -->
                 
                 <Label Content="Basic" FontSize="{StaticResource size_mainCategoryFont}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
+
+                <DockPanel ToolTip="{StaticResource toolTipText_startup}"
+                                Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
+                    <Label Content="Startup" Width="{StaticResource width_label}"/>
+                    <CheckBox Name="CheckBox_startup" HorizontalAlignment="Right"
+                                  Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
+                                  MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
+                                    IsChecked="{Binding isChecked_checkBox_startup}"/>
+                </DockPanel>
 
                 <DockPanel ToolTip="{StaticResource toolTipText_topMost}"
                                 Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
