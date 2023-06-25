@@ -31,5 +31,8 @@
 you don’t understand 
 it well enough. </Value>
     </Setting>
+    <Setting Name="startup" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

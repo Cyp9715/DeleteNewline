@@ -9,6 +9,6 @@ namespace DeleteNewline
     static class Global
     {
         public const string programName = "Delete Newline";
-        public const string version = "1.3.0";
+        public const string version = "1.3.1";
     }
 }
