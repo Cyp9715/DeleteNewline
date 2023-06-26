@@ -22,7 +22,6 @@
     <!-- ToolTips -->
     <bcl:String x:Key="toolTipText_NavigationItem_InputTextPage">When you paste a string into the Input Text Page, the string with newlines removed is copied to your clipboard.</bcl:String>
 
-    <bcl:String x:Key="toolTipText_startup">DeleteNewline is executed when Windows starts.</bcl:String>
     <bcl:String x:Key="toolTipText_topMost">Set DeleteNewline to be on top of other programs.</bcl:String>
     <bcl:String x:Key="toolTipText_keyBind">Drag a specific string anywhere and press the Keybind to send the string with newline removed to your clipboard! [You must combine the two keys.]</bcl:String>
     <bcl:String x:Key="toolTipText_notification">Activate Windows notification according to Keybind operation.</bcl:String>

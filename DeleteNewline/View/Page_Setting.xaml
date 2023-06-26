@@ -23,17 +23,8 @@
             <StackPanel Orientation="Vertical" Grid.Column="1" VerticalAlignment="Top" Margin="0,0,0,40">
                 
                 <!-- BASIC -->
-                
-                <Label Content="Basic" FontSize="{StaticResource size_mainCategoryFont}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
-                <DockPanel ToolTip="{StaticResource toolTipText_startup}"
-                                Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
-                    <Label Content="Startup" Width="{StaticResource width_label}"/>
-                    <CheckBox Name="CheckBox_startup" HorizontalAlignment="Right"
-                                  Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
-                                  MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
-                                    IsChecked="{Binding isChecked_checkBox_startup}"/>
-                </DockPanel>
+                <Label Content="Basic" FontSize="{StaticResource size_mainCategoryFont}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
                 <DockPanel ToolTip="{StaticResource toolTipText_topMost}"
                                 Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">

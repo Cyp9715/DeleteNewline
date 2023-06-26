@@ -6,7 +6,7 @@
       <Value Profile="(Default)">650</Value>
     </Setting>
     <Setting Name="mainWindowSize_height" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">780</Value>
+      <Value Profile="(Default)">735</Value>
     </Setting>
     <Setting Name="bindKey_1" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">120</Value>
@@ -30,9 +30,6 @@
       <Value Profile="(Default)">If you can’t explain it simply,
 you don’t understand 
 it well enough. </Value>
-    </Setting>
-    <Setting Name="startup" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

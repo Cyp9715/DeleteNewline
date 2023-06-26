@@ -20,7 +20,6 @@ namespace DeleteNewline.ViewModel
             {
                 vm_settings = this;
 
-                isChecked_checkBox_startup = appdata.startup;
                 isChecked_checkBox_topMost = appdata.topMost;
                 isChecked_checkBox_notification = appdata.notification;
                 SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
@@ -34,7 +33,6 @@ namespace DeleteNewline.ViewModel
             }
         }
 
-        bool _isChecked_checkBox_startup;
         bool _isChecked_checkBox_topMost;
         bool _isChecked_checkBox_notification;
 
@@ -44,27 +42,6 @@ namespace DeleteNewline.ViewModel
 
         string _text_textBox_inputRegex = String.Empty;
         string _text_textBox_outputRegex = String.Empty;
-
-        
-        public bool isChecked_checkBox_startup
-        {
-            get => _isChecked_checkBox_startup;
-            set
-            {
-                SetProperty(ref _isChecked_checkBox_startup, value);
-
-                if(value == true)
-                {
-                    Windows.Startup.Registered();
-                }
-                else
-                {
-                    Windows.Startup.Unregistered();
-                }
-
-                appdata.startup = value;
-            }
-        }
 
         public bool isChecked_checkBox_topMost
         {
