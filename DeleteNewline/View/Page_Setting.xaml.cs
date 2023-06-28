@@ -34,7 +34,7 @@ namespace DeleteNewline
             else
             {
                 // 만약 key1과 key2가 같은 입력값이라면 key2 에 할당하지 않음 (Press 동작 방지)
-                if(e.Key != key1)
+                if(e.Key != key1 && e.SystemKey != key1)
                 {
                     key2 = (e.Key == Key.System) ? e.SystemKey : e.Key;
                 }
@@ -63,6 +63,11 @@ namespace DeleteNewline
         }
 
         // 포커스를 잃어버릴경우 appdata 기반으로 키를 설정하고 UI를 재설정함.
+        
+        /* 
+         * LeftShift + LeftAlt 진행 후, 다시 클릭하여 LeftAlt 만 진행하는경우 LeftAlt 만으로도 입력이 가능한 버그가 있음.
+         * 이는 appdata 를 불러와 오작동을 방지하는 매커니즘에 의한 잘못된 동작임.
+         */
         private void TextBox_bindKey_LostFocus(object sender, RoutedEventArgs e)
         {
             vm_setting.SaveKeyBind();
