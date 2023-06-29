@@ -18,23 +18,28 @@ namespace Windows
                     new ToastContentBuilder()
                     .AddText(title)
                     .AddText(content)
+                    .SetBackgroundActivation()
                     .Show(toast =>
                     {
                         toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);
                     });
+
+
                 } 
                 catch (ArgumentException) 
                 {
                     new ToastContentBuilder()
                     .AddText("SUCCESS... BUT")
                     .AddText("INCLUDE INVALID CHARACTER.")
+                    .SetBackgroundActivation()
                     .Show(toast =>
                     {
                         toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);
                     });
                 }
-
             });
+
+            
 
             task_notify.Start();
             task_notify.Wait();
