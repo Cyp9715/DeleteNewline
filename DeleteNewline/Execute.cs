@@ -6,8 +6,6 @@ namespace DeleteNewline
 {
     static class Execute
     {
-        static IDataObject? idataObj;
-
         public static void DeleteNewline_WithNotifier(string regex, string replace)
         {
             string notifyHeader = String.Empty;
@@ -19,11 +17,11 @@ namespace DeleteNewline
 
             VirtualInput.InputImplement.TypeKeyboard_Copy();
 
-            if (ClipboardManager.GetText(ref idataObj) == true)
+            if (ClipboardManager.ContainText() == true)
             {
                 isTextForm = true;
 
-                (success, replacedText) = ClipboardManager.ReplaceText(ref idataObj, regex, replace);                
+                (success, replacedText) = ClipboardManager.ReplaceText(regex, replace);                
 
                 int limitLen = 100;
 
@@ -59,9 +57,9 @@ namespace DeleteNewline
         {
             VirtualInput.InputImplement.TypeKeyboard_Copy();
 
-            if (ClipboardManager.GetText(ref idataObj) == true)
+            if (ClipboardManager.ContainText() == true)
             {
-                ClipboardManager.ReplaceText(ref idataObj, regex, replace);
+                ClipboardManager.ReplaceText(regex, replace);
             }
         }
     }

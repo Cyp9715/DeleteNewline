@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Navigation;
 
 namespace DeleteNewline
 {
@@ -7,11 +8,11 @@ namespace DeleteNewline
         static RegexManager regexManager = new RegexManager();
         static private object lockClipboard = new object();
 
-        public static (bool, string) ReplaceText(ref IDataObject idata, string regex, string replace)
+        public static (bool, string) ReplaceText(string regex, string replace)
         {
             lock(lockClipboard)
             {
-                string clipboardText = (string)idata.GetData(DataFormats.Text);
+                string clipboardText = Clipboard.GetText(TextDataFormat.UnicodeText);
                 (bool success, clipboardText) = regexManager.Replace(clipboardText, regex, replace);
                 Clipboard.SetDataObject(clipboardText);
 
@@ -19,23 +20,20 @@ namespace DeleteNewline
             }
         }
 
-        public static bool GetText(ref IDataObject idata)
+        public static string GetText()
         {
-            IDataObject temp_idata;
+            return Clipboard.GetText(TextDataFormat.UnicodeText);
+        }
 
-            lock (lockClipboard)
+        public static bool ContainText()
+        {
+            if(Clipboard.ContainsText() == true)
             {
-                temp_idata = Clipboard.GetDataObject();
-
-                if (temp_idata.GetDataPresent(DataFormats.Text) == false)
-                {
-                    return false;
-                }
-                else
-                {
-                    idata = temp_idata;
-                    return true;
-                }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

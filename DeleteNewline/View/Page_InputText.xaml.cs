@@ -18,21 +18,19 @@ namespace DeleteNewline
             DataContext = vm_Input;
         }
 
-        IDataObject? idataObj;
-
         private void MenuItem_Paste_Click(object sender, RoutedEventArgs e)
         {
             string originalText = String.Empty;
 
-            if (ClipboardManager.GetText(ref idataObj) == true)
+            if (ClipboardManager.ContainText() == true)
             {
-                originalText = (string)idataObj.GetData(DataFormats.Text);
+                originalText = ClipboardManager.GetText();
                 TextBox_Main.AppendText(originalText);
 
                 string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
                 string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
 
-                ClipboardManager.ReplaceText(ref idataObj, regexExpression, regexReplace);
+                ClipboardManager.ReplaceText(regexExpression, regexReplace);
             }
             else
             {
@@ -45,12 +43,12 @@ namespace DeleteNewline
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
-                if (ClipboardManager.GetText(ref idataObj) == true)
+                if (ClipboardManager.ContainText() == true)
                 {
                     string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
                     string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
 
-                    ClipboardManager.ReplaceText(ref idataObj, regexExpression, regexReplace);
+                    ClipboardManager.ReplaceText(regexExpression, regexReplace);
                 }
                 else
                 {
