@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using DeleteNewline.ViewModel;
 
 namespace GlobalHook
@@ -39,8 +41,8 @@ namespace GlobalHook
         static VirtualKeycodes key1 = VirtualKeycodes.LeftAlt;
         static VirtualKeycodes key2 = VirtualKeycodes.F1;
 
-        static bool isPressedKey1 = false;
-        static bool isPressedKey2 = false;
+        static Dictionary<VirtualKeycodes, uint> pressedKeys = new Dictionary<VirtualKeycodes, uint>();
+        static uint pressedCount = 0;
 
         public static void SetKeys(VirtualKeycodes key1_, VirtualKeycodes key2_)
         {
@@ -48,42 +50,38 @@ namespace GlobalHook
             key2 = key2_;
         }
 
+        static uint keydownCount = 0;
+
         private static void GlobalKeyHook_OnKeyDown(object? sender, GlobalKeyEventArgs e)
         {
-            if(e.KeyCode == key1)
-            {
-                isPressedKey1 = true;
-            }
-
-            // 순서제한, LeftAlt → F1 순서는 가능
-            // F1 → LeftAlt 순서는 불가능
-            if(e.KeyCode == key2 && isPressedKey1 == true)
-            {
-                isPressedKey2 = true;
-            }
+            Debug.WriteLine("KeyDown : " + e.KeyCode);
+            pressedKeys.Add(e.KeyCode, ++pressedCount);
         }
+
+        static uint keyupCount = 0;
 
         private static void GlobalKeyHook_OnKeyUp(object? sender, GlobalKeyEventArgs e)
         {
-            if (isPressedKey1 == true && isPressedKey2 == true)
+            bool isExist = pressedKeys.ContainsKey(key1) && pressedKeys.ContainsKey(key2);
+
+            if (isExist)
             {
-                isPressedKey1 = false;
-                isPressedKey2 = false;
+                bool onlyTwoKeys = pressedKeys.Count == 2;
+                bool isSequential = pressedKeys[key1] + 1 == pressedKeys[key2];
 
-                string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
-                string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
+                pressedKeys.Remove(e.KeyCode);
 
-                execute(regexExpression, regexReplace);
+                if (onlyTwoKeys && isSequential)
+                {
+                    string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
+                    string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
+
+                    execute(regexExpression, regexReplace);
+                }
             }
-
-            if (e.KeyCode == key1)
+            else
             {
-                isPressedKey1 = false;
-            }
-
-            if (e.KeyCode == key2)
-            {
-                isPressedKey2 = false;
+                pressedKeys.Remove(e.KeyCode);
             }
         }
     }

@@ -47,15 +47,12 @@ namespace DeleteNewline
             if (args.IsSettingsInvoked)
             {
                 frame_main.Content = Page_Setting.instance;
-                HookImplement.UnInstallGlobalHook();
-                Windows.Notification.Send("Enter the settings page", "To use keyBind, go to Input Text page.");
             }
             else
             {
                 switch (sender.MenuItems.IndexOf(args.InvokedItemContainer))
                 {
                     case 0:
-                        HookImplement.InstallGlobalHook();
                         frame_main.Content = Page_InputText.instance;
                         break;
                 }

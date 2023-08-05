@@ -1,4 +1,5 @@
 ﻿using DeleteNewline.ViewModel;
+using GlobalHook;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -43,19 +44,22 @@ namespace DeleteNewline
             vm_setting.SetUI_keybind(key1, key2);
         }
 
-        // 키를 해제할경우 해당 키값을 셋팅에 이관.
+        // 키를 입력후 뗄 경우 vm_setting.key 임시변수에 값을 지정.
         private void TextBox_bindKey_KeyUp(object sender, KeyEventArgs e)
         {
             vm_setting.key1 = key1;
             vm_setting.key2 = key2;
 
+            // 키를 뗼경우 자동적으로 포커스를 초기화 시킴.
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope((TextBox)sender), null);
             Keyboard.ClearFocus();
         }
 
-        // 포커스를 다시 얻었을 경우 각종 키 임시변수 값들과 텍스트박스를 초기화함.
+        // 포커스를 다시 얻었을 경우 GlobalHook 를 활성화 하고, 임시변수 값들과 텍스트박스를 초기화함.
         private void TextBox_bindKey_GotFocus(object sender, RoutedEventArgs e)
         {
+            HookImplement.UnInstallGlobalHook();
+
             key1 = Key.None;
             key2 = Key.None;
 
@@ -63,40 +67,37 @@ namespace DeleteNewline
         }
 
         // 포커스를 잃어버릴경우 appdata 기반으로 키를 설정하고 UI를 재설정함.
-        
-        /* 
-         * LeftShift + LeftAlt 진행 후, 다시 클릭하여 LeftAlt 만 진행하는경우 LeftAlt 만으로도 입력이 가능한 버그가 있음.
-         * 이는 appdata 를 불러와 오작동을 방지하는 매커니즘에 의한 잘못된 동작임.
-         */
         private void TextBox_bindKey_LostFocus(object sender, RoutedEventArgs e)
         {
             vm_setting.SaveKeyBind();
             vm_setting.SetHookKeys();
 
             vm_setting.SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
+
+            HookImplement.InstallGlobalHook();
         }
 
         private void button_RegexDefault_Click(object sender, RoutedEventArgs e)
         {
-            vm_setting.text_textBox_regexExpression = "\\r\\n";
+            vm_setting.text_textBox_regexExpression = @"\r\n";
             vm_setting.text_textBox_regexReplace = " ";
 
             vm_setting.UpdateTextBox_regexOutput();
         }
 
-        private void TextBox_regexInput_KeyUp(object sender, KeyEventArgs e)
+        private void TextBox_regexExpression_TextChanged(object sender, TextChangedEventArgs e)
         {
-            vm_setting.UpdateTextBox_regexOutput(textBox_regexInput:TextBox_regexInput);
+            vm_setting.UpdateTextBox_regexOutput(textBox_regexExpression: TextBox_regexExpression);
         }
 
-        private void TextBox_RegexReplace_KeyUp(object sender, KeyEventArgs e)
+        private void TextBox_regexReplace_TextChanged(object sender, TextChangedEventArgs e)
         {
-            vm_setting.UpdateTextBox_regexOutput(textBox_regexReplace:TextBox_regexReplace);
+            vm_setting.UpdateTextBox_regexOutput(textBox_regexReplace: TextBox_regexReplace);
         }
 
-        private void TextBox_regexExpression_KeyUp(object sender, KeyEventArgs e)
+        private void TextBox_regexInput_TextChanged(object sender, TextChangedEventArgs e)
         {
-            vm_setting.UpdateTextBox_regexOutput(textBox_regexExpression:TextBox_regexExpression);
+            vm_setting.UpdateTextBox_regexOutput(textBox_regexInput: TextBox_regexInput);
         }
     }
 }

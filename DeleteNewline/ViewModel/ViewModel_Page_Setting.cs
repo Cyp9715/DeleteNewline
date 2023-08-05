@@ -168,6 +168,13 @@ namespace DeleteNewline.ViewModel
                 appdata.bindKey_2 = (int)key2;
             }
 
+            // 만약 사용자가 의도적으로 '동일한 키' 입력을 지정하려 한다면(ex : S + S) 기본 키 셋팅값인 LeftAlt + F1 값으로 설정함.
+            if(appdata.bindKey_1 == appdata.bindKey_2)
+            {
+                appdata.bindKey_1 = (int)Key.LeftAlt;
+                appdata.bindKey_2 = (int)Key.F1;
+            }
+
             appdata.Save();
         }
 

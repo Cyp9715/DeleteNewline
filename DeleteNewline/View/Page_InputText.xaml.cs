@@ -24,7 +24,7 @@ namespace DeleteNewline
 
             if (ClipboardManager.ContainText() == true)
             {
-                originalText = ClipboardManager.GetText();
+                originalText = ClipboardManager.GetText_unicode();
                 TextBox_Main.AppendText(originalText);
 
                 string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;

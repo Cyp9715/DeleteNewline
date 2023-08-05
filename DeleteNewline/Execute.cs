@@ -50,7 +50,7 @@ namespace DeleteNewline
                 notifyHeader = "SUCCESS";
             }
 
-            Notification.Send(notifyHeader, notifyContent);
+            Notification.Send(notifyHeader, notifyContent, Notification.SoundType.default_);
         }
 
         public static void DeleteNewline_WithoutNotifier(string regex, string replace)

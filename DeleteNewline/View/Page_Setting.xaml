@@ -62,16 +62,16 @@
                 <Label Content="Regex" FontSize="{StaticResource size_mainCategoryFont}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
                 <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}" ToolTip="{StaticResource toolTipText_regexExpression}">
-                    <Label Content="Regex Expression" VerticalAlignment="Center"/>
+                    <Label Content="Expression" VerticalAlignment="Center"/>
                     <TextBox x:Name="TextBox_regexExpression"  Text="{Binding text_textBox_regexExpression}"
-                             Width="275" HorizontalAlignment="Right" TextAlignment="Center" KeyUp="TextBox_regexExpression_KeyUp"/>
+                             Width="275" HorizontalAlignment="Right" TextAlignment="Center" TextChanged="TextBox_regexExpression_TextChanged"/>
                 </DockPanel>
 
                 <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}" ToolTip="{StaticResource toolTipText_regexReplace}">
                     <Label Content="Replace" VerticalAlignment="Center"/>
                     <TextBox x:Name="TextBox_regexReplace"  Text="{Binding text_textBox_regexReplace}"
                              Width="275" HorizontalAlignment="Right" TextAlignment="Center"
-                             Foreground="Yellow" KeyUp="TextBox_RegexReplace_KeyUp"/>
+                             Foreground="Yellow" TextChanged="TextBox_regexReplace_TextChanged"/>
                 </DockPanel>
 
                 <Grid x:Name="Grid_RegexExample" Margin="40,20,40,0" Width="450">
@@ -89,7 +89,7 @@
                            ToolTip="{StaticResource toolTipText_inputRegex}"/>
 
                     <TextBox x:Name="TextBox_regexInput" Grid.Row="1" Margin="0,5,0,10" Height="100" AcceptsReturn="True" 
-                             Text="{Binding text_textBox_inputRegex}" ToolTip="{StaticResource toolTipText_inputRegex}" KeyUp="TextBox_regexInput_KeyUp"/>
+                             Text="{Binding text_textBox_inputRegex}" ToolTip="{StaticResource toolTipText_inputRegex}" TextChanged="TextBox_regexInput_TextChanged"/>
 
                     <TextBlock Grid.Row = "1" IsHitTestVisible="False" Text="{StaticResource waterMark_inputRegex}" 
                                VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="DarkGray">

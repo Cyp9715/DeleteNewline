@@ -40,5 +40,5 @@
     <bcl:String x:Key="waterMark_ouputRegex">The Regex applied string is output.</bcl:String>
 
     <!-- version infomation -->
-    <bcl:String x:Key="text_versionInfomation">Delete Newline 1.3.3</bcl:String>
+    <bcl:String x:Key="text_versionInfomation">Delete Newline 1.3.4</bcl:String>
 </ResourceDictionary>
