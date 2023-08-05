@@ -9,7 +9,6 @@ namespace DeleteNewline.ViewModel
     class ViewModel_Page_Setting : ObservableObject
     {
         public static ViewModel_Page_Setting? vm_settings;
-        RegexManager regexManager = new RegexManager();
 
         Settings appdata = DeleteNewline.Settings.Default;
         readonly string setting_space = "`space`";
@@ -146,7 +145,7 @@ namespace DeleteNewline.ViewModel
             }
 
             OnPropertyChanging("text_textBox_outputRegexExample");
-            (var success, text_textBox_outputRegex) = regexManager.Replace(text_textBox_inputRegex, text_textBox_regexExpression, text_textBox_regexReplace);
+            (var success, text_textBox_outputRegex) = RegexManager.Replace(text_textBox_inputRegex, text_textBox_regexExpression, text_textBox_regexReplace);
             OnPropertyChanged("text_textBox_outputRegexExample");
         }
 

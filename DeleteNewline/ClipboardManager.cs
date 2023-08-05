@@ -8,15 +8,13 @@ namespace DeleteNewline
 {
     static class ClipboardManager
     {
-        static RegexManager regexManager = new RegexManager();
-
         public static (bool, string) ReplaceText(string regex, string replace)
         {
             bool success = false;
             string replacedText = string.Empty;
 
             string clipboardText = GetText();
-            (success, replacedText) = regexManager.Replace(clipboardText, regex, replace);
+            (success, replacedText) = RegexManager.Replace(clipboardText, regex, replace);
             
             return (success, replacedText);
         }
@@ -25,7 +23,7 @@ namespace DeleteNewline
         {
             string output = string.Empty;
 
-            // ClipBoard 를 다른 프로그램에서 이미 사용중일 경우 재시도.
+            // Clipboard 를 다른 프로그램에서 이미 사용중일 경우 재시도.
             Thread thread = new Thread(() =>
             {
                 int maxTryCount = 5;

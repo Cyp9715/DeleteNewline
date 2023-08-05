@@ -50,15 +50,10 @@ namespace GlobalHook
             key2 = key2_;
         }
 
-        static uint keydownCount = 0;
-
         private static void GlobalKeyHook_OnKeyDown(object? sender, GlobalKeyEventArgs e)
         {
-            Debug.WriteLine("KeyDown : " + e.KeyCode);
             pressedKeys.Add(e.KeyCode, ++pressedCount);
         }
-
-        static uint keyupCount = 0;
 
         private static void GlobalKeyHook_OnKeyUp(object? sender, GlobalKeyEventArgs e)
         {

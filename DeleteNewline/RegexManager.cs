@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace DeleteNewline
 {
-    public class RegexManager
+    public static class RegexManager
     {
-        public (bool,string) Replace(string text, string regex, string replace)
+        public static (bool,string) Replace(string text, string regex, string replace)
         {
             try
             {
