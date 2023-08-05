@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using Windows;
 
 namespace DeleteNewline
@@ -21,7 +20,8 @@ namespace DeleteNewline
             {
                 isTextForm = true;
 
-                (success, replacedText) = ClipboardManager.ReplaceText(regex, replace);                
+                (success, replacedText) = ClipboardManager.ReplaceText(regex, replace);
+                ClipboardManager.SetText(replacedText);
 
                 int limitLen = 100;
 
@@ -39,18 +39,19 @@ namespace DeleteNewline
             {
                 notifyHeader = "ERROR";
                 notifyContent = "CLIPBOARD FORM IS NOT TEXT";
+                Notification.Send(notifyHeader, notifyContent, Notification.SoundType.reminder, 300);
             }
             else if(success == false)
             {
                 notifyHeader = "ERROR";
-                notifyContent = replacedText;
+                notifyContent = "THE REGULAR EXPRESSION FUNCTION DID NOT WORK CORRECTLY.";
+                Notification.Send(notifyHeader, notifyContent, Notification.SoundType.reminder, 300);
             }
             else
             {
                 notifyHeader = "SUCCESS";
+                Notification.Send(notifyHeader, notifyContent, Notification.SoundType.default_);
             }
-
-            Notification.Send(notifyHeader, notifyContent, Notification.SoundType.default_);
         }
 
         public static void DeleteNewline_WithoutNotifier(string regex, string replace)
@@ -59,7 +60,8 @@ namespace DeleteNewline
 
             if (ClipboardManager.ContainText() == true)
             {
-                ClipboardManager.ReplaceText(regex, replace);
+                (bool success, string replacedText) = ClipboardManager.ReplaceText(regex, replace);
+                ClipboardManager.SetText(replacedText);
             }
         }
     }

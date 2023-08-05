@@ -15,14 +15,13 @@ namespace DeleteNewline
             bool success = false;
             string replacedText = string.Empty;
 
-            string clipboardText = GetText_unicode();
+            string clipboardText = GetText();
             (success, replacedText) = regexManager.Replace(clipboardText, regex, replace);
-            Clipboard.SetDataObject(replacedText);
             
-            return (success, clipboardText);
+            return (success, replacedText);
         }
 
-        public static string GetText_unicode()
+        public static string GetText()
         {
             string output = string.Empty;
 
@@ -44,8 +43,9 @@ namespace DeleteNewline
 
                         if(i == maxTryCount)
                         {
-                            string warningMsg = "FAILED Clipboard.GetText()";
-                            Notification.Send(warningMsg, String.Empty, Notification.SoundType.reminder);
+                            string msgHeader = "ERROR";
+                            string msgContent = "FAILED Clipboard.GetText()";
+                            Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
                         }
                     }
                 }
@@ -56,6 +56,11 @@ namespace DeleteNewline
             thread.Join();
 
             return output;
+        }
+
+        public static void SetText(string text)
+        {
+            Clipboard.SetDataObject(text);
         }
 
         public static bool ContainText()

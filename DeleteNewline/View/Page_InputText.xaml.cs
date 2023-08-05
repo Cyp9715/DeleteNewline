@@ -24,13 +24,14 @@ namespace DeleteNewline
 
             if (ClipboardManager.ContainText() == true)
             {
-                originalText = ClipboardManager.GetText_unicode();
+                originalText = ClipboardManager.GetText();
                 TextBox_Main.AppendText(originalText);
 
                 string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
                 string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
 
-                ClipboardManager.ReplaceText(regexExpression, regexReplace);
+                (bool success, string replacedText) = ClipboardManager.ReplaceText(regexExpression, regexReplace);
+                ClipboardManager.SetText(replacedText);
             }
             else
             {
@@ -48,7 +49,8 @@ namespace DeleteNewline
                     string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
                     string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
 
-                    ClipboardManager.ReplaceText(regexExpression, regexReplace);
+                    (bool success, string replacedText) = ClipboardManager.ReplaceText(regexExpression, regexReplace);
+                    ClipboardManager.SetText(replacedText);
                 }
                 else
                 {
