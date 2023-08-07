@@ -6,6 +6,12 @@ using Windows;
 
 namespace DeleteNewline
 {
+    /* 
+     * ClipboardManager 의 SetText, GetText 부분에서 Exception 이 발생한다면
+     * 이는 대부분 VirtualInput 과 상호작용간의 오류 (VirtualInput 은 Ctrl+C 를 통해 Clipboard 에 접근함) 문제임.
+     * 때문에 VirtualInput 실행단에 적절히 유휴시간을 둘 필요성이 있으며,
+     * 해당 코드에서는 올바르게 데이터를 가져왔는지, 올바르게 지정했는지 이중으로 확인할 필요성이 있음.
+     */
     static class ClipboardManager
     {
         public static (bool, string) ReplaceText(string regex, string replace)
@@ -22,38 +28,38 @@ namespace DeleteNewline
         public static string GetText()
         {
             string output = string.Empty;
-            int maxTryCount = 5;
 
-            for (int i = 1; i <= maxTryCount; ++i)
+            try
             {
-                try
+                output = Clipboard.GetText(TextDataFormat.UnicodeText);
+
+                if(String.IsNullOrEmpty(output))
                 {
-                    output = Clipboard.GetText(TextDataFormat.UnicodeText);
-                    Thread.Sleep(100);
-                    break;
+                    string msgHeader = "ERROR";
+                    string msgContent = "STRING DATA FORMAT IS INCORRECT";
+                    Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
                 }
-                catch (Exception)
-                {
-                    if (i == maxTryCount)
-                    {
-                        string msgHeader = "ERROR";
-                        string msgContent = "FAILED GET CLIPBOARD";
-                        Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
-                    }
-                }
+            }
+            catch (Exception)
+            {
+                string msgHeader = "ERROR";
+                string msgContent = "FAILED GET CLIPBOARD";
+                Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
             }
 
             return output;
         }
 
 
-        // SetDataObject 는 기본적으로 100ms 간격으로 10번 시도함.
+        /*
+         * 해당함수는 Text를 Clipboard 에 확실히 Set 하도록 보장하지 않는 문제점이 있음.
+         * 사용자 반응성을 중시.
+         */
         public static void SetText(string text)
         {
             try
             {
                 Clipboard.SetDataObject(text);
-                Thread.Sleep(100);
             }
             catch (Exception)
             {

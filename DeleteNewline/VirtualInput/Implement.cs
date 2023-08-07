@@ -13,8 +13,7 @@ namespace VirtualInput
              * Ctrl + C 동작은 Sleep 없이 즉발로 발동됨.
              * ClipboardManager 내부의 Sleep 과 어느정도 연동성이 존재함. (때문에 조심히 다뤄야 함.)
              * 
-             * 해당 부분에서 Sleep 를 운용할 경우
-             * RetryClipboardAction() 부분의 Sleep 를 더 넉넉하게 부여해야 함.
+             * Virtual Key 입력의 즉발성으로 인해 어느정도의 유휴시간이 필요함.
              * 
             */
             Thread thread = new Thread(() =>
@@ -23,6 +22,8 @@ namespace VirtualInput
                 VirtualInput.Keyboard.Press(Key.LeftCtrl);
                 VirtualInput.Keyboard.Type(Key.C);
                 VirtualInput.Keyboard.Release(Key.LeftCtrl);
+
+                Thread.Sleep(150);
             });
 
             thread.SetApartmentState(ApartmentState.STA);
