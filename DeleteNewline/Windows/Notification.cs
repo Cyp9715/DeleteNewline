@@ -64,12 +64,13 @@ namespace Windows
 
 
                 } 
-                catch (ArgumentException)
+                catch (Exception)
                 {
                     new ToastContentBuilder()
                     .AddText("SUCCESS... BUT")
                     .AddText("INCLUDE INVALID CHARACTER.")
                     .SetBackgroundActivation()
+                    .AddAudio(new Uri(SoundType.reminder))
                     .Show(toast =>
                     {
                         toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);

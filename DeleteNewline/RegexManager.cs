@@ -1,5 +1,4 @@
 ﻿using System;
-using System.DirectoryServices.ActiveDirectory;
 using System.Text.RegularExpressions;
 
 namespace DeleteNewline

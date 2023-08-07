@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using DeleteNewline.ViewModel;
+using Windows.Devices.Printers;
 
 namespace GlobalHook
 {
-    static class HookImplement
+    static class Implement
     {
         static GlobalKeyHook? globalKeyHook;
         static bool isSetHook = false;
@@ -50,8 +51,15 @@ namespace GlobalHook
             key2 = key2_;
         }
 
+        // 혹시라도 해당 로직부분에서 단 하나라도 제대로 인식되지 않을경우 프로그램 작동에 문제가 생길 여지가 있음.
         private static void GlobalKeyHook_OnKeyDown(object? sender, GlobalKeyEventArgs e)
         {
+            Debug.WriteLine(e.KeyCode + " : 1");
+            if(pressedKeys.ContainsKey(e.KeyCode))
+            {
+                pressedKeys.Clear();
+            }
+
             pressedKeys.Add(e.KeyCode, ++pressedCount);
         }
 
@@ -59,16 +67,19 @@ namespace GlobalHook
         {
             bool isExist = pressedKeys.ContainsKey(key1) && pressedKeys.ContainsKey(key2);
 
+            Debug.WriteLine(e.KeyCode + " : 0");
+
             if (isExist)
             {
                 bool onlyTwoKeys = pressedKeys.Count == 2;
                 bool isSequential = pressedKeys[key1] + 1 == pressedKeys[key2];
 
-                pressedKeys.Remove(e.KeyCode);
+                // Virtual Input 으로 인한 연속호출 방지.
+                pressedKeys.Clear();
 
                 if (onlyTwoKeys && isSequential)
                 {
-                    string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
+                    string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;   
                     string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
 
                     execute(regexExpression, regexReplace);

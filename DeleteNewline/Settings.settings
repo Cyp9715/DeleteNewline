@@ -21,7 +21,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="regexExpression" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\r\n</Value>
+      <Value Profile="(Default)">\r\n|\n</Value>
     </Setting>
     <Setting Name="regexReplace" Type="System.String" Scope="User">
       <Value Profile="(Default)">`space`</Value>

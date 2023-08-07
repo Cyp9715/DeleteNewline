@@ -14,7 +14,7 @@ namespace DeleteNewline
             bool success = false;
             string replacedText = String.Empty;
 
-            VirtualInput.InputImplement.TypeKeyboard_Copy();
+            VirtualInput.Implement.TypeKeyboard_Copy();
 
             if (ClipboardManager.ContainText() == true)
             {
@@ -56,7 +56,7 @@ namespace DeleteNewline
 
         public static void DeleteNewline_WithoutNotifier(string regex, string replace)
         {
-            VirtualInput.InputImplement.TypeKeyboard_Copy();
+            VirtualInput.Implement.TypeKeyboard_Copy();
 
             if (ClipboardManager.ContainText() == true)
             {

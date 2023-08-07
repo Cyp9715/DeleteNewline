@@ -58,7 +58,7 @@ namespace DeleteNewline
         // 포커스를 다시 얻었을 경우 GlobalHook 를 활성화 하고, 임시변수 값들과 텍스트박스를 초기화함.
         private void TextBox_bindKey_GotFocus(object sender, RoutedEventArgs e)
         {
-            HookImplement.UnInstallGlobalHook();
+            Implement.UnInstallGlobalHook();
 
             key1 = Key.None;
             key2 = Key.None;
@@ -74,12 +74,12 @@ namespace DeleteNewline
 
             vm_setting.SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
 
-            HookImplement.InstallGlobalHook();
+            Implement.InstallGlobalHook();
         }
 
         private void button_RegexDefault_Click(object sender, RoutedEventArgs e)
         {
-            vm_setting.text_textBox_regexExpression = @"\r\n";
+            vm_setting.text_textBox_regexExpression = @"\r\n|\n";
             vm_setting.text_textBox_regexReplace = " ";
 
             vm_setting.UpdateTextBox_regexOutput();

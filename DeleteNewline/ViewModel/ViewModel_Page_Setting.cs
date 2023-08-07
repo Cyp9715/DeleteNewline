@@ -62,7 +62,7 @@ namespace DeleteNewline.ViewModel
             {
                 SetProperty(ref _isChecked_checkBox_notification, value);
 
-                HookImplement.execute = (value == true) ?
+                Implement.execute = (value == true) ?
                     Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
 
                 appdata.notification = value;
@@ -182,7 +182,7 @@ namespace DeleteNewline.ViewModel
             var Virtual_Key1 = KeyInterop.VirtualKeyFromKey((Key)appdata.bindKey_1);
             var Virtual_Key2 = KeyInterop.VirtualKeyFromKey((Key)appdata.bindKey_2);
 
-            HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
+            Implement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
         }
 
         KeyConverter keyConverter = new KeyConverter();

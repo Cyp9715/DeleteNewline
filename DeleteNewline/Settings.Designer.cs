@@ -97,7 +97,7 @@ namespace DeleteNewline {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\r\\n")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\r\\n|\\n")]
         public string regexExpression {
             get {
                 return ((string)(this["regexExpression"]));

@@ -30,7 +30,7 @@ namespace DeleteNewline
             mainWindow.Topmost = appdata.topMost;
 
             // Init GlobalHook
-            HookImplement.InstallGlobalHook();
+            Implement.InstallGlobalHook();
 
             // Init tray
             SetNotifyIcon();
