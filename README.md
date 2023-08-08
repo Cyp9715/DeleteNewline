@@ -24,7 +24,7 @@ Currently, my personal use environment stays in Windows, so there is no plan to 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
 
 Additionally supports the Delete Newline regular expression.  
-Users can use a combination of regular expressions and the keybind option to instantly extract transformed strings conveniently.
+Users can conveniently extract the converted string using a combination of regular expressions and keybind options.
 
 ## Download
 
