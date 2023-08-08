@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using DeleteNewline.ViewModel;
+using Windows;
 using Windows.Devices.Printers;
 
 namespace GlobalHook
@@ -54,29 +55,30 @@ namespace GlobalHook
         // 혹시라도 해당 로직부분에서 단 하나라도 제대로 인식되지 않을경우 프로그램 작동에 문제가 생길 여지가 있음.
         private static void GlobalKeyHook_OnKeyDown(object? sender, GlobalKeyEventArgs e)
         {
-            Debug.WriteLine(e.KeyCode + " : 1");
-            if(pressedKeys.ContainsKey(e.KeyCode))
+            try
             {
-                pressedKeys.Clear();
+                pressedKeys.Add(e.KeyCode, ++pressedCount);
             }
-
-            pressedKeys.Add(e.KeyCode, ++pressedCount);
+            catch (System.ArgumentException)
+            {
+                string msgHeader = "ERROR";
+                string msgContent = "FAILED. GLOBALHOOK DETECT";
+                Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
+            }
         }
 
         private static void GlobalKeyHook_OnKeyUp(object? sender, GlobalKeyEventArgs e)
         {
             bool isExist = pressedKeys.ContainsKey(key1) && pressedKeys.ContainsKey(key2);
 
-            Debug.WriteLine(e.KeyCode + " : 0");
-
             if (isExist)
             {
+                // 이 부분에서 문제가 생길 수 있음.
                 bool onlyTwoKeys = pressedKeys.Count == 2;
                 bool isSequential = pressedKeys[key1] + 1 == pressedKeys[key2];
 
-                // Virtual Input 으로 인한 연속호출 방지.
+                // VirtualInput 으로 인한 연속호출 방지.
                 pressedKeys.Clear();
-
                 if (onlyTwoKeys && isSequential)
                 {
                     string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;   
