@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace VirtualInput
@@ -14,7 +16,6 @@ namespace VirtualInput
              * ClipboardManager 내부의 Sleep 과 어느정도 연동성이 존재함. (때문에 조심히 다뤄야 함.)
              * 
              * Virtual Key 입력의 즉발성으로 인해 어느정도의 유휴시간이 필요함.
-             * 
             */
             Thread thread = new Thread(() =>
             {
@@ -23,7 +24,7 @@ namespace VirtualInput
                 VirtualInput.Keyboard.Type(Key.C);
                 VirtualInput.Keyboard.Release(Key.LeftCtrl);
 
-                Thread.Sleep(150);
+                Thread.Sleep(200);
             });
 
             thread.SetApartmentState(ApartmentState.STA);

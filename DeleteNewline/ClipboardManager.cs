@@ -8,9 +8,13 @@ namespace DeleteNewline
 {
     /* 
      * ClipboardManager 의 SetText, GetText 부분에서 Exception 이 발생한다면
-     * 이는 대부분 VirtualInput 과 상호작용간의 오류 (VirtualInput 은 Ctrl+C 를 통해 Clipboard 에 접근함) 문제임.
-     * 때문에 VirtualInput 실행단에 적절히 유휴시간을 둘 필요성이 있으며,
-     * 해당 코드에서는 올바르게 데이터를 가져왔는지, 올바르게 지정했는지 이중으로 확인할 필요성이 있음.
+     * 이는 대부분 VirtualInput 과 상호작용 오류 (VirtualInput.TypeKeyboard_Copy() 는 Ctrl+C 를 통해 Clipboard 에 접근함) 문제임.
+     * 때문에 VirtualInput 실행단을 Thread 로 분리한뒤, Thread 내부에서 적절히 유휴시간을 둘 필요성 + Join() 을 통해 동기화할 필요가 있음.
+     * 
+     * 이상적으론 해당 코드의 SetText 가 온전히 Text 를 설정할 수 있다는 보장이 없기 때문에 이를 확인하는 절차가 필요하나,
+     * 또다시 클립보드에 접근하여 오히려 안정성을 떨어뜨리는 문제가 있음.
+     * SetText() 를 검증하려 GetText() 를 사용하는 등으로 구현 하였는데, 그러한 구현은 COM 객체의 동시접근으로 인한 에러 횟수를 크게 늘림.
+     * 그렇다고 Thread.Sleep() 등을 사용하면 사용자 반응성이 크게 저하되는 문제가 존재함.
      */
     static class ClipboardManager
     {
@@ -32,13 +36,6 @@ namespace DeleteNewline
             try
             {
                 output = Clipboard.GetText(TextDataFormat.UnicodeText);
-
-                if(String.IsNullOrEmpty(output))
-                {
-                    string msgHeader = "ERROR";
-                    string msgContent = "STRING DATA FORMAT IS INCORRECT";
-                    Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
-                }
             }
             catch (Exception)
             {
@@ -51,10 +48,6 @@ namespace DeleteNewline
         }
 
 
-        /*
-         * 해당함수는 Text를 Clipboard 에 확실히 Set 하도록 보장하지 않는 문제점이 있음.
-         * 사용자 반응성을 중시.
-         */
         public static void SetText(string text)
         {
             try
