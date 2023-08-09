@@ -26,7 +26,7 @@ Text with Newline removed is located on your 'clipboard'. You can check it by us
 Additionally supports the Delete Newline regular expression.  
 Users can conveniently extract the converted string using a combination of regular expressions and keybind options.
 
-Please note that the keybind option may not run in certain programs due to permission issues. (Ex: Drawboard, League of Legends Client Etc...) In this case. Running the program with administrator privileges solved the problem.
+Please note that the keybind option may not run in certain programs due to permission issues. (Ex: Drawboard, League of Legends Client Etc...) In this case. Run the program with administrator privileges.
 
 ## Download
 
