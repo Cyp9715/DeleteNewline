@@ -19,11 +19,14 @@ Currently, my personal use environment stays in Windows, so there is no plan to 
 ## How to Use?
 * Copy the text and copy it to the appropriate application window.  
 * Copy the text, right-click on the appropriate program window, and then click the Paste button.  
-* Drag the text and press the **Alt + F1** button.
-
-perhaps the last function is most useful.
+* Drag the text and press the **Alt + F1** button. (called keybind)
 
 Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
+
+Additionally supports the Delete Newline regular expression.  
+Users can conveniently extract the converted string using a combination of regular expressions and keybind options.
+
+Please note that the keybind option may not run in certain programs due to permission issues. (Ex:League of Legends Client, Etc...) In this case. Run the program with administrator privileges.
 
 ## Download
 
