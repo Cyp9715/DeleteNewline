@@ -6,10 +6,12 @@ namespace DeleteNewline.ViewModel
     {
         public void AddAlertMessage(ref TextBox textBox)
         {
-            textBox.AppendText("\r\n");
-            textBox.AppendText(" ========================================================\r\n");
-            textBox.AppendText(" ================== Only text form can be entered =================\r\n");
-            textBox.AppendText(" ========================================================\r\n");
+            string errMsg = "\r\n" +
+                  " ========================================================\r\n" +
+                  " ================== Only text form can be entered =================\r\n" +
+                  " ========================================================\r\n";
+
+            textBox.AppendText(errMsg);
             textBox.ScrollToEnd();
         }
     }

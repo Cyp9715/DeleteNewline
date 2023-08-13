@@ -24,75 +24,156 @@
                 
                 <!-- BASIC -->
 
-                <Label Content="Basic" FontSize="{StaticResource LargeSize}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
-
-                <DockPanel ToolTip="{StaticResource toolTipText_topMost}"
-                                Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
-                    <Label Content="TopMost" Width="{StaticResource width_label}"/>
-                    <CheckBox Name="CheckBox_topMost" HorizontalAlignment="Right"
-                                  Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
-                                  MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
-                                    IsChecked="{Binding isChecked_checkBox_topMost}"/>
+                <Label 
+                    Content="Basic"
+                    Margin="{StaticResource margin_mainCategory}"
+                    FontSize="{StaticResource LargeSize}"
+                    FontWeight="Bold" />
+                <DockPanel 
+                    Margin="{StaticResource margin_internalPanel}"
+                    Width="{StaticResource width_dockPanel}"
+                    ToolTip="{StaticResource toolTipText_topMost}">
+                <Label 
+                    Content="TopMost"
+                    Width="{StaticResource width_label}" />
+                <CheckBox 
+                    x:Name="CheckBox_topMost"
+                    HorizontalAlignment="Right"
+                    Margin="{StaticResource margin_checkBox}"
+                    Width="{StaticResource width_checkBox}"
+                    Height="{StaticResource height_checkBox}"
+                    MinHeight="{StaticResource minHeight_checkBox}"
+                    MinWidth="{StaticResource minWidth_checkBox}"
+                    IsChecked="{Binding isChecked_checkBox_topMost}" />
                 </DockPanel>
 
-                <DockPanel ToolTip="{StaticResource toolTipText_notification}"
-                                Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
-                    <Label Content="Notification" Width="{StaticResource width_label}"/>
-                    <CheckBox Name="CheckBox_notification"  HorizontalAlignment="Right"
-                                Margin="{StaticResource margin_checkBox}" Width="{StaticResource width_checkBox}" Height="{StaticResource height_checkBox}" 
-                                MinHeight="{StaticResource minHeight_checkBox}" MinWidth="{StaticResource minWidth_checkBox}"
-                                    IsChecked="{Binding isChecked_checkBox_notification}"/>
+                <DockPanel
+                    ToolTip="{StaticResource toolTipText_notification}"
+                    Margin="{StaticResource margin_internalPanel}"
+                    Width="{StaticResource width_dockPanel}">
+                    
+                <Label 
+                    Content="Notification"
+                    Width="{StaticResource width_label}" />
+                
+                <CheckBox 
+                    x:Name="CheckBox_notification"
+                    HorizontalAlignment="Right"
+                    Margin="{StaticResource margin_checkBox}"
+                    Width="{StaticResource width_checkBox}"
+                    Height="{StaticResource height_checkBox}"
+                    MinHeight="{StaticResource minHeight_checkBox}"
+                    MinWidth="{StaticResource minWidth_checkBox}"
+                    IsChecked="{Binding isChecked_checkBox_notification}" />
                 </DockPanel>
 
-                <DockPanel Margin="0,13,0,0" 
-                                    ToolTip="{StaticResource toolTipText_keyBind}" Width="{StaticResource width_dockPanel}">
-                    <Label Content="Keybind" VerticalAlignment="Center"/>
-                    <TextBox x:Name="TextBox_bindKey" Width="275" IsReadOnly="True" HorizontalAlignment="Right"
-                                 KeyDown="TextBox_bindKey_KeyDown" KeyUp="TextBox_bindKey_KeyUp" GotFocus="TextBox_bindKey_GotFocus" 
-                                     Text="{Binding text_textBox_keybind}" LostFocus="TextBox_bindKey_LostFocus" TextAlignment="Center"/>
+                <DockPanel 
+                    Margin="0,13,0,0"
+                    ToolTip="{StaticResource toolTipText_keyBind}"
+                    Width="{StaticResource width_dockPanel}">
+                <Label 
+                    Content="Keybind"
+                    VerticalAlignment="Center" />
+                <TextBox 
+                    x:Name="TextBox_bindKey"
+                    Width="275"
+                    HorizontalAlignment="Right"
+                    Text="{Binding ViewModel.text_textBox_keybind}"
+                    TextAlignment="Center"
+                    IsReadOnly="True"
+                    KeyDown="TextBox_bindKey_KeyDown"
+                    KeyUp="TextBox_bindKey_KeyUp"
+                    GotFocus="TextBox_bindKey_GotFocus"
+                    LostFocus="TextBox_bindKey_LostFocus" />
                 </DockPanel>
 
                 <DockPanel Margin="0,35,0,0">
-                    <Rectangle Width="400" Height="1" Fill="Gray" />
+                    <Rectangle 
+                        Width="400" 
+                        Height="1" 
+                        Fill="Gray" />
                 </DockPanel>
 
-                
+
                 <!-- REGEX -->
 
-                <Label Content="Regex" FontSize="{StaticResource LargeSize}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
+                <Label 
+                    Content="Regex"
+                    Margin="{StaticResource margin_mainCategory}"
+                    FontSize="{StaticResource LargeSize}"
+                    FontWeight="Bold" />
 
-                <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}" ToolTip="{StaticResource toolTipText_regexExpression}">
-                    <Label Content="Expression" VerticalAlignment="Center"/>
-                    <TextBox x:Name="TextBox_regexExpression"  Text="{Binding text_textBox_regexExpression}"
-                             Width="275" HorizontalAlignment="Right" TextAlignment="Center" TextChanged="TextBox_regexExpression_TextChanged"/>
+                <DockPanel 
+                    Margin="0,13,0,0"
+                    Width="{StaticResource width_dockPanel}"
+                    ToolTip="{StaticResource toolTipText_regexExpression}">
+                    <Label 
+                        Content="Expression"
+                        VerticalAlignment="Center" />
+                    <TextBox 
+                        x:Name="TextBox_regexExpression"
+                        Width="275"
+                        HorizontalAlignment="Right"
+                        Text="{Binding text_textBox_regexExpression}"
+                        TextAlignment="Center"
+                        TextChanged="TextBox_regexExpression_TextChanged" />
                 </DockPanel>
 
-                <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}" ToolTip="{StaticResource toolTipText_regexReplace}">
-                    <Label Content="Replace" VerticalAlignment="Center"/>
-                    <TextBox x:Name="TextBox_regexReplace"  Text="{Binding text_textBox_regexReplace}"
-                             Width="275" HorizontalAlignment="Right" TextAlignment="Center"
-                             Foreground="Yellow" TextChanged="TextBox_regexReplace_TextChanged"/>
+                <DockPanel 
+                    Margin="0,13,0,0"
+                    Width="{StaticResource width_dockPanel}"
+                    ToolTip="{StaticResource toolTipText_regexReplace}">
+                    <Label 
+                        Content="Replace"
+                        VerticalAlignment="Center"/>
+                    <TextBox 
+                        x:Name="TextBox_regexReplace"
+                        Width="275"
+                        HorizontalAlignment="Right"
+                        Text="{Binding text_textBox_regexReplace}"
+                        TextAlignment="Center"
+                        Foreground="Yellow"
+                        TextChanged="TextBox_regexReplace_TextChanged"/>
                 </DockPanel>
 
-                <Grid x:Name="Grid_RegexExample" Margin="40,20,40,0" Width="450">
+                <Grid 
+                    x:Name="Grid_RegexExample"
+                    Margin="40,20,40,0"
+                    Width="450">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height=" 1*"/>
-                        <RowDefinition Height=" 1*"/>
-                        <RowDefinition Height=" 1*"/>
-                        <RowDefinition Height=" 1*"/>
-                        <RowDefinition Height=" 1*"/>
-
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
 
-                    <Label x:Name="Label_regexInput"  Content="input" Grid.Row="0" Margin="0,0,0,0" 
-                           Foreground="LightGray" FontSize="12" HorizontalAlignment="Right"
-                           ToolTip="{StaticResource toolTipText_inputRegex}"/>
+                    <Label 
+                        x:Name="Label_regexInput"
+                        Grid.Row="0"
+                        Content="input"
+                        HorizontalAlignment="Right"
+                        Foreground="LightGray"
+                        FontSize="12"
+                        ToolTip="{StaticResource toolTipText_inputRegex}"/>
 
-                    <TextBox x:Name="TextBox_regexInput" Grid.Row="1" Margin="0,5,0,10" Height="100" AcceptsReturn="True" 
-                             Text="{Binding text_textBox_inputRegex}" ToolTip="{StaticResource toolTipText_inputRegex}" TextChanged="TextBox_regexInput_TextChanged"/>
+                    <TextBox 
+                        x:Name="TextBox_regexInput"
+                        Grid.Row="1"
+                        Margin="0,5,0,10"
+                        Height="100"
+                        Text="{Binding text_textBox_inputRegex}"
+                        ToolTip="{StaticResource toolTipText_inputRegex}"
+                        AcceptsReturn="True" 
+                        TextChanged="TextBox_regexInput_TextChanged"/>
 
-                    <TextBlock Grid.Row = "1" IsHitTestVisible="False" Text="{StaticResource waterMark_inputRegex}" 
-                               VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="DarkGray">
+                    <TextBlock 
+                        Grid.Row="1"
+                        IsHitTestVisible="False"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="DarkGray"
+                        Text="{StaticResource waterMark_inputRegex}">
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -105,18 +186,32 @@
                         </TextBlock.Style>
                     </TextBlock>
 
+                    <Label 
+                        Grid.Row="2"
+                        Content="output"
+                        Margin="{Binding Margin, ElementName=Label_regexInput}"
+                        Foreground="LightGray"
+                        FontSize="12"
+                        HorizontalAlignment="Right"
+                        ToolTip="{StaticResource toolTipText_outputRegex}"/>
 
-                    <Label Grid.Row="2" Content="output" Margin="{Binding Margin, ElementName=Label_regexInput}"
-                          Foreground="LightGray" FontSize="12" HorizontalAlignment="Right"
-                          ToolTip="{StaticResource toolTipText_outputRegex}"/>
+                    <TextBox 
+                        x:Name="TextBox_regexOutput"
+                        Grid.Row="3"
+                        Margin="{Binding Margin, ElementName=TextBox_regexInput}"
+                        Height="{Binding Height, ElementName=TextBox_regexInput}"
+                        IsReadOnly="True"
+                        Text="{Binding text_textBox_outputRegex}"
+                        ToolTip="{StaticResource toolTipText_outputRegex}"/>
 
-                    <TextBox x:Name="TextBox_regexOutput" Grid.Row="3" Margin="{Binding Margin, ElementName=TextBox_regexInput}" 
-                             Height="{Binding Height, ElementName=TextBox_regexInput}" IsReadOnly="True"
-                             Text="{Binding text_textBox_outputRegex}" ToolTip="{StaticResource toolTipText_outputRegex}"/>
-
-                    <Button x:Name="button_RegexDefault" Grid.Row="4" Width="{Binding Path=Width, ElementName=Grid_RegexExample}" 
-                            Content="Default Regex Settings" HorizontalAlignment="Center" 
-                            Click="button_RegexDefault_Click" ToolTip="{StaticResource toolTipText_defaultRegexSettings}">
+                    <Button 
+                        x:Name="button_RegexDefault"
+                        Grid.Row="4"
+                        Width="{Binding Path=Width, ElementName=Grid_RegexExample}"
+                        Content="Default Regex Settings"
+                        HorizontalAlignment="Center"
+                        Click="button_RegexDefault_Click"
+                        ToolTip="{StaticResource toolTipText_defaultRegexSettings}">
                         <Button.Resources>
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius" Value="10"/>
@@ -128,9 +223,16 @@
             
             
             <!-- VERSION INFOMATION -->
-            <Label Grid.Column="1" x:Name="TextBox_version" FontSize="11" Content="{StaticResource text_versionInfomation}"
-                 UseLayoutRounding="True" Foreground="LightGray" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"/>
-
+            <Label 
+                Grid.Column="1"
+                x:Name="TextBox_version"
+                FontSize="11"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Foreground="LightGray"
+                Content="{StaticResource text_versionInfomation}"
+                UseLayoutRounding="True"
+                Margin="10"/>
 
         </Grid>
 
