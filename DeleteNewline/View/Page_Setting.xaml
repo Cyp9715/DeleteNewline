@@ -24,7 +24,7 @@
                 
                 <!-- BASIC -->
 
-                <Label Content="Basic" FontSize="{StaticResource LargeSize}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
+                <Label Content="Basic" FontSize="{StaticResource size_mainCategoryFont}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
                 <DockPanel ToolTip="{StaticResource toolTipText_topMost}"
                                 Margin="{StaticResource margin_internalPanel}" Width="{StaticResource width_dockPanel}">
@@ -59,7 +59,7 @@
                 
                 <!-- REGEX -->
 
-                <Label Content="Regex" FontSize="{StaticResource LargeSize}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
+                <Label Content="Regex" FontSize="{StaticResource size_mainCategoryFont}" FontWeight="Bold" Margin="{StaticResource margin_mainCategory}"/>
 
                 <DockPanel Margin="0,13,0,0" Width="{StaticResource width_dockPanel}" ToolTip="{StaticResource toolTipText_regexExpression}">
                     <Label Content="Expression" VerticalAlignment="Center"/>

@@ -7,10 +7,8 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemeResources RequestedTheme="Dark"/>
-                <ui:XamlControlsResources/>
-                <ResourceDictionary Source="Style/Thickness.xaml"/>
-                <ResourceDictionary Source="Style/Description.xaml"/>
-                <ResourceDictionary Source="Style/FontSize.xaml"/>
+                <ui:XamlControlsResources />
+                <ResourceDictionary Source="View/Mutable.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
