@@ -78,7 +78,7 @@
                     x:Name="TextBox_bindKey"
                     Width="275"
                     HorizontalAlignment="Right"
-                    Text="{Binding ViewModel.text_textBox_keybind}"
+                    Text="{Binding text_textBox_keybind}"
                     TextAlignment="Center"
                     IsReadOnly="True"
                     KeyDown="TextBox_bindKey_KeyDown"
