@@ -9,16 +9,13 @@ namespace DeleteNewline
     public partial class Page_Setting
     {
         Settings appdata = DeleteNewline.Settings.Default;
-        ViewModel_Page_Setting vm_setting;
+        ViewModel_Setting vm_setting;
 
-        public static Page_Setting? instance;
-
-        public Page_Setting() 
+        public Page_Setting(ViewModel_Setting vm_setting_) 
         {
             InitializeComponent();
-            instance = this;
-            vm_setting = new ViewModel_Page_Setting();
-            DataContext = vm_setting;
+            vm_setting = vm_setting_;
+            DataContext = vm_setting_;
         }
 
 

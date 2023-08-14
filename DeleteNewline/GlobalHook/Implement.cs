@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using DeleteNewline;
 using DeleteNewline.ViewModel;
 using Windows;
 using Windows.Devices.Printers;
@@ -11,9 +12,9 @@ namespace GlobalHook
     {
         static GlobalKeyHook? globalKeyHook;
         static bool isSetHook = false;
-        
         public static Action<string, string>? execute;
-
+        static ViewModel_Setting vm_settings = App.GetService<ViewModel_Setting>();
+ 
         public static void InstallGlobalHook()
         {
             if(globalKeyHook == null) 
@@ -81,9 +82,9 @@ namespace GlobalHook
                 pressedKeys.Clear();
                 if (onlyTwoKeys && isSequential)
                 {
-                    string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;   
-                    string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
-
+                    string regexExpression = vm_settings.text_textBox_regexExpression;   
+                    string regexReplace = vm_settings.text_textBox_regexReplace;
+                        
                     execute(regexExpression, regexReplace);
                 }
             }

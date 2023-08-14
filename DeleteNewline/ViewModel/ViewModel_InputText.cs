@@ -2,7 +2,7 @@
 
 namespace DeleteNewline.ViewModel
 {
-    class ViewModel_Page_InputText
+    public class ViewModel_InputText
     {
         public void AddAlertMessage(ref TextBox textBox)
         {

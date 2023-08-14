@@ -7,15 +7,16 @@ namespace DeleteNewline
 {
     public partial class Page_InputText
     {
-        public static Page_InputText? instance;
-        ViewModel_Page_InputText vm_Input;
+        ViewModel_InputText? vm_input;
+        ViewModel_Setting? vm_settings;
 
-        public Page_InputText()
+        public Page_InputText(ViewModel_InputText? vm_input_, ViewModel_Setting? vm_settings_)
         {
             InitializeComponent();
-            instance = this;
-            vm_Input = new ViewModel_Page_InputText();
-            DataContext = vm_Input;
+            vm_input = vm_input_;
+            vm_settings = vm_settings_;
+
+            DataContext = vm_input_;
         }
 
         private void MenuItem_Paste_Click(object sender, RoutedEventArgs e)
@@ -27,15 +28,15 @@ namespace DeleteNewline
                 originalText = ClipboardManager.GetText();
                 TextBox_Main.AppendText(originalText);
 
-                string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
-                string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
+                string regexExpression = vm_settings.text_textBox_regexExpression;
+                string regexReplace = vm_settings.text_textBox_regexReplace;
 
                 (bool success, string replacedText) = ClipboardManager.ReplaceText(regexExpression, regexReplace);
                 ClipboardManager.SetText(replacedText);
             }
             else
             {
-                vm_Input.AddAlertMessage(ref TextBox_Main);
+                vm_input.AddAlertMessage(ref TextBox_Main);
                 return;
             }
         }
@@ -46,15 +47,15 @@ namespace DeleteNewline
             {
                 if (ClipboardManager.ContainText() == true)
                 {
-                    string regexExpression = ViewModel_Page_Setting.vm_settings.text_textBox_regexExpression;
-                    string regexReplace = ViewModel_Page_Setting.vm_settings.text_textBox_regexReplace;
+                    string regexExpression = vm_settings.text_textBox_regexExpression;
+                    string regexReplace = vm_settings.text_textBox_regexReplace;
 
                     (bool success, string replacedText) = ClipboardManager.ReplaceText(regexExpression, regexReplace);
                     ClipboardManager.SetText(replacedText);
                 }
                 else
                 {
-                    vm_Input.AddAlertMessage(ref TextBox_Main);
+                    vm_input.AddAlertMessage(ref TextBox_Main);
                     return;
                 }
             }

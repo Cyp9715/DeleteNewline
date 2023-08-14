@@ -1,35 +1,28 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using System.Windows.Input;
 using GlobalHook;
+using System.Windows.Input;
 using System.Windows.Controls;
 
 namespace DeleteNewline.ViewModel
 {
-    class ViewModel_Page_Setting : ObservableObject
+    public class ViewModel_Setting : ObservableObject
     {
-        public static ViewModel_Page_Setting? vm_settings;
-
         Settings appdata = DeleteNewline.Settings.Default;
         readonly string setting_space = "`space`";
 
-        public ViewModel_Page_Setting()
+        public ViewModel_Setting()
         {
-            if(vm_settings == null)
-            {
-                vm_settings = this;
-
-                isChecked_checkBox_topMost = appdata.topMost;
-                isChecked_checkBox_notification = appdata.notification;
-                SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
+            isChecked_checkBox_topMost = appdata.topMost;
+            isChecked_checkBox_notification = appdata.notification;
+            SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
                 
-                text_textBox_regexExpression = appdata.regexExpression == setting_space ? " " : appdata.regexExpression;
-                text_textBox_regexReplace = appdata.regexReplace == setting_space ? " " : appdata.regexReplace;
-                text_textBox_inputRegex = appdata.regexInput;
-                UpdateTextBox_regexOutput();
+            text_textBox_regexExpression = appdata.regexExpression == setting_space ? " " : appdata.regexExpression;
+            text_textBox_regexReplace = appdata.regexReplace == setting_space ? " " : appdata.regexReplace;
+            text_textBox_inputRegex = appdata.regexInput;
+            UpdateTextBox_regexOutput();
 
-                SetHookKeys();
-            }
+            SetHookKeys();
         }
 
         bool _isChecked_checkBox_topMost;
@@ -49,7 +42,7 @@ namespace DeleteNewline.ViewModel
             {
                 SetProperty(ref _isChecked_checkBox_topMost, value);
 
-                MainWindow.mainWindow.Topmost = value;
+                Page_MainWindow.mainWindow.Topmost = value;
                 appdata.topMost = value;
             }
         }
