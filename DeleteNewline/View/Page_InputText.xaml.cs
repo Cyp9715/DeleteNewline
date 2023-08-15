@@ -8,13 +8,12 @@ namespace DeleteNewline
     public partial class Page_InputText
     {
         ViewModel_InputText? vm_input;
-        ViewModel_Setting? vm_settings;
+        ViewModel_Setting? vm_setting;
 
-        public Page_InputText(ViewModel_InputText? vm_input_, ViewModel_Setting? vm_settings_)
+        public Page_InputText(ViewModel_InputText? vm_input_)
         {
             InitializeComponent();
             vm_input = vm_input_;
-            vm_settings = vm_settings_;
 
             DataContext = vm_input_;
         }
@@ -28,8 +27,8 @@ namespace DeleteNewline
                 originalText = ClipboardManager.GetText();
                 TextBox_Main.AppendText(originalText);
 
-                string regexExpression = vm_settings.text_textBox_regexExpression;
-                string regexReplace = vm_settings.text_textBox_regexReplace;
+                string regexExpression = vm_setting.text_textBox_regexExpression;
+                string regexReplace = vm_setting.text_textBox_regexReplace;
 
                 (bool success, string replacedText) = ClipboardManager.ReplaceText(regexExpression, regexReplace);
                 ClipboardManager.SetText(replacedText);
@@ -47,8 +46,8 @@ namespace DeleteNewline
             {
                 if (ClipboardManager.ContainText() == true)
                 {
-                    string regexExpression = vm_settings.text_textBox_regexExpression;
-                    string regexReplace = vm_settings.text_textBox_regexReplace;
+                    string regexExpression = vm_setting.text_textBox_regexExpression;
+                    string regexReplace = vm_setting.text_textBox_regexReplace;
 
                     (bool success, string replacedText) = ClipboardManager.ReplaceText(regexExpression, regexReplace);
                     ClipboardManager.SetText(replacedText);
@@ -64,6 +63,11 @@ namespace DeleteNewline
         private void MenuItem_Clear_Click(object sender, RoutedEventArgs e)
         {
             TextBox_Main.Clear();
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            vm_setting = App.GetService<ViewModel_Setting>();
         }
     }
 }
