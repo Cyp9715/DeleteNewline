@@ -101,8 +101,7 @@ namespace DeleteNewline
             {
                 if (args.InvokedItemContainer is ModernWpf.Controls.NavigationViewItem navigationViewItem)
                 {
-                    string navigationTarget = navigationViewItem.Tag as string;
-                    vm_mainWindow.Navigate(navigationTarget);
+                    frame_main.Content = App.GetService<Page_InputText>();
                 }
             }
         }

@@ -26,7 +26,6 @@
         </Grid.ColumnDefinitions>
 
         <Frame Name="frame_main"
-               Content="{Binding CurrentContent}" 
                Grid.Column="1" 
                NavigationUIVisibility="Hidden"/>
         

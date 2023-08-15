@@ -13,7 +13,6 @@ namespace GlobalHook
         static GlobalKeyHook? globalKeyHook;
         static bool isSetHook = false;
         public static Action<string, string>? execute;
-        static ViewModel_Setting vm_settings = App.GetService<ViewModel_Setting>();
  
         public static void InstallGlobalHook()
         {
@@ -82,9 +81,11 @@ namespace GlobalHook
                 pressedKeys.Clear();
                 if (onlyTwoKeys && isSequential)
                 {
-                    string regexExpression = vm_settings.text_textBox_regexExpression;   
-                    string regexReplace = vm_settings.text_textBox_regexReplace;
-                        
+                    ViewModel_Setting vm_setting = App.GetService<ViewModel_Setting>();
+
+                    string regexExpression = vm_setting.text_textBox_regexExpression;
+                    string regexReplace = vm_setting.text_textBox_regexReplace;
+
                     execute(regexExpression, regexReplace);
                 }
             }
