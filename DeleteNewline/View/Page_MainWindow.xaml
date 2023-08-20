@@ -17,29 +17,27 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Name="ColumnDefinition_mainWindow_0" Width="40"/>
-            <ColumnDefinition Name="ColumnDefinition_mainWindow_1" Width="1*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Frame Name="frame_main"
-               Grid.Column="1" 
-               NavigationUIVisibility="Hidden"/>
-        
-        <ui:NavigationView x:Name="navigationView_side" 
+               NavigationUIVisibility="Hidden"
+               Margin="40,0,0,0"/>
+
+        <ui:NavigationView x:Name="navigationView_side"
                            IsBackButtonVisible="Collapsed" 
-                           PaneOpening="NavigationView_PaneOpening" 
-                           PaneClosing="NavigationView_PaneClosing" 
                            PaneDisplayMode="LeftCompact" 
                            ItemInvoked="NavigationView_ItemInvoked">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Name="NavigationViewItem_InputText" 
                                        Tag="InputText"
                                        ToolTip="{StaticResource toolTipText_NavigationItem_InputTextPage}">
-                    <StackPanel Orientation="Horizontal" Margin="-15,0,0,0">
+                    <StackPanel Orientation="Horizontal" 
+                                Margin="-15,0,0,0">
                         <Image
                            Margin="9,0,12,0"
                            Height="20"
@@ -51,7 +49,6 @@
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
         </ui:NavigationView>
-
     </Grid>
 
 </Window>

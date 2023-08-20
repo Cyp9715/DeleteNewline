@@ -81,16 +81,6 @@ namespace DeleteNewline
             mainWindow.Visibility = Visibility.Hidden;
         }
 
-        private void NavigationView_PaneOpening(ModernWpf.Controls.NavigationView sender, object args)
-        {
-            ColumnDefinition_mainWindow_0.Width = new GridLength(navigationView_side.OpenPaneLength - 20);
-        }
-
-        private void NavigationView_PaneClosing(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewPaneClosingEventArgs args)
-        {
-            ColumnDefinition_mainWindow_0.Width = new GridLength(40);
-        }
-
         private void NavigationView_ItemInvoked(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewItemInvokedEventArgs args)
         {
             if (args.IsSettingsInvoked)
