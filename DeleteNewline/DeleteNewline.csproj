@@ -32,21 +32,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\copy_white.png" />
     <None Remove="Resources\grayLine.png" />
-    <None Remove="Resources\paste_white.png" />
-    <None Remove="Resources\reset_white.png" />
   </ItemGroup>
 
   <ItemGroup>
-	  <Resource Include="Resources\copy_white.png" />
 	  <Resource Include="Resources\favicon.ico" />
-	  <Resource Include="Resources\paste_white.png" />
-	  <Resource Include="Resources\reset_white.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="ModernWpfUI" Version="0.9.6">
