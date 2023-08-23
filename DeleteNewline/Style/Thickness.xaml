@@ -8,7 +8,7 @@
     <Thickness x:Key="margin_internalRegex" Left="0" Top="13" Right="0" Bottom="0"/>
 
     <bcl:Double x:Key="width_label">155</bcl:Double>
-    <bcl:Double x:Key="width_dockPanel">410</bcl:Double>
+    <bcl:Double x:Key="width_dockPanel">450</bcl:Double>
 	
     <bcl:Double x:Key="width_checkBox">20</bcl:Double>
     <bcl:Double x:Key="height_checkBox">20</bcl:Double>

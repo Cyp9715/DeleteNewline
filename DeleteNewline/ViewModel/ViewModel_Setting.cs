@@ -3,6 +3,8 @@ using System;
 using GlobalHook;
 using System.Windows.Input;
 using System.Windows.Controls;
+using Microsoft.Toolkit.Collections;
+using System.Reflection;
 
 namespace DeleteNewline.ViewModel
 {
@@ -141,6 +143,7 @@ namespace DeleteNewline.ViewModel
             (var success, text_textBox_outputRegex) = RegexManager.Replace(text_textBox_inputRegex, text_textBox_regexExpression, text_textBox_regexReplace);
             OnPropertyChanged("text_textBox_outputRegexExample");
         }
+
 
 
         public Key key1 = Key.None;

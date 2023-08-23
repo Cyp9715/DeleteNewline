@@ -1,8 +1,11 @@
 ﻿using DeleteNewline.ViewModel;
 using GlobalHook;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Markup;
+using System.Xml.Linq;
 
 namespace DeleteNewline
 {
@@ -16,6 +19,7 @@ namespace DeleteNewline
             InitializeComponent();
             vm_setting = vm_setting_;
             DataContext = vm_setting_;
+            ItemsControl_addRegex.ItemsSource = MachineFunctions = new ObservableCollection<MachineFunction>();
         }
 
 
@@ -84,17 +88,49 @@ namespace DeleteNewline
 
         private void TextBox_regexExpression_TextChanged(object sender, TextChangedEventArgs e)
         {
-            vm_setting.UpdateTextBox_regexOutput(textBox_regexExpression: TextBox_regexExpression);
+            //vm_setting.UpdateTextBox_regexOutput(textBox_regexExpression: TextBox_regexExpression);
         }
 
         private void TextBox_regexReplace_TextChanged(object sender, TextChangedEventArgs e)
         {
-            vm_setting.UpdateTextBox_regexOutput(textBox_regexReplace: TextBox_regexReplace);
+           // vm_setting.UpdateTextBox_regexOutput(textBox_regexReplace: TextBox_regexReplace);
         }
 
         private void TextBox_regexInput_TextChanged(object sender, TextChangedEventArgs e)
         {
             vm_setting.UpdateTextBox_regexOutput(textBox_regexInput: TextBox_regexInput);
+        }
+
+        public class MachineFunction
+        {
+            public string Name { get; set; }
+            public int Machines { get; set; }
+
+            public ObservableCollection<itemSource_RegexStackPanelElement> itemSource { get; set; }
+
+            public MachineFunction()
+            {
+                itemSource = new ObservableCollection<itemSource_RegexStackPanelElement>();
+            }
+        }
+
+        public class itemSource_RegexStackPanelElement
+        {
+            public string Name { get; set; }
+            public int Index { get; set; }
+
+            public itemSource_RegexStackPanelElement(int index)
+            {
+                this.Index = index;
+            }
+        }
+
+        public ObservableCollection<MachineFunction> MachineFunctions { get; set; }
+
+
+        private void Button_addRegex_Click(object sender, RoutedEventArgs e)
+        {
+            MachineFunctions.Add(new MachineFunction());
         }
     }
 }
