@@ -1,6 +1,8 @@
 ﻿using DeleteNewline.ViewModel;
 using GlobalHook;
+using Microsoft.VisualBasic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,9 +21,9 @@ namespace DeleteNewline
             InitializeComponent();
             vm_setting = vm_setting_;
             DataContext = vm_setting_;
-            ItemsControl_addRegex.ItemsSource = MachineFunctions = new ObservableCollection<MachineFunction>();
+            additionalRegex = new ObservableCollection<GenericParameter_OC>();
+            ItemsControl_addRegex.ItemsSource = additionalRegex;
         }
-
 
         Key key1 = Key.None;
         Key key2 = Key.None;
@@ -101,36 +103,40 @@ namespace DeleteNewline
             vm_setting.UpdateTextBox_regexOutput(textBox_regexInput: TextBox_regexInput);
         }
 
-        public class MachineFunction
+        public class GenericParameter_OC
         {
-            public string Name { get; set; }
-            public int Machines { get; set; }
+            public string Content_expression { get; set; } = string.Empty;
+            public string Content_replace { get; set; } = string.Empty;
 
-            public ObservableCollection<itemSource_RegexStackPanelElement> itemSource { get; set; }
+            public int index { get; set; }
 
-            public MachineFunction()
+            public GenericParameter_OC(string content_expression, string content_replace, int index_) 
             {
-                itemSource = new ObservableCollection<itemSource_RegexStackPanelElement>();
+                Content_expression = content_expression;
+                Content_replace = content_replace;
+                index = index_;
             }
         }
 
-        public class itemSource_RegexStackPanelElement
-        {
-            public string Name { get; set; }
-            public int Index { get; set; }
+        public ObservableCollection<GenericParameter_OC> additionalRegex { get; set; }
 
-            public itemSource_RegexStackPanelElement(int index)
-            {
-                this.Index = index;
-            }
-        }
-
-        public ObservableCollection<MachineFunction> MachineFunctions { get; set; }
-
+        int gp_count = 0;
 
         private void Button_addRegex_Click(object sender, RoutedEventArgs e)
         {
-            MachineFunctions.Add(new MachineFunction());
+            additionalRegex.Add(new GenericParameter_OC("Regex2", "Replace2", gp_count++));
+        }
+
+        private void Button_deleteRegex_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.CommandParameter is GenericParameter_OC gp_oc)
+            {
+                // machineFunction의 index 및 다른 속성에 접근할 수 있다.
+                int index = gp_oc.index;
+
+                // 이 정보를 사용하여 작업을 수행한다.
+                additionalRegex.Remove(additionalRegex.Where(i => i.index == index).Single());
+            }
         }
     }
 }

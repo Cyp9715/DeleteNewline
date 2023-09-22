@@ -169,7 +169,7 @@
                                                Width="410"
                                                ToolTip="{StaticResource toolTipText_regexExpression}">
 
-                                        <Label Content="Expression"
+                                        <Label Content="{Binding Content_expression}"
                                                VerticalAlignment="Center" />
 
                                         <TextBox Width="235"
@@ -184,7 +184,7 @@
                                                Width="410"
                                                ToolTip="{StaticResource toolTipText_regexReplace}">
 
-                                        <Label Content="Replace"
+                                        <Label Content="{Binding Content_replace}"
                                                VerticalAlignment="Center" />
 
                                         <TextBox Width="235"
@@ -202,7 +202,8 @@
                                         Height="30"
                                         Margin="{StaticResource margin_internalRegex}"
                                         HorizontalAlignment="Right"
-                                        Click="Button_addRegex_Click">
+                                        CommandParameter="{Binding}"
+                                        Click="Button_deleteRegex_Click">
                                     <iconPacks:PackIconMicrons Width="10"
                                                                Height="10"
                                                                Kind="Minus" />
@@ -213,7 +214,6 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-
 
 
                 <Grid x:Name="Grid_RegexExample"
@@ -311,10 +311,8 @@
                    Content="{StaticResource text_versionInfomation}"
                    UseLayoutRounding="True"
                    Margin="10" />
-
         </Grid>
-
+        
     </ScrollViewer>
-
-
+    
 </Page>
