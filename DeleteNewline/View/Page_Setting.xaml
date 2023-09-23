@@ -154,7 +154,7 @@
                 </Grid>
 
                 <ItemsControl x:Name="ItemsControl_addRegex"
-                              ItemsSource="{Binding itemSource_RegexStackPanelElement}">
+                              ItemsSource="{Binding additionalRegex}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Width="450">
@@ -169,12 +169,12 @@
                                                Width="410"
                                                ToolTip="{StaticResource toolTipText_regexExpression}">
 
-                                        <Label Content="{Binding Content_expression}"
+                                        <Label Content="{Binding label_expression}"
                                                VerticalAlignment="Center" />
 
                                         <TextBox Width="235"
                                                  Height="32"
-                                                 Text="{Binding text_textBox_regexExpression}"
+                                                 Text="{Binding text_textBox_addtionalRegexExpression}"
                                                  TextAlignment="Center"
                                                  HorizontalAlignment="Right"
                                                  TextChanged="TextBox_regexExpression_TextChanged" />
@@ -184,12 +184,12 @@
                                                Width="410"
                                                ToolTip="{StaticResource toolTipText_regexReplace}">
 
-                                        <Label Content="{Binding Content_replace}"
+                                        <Label Content="{Binding label_replace}"
                                                VerticalAlignment="Center" />
 
                                         <TextBox Width="235"
                                                  HorizontalAlignment="Right"
-                                                 Text="{Binding text_textBox_regexReplace}"
+                                                 Text="{Binding text_textBox_additionalRegexReplace}"
                                                  TextAlignment="Center"
                                                  Foreground="Yellow"
                                                  TextChanged="TextBox_regexReplace_TextChanged" />

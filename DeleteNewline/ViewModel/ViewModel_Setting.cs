@@ -5,6 +5,8 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using Microsoft.Toolkit.Collections;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace DeleteNewline.ViewModel
 {
@@ -23,6 +25,8 @@ namespace DeleteNewline.ViewModel
             text_textBox_regexReplace = appdata.regexReplace == setting_space ? " " : appdata.regexReplace;
             text_textBox_inputRegex = appdata.regexInput;
             UpdateTextBox_regexOutput();
+
+            additionalRegex = new ObservableCollection<GenericParameter_OC>();
 
             SetHookKeys();
         }
@@ -139,12 +143,12 @@ namespace DeleteNewline.ViewModel
                 text_textBox_regexReplace = textBox_regexReplace.Text;
             }
 
+            var regexAndReplace = GetAdditionalRegexAndReplace();
+
             OnPropertyChanging("text_textBox_outputRegexExample");
-            (var success, text_textBox_outputRegex) = RegexManager.Replace(text_textBox_inputRegex, text_textBox_regexExpression, text_textBox_regexReplace);
+            (var success, text_textBox_outputRegex) = RegexManager.Replace(text_textBox_inputRegex, regexAndReplace.Item1, regexAndReplace.Item2);
             OnPropertyChanged("text_textBox_outputRegexExample");
         }
-
-
 
         public Key key1 = Key.None;
         public Key key2 = Key.None;
@@ -200,5 +204,45 @@ namespace DeleteNewline.ViewModel
                 text_textBox_keybind = key1_text + " + " + key2_text;
             }
         }
+
+        public (List<string>, List<string>) GetAdditionalRegexAndReplace()
+        {
+            List<string> regex_expressions = new List<string>();
+            List<string> regex_replaces = new List<string>();
+
+            regex_expressions.Add(text_textBox_regexExpression);
+            regex_replaces.Add(text_textBox_regexReplace);
+
+            if (additionalRegex != null)
+            {
+                foreach (var i in additionalRegex)
+                {
+                    regex_expressions.Add(i.text_textBox_addtionalRegexExpression);
+                    regex_replaces.Add(i.text_textBox_additionalRegexReplace);
+                }
+            }
+            return (regex_expressions, regex_replaces);
+        }
+
+        public class GenericParameter_OC
+        {
+            public string label_expression { get; set; } = string.Empty;
+            public string label_replace { get; set; } = string.Empty;
+            public string text_textBox_addtionalRegexExpression { get; set; } = string.Empty;
+            public string text_textBox_additionalRegexReplace { get; set; } = string.Empty;
+
+            public int index { get; set; }
+
+            public GenericParameter_OC(string content_expression, string content_replace, int index_)
+            {
+                label_expression = content_expression;
+                label_replace = content_replace;
+                index = index_;
+            }
+        }
+
+        public int gp_count = 1;
+
+        public ObservableCollection<GenericParameter_OC> additionalRegex { get; set; }
     }
 }

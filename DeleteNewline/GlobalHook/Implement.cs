@@ -12,7 +12,7 @@ namespace GlobalHook
     {
         static GlobalKeyHook? globalKeyHook;
         static bool isSetHook = false;
-        public static Action<string, string>? execute;
+        public static Action<List<string>, List<string>>? execute;
  
         public static void InstallGlobalHook()
         {
@@ -83,10 +83,9 @@ namespace GlobalHook
                 {
                     ViewModel_Setting vm_setting = App.GetService<ViewModel_Setting>();
 
-                    string regexExpression = vm_setting.text_textBox_regexExpression;
-                    string regexReplace = vm_setting.text_textBox_regexReplace;
+                    (List<string>, List<string>) regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
 
-                    execute(regexExpression, regexReplace);
+                    execute(regexAndReplace.Item1, regexAndReplace.Item2);
                 }
             }
             else

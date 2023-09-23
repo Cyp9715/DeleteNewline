@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using System.Windows.Navigation;
@@ -18,7 +19,7 @@ namespace DeleteNewline
      */
     static class ClipboardManager
     {
-        public static (bool, string) ReplaceText(string regex, string replace)
+        public static (bool, string) ReplaceText(List<string> regex, List<string> replace)
         {
             bool success = false;
             string replacedText = string.Empty;

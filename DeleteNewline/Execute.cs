@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Windows;
 
 namespace DeleteNewline
 {
     static class Execute
     {
-        public static void DeleteNewline_WithNotifier(string regex, string replace)
+        public static void DeleteNewline_WithNotifier(List<string> regex, List<string> replace)
         {
             string notifyHeader = String.Empty;
             string notifyContent = String.Empty;
@@ -54,7 +55,7 @@ namespace DeleteNewline
             }
         }
 
-        public static void DeleteNewline_WithoutNotifier(string regex, string replace)
+        public static void DeleteNewline_WithoutNotifier(List<string> regex, List<string> replace)
         {
             VirtualInput.Implement.TypeKeyboard_Copy();
 

@@ -27,10 +27,9 @@ namespace DeleteNewline
                 originalText = ClipboardManager.GetText();
                 TextBox_Main.AppendText(originalText);
 
-                string regexExpression = vm_setting.text_textBox_regexExpression;
-                string regexReplace = vm_setting.text_textBox_regexReplace;
+                var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
 
-                (bool success, string replacedText) = ClipboardManager.ReplaceText(regexExpression, regexReplace);
+                (bool success, string replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
                 ClipboardManager.SetText(replacedText);
             }
             else
@@ -46,10 +45,9 @@ namespace DeleteNewline
             {
                 if (ClipboardManager.ContainText() == true)
                 {
-                    string regexExpression = vm_setting.text_textBox_regexExpression;
-                    string regexReplace = vm_setting.text_textBox_regexReplace;
+                    var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
 
-                    (bool success, string replacedText) = ClipboardManager.ReplaceText(regexExpression, regexReplace);
+                    (bool success, string replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
                     ClipboardManager.SetText(replacedText);
                 }
                 else

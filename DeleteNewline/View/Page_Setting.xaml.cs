@@ -21,8 +21,6 @@ namespace DeleteNewline
             InitializeComponent();
             vm_setting = vm_setting_;
             DataContext = vm_setting_;
-            additionalRegex = new ObservableCollection<GenericParameter_OC>();
-            ItemsControl_addRegex.ItemsSource = additionalRegex;
         }
 
         Key key1 = Key.None;
@@ -90,12 +88,12 @@ namespace DeleteNewline
 
         private void TextBox_regexExpression_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //vm_setting.UpdateTextBox_regexOutput(textBox_regexExpression: TextBox_regexExpression);
+            vm_setting.UpdateTextBox_regexOutput(textBox_regexExpression: TextBox_regexExpression);
         }
 
         private void TextBox_regexReplace_TextChanged(object sender, TextChangedEventArgs e)
         {
-           // vm_setting.UpdateTextBox_regexOutput(textBox_regexReplace: TextBox_regexReplace);
+            vm_setting.UpdateTextBox_regexOutput(textBox_regexReplace: TextBox_regexReplace);
         }
 
         private void TextBox_regexInput_TextChanged(object sender, TextChangedEventArgs e)
@@ -103,39 +101,20 @@ namespace DeleteNewline
             vm_setting.UpdateTextBox_regexOutput(textBox_regexInput: TextBox_regexInput);
         }
 
-        public class GenericParameter_OC
-        {
-            public string Content_expression { get; set; } = string.Empty;
-            public string Content_replace { get; set; } = string.Empty;
-
-            public int index { get; set; }
-
-            public GenericParameter_OC(string content_expression, string content_replace, int index_) 
-            {
-                Content_expression = content_expression;
-                Content_replace = content_replace;
-                index = index_;
-            }
-        }
-
-        public ObservableCollection<GenericParameter_OC> additionalRegex { get; set; }
-
-        int gp_count = 0;
-
         private void Button_addRegex_Click(object sender, RoutedEventArgs e)
         {
-            additionalRegex.Add(new GenericParameter_OC("Regex2", "Replace2", gp_count++));
+            vm_setting.additionalRegex.Add(new ViewModel_Setting.GenericParameter_OC("Regex " + vm_setting.gp_count, "Replace " + vm_setting.gp_count, vm_setting.gp_count++));
         }
 
         private void Button_deleteRegex_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.CommandParameter is GenericParameter_OC gp_oc)
+            if (sender is Button button && button.CommandParameter is ViewModel_Setting.GenericParameter_OC gp_oc)
             {
                 // machineFunction의 index 및 다른 속성에 접근할 수 있다.
                 int index = gp_oc.index;
 
                 // 이 정보를 사용하여 작업을 수행한다.
-                additionalRegex.Remove(additionalRegex.Where(i => i.index == index).Single());
+                vm_setting.additionalRegex.Remove(vm_setting.additionalRegex.Where(i => i.index == index).Single());
             }
         }
     }
