@@ -34,3 +34,11 @@ Delete Newline is free.
 
 The executable file (exe) of Delete Newline is provided only up to version 1.2.7.  
 Starting from version 1.3.0, it can be downloaded using the [MS Store](https://apps.microsoft.com/store/detail/delete-newline/9NC17SL0VV5S).
+
+## Future.
+
+I will support multiple regular expressions, and I will complete the project as soon as I complete the function.  
+However, as of now, we do not feel the need for that function and are not working on the project due to personal schedules.  
+And I also found some minor bugs, but they're not a fatal part of the program's run, so I'm going to fix them in the same patch as well.
+
+12/08/23
