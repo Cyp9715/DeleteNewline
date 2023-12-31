@@ -41,7 +41,7 @@ You will be able to apply Regex in Chain form as shown below.
 
 ![image](https://github.com/Cyp9715/DeleteNewline/assets/16573620/448f17f4-3ff8-4767-bb14-a487609c2061)
 
-The problem is that I am late in updating this due to my personal schedule.
+The problem is that I am late in updating this due to my personal schedule.  
 If you are a programmer, you can use the feature by cloning and building the latest version.
 
 I plan to optimize the code written to date in version 1.4.0 and fix all bugs if possible, so it could be completed in the second half of 2024.
