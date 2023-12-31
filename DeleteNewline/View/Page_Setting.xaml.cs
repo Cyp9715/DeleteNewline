@@ -51,7 +51,7 @@ namespace DeleteNewline
             vm_setting.key1 = key1;
             vm_setting.key2 = key2;
 
-            // 키를 뗼경우 자동적으로 포커스를 초기화 시킴.
+            // 키를 뗄경우 자동적으로 포커스를 초기화 시킴.
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope((TextBox)sender), null);
             Keyboard.ClearFocus();
         }

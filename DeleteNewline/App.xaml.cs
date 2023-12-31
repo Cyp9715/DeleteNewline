@@ -38,8 +38,6 @@ namespace DeleteNewline
                 services.AddSingleton<ViewModel_InputText>();
                 services.AddSingleton<ViewModel_Setting>();
 
-
-
                 services.AddSingleton<Page_MainWindow>();
                 services.AddSingleton<Page_InputText>();
                 services.AddSingleton<Page_Setting>();
