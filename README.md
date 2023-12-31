@@ -38,8 +38,10 @@ Starting from version 1.3.0, it can be downloaded using the [MS Store](https://a
 ## sneak peek Ver 1.4.0.
 
 You will be able to apply Regex in Chain form as shown below.  
-The problem is that I am late in updating this due to my personal schedule.
+
 ![image](https://github.com/Cyp9715/DeleteNewline/assets/16573620/448f17f4-3ff8-4767-bb14-a487609c2061)
 
+The problem is that I am late in updating this due to my personal schedule.
+If you are a programmer, you can use the feature by cloning and building the latest version.
 
-We plan to optimize the code written to date in version 1.4.0 and fix all bugs if possible, so it could be completed in the second half of 2024.
+I plan to optimize the code written to date in version 1.4.0 and fix all bugs if possible, so it could be completed in the second half of 2024.
