@@ -28,8 +28,8 @@ namespace DeleteNewline
         private void InitializeSettings()
         {
             // Init Content
-            mainWindow.navigationView_side.SelectedItem = mainWindow.NavigationViewItem_InputText;
-            mainWindow.frame_main.Content = App.GetService<Page_InputText>();
+            mainWindow.NavigationView_Side.SelectedItem = mainWindow.NavigationViewItem_InputText;
+            mainWindow.Frame_Main.Content = App.GetService<Page_InputText>();
 
             // Init Window Setting.
             mainWindow.Width = appdata.mainWindowSize_width;
@@ -85,13 +85,13 @@ namespace DeleteNewline
         {
             if (args.IsSettingsInvoked)
             {
-                frame_main.Content = App.GetService<Page_Setting>();
+                Frame_Main.Content = App.GetService<Page_Setting>();
             }
             else
             {
                 if (args.InvokedItemContainer is ModernWpf.Controls.NavigationViewItem navigationViewItem)
                 {
-                    frame_main.Content = App.GetService<Page_InputText>();
+                    Frame_Main.Content = App.GetService<Page_InputText>();
                 }
             }
         }

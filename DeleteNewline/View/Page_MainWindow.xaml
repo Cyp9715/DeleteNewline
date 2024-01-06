@@ -25,11 +25,11 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Frame Name="frame_main"
+        <Frame Name="Frame_Main"
                NavigationUIVisibility="Hidden"
                Margin="40,0,0,0" />
 
-        <ui:NavigationView x:Name="navigationView_side"
+        <ui:NavigationView x:Name="NavigationView_Side"
                            IsBackButtonVisible="Collapsed"
                            PaneDisplayMode="LeftCompact"
                            ItemInvoked="NavigationView_ItemInvoked">

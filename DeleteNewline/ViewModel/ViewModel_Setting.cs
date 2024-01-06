@@ -1,12 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
+﻿using System;
 using GlobalHook;
 using System.Windows.Input;
 using System.Windows.Controls;
-using Microsoft.Toolkit.Collections;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace DeleteNewline.ViewModel
 {
@@ -118,11 +116,7 @@ namespace DeleteNewline.ViewModel
         public string text_textBox_outputRegex
         {
             get => _text_textBox_outputRegex;
-        
-            set
-            {
-                SetProperty(ref _text_textBox_outputRegex, value);
-            }
+            set => SetProperty(ref _text_textBox_outputRegex, value);
         }
 
         public void UpdateTextBox_regexOutput(TextBox? textBox_regexExpression = null, TextBox? textBox_regexReplace = null, TextBox ? textBox_regexInput = null)

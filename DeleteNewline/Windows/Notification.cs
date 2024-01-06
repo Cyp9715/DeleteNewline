@@ -1,7 +1,7 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Windows
 {
