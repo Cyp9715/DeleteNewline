@@ -13,7 +13,8 @@ namespace GlobalHook
         static GlobalKeyHook? globalKeyHook;
         static bool isSetHook = false;
         public static Action<List<string>, List<string>>? execute;
- 
+        private const int NotificationDuration = 300;
+
         public static void InstallGlobalHook()
         {
             if(globalKeyHook == null) 
@@ -63,7 +64,7 @@ namespace GlobalHook
             {
                 string msgHeader = "ERROR";
                 string msgContent = "FAILED. GLOBALHOOK DETECT";
-                Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
+                Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, NotificationDuration);
             }
         }
 

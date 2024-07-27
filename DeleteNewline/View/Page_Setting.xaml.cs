@@ -1,19 +1,15 @@
 ﻿using DeleteNewline.ViewModel;
 using GlobalHook;
-using Microsoft.VisualBasic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Markup;
-using System.Xml.Linq;
 
 namespace DeleteNewline
 {
     public partial class Page_Setting
     {
-        Settings appdata = DeleteNewline.Settings.Default;
+        Settings appdata = Settings.GetSettings();
         ViewModel_Setting vm_setting;
 
         public Page_Setting(ViewModel_Setting vm_setting_) 

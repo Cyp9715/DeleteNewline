@@ -13,7 +13,7 @@ namespace DeleteNewline
     {
         public static Page_MainWindow? mainWindow;
         ViewModel_MainWindow vm_mainWindow;
-        Settings appdata = DeleteNewline.Settings.Default;
+        Settings appdata = DeleteNewline.ViewModel.Settings.GetSettings();
 
         public Page_MainWindow(ViewModel_MainWindow vm_mainWindow_)
         {
@@ -23,7 +23,7 @@ namespace DeleteNewline
             DataContext = vm_mainWindow_;
 
             InitializeSettings();
-        }
+        } 
 
         private void InitializeSettings()
         {
@@ -66,7 +66,7 @@ namespace DeleteNewline
         {
             appdata.mainWindowSize_width = mainWindow.Width;
             appdata.mainWindowSize_height = mainWindow.Height;
-            appdata.Save();
+            Settings.SaveSettings(appdata);
 
             System.Environment.Exit(0);
         }
@@ -75,7 +75,7 @@ namespace DeleteNewline
         {
             appdata.mainWindowSize_width = mainWindow.Width;
             appdata.mainWindowSize_height = mainWindow.Height;
-            appdata.Save();
+            Settings.SaveSettings(appdata);
 
             e.Cancel = true;
             mainWindow.Visibility = Visibility.Hidden;

@@ -1,5 +1,6 @@
 ﻿using System;
 using GlobalHook;
+using Newtonsoft.Json;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Collections.Generic;
@@ -8,9 +9,56 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace DeleteNewline.ViewModel
 {
+    class Settings
+    {
+        private static Settings? instance;
+        private Settings() { }
+
+        public static Settings GetSettings()
+        {            
+            instance ??= new Settings();
+            return instance;
+        }
+
+        public static void SaveSettings(Settings source)
+        {
+            if (instance != null)
+            {
+                instance.mainWindowSize_width = source.mainWindowSize_width;
+                instance.mainWindowSize_height = source.mainWindowSize_height;
+                instance.topMost = source.topMost;
+                instance.notification = source.notification;
+                instance.bindKey_1 = source.bindKey_1;
+                instance.bindKey_1 = source.bindKey_1;
+                instance.regexExpression = source.regexExpression;
+                instance.regexReplace = source.regexReplace;
+                instance.inputRegex = source.inputRegex;
+                instance.outputRegex = source.outputRegex;
+            }
+        }
+
+        public double mainWindowSize_width { get; set; }
+        public double mainWindowSize_height { get; set; }
+
+        public bool topMost { get; set; } = false;
+        public bool notification { get; set; } = true;
+
+        public Key bindKey_1 { get; set; } = Key.LeftAlt;
+        public Key bindKey_2 { get; set; } = Key.F1;
+
+        public string regexInput { get; set; } = String.Empty;
+
+        public string regexExpression { get; set; } = String.Empty;
+        public string regexReplace { get; set; } = String.Empty;
+
+        public string inputRegex { get; set; } = String.Empty;
+        public string outputRegex { get; set; } = String.Empty;
+    }
+
     public class ViewModel_Setting : ObservableObject
     {
-        Settings appdata = DeleteNewline.Settings.Default;
+        private const string settingFile = "setting.json";
+        Settings appdata = Settings.GetSettings();
         readonly string setting_space = "`space`";
 
         public ViewModel_Setting()
@@ -153,22 +201,22 @@ namespace DeleteNewline.ViewModel
             // 갱신되지 않을경우 기본셋팅코드로 리셋.
             if (key1 != Key.None)
             {
-                appdata.bindKey_1 = (int)key1;
+                appdata.bindKey_1 = key1;
             }
 
             if (key2 != Key.None)
             {
-                appdata.bindKey_2 = (int)key2;
+                appdata.bindKey_2 = key2;
             }
 
             // 만약 사용자가 의도적으로 '동일한 키' 입력을 지정하려 한다면(ex : S + S) 기본 키 셋팅값인 LeftAlt + F1 값으로 설정함.
             if(appdata.bindKey_1 == appdata.bindKey_2)
             {
-                appdata.bindKey_1 = (int)Key.LeftAlt;
-                appdata.bindKey_2 = (int)Key.F1;
+                appdata.bindKey_1 = Key.LeftAlt;
+                appdata.bindKey_2 = Key.F1;
             }
 
-            appdata.Save();
+            Settings.SaveSettings(appdata);
         }
 
         public void SetHookKeys()
