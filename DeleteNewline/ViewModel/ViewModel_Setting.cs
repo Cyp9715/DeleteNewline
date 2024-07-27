@@ -1,6 +1,5 @@
 ﻿using System;
 using GlobalHook;
-using Newtonsoft.Json;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Collections.Generic;
@@ -9,72 +8,24 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace DeleteNewline.ViewModel
 {
-    class Settings
-    {
-        private static Settings? instance;
-        private Settings() { }
-
-        public static Settings GetSettings()
-        {            
-            instance ??= new Settings();
-            return instance;
-        }
-
-        public static void SaveSettings(Settings source)
-        {
-            if (instance != null)
-            {
-                instance.mainWindowSize_width = source.mainWindowSize_width;
-                instance.mainWindowSize_height = source.mainWindowSize_height;
-                instance.topMost = source.topMost;
-                instance.notification = source.notification;
-                instance.bindKey_1 = source.bindKey_1;
-                instance.bindKey_1 = source.bindKey_1;
-                instance.regexExpression = source.regexExpression;
-                instance.regexReplace = source.regexReplace;
-                instance.inputRegex = source.inputRegex;
-                instance.outputRegex = source.outputRegex;
-            }
-        }
-
-        public double mainWindowSize_width { get; set; }
-        public double mainWindowSize_height { get; set; }
-
-        public bool topMost { get; set; } = false;
-        public bool notification { get; set; } = true;
-
-        public Key bindKey_1 { get; set; } = Key.LeftAlt;
-        public Key bindKey_2 { get; set; } = Key.F1;
-
-        public string regexInput { get; set; } = String.Empty;
-
-        public string regexExpression { get; set; } = String.Empty;
-        public string regexReplace { get; set; } = String.Empty;
-
-        public string inputRegex { get; set; } = String.Empty;
-        public string outputRegex { get; set; } = String.Empty;
-    }
-
     public class ViewModel_Setting : ObservableObject
     {
-        private const string settingFile = "setting.json";
-        Settings appdata = Settings.GetSettings();
-        readonly string setting_space = "`space`";
+        Settings appdata = Settings.GetInstance();
 
         public ViewModel_Setting()
         {
             isChecked_checkBox_topMost = appdata.topMost;
             isChecked_checkBox_notification = appdata.notification;
             SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
-                
-            text_textBox_regexExpression = appdata.regexExpression == setting_space ? " " : appdata.regexExpression;
-            text_textBox_regexReplace = appdata.regexReplace == setting_space ? " " : appdata.regexReplace;
+
+            text_textBox_regexExpression = appdata.regexExpression;
+            text_textBox_regexReplace = appdata.regexReplace;
             text_textBox_inputRegex = appdata.regexInput;
             UpdateTextBox_regexOutput();
 
             additionalRegex = new ObservableCollection<GenericParameter_OC>();
 
-            SetHookKeys();
+            Implement.SetHookKeys(appdata);
         }
 
         bool _isChecked_checkBox_topMost;
@@ -135,7 +86,7 @@ namespace DeleteNewline.ViewModel
             set
             {
                 SetProperty(ref _text_textBox_regexExpression, value);
-                appdata.regexExpression = value == " " ? setting_space : value;
+                appdata.regexExpression = value;
             }
         }
 
@@ -146,7 +97,7 @@ namespace DeleteNewline.ViewModel
             set
             {
                 SetProperty(ref _text_textBox_regexReplace, value);
-                appdata.regexReplace = value == " " ? setting_space : value;
+                appdata.regexReplace = value;
             }
         }
 
@@ -216,15 +167,7 @@ namespace DeleteNewline.ViewModel
                 appdata.bindKey_2 = Key.F1;
             }
 
-            Settings.SaveSettings(appdata);
-        }
-
-        public void SetHookKeys()
-        {
-            var Virtual_Key1 = KeyInterop.VirtualKeyFromKey((Key)appdata.bindKey_1);
-            var Virtual_Key2 = KeyInterop.VirtualKeyFromKey((Key)appdata.bindKey_2);
-
-            Implement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
+            Settings.Apply(appdata);
         }
 
         KeyConverter keyConverter = new KeyConverter();

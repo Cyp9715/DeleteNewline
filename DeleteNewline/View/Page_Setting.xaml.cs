@@ -9,7 +9,7 @@ namespace DeleteNewline
 {
     public partial class Page_Setting
     {
-        Settings appdata = Settings.GetSettings();
+        Settings appdata = Settings.GetInstance();
         ViewModel_Setting vm_setting;
 
         public Page_Setting(ViewModel_Setting vm_setting_) 
@@ -67,7 +67,7 @@ namespace DeleteNewline
         private void TextBox_bindKey_LostFocus(object sender, RoutedEventArgs e)
         {
             vm_setting.SaveKeyBind();
-            vm_setting.SetHookKeys();
+            Implement.SetHookKeys(appdata);
 
             vm_setting.SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
 

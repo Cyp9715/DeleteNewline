@@ -17,6 +17,7 @@ namespace DeleteNewline
         public InitialSetting()
         {
             PreventMultipleRun();
+            ApplySettingFile();
 
             // Init GlobalHook
             Implement.InstallGlobalHook();
@@ -32,38 +33,29 @@ namespace DeleteNewline
             }
         }
 
-        string settingFilePath = "settings.json";
-
-        private void CheckSettingFile()
+        /* 
+         * Setting 파일의 존재여부를 확인하여
+         * 존재하지 않는다면 기본 Setting 파일을 생성하며
+         * 존재한다면 셋팅사항을 프로그램에 적용.
+         */
+        private void ApplySettingFile()
         {
-            if (File.Exists(settingFilePath) == false)
+            if (File.Exists(Settings.settingFilePath) == false)
             {
-                var settings = DeleteNewline.ViewModel.Settings.GetSettings();
-                JsonConvert.SerializeObject(settings, Formatting.Indented);
+                var defaultSetting = Settings.GetInstance();
+                Settings.Save(defaultSetting);
             }
             else
             {
-                string str_settings = File.ReadAllText(settingFilePath);
-                var loadedSettings = JsonConvert.DeserializeObject<DeleteNewline.ViewModel.Settings>(str_settings);
+                string str_settings = File.ReadAllText(Settings.settingFilePath);
+                var loadedSettings = JsonConvert.DeserializeObject<Settings>(str_settings);
 
                 if (loadedSettings != null)
                 {
-                    var settingsInstance = DeleteNewline.ViewModel.Settings.GetSettings();
-                    CopySettings(loadedSettings, settingsInstance);
+                    Settings.Apply(loadedSettings);
+                    Implement.SetHookKeys(loadedSettings);
                 }
             }
-        }
-
-        private void CopySettings(Settings source, Settings destination)
-        {
-            destination.topMost = source.topMost;
-            destination.notification = source.notification;
-            destination.bindKey_1 = source.bindKey_1;
-            destination.bindKey_1 = source.bindKey_1;
-            destination.regexExpression = source.regexExpression;
-            destination.regexReplace = source.regexReplace;
-            destination.inputRegex = source.inputRegex;
-            destination.outputRegex = source.outputRegex;
         }
     }
 }

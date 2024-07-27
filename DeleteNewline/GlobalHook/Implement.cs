@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Input;
 using DeleteNewline;
 using DeleteNewline.ViewModel;
 using Windows;
 using Windows.Devices.Printers;
+using Windows.Storage;
 
 namespace GlobalHook
 {
@@ -93,6 +95,14 @@ namespace GlobalHook
             {
                 pressedKeys.Remove(e.KeyCode);
             }
+        }
+
+        public static void SetHookKeys(Settings setting)
+        {
+            var Virtual_Key1 = KeyInterop.VirtualKeyFromKey((Key)setting.bindKey_1);
+            var Virtual_Key2 = KeyInterop.VirtualKeyFromKey((Key)setting.bindKey_2);
+
+            Implement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
         }
     }
 }

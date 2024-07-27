@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Windows;
 using DeleteNewline.ViewModel;
 using GlobalHook;
@@ -13,7 +14,7 @@ namespace DeleteNewline
     {
         public static Page_MainWindow? mainWindow;
         ViewModel_MainWindow vm_mainWindow;
-        Settings appdata = DeleteNewline.ViewModel.Settings.GetSettings();
+        Settings appdata = Settings.GetInstance();
 
         public Page_MainWindow(ViewModel_MainWindow vm_mainWindow_)
         {
@@ -66,7 +67,8 @@ namespace DeleteNewline
         {
             appdata.mainWindowSize_width = mainWindow.Width;
             appdata.mainWindowSize_height = mainWindow.Height;
-            Settings.SaveSettings(appdata);
+            Settings.Apply(appdata);
+            Settings.Save(appdata);
 
             System.Environment.Exit(0);
         }
@@ -75,7 +77,8 @@ namespace DeleteNewline
         {
             appdata.mainWindowSize_width = mainWindow.Width;
             appdata.mainWindowSize_height = mainWindow.Height;
-            Settings.SaveSettings(appdata);
+            Settings.Apply(appdata);
+            Settings.Save(appdata);
 
             e.Cancel = true;
             mainWindow.Visibility = Visibility.Hidden;
