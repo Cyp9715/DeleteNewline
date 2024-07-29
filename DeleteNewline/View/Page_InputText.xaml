@@ -14,7 +14,6 @@
         <TextBox x:Name="TextBox_Main"
                  TextWrapping="Wrap"
                  Margin="10,10,10,10"
-                 Grid.Column="1"
                  AcceptsReturn="True"
                  KeyUp="TextBox_Main_KeyUp"
                  VerticalScrollBarVisibility="Auto">

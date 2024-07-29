@@ -61,8 +61,6 @@ namespace Windows
                     {
                         toast.ExpirationTime = DateTime.Now.AddSeconds(expirationTime);
                     });
-
-
                 } 
                 catch (Exception)
                 {

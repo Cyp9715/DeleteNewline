@@ -5,8 +5,6 @@ using System.Windows.Input;
 using DeleteNewline;
 using DeleteNewline.ViewModel;
 using Windows;
-using Windows.Devices.Printers;
-using Windows.Storage;
 
 namespace GlobalHook
 {
