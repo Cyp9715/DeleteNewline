@@ -10,7 +10,7 @@ using Windows.Storage;
 
 namespace GlobalHook
 {
-    static class Implement
+    static class HookImplement
     {
         static GlobalKeyHook? globalKeyHook;
         static bool isSetHook = false;
@@ -102,7 +102,7 @@ namespace GlobalHook
             var Virtual_Key1 = KeyInterop.VirtualKeyFromKey((Key)setting.bindKey_1);
             var Virtual_Key2 = KeyInterop.VirtualKeyFromKey((Key)setting.bindKey_2);
 
-            Implement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
+            HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
         }
     }
 }

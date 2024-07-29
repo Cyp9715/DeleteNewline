@@ -14,4 +14,7 @@
     <bcl:Double x:Key="height_checkBox">20</bcl:Double>
     <bcl:Double x:Key="minWidth_checkBox">0</bcl:Double>
     <bcl:Double x:Key="minHeight_checkBox">0</bcl:Double>
+
+    <bcl:Double x:Key="minWidth_window">650</bcl:Double>
+    <bcl:Double x:Key="minHeight_window">365</bcl:Double>
 </ResourceDictionary>

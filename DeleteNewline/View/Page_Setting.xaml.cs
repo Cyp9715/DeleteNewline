@@ -9,12 +9,13 @@ namespace DeleteNewline
 {
     public partial class Page_Setting
     {
-        Settings appdata = Settings.GetInstance();
+        Settings appdata;
         ViewModel_Setting vm_setting;
 
         public Page_Setting(ViewModel_Setting vm_setting_) 
         {
             InitializeComponent();
+            appdata = Settings.GetInstance();
             vm_setting = vm_setting_;
             DataContext = vm_setting_;
         }
@@ -55,7 +56,7 @@ namespace DeleteNewline
         // 포커스를 다시 얻었을 경우 GlobalHook 를 활성화 하고, 임시변수 값들과 텍스트박스를 초기화함.
         private void TextBox_bindKey_GotFocus(object sender, RoutedEventArgs e)
         {
-            Implement.UnInstallGlobalHook();
+            HookImplement.UnInstallGlobalHook();
 
             key1 = Key.None;
             key2 = Key.None;
@@ -67,11 +68,11 @@ namespace DeleteNewline
         private void TextBox_bindKey_LostFocus(object sender, RoutedEventArgs e)
         {
             vm_setting.SaveKeyBind();
-            Implement.SetHookKeys(appdata);
+            HookImplement.SetHookKeys(appdata);
 
             vm_setting.SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
 
-            Implement.InstallGlobalHook();
+            HookImplement.InstallGlobalHook();
         }
 
         private void button_RegexDefault_Click(object sender, RoutedEventArgs e)

@@ -25,7 +25,7 @@ namespace DeleteNewline.ViewModel
 
             additionalRegex = new ObservableCollection<GenericParameter_OC>();
 
-            Implement.SetHookKeys(appdata);
+            HookImplement.SetHookKeys(appdata);
         }
 
         bool _isChecked_checkBox_topMost;
@@ -58,7 +58,7 @@ namespace DeleteNewline.ViewModel
             {
                 SetProperty(ref _isChecked_checkBox_notification, value);
 
-                Implement.execute = (value == true) ?
+                HookImplement.execute = (value == true) ?
                     Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
 
                 appdata.notification = value;

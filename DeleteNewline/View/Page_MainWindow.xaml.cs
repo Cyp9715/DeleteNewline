@@ -13,90 +13,45 @@ namespace DeleteNewline
     public partial class Page_MainWindow
     {
         public static Page_MainWindow? mainWindow;
+        System.Windows.Forms.NotifyIcon? notifyIcon;
         ViewModel_MainWindow vm_mainWindow;
-        Settings appdata = Settings.GetInstance();
 
         public Page_MainWindow(ViewModel_MainWindow vm_mainWindow_)
         {
             InitializeComponent();
             mainWindow = (Page_MainWindow)Application.Current.MainWindow;
             vm_mainWindow = vm_mainWindow_;
-            DataContext = vm_mainWindow_;
+            this.DataContext = vm_mainWindow_;
 
-            InitializeSettings();
+            InitNotifyIcon();
         } 
 
-        private void InitializeSettings()
+        private void InitNotifyIcon()
         {
-            // Init Content
-            mainWindow.NavigationView_Side.SelectedItem = mainWindow.NavigationViewItem_InputText;
-            mainWindow.Frame_Main.Content = App.GetService<Page_InputText>();
-
-            // Init Window Setting.
-            mainWindow.Width = appdata.mainWindowSize_width;
-            mainWindow.Height = appdata.mainWindowSize_height;
-            mainWindow.Topmost = appdata.topMost;
-
-            SetNotifyIcon();
-            SetContextMenu();
-        }
-
-        private System.Windows.Forms.NotifyIcon notifyIcon = new System.Windows.Forms.NotifyIcon();
-
-        private void SetNotifyIcon()
-        {
-            notifyIcon.Icon = Resource.favicon;
-            notifyIcon.Text = Global.programName;
-
-            notifyIcon.DoubleClick += delegate (object? sender, EventArgs eventArgs)
+            notifyIcon = new System.Windows.Forms.NotifyIcon
             {
-                mainWindow.Visibility = Visibility.Visible;
-                mainWindow.WindowState = WindowState.Normal;
+                Icon = Resource.favicon,
+                Text = GlobalVariables.programName,
+                Visible = true
             };
 
-            notifyIcon.Visible = true;
-        }
-
-        private void SetContextMenu()
-        {
-            notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            notifyIcon.ContextMenuStrip.Items.Add("Exit", null, Action_ContextMenu_Exit);
-        }
-
-        private void Action_ContextMenu_Exit(object? sender, EventArgs e)
-        {
-            appdata.mainWindowSize_width = mainWindow.Width;
-            appdata.mainWindowSize_height = mainWindow.Height;
-            Settings.Apply(appdata);
-            Settings.Save(appdata);
-
-            System.Environment.Exit(0);
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            appdata.mainWindowSize_width = mainWindow.Width;
-            appdata.mainWindowSize_height = mainWindow.Height;
-            Settings.Apply(appdata);
-            Settings.Save(appdata);
-
-            e.Cancel = true;
-            mainWindow.Visibility = Visibility.Hidden;
-        }
-
-        private void NavigationView_ItemInvoked(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewItemInvokedEventArgs args)
-        {
-            if (args.IsSettingsInvoked)
+            // 더블클릭시 화면 Visible.
+            notifyIcon.DoubleClick += (sender, eventArgs) =>
             {
-                Frame_Main.Content = App.GetService<Page_Setting>();
-            }
-            else
-            {
-                if (args.InvokedItemContainer is ModernWpf.Controls.NavigationViewItem navigationViewItem)
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    Frame_Main.Content = App.GetService<Page_InputText>();
-                }
-            }
+                    var mainWindow = Application.Current.MainWindow;
+                    if (mainWindow != null)
+                    {
+                        mainWindow.Visibility = Visibility.Visible;
+                        mainWindow.WindowState = WindowState.Normal;
+                    }
+                });
+            };
+
+            // notifyIcon 내부 ContentMenu 설정
+            notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            notifyIcon.ContextMenuStrip.Items.Add("Exit DeleteNewline", null, vm_mainWindow.Action_ContextMenu_Exit);
         }
     }
 }

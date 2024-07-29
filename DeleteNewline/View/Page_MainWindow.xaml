@@ -1,5 +1,6 @@
 ﻿<Window x:Class="DeleteNewline.Page_MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,13 +10,24 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         KeyboardNavigation.TabNavigation="None"
         Title="Delete Newline"
-        Height="780"
-        Width="1280"
-        Closing="Window_Closing"
+        Width="{Binding MainWindowSize_width, Mode=TwoWay}"
+        Height="{Binding MainWindowSize_height, Mode=TwoWay}"
         MinWidth="650"
         MinHeight="365"
-        Visibility="Hidden">
+        Visibility="{Binding WindowVisibility, Mode=TwoWay}"
+        Topmost="{Binding TopMost, Mode=TwoWay}">
 
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding WindowLoadedCommand}"/>
+        </b:EventTrigger>
+        
+        <b:EventTrigger EventName="Closing">
+            <b:InvokeCommandAction Command="{Binding WindowClosingCommand}"
+                                   PassEventArgsToCommand="True"/>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -27,12 +39,21 @@
 
         <Frame Name="Frame_Main"
                NavigationUIVisibility="Hidden"
-               Margin="40,0,0,0" />
+               Margin="40,0,0,0" 
+               Content="{Binding CurrentPage, Mode=TwoWay}"/>
 
         <ui:NavigationView x:Name="NavigationView_Side"
                            IsBackButtonVisible="Collapsed"
                            PaneDisplayMode="LeftCompact"
-                           ItemInvoked="NavigationView_ItemInvoked">
+                           SelectedItem="{Binding SelectedNavigationItem, Mode=TwoWay}">
+            
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="ItemInvoked">
+                    <b:InvokeCommandAction Command="{Binding NavigateCommand}"
+                                           PassEventArgsToCommand="True"/>
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+            
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Name="NavigationViewItem_InputText"
                                        Tag="InputText"

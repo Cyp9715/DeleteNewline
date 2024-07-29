@@ -2,7 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:bcl="clr-namespace:System;assembly=mscorlib">
 
-
 	<bcl:Double x:Key="LargeSize">18</bcl:Double>
 	
 </ResourceDictionary>

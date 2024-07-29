@@ -7,15 +7,14 @@ namespace DeleteNewline
 {
     public partial class Page_InputText
     {
-        ViewModel_InputText? vm_input;
+        ViewModel_InputText? vm_inputText;
         ViewModel_Setting? vm_setting;
 
-        public Page_InputText(ViewModel_InputText? vm_input_)
+        public Page_InputText(ViewModel_InputText? vm_inputText_)
         {
             InitializeComponent();
-            vm_input = vm_input_;
-
-            DataContext = vm_input_;
+            vm_inputText = vm_inputText_;
+            DataContext = vm_inputText_;
         }
 
         private void MenuItem_Paste_Click(object sender, RoutedEventArgs e)
@@ -34,7 +33,7 @@ namespace DeleteNewline
             }
             else
             {
-                vm_input.AddAlertMessage(ref TextBox_Main);
+                vm_inputText.AddAlertMessage(ref TextBox_Main);
                 return;
             }
         }
@@ -52,7 +51,7 @@ namespace DeleteNewline
                 }
                 else
                 {
-                    vm_input.AddAlertMessage(ref TextBox_Main);
+                    vm_inputText.AddAlertMessage(ref TextBox_Main);
                     return;
                 }
             }

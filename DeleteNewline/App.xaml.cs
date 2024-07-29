@@ -48,10 +48,11 @@ namespace DeleteNewline
         {
             base.OnStartup(e);
 
-            var mainWindowViewModel = GetService<ViewModel_MainWindow>();
-            var mainWindow = new Page_MainWindow(mainWindowViewModel);
+            var mainWindow = GetService<Page_MainWindow>();
 
             this.MainWindow = mainWindow;
+
+            // Delete Newline 은 시작과 동시에 Hidden.
             //mainWindow.Show();
         }
 

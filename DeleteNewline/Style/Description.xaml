@@ -2,7 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
                     xmlns:bcl="clr-namespace:System;assembly=mscorlib">
 	
-	
 	<!-- ToolTips -->
 	<bcl:String x:Key="toolTipText_NavigationItem_InputTextPage">When you paste a string into the Input Text Page, the string with newlines removed is copied to your clipboard.</bcl:String>
 
@@ -24,5 +23,5 @@
 	<bcl:String x:Key="waterMark_ouputRegex">The Regex applied string is output.</bcl:String>
 
 	<!-- Version Infomation -->
-	<bcl:String x:Key="text_versionInfomation">Delete Newline 1.4</bcl:String>
+	<bcl:String x:Key="text_versionInfomation">Delete Newline 2.0</bcl:String>
 </ResourceDictionary>
