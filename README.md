@@ -35,7 +35,7 @@ Delete Newline is free.
 The executable file (exe) of Delete Newline is provided only up to version 1.2.7.  
 Starting from version 1.3.0, it can be downloaded using the [MS Store](https://apps.microsoft.com/store/detail/delete-newline/9NC17SL0VV5S).
 
-## sneak peek Ver 1.4.0.
+## sneak peek Ver 2.0
 
 You will be able to apply Regex in Chain form as shown below.  
 
