@@ -1,18 +1,73 @@
-﻿using System.Windows.Controls;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Windows;
+using System.Windows.Input;
+using Windows;
 
 namespace DeleteNewline.ViewModel
 {
-    public class ViewModel_InputText
+    public partial class ViewModel_InputText : ObservableValidator
     {
-        public void AddAlertMessage(ref TextBox textBox)
-        {
-            string errMsg = "\r\n" +
-                  " ========================================================\r\n" +
-                  " ================== Only text form can be entered =================\r\n" +
-                  " ========================================================\r\n";
+        ViewModel_Setting? vm_setting;
 
-            textBox.AppendText(errMsg);
-            textBox.ScrollToEnd();
+        [ObservableProperty]
+        private string? textboxContent;
+
+        [ObservableProperty]
+        private bool scrollToEnd;
+
+        [RelayCommand]
+        private void Textbox_MenuItemPaste()
+        {
+            string originalText = string.Empty;
+
+            if (ClipboardManager.ContainText() == true)
+            {
+                originalText = ClipboardManager.GetText();
+                TextboxContent += originalText;
+
+                var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
+
+                (bool success, string replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
+                ClipboardManager.SetText(replacedText);
+            }
+            else
+            {
+                Notification.Send("ERROR", "FAILED GET CLIPBOARD", Notification.SoundType.reminder, 300);
+                return;
+            }
+        }
+
+        [RelayCommand]
+        private void Textbox_KeyUp(KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
+            {
+                if (ClipboardManager.ContainText() == true)
+                {
+                    var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
+
+                    (bool success, string replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
+                    ClipboardManager.SetText(replacedText);
+                }
+                else
+                {
+                    Notification.Send("ERROR", "FAILED GET CLIPBOARD", Notification.SoundType.reminder, 300);
+                    return;
+                }
+            }
+        }
+
+        [RelayCommand]
+        private void Page_Loaded()
+        {
+            vm_setting = App.GetService<ViewModel_Setting>();
+        }
+
+        [RelayCommand]
+        private void MenuItem_Clear_Click()
+        {
+            TextboxContent = string.Empty;
         }
     }
 }

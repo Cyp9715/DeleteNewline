@@ -40,9 +40,7 @@ namespace DeleteNewline
             }
             catch (Exception)
             {
-                string msgHeader = "ERROR";
-                string msgContent = "FAILED GET CLIPBOARD";
-                Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
+                Notification.Send("ERROR", "FAILED GET CLIPBOARD", Notification.SoundType.reminder, 300);
             }
 
             return output;
@@ -57,9 +55,7 @@ namespace DeleteNewline
             }
             catch (Exception)
             {
-                string msgHeader = "ERROR";
-                string msgContent = "FAILED SET CLIPBOARD";
-                Notification.Send(msgHeader, msgContent, Notification.SoundType.reminder, 300);
+                Notification.Send("ERROR", "FAILED SET CLIPBOARD", Notification.SoundType.reminder, 300);
             }
         }
 

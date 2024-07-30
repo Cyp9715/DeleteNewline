@@ -49,6 +49,7 @@ namespace DeleteNewline.ViewModel
 
         public void Action_ContextMenu_Exit(object? sender, EventArgs e)
         {
+            // window 사이즈를 비롯한 setting 정보를 파일에 저장.
             setting.mainWindowSize_width = MainWindowSize_width;
             setting.mainWindowSize_height = MainWindowSize_height;
             Settings.Apply(setting);

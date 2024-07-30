@@ -51,7 +51,6 @@ namespace Windows
             {
                 try
                 {
-                    // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
                     new ToastContentBuilder()
                     .AddText(title)
                     .AddText(removeHexDecimalText)

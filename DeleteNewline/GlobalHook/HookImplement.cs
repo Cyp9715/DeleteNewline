@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Input;
 using DeleteNewline;
 using DeleteNewline.ViewModel;
@@ -17,10 +16,7 @@ namespace GlobalHook
 
         public static void InstallGlobalHook()
         {
-            if(globalKeyHook == null) 
-            { 
-                globalKeyHook = new GlobalKeyHook();
-            }
+            globalKeyHook ??= new GlobalKeyHook();
 
             if(isSetHook == false)
             {
@@ -47,7 +43,7 @@ namespace GlobalHook
         static Dictionary<VirtualKeycodes, uint> pressedKeys = new Dictionary<VirtualKeycodes, uint>();
         static uint pressedCount = 0;
 
-        public static void SetKeys(VirtualKeycodes key1_, VirtualKeycodes key2_)
+        private static void SetKeys(VirtualKeycodes key1_, VirtualKeycodes key2_)
         {
             key1 = key1_;
             key2 = key2_;
