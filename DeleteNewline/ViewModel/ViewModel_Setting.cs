@@ -11,26 +11,26 @@ namespace DeleteNewline.ViewModel
 {
     public partial class ViewModel_Setting : ObservableValidator
     {
-        Settings appdata = Settings.GetInstance();
+        Settings setting;
         KeyConverter keyConverter;
 
         public ViewModel_Setting()
         {
+            setting = Settings.GetInstance();
             keyConverter = new KeyConverter();
 
-            IsChecked_checkBox_topMost = appdata.topMost;
-            IsChecked_checkBox_notification = appdata.notification;
-            SetNotifier();
-            SetUI_keybind(appdata.bindKey_1, appdata.bindKey_2);
+            IsChecked_checkBox_topMost = setting.topMost;
+            IsChecked_checkBox_notification = setting.notification;
+            SetUI_keybind(setting.bindKey_1, setting.bindKey_2);
 
-            Text_textBox_regexExpression = appdata.regexExpression;
-            Text_textBox_regexReplace = appdata.regexReplace;
-            Text_textBox_inputRegex = appdata.inputRegex;
+            Text_textBox_regexExpression = setting.regexExpression;
+            Text_textBox_regexReplace = setting.regexReplace;
+            Text_textBox_inputRegex = setting.inputRegex;
             Update_RegexOutput();
 
+            SetNotifier();
+            HookImplement.SetHookKeys(setting.bindKey_1, setting.bindKey_2);
             additionalRegex = new ObservableCollection<GenericParameter_OC>();
-
-            HookImplement.SetHookKeys(appdata.bindKey_1, appdata.bindKey_2);
         }
 
         [ObservableProperty]
@@ -46,37 +46,13 @@ namespace DeleteNewline.ViewModel
         string text_textBox_regexReplace;
 
         [ObservableProperty]
-        string text_textBox_inputRegex;
+        string text_textBox_inputRegex = string.Empty;
         [ObservableProperty]
         string text_textBox_outputRegex;
 
 
         Key key1 = Key.None;
         Key key2 = Key.None;
-
-        public void SaveKeyBind()
-        {
-            // None 일경우 (사용자가 아무것도 지정하지 않은경우) 문제 방지 기능이 있음.
-            // 갱신되지 않을경우 기본셋팅코드로 리셋.
-            if (key1 != Key.None)
-            {
-                appdata.bindKey_1 = key1;
-            }
-
-            if (key2 != Key.None)
-            {
-                appdata.bindKey_2 = key2;
-            }
-
-            // 만약 사용자가 의도적으로 '동일한 키' 입력을 지정하려 한다면(ex : S + S) 기본 키 셋팅값인 LeftAlt + F1 값으로 설정함.
-            if(appdata.bindKey_1 == appdata.bindKey_2)
-            {
-                appdata.bindKey_1 = Key.LeftAlt;
-                appdata.bindKey_2 = Key.F1;
-            }
-
-            Settings.Apply(appdata);
-        }
 
         // 키를 누르는것에 따라 UI를 지정함. (여기서 지정되는 Key 는 사용자 반응성을 위한것으로 임시적임)
         [RelayCommand]
@@ -123,10 +99,28 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void TextBox_bindKey_LostFocus()
         {
-            SaveKeyBind();
-            HookImplement.SetHookKeys(appdata.bindKey_1, appdata.bindKey_2);
+            // None 일경우 (사용자가 아무것도 지정하지 않은경우) 문제 방지 기능이 있음.
+            // 갱신되지 않을경우 기본셋팅코드로 리셋.
+            if (key1 != Key.None)
+            {
+                setting.bindKey_1 = key1;
+            }
 
-            SetUI_keybind(appdata.bindKey_1, appdata.bindKey_2);
+            if (key2 != Key.None)
+            {
+                setting.bindKey_2 = key2;
+            }
+
+            // 만약 사용자가 의도적으로 '동일한 키' 입력을 지정하려 한다면(ex : S + S) 기본 키 셋팅값인 LeftAlt + F1 값으로 설정함.
+            if (setting.bindKey_1 == setting.bindKey_2)
+            {
+                setting.bindKey_1 = Key.LeftAlt;
+                setting.bindKey_2 = Key.F1;
+            }
+
+            Settings.Apply(setting);
+            HookImplement.SetHookKeys(setting.bindKey_1, setting.bindKey_2);
+            SetUI_keybind(setting.bindKey_1, setting.bindKey_2);
 
             HookImplement.InstallGlobalHook();
         }
@@ -180,13 +174,13 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void TextBox_regexExpression_TextChanged()
         {
-            appdata.regexExpression = Text_textBox_regexExpression;
-            appdata.regexReplace = Text_textBox_regexReplace;
-            appdata.inputRegex = Text_textBox_inputRegex;
-            appdata.outputRegex = Text_textBox_outputRegex;
+            setting.regexExpression = Text_textBox_regexExpression;
+            setting.regexReplace = Text_textBox_regexReplace;
+            setting.inputRegex = Text_textBox_inputRegex;
+            setting.outputRegex = Text_textBox_outputRegex;
 
             Update_RegexOutput();
-            Settings.Apply(appdata);
+            Settings.Apply(setting);
         }
 
         [RelayCommand]
@@ -201,7 +195,6 @@ namespace DeleteNewline.ViewModel
             var regexAndReplace = GetAdditionalRegexAndReplace();
             (var success, Text_textBox_outputRegex) = RegexManager.Replace(Text_textBox_inputRegex, regexAndReplace.Item1, regexAndReplace.Item2);
         }
-
 
         public class GenericParameter_OC
         {

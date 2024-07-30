@@ -95,8 +95,8 @@
                             </b:EventTrigger>
 
                             <b:EventTrigger EventName="KeyUp">
-                                <b:InvokeCommandAction Command="{Binding TextBox_bindKey_KeyDownCommand}" 
-                                                       PassEventArgsToCommand="True"/>
+                                <b:InvokeCommandAction Command="{Binding TextBox_bindKey_KeyUpCommand}" 
+                                                       CommandParameter="{Binding ElementName=TextBox_bindKey}"/>
                             </b:EventTrigger>
 
                             <b:EventTrigger EventName="GotFocus">
