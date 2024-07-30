@@ -12,7 +12,7 @@ You can use other programs or websites, but the convenience provided by DeleteNe
 
 ## Release environment
 * OS : Windows  
-* .NET : 6.0 LTS
+* .NET : 8.0 LTS
 
 Currently, my personal use environment stays in Windows, so there is no plan to support MAC environment.
 
