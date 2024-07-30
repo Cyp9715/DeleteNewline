@@ -91,10 +91,10 @@ namespace GlobalHook
             }
         }
 
-        public static void SetHookKeys(Settings setting)
+        public static void SetHookKeys(Key bindKey_1, Key bindKey_2)
         {
-            var Virtual_Key1 = KeyInterop.VirtualKeyFromKey((Key)setting.bindKey_1);
-            var Virtual_Key2 = KeyInterop.VirtualKeyFromKey((Key)setting.bindKey_2);
+            var Virtual_Key1 = KeyInterop.VirtualKeyFromKey(bindKey_1);
+            var Virtual_Key2 = KeyInterop.VirtualKeyFromKey(bindKey_2);
 
             HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
         }

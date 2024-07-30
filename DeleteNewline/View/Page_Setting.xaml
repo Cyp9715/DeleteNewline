@@ -1,9 +1,9 @@
 ﻿<Page x:Class="DeleteNewline.Page_Setting"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       mc:Ignorable="d"
       d:DesignHeight="780"
@@ -47,7 +47,7 @@
                               Height="{StaticResource height_checkBox}"
                               MinHeight="{StaticResource minHeight_checkBox}"
                               MinWidth="{StaticResource minWidth_checkBox}"
-                              IsChecked="{Binding isChecked_checkBox_topMost}" />
+                              IsChecked="{Binding IsChecked_checkBox_topMost}" />
                 </DockPanel>
 
                 <DockPanel ToolTip="{StaticResource toolTipText_notification}"
@@ -64,7 +64,15 @@
                               Height="{StaticResource height_checkBox}"
                               MinHeight="{StaticResource minHeight_checkBox}"
                               MinWidth="{StaticResource minWidth_checkBox}"
-                              IsChecked="{Binding isChecked_checkBox_notification}" />
+                              IsChecked="{Binding IsChecked_checkBox_notification}">
+
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="Click">
+                                <b:InvokeCommandAction Command="{Binding SetNotifier}"/>
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+                        
+                    </CheckBox>
                 </DockPanel>
 
                 <DockPanel Margin="0,13,0,0"
@@ -75,13 +83,33 @@
                     <TextBox x:Name="TextBox_bindKey"
                              Width="275"
                              HorizontalAlignment="Right"
-                             Text="{Binding text_textBox_keybind}"
+                             Text="{Binding Text_textBox_keybind, Mode=TwoWay}"
                              TextAlignment="Center"
-                             IsReadOnly="True"
-                             KeyDown="TextBox_bindKey_KeyDown"
-                             KeyUp="TextBox_bindKey_KeyUp"
-                             GotFocus="TextBox_bindKey_GotFocus"
-                             LostFocus="TextBox_bindKey_LostFocus" />
+                             IsReadOnly="True">
+
+                        <b:Interaction.Triggers>
+
+                            <b:EventTrigger EventName="KeyDown">
+                                <b:InvokeCommandAction Command="{Binding TextBox_bindKey_KeyDownCommand}"
+                                                       PassEventArgsToCommand="True"/>
+                            </b:EventTrigger>
+
+                            <b:EventTrigger EventName="KeyUp">
+                                <b:InvokeCommandAction Command="{Binding TextBox_bindKey_KeyDownCommand}" 
+                                                       PassEventArgsToCommand="True"/>
+                            </b:EventTrigger>
+
+                            <b:EventTrigger EventName="GotFocus">
+                                <b:InvokeCommandAction Command="{Binding TextBox_bindKey_GotFocusCommand}"/>
+                            </b:EventTrigger>
+
+                            <b:EventTrigger EventName="LostFocus">
+                                <b:InvokeCommandAction Command="{Binding TextBox_bindKey_LostFocusCommand}"/>
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+                        
+                        
+                    </TextBox>
                 </DockPanel>
 
                 <DockPanel Margin="0,35,0,0">
@@ -118,10 +146,17 @@
                             <TextBox x:Name="TextBox_regexExpression"
                                      Width="235"
                                      Height="32"
-                                     Text="{Binding text_textBox_regexExpression}"
+                                     Text="{Binding Text_textBox_regexExpression, UpdateSourceTrigger=PropertyChanged}"
                                      TextAlignment="Center"
-                                     HorizontalAlignment="Right"
-                                     TextChanged="TextBox_regexExpression_TextChanged" />
+                                     HorizontalAlignment="Right">
+
+                                <b:Interaction.Triggers>
+                                    <b:EventTrigger EventName="TextChanged">
+                                        <b:InvokeCommandAction Command="{Binding TextBox_regexExpression_TextChangedCommand}"/>
+                                    </b:EventTrigger>
+                                </b:Interaction.Triggers>
+                                
+                            </TextBox>
                         </DockPanel>
 
                         <DockPanel Margin="0,13,0,0"
@@ -134,10 +169,17 @@
                             <TextBox x:Name="TextBox_regexReplace"
                                      Width="235"
                                      HorizontalAlignment="Right"
-                                     Text="{Binding text_textBox_regexReplace}"
+                                     Text="{Binding Text_textBox_regexReplace, UpdateSourceTrigger=PropertyChanged}"
                                      TextAlignment="Center"
-                                     Foreground="Yellow"
-                                     TextChanged="TextBox_regexReplace_TextChanged" />
+                                     Foreground="Yellow">
+
+                                <b:Interaction.Triggers>
+                                    <b:EventTrigger EventName="TextChanged">
+                                        <b:InvokeCommandAction Command="{Binding TextBox_regexExpression_TextChangedCommand}"/>
+                                    </b:EventTrigger>
+                                </b:Interaction.Triggers>
+
+                            </TextBox>
                         </DockPanel>
                     </StackPanel>
 
@@ -177,8 +219,15 @@
                                                  Height="32"
                                                  Text="{Binding text_textBox_addtionalRegexExpression}"
                                                  TextAlignment="Center"
-                                                 HorizontalAlignment="Right"
-                                                 TextChanged="TextBox_regexExpression_TextChanged" />
+                                                 HorizontalAlignment="Right">
+
+                                            <b:Interaction.Triggers>
+                                                <b:EventTrigger EventName="TextChanged">
+                                                    <b:InvokeCommandAction Command="{Binding TextBox_regexExpression_TextChangedCommand}"/>
+                                                </b:EventTrigger>
+                                            </b:Interaction.Triggers>
+
+                                        </TextBox>
                                     </DockPanel>
 
                                     <DockPanel Margin="0,13,0,0"
@@ -192,8 +241,14 @@
                                                  HorizontalAlignment="Right"
                                                  Text="{Binding text_textBox_additionalRegexReplace}"
                                                  TextAlignment="Center"
-                                                 Foreground="Yellow"
-                                                 TextChanged="TextBox_regexReplace_TextChanged" />
+                                                 Foreground="Yellow">
+
+                                            <b:Interaction.Triggers>
+                                                <b:EventTrigger EventName="TextChanged">
+                                                    <b:InvokeCommandAction Command="{Binding TextBox_regexExpression_TextChangedCommand}"/>
+                                                </b:EventTrigger>
+                                            </b:Interaction.Triggers>
+                                        </TextBox>
                                     </DockPanel>
                                 </StackPanel>
 
@@ -240,12 +295,19 @@
                              Grid.Row="1"
                              Margin="0,5,0,10"
                              Height="100"
-                             Text="{Binding text_textBox_inputRegex}"
+                             Text="{Binding Text_textBox_inputRegex, UpdateSourceTrigger=PropertyChanged}"
                              ToolTip="{StaticResource toolTipText_inputRegex}"
-                             AcceptsReturn="True"
-                             TextChanged="TextBox_regexInput_TextChanged" />
+                             AcceptsReturn="True">
 
-                    <TextBlock Grid.Row="1"
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="TextChanged">
+                                <b:InvokeCommandAction Command="{Binding TextBox_regexExpression_TextChangedCommand}"/>
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+
+                    </TextBox>
+
+                        <TextBlock Grid.Row="1"
                                IsHitTestVisible="False"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
@@ -279,7 +341,7 @@
                              Margin="{Binding Margin, ElementName=TextBox_regexInput}"
                              Height="{Binding Height, ElementName=TextBox_regexInput}"
                              IsReadOnly="True"
-                             Text="{Binding text_textBox_outputRegex}"
+                             Text="{Binding Text_textBox_outputRegex}"
                              ToolTip="{StaticResource toolTipText_outputRegex}" />
 
                     <Button x:Name="button_RegexDefault"
@@ -287,7 +349,6 @@
                             Width="{Binding Path=Width, ElementName=Grid_RegexExample}"
                             Content="Default Regex Settings"
                             HorizontalAlignment="Center"
-                            Click="button_RegexDefault_Click"
                             ToolTip="{StaticResource toolTipText_defaultRegexSettings}">
                         <Button.Resources>
                             <Style TargetType="Border">
@@ -295,6 +356,12 @@
                                         Value="10" />
                             </Style>
                         </Button.Resources>
+
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="Click">
+                                <b:InvokeCommandAction Command="{Binding button_RegexDefault_ClickCommand}"/>
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
                     </Button>
                 </Grid>
 

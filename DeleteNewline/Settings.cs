@@ -60,7 +60,7 @@ namespace DeleteNewline
                 if (loadedSettings != null)
                 {
                     Settings.Apply(loadedSettings);
-                    HookImplement.SetHookKeys(loadedSettings);
+                    HookImplement.SetHookKeys(loadedSettings.bindKey_1, loadedSettings.bindKey_2);
                 }
             }
         }
@@ -126,8 +126,6 @@ namespace DeleteNewline
 
         public Key bindKey_1 { get; set; } = Key.LeftAlt;
         public Key bindKey_2 { get; set; } = Key.F1;
-
-        public string regexInput { get; set; } = String.Empty;
 
         public string regexExpression { get; set; } = String.Empty;
         public string regexReplace { get; set; } = String.Empty;

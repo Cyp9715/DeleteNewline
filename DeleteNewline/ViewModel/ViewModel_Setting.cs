@@ -5,146 +5,54 @@ using System.Windows.Controls;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace DeleteNewline.ViewModel
 {
-    public class ViewModel_Setting : ObservableObject
+    public partial class ViewModel_Setting : ObservableValidator
     {
         Settings appdata = Settings.GetInstance();
+        KeyConverter keyConverter;
 
         public ViewModel_Setting()
         {
-            isChecked_checkBox_topMost = appdata.topMost;
-            isChecked_checkBox_notification = appdata.notification;
-            SetUI_keybind((Key)appdata.bindKey_1, (Key)appdata.bindKey_2);
+            keyConverter = new KeyConverter();
 
-            text_textBox_regexExpression = appdata.regexExpression;
-            text_textBox_regexReplace = appdata.regexReplace;
-            text_textBox_inputRegex = appdata.regexInput;
-            UpdateTextBox_regexOutput();
+            IsChecked_checkBox_topMost = appdata.topMost;
+            IsChecked_checkBox_notification = appdata.notification;
+            SetNotifier();
+            SetUI_keybind(appdata.bindKey_1, appdata.bindKey_2);
+
+            Text_textBox_regexExpression = appdata.regexExpression;
+            Text_textBox_regexReplace = appdata.regexReplace;
+            Text_textBox_inputRegex = appdata.inputRegex;
+            Update_RegexOutput();
 
             additionalRegex = new ObservableCollection<GenericParameter_OC>();
 
-            HookImplement.SetHookKeys(appdata);
+            HookImplement.SetHookKeys(appdata.bindKey_1, appdata.bindKey_2);
         }
 
-        bool _isChecked_checkBox_topMost;
-        bool _isChecked_checkBox_notification;
+        [ObservableProperty]
+        bool isChecked_checkBox_topMost;
+        [ObservableProperty]
+        bool isChecked_checkBox_notification;
 
-        string _text_textBox_keybind = String.Empty;
-        string _text_textBox_regexExpression = String.Empty;
-        string _text_textBox_regexReplace = String.Empty;
+        [ObservableProperty]
+        string text_textBox_keybind;
+        [ObservableProperty]
+        string text_textBox_regexExpression;
+        [ObservableProperty]
+        string text_textBox_regexReplace;
 
-        string _text_textBox_inputRegex = String.Empty;
-        string _text_textBox_outputRegex = String.Empty;
+        [ObservableProperty]
+        string text_textBox_inputRegex;
+        [ObservableProperty]
+        string text_textBox_outputRegex;
 
-        public bool isChecked_checkBox_topMost
-        {
-            get => _isChecked_checkBox_topMost;
-            set
-            {
-                SetProperty(ref _isChecked_checkBox_topMost, value);
 
-                Page_MainWindow.mainWindow.Topmost = value;
-                appdata.topMost = value;
-            }
-        }
-
-        // 해당변수가 변경될 때 지정된 값에 따라 HookImplement.execute 의 Action 값을 치환해 줌.
-        public bool isChecked_checkBox_notification
-        {
-            get =>_isChecked_checkBox_notification;
-            set
-            {
-                SetProperty(ref _isChecked_checkBox_notification, value);
-
-                HookImplement.execute = (value == true) ?
-                    Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
-
-                appdata.notification = value;
-            }
-        }
-
-        public string text_textBox_keybind
-        {
-            get => _text_textBox_keybind;
-
-            // SetProperty 는 변경되었을 경우만 OnPropertyChanged 를 발생시키기에 수동으로 추가함.
-            // 아무것도 입력하지 않고 textBox_bindKey Focus 벗어날 시 문제발생
-            set
-            {
-                OnPropertyChanging("text_textBox_keybind");
-                _text_textBox_keybind = value;
-                OnPropertyChanged("text_textBox_keybind");
-            }
-        }
-
-        public string text_textBox_regexExpression
-        {
-            get => _text_textBox_regexExpression;
-
-            set
-            {
-                SetProperty(ref _text_textBox_regexExpression, value);
-                appdata.regexExpression = value;
-            }
-        }
-
-        public string text_textBox_regexReplace
-        {
-            get => _text_textBox_regexReplace;
-
-            set
-            {
-                SetProperty(ref _text_textBox_regexReplace, value);
-                appdata.regexReplace = value;
-            }
-        }
-
-        public string text_textBox_inputRegex
-        {
-            get => _text_textBox_inputRegex;
-
-            set
-            {
-                SetProperty(ref _text_textBox_inputRegex, value);
-                appdata.regexInput = value;
-            }
-        }
-
-        public string text_textBox_outputRegex
-        {
-            get => _text_textBox_outputRegex;
-            set => SetProperty(ref _text_textBox_outputRegex, value);
-        }
-
-        public void UpdateTextBox_regexOutput(TextBox? textBox_regexExpression = null, TextBox? textBox_regexReplace = null, TextBox ? textBox_regexInput = null)
-        {
-            // realtime update
-            if (textBox_regexInput != null)
-            {
-                text_textBox_inputRegex = textBox_regexInput.Text;
-            }
-
-            if (textBox_regexExpression != null)
-            {
-                text_textBox_regexExpression = textBox_regexExpression.Text;
-            }
-
-            if (textBox_regexReplace != null)
-            {
-                text_textBox_regexReplace = textBox_regexReplace.Text;
-            }
-
-            var regexAndReplace = GetAdditionalRegexAndReplace();
-
-            OnPropertyChanging("text_textBox_outputRegexExample");
-            (var success, text_textBox_outputRegex) = RegexManager.Replace(text_textBox_inputRegex, regexAndReplace.Item1, regexAndReplace.Item2);
-            OnPropertyChanged("text_textBox_outputRegexExample");
-        }
-
-        public Key key1 = Key.None;
-        public Key key2 = Key.None;
+        Key key1 = Key.None;
+        Key key2 = Key.None;
 
         public void SaveKeyBind()
         {
@@ -170,23 +78,74 @@ namespace DeleteNewline.ViewModel
             Settings.Apply(appdata);
         }
 
-        KeyConverter keyConverter = new KeyConverter();
+        // 키를 누르는것에 따라 UI를 지정함. (여기서 지정되는 Key 는 사용자 반응성을 위한것으로 임시적임)
+        [RelayCommand]
+        private void TextBox_bindKey_KeyDown(KeyEventArgs e)
+        {
+            if (key1 == Key.None)
+            {
+                key1 = (e.Key == Key.System) ? e.SystemKey : e.Key;
+            }
+            else
+            {
+                // 만약 key1과 key2가 같은 입력값이라면 key2 에 할당하지 않음 (Press 동작 방지)
+                if (e.Key != key1 && e.SystemKey != key1)
+                {
+                    key2 = (e.Key == Key.System) ? e.SystemKey : e.Key;
+                }
+            }
+
+            SetUI_keybind(key1, key2);
+        }
+
+        // 키를 입력후 뗄 경우 vm_setting.key 임시변수에 값을 지정.
+        [RelayCommand]
+        private void TextBox_bindKey_KeyUp(object sender)
+        {
+            // 키를 뗄경우 자동적으로 포커스를 초기화 시킴.
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope((TextBox)sender), null);
+            Keyboard.ClearFocus();
+        }
+
+        // 포커스를 다시 얻었을 경우 GlobalHook 를 활성화 하고, 임시변수 값들과 텍스트박스를 초기화함.
+        [RelayCommand]
+        private void TextBox_bindKey_GotFocus()
+        {
+            HookImplement.UnInstallGlobalHook();
+
+            key1 = Key.None;
+            key2 = Key.None;
+
+            Text_textBox_keybind = string.Empty;
+        }
+
+        // 포커스를 잃어버릴경우 appdata 기반으로 키를 설정하고 UI를 재설정함.
+        [RelayCommand]
+        private void TextBox_bindKey_LostFocus()
+        {
+            SaveKeyBind();
+            HookImplement.SetHookKeys(appdata.bindKey_1, appdata.bindKey_2);
+
+            SetUI_keybind(appdata.bindKey_1, appdata.bindKey_2);
+
+            HookImplement.InstallGlobalHook();
+        }
 
         public void SetUI_keybind(Key key1, Key key2)
         {
-            string key1_text = String.Empty;
-            string key2_text = String.Empty;
+            string key1_text = string.Empty;
+            string key2_text = string.Empty;
 
             if (key2 == Key.None)
             {
                 key1_text = keyConverter.ConvertToString(key1)!;
-                text_textBox_keybind = key1_text;
+                Text_textBox_keybind = key1_text;
             }
             else
             {
                 key1_text = keyConverter.ConvertToString(key1)!;
                 key2_text = keyConverter.ConvertToString(key2)!;
-                text_textBox_keybind = key1_text + " + " + key2_text;
+                Text_textBox_keybind = key1_text + " + " + key2_text;
             }
         }
 
@@ -195,8 +154,8 @@ namespace DeleteNewline.ViewModel
             List<string> regex_expressions = new List<string>();
             List<string> regex_replaces = new List<string>();
 
-            regex_expressions.Add(text_textBox_regexExpression);
-            regex_replaces.Add(text_textBox_regexReplace);
+            regex_expressions.Add(Text_textBox_regexExpression);
+            regex_replaces.Add(Text_textBox_regexReplace);
 
             if (additionalRegex != null)
             {
@@ -208,6 +167,41 @@ namespace DeleteNewline.ViewModel
             }
             return (regex_expressions, regex_replaces);
         }
+
+        [RelayCommand]
+        private void button_RegexDefault_Click()
+        {
+            Text_textBox_regexExpression = @"\r\n|\n";
+            Text_textBox_regexReplace = " ";
+
+            Update_RegexOutput();
+        }
+
+        [RelayCommand]
+        private void TextBox_regexExpression_TextChanged()
+        {
+            appdata.regexExpression = Text_textBox_regexExpression;
+            appdata.regexReplace = Text_textBox_regexReplace;
+            appdata.inputRegex = Text_textBox_inputRegex;
+            appdata.outputRegex = Text_textBox_outputRegex;
+
+            Update_RegexOutput();
+            Settings.Apply(appdata);
+        }
+
+        [RelayCommand]
+        private void SetNotifier()
+        {
+            HookImplement.execute = (IsChecked_checkBox_notification == true) ? 
+                Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
+        }
+
+        public void Update_RegexOutput()
+        {
+            var regexAndReplace = GetAdditionalRegexAndReplace();
+            (var success, Text_textBox_outputRegex) = RegexManager.Replace(Text_textBox_inputRegex, regexAndReplace.Item1, regexAndReplace.Item2);
+        }
+
 
         public class GenericParameter_OC
         {

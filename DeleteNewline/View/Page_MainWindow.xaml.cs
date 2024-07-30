@@ -40,7 +40,6 @@ namespace DeleteNewline
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    var mainWindow = Application.Current.MainWindow;
                     if (mainWindow != null)
                     {
                         mainWindow.Visibility = Visibility.Visible;
