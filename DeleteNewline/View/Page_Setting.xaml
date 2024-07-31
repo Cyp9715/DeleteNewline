@@ -47,7 +47,15 @@
                               Height="{StaticResource height_checkBox}"
                               MinHeight="{StaticResource minHeight_checkBox}"
                               MinWidth="{StaticResource minWidth_checkBox}"
-                              IsChecked="{Binding IsChecked_checkBox_topMost}" />
+                              IsChecked="{Binding IsTopMost}">
+                        
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="Click">
+                                <b:InvokeCommandAction Command="{Binding SetTopMostCommand}"/>
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+
+                    </CheckBox>
                 </DockPanel>
 
                 <DockPanel ToolTip="{StaticResource toolTipText_notification}"
@@ -64,11 +72,11 @@
                               Height="{StaticResource height_checkBox}"
                               MinHeight="{StaticResource minHeight_checkBox}"
                               MinWidth="{StaticResource minWidth_checkBox}"
-                              IsChecked="{Binding IsChecked_checkBox_notification}">
+                              IsChecked="{Binding IsNotificationEnabled}">
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding SetNotifier}"/>
+                                <b:InvokeCommandAction Command="{Binding SetNotifierCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                         
@@ -83,12 +91,11 @@
                     <TextBox x:Name="TextBox_bindKey"
                              Width="275"
                              HorizontalAlignment="Right"
-                             Text="{Binding Text_textBox_keybind, Mode=TwoWay}"
+                             Text="{Binding KeybindText, Mode=TwoWay}"
                              TextAlignment="Center"
                              IsReadOnly="True">
 
                         <b:Interaction.Triggers>
-
                             <b:EventTrigger EventName="KeyDown">
                                 <b:InvokeCommandAction Command="{Binding TextBox_bindKey_KeyDownCommand}"
                                                        PassEventArgsToCommand="True"/>
@@ -120,7 +127,6 @@
 
 
                 <!-- REGEX -->
-
                 <Label Content="Regex"
                        Margin="{StaticResource margin_mainCategory}"
                        FontSize="{StaticResource LargeSize}"
@@ -146,7 +152,7 @@
                             <TextBox x:Name="TextBox_regexExpression"
                                      Width="235"
                                      Height="32"
-                                     Text="{Binding Text_textBox_regexExpression, UpdateSourceTrigger=PropertyChanged}"
+                                     Text="{Binding RegexExpression, UpdateSourceTrigger=PropertyChanged}"
                                      TextAlignment="Center"
                                      HorizontalAlignment="Right">
 
@@ -169,7 +175,7 @@
                             <TextBox x:Name="TextBox_regexReplace"
                                      Width="235"
                                      HorizontalAlignment="Right"
-                                     Text="{Binding Text_textBox_regexReplace, UpdateSourceTrigger=PropertyChanged}"
+                                     Text="{Binding RegexReplace, UpdateSourceTrigger=PropertyChanged}"
                                      TextAlignment="Center"
                                      Foreground="Yellow">
 
@@ -188,11 +194,17 @@
                             Width="30"
                             Height="30"
                             Margin="{StaticResource margin_internalRegex}"
-                            HorizontalAlignment="Right"
-                            Click="Button_addRegex_Click">
+                            HorizontalAlignment="Right">
+
                         <iconPacks:PackIconModern Width="10"
                                                   Height="10"
                                                   Kind="Add" />
+
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="Click">
+                                <b:InvokeCommandAction Command="{Binding Button_addRegex_ClickCommand}"/>
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
                     </Button>
                 </Grid>
 
@@ -257,9 +269,15 @@
                                         Width="30"
                                         Height="30"
                                         Margin="{StaticResource margin_internalRegex}"
-                                        HorizontalAlignment="Right"
-                                        CommandParameter="{Binding}"
-                                        Click="Button_deleteRegex_Click">
+                                        HorizontalAlignment="Right">
+
+                                    <b:Interaction.Triggers>
+                                        <b:EventTrigger EventName="Click">
+                                            <b:InvokeCommandAction Command="{Binding DataContext.Button_deleteRegex_ClickCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"/>
+                                        </b:EventTrigger>
+                                    </b:Interaction.Triggers>
+
                                     <iconPacks:PackIconMicrons Width="10"
                                                                Height="10"
                                                                Kind="Minus" />
@@ -295,7 +313,7 @@
                              Grid.Row="1"
                              Margin="0,5,0,10"
                              Height="100"
-                             Text="{Binding Text_textBox_inputRegex, UpdateSourceTrigger=PropertyChanged}"
+                             Text="{Binding InputTestRegex, UpdateSourceTrigger=PropertyChanged}"
                              ToolTip="{StaticResource toolTipText_inputRegex}"
                              AcceptsReturn="True">
 
@@ -341,7 +359,7 @@
                              Margin="{Binding Margin, ElementName=TextBox_regexInput}"
                              Height="{Binding Height, ElementName=TextBox_regexInput}"
                              IsReadOnly="True"
-                             Text="{Binding Text_textBox_outputRegex}"
+                             Text="{Binding OutputTestRegex}"
                              ToolTip="{StaticResource toolTipText_outputRegex}" />
 
                     <Button x:Name="button_RegexDefault"

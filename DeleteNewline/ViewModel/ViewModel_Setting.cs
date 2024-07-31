@@ -1,5 +1,6 @@
-﻿using System;
-using GlobalHook;
+﻿using GlobalHook;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Collections.Generic;
@@ -16,40 +17,40 @@ namespace DeleteNewline.ViewModel
 
         public ViewModel_Setting()
         {
-            setting = Settings.GetInstance();
             keyConverter = new KeyConverter();
+            setting = Settings.GetInstance();
 
-            IsChecked_checkBox_topMost = setting.topMost;
-            IsChecked_checkBox_notification = setting.notification;
-            SetUI_keybind(setting.bindKey_1, setting.bindKey_2);
-
-            Text_textBox_regexExpression = setting.regexExpression;
-            Text_textBox_regexReplace = setting.regexReplace;
-            Text_textBox_inputRegex = setting.inputRegex;
-            Update_RegexOutput();
-
-            SetNotifier();
-            HookImplement.SetHookKeys(setting.bindKey_1, setting.bindKey_2);
+            ImportSettingToUI();
             additionalRegex = new ObservableCollection<GenericParameter_OC>();
         }
 
-        [ObservableProperty]
-        bool isChecked_checkBox_topMost;
-        [ObservableProperty]
-        bool isChecked_checkBox_notification;
+        [ObservableProperty] bool isTopMost;
+        [ObservableProperty] bool isNotificationEnabled;
 
-        [ObservableProperty]
-        string text_textBox_keybind;
-        [ObservableProperty]
-        string text_textBox_regexExpression;
-        [ObservableProperty]
-        string text_textBox_regexReplace;
+        [ObservableProperty] string keybindText = string.Empty;
+        [ObservableProperty] string regexExpression = string.Empty;
+        [ObservableProperty] string regexReplace = string.Empty;
 
-        [ObservableProperty]
-        string text_textBox_inputRegex = string.Empty;
-        [ObservableProperty]
-        string text_textBox_outputRegex;
+        [ObservableProperty] string inputTestRegex = string.Empty;
+        [ObservableProperty] string outputTestRegex = string.Empty;
 
+        public void ImportSettingToUI()
+        {
+            IsTopMost = setting.topMost;
+            SetTopMost();
+            IsNotificationEnabled = setting.notification;
+            SetNotifier();
+
+            // 가상 키 코드를 WPF Key 타입으로 변환
+            SetUI_keybind(KeyInterop.KeyFromVirtualKey((int)Hook.key1),
+                          KeyInterop.KeyFromVirtualKey((int)Hook.key2));
+
+            RegexExpression = setting.regexExpression;
+            RegexReplace = setting.regexReplace;
+            InputTestRegex = setting.inputRegex;
+            Update_RegexOutput();
+
+        }
 
         Key key1 = Key.None;
         Key key2 = Key.None;
@@ -64,7 +65,7 @@ namespace DeleteNewline.ViewModel
             }
             else
             {
-                // 만약 key1과 key2가 같은 입력값이라면 key2 에 할당하지 않음 (Press 동작 방지)
+                // 만약 key1과 key2가 같은 입력값이라면 key2에 할당하지 않음 (Press 동작 방지)
                 if (e.Key != key1 && e.SystemKey != key1)
                 {
                     key2 = (e.Key == Key.System) ? e.SystemKey : e.Key;
@@ -83,19 +84,19 @@ namespace DeleteNewline.ViewModel
             Keyboard.ClearFocus();
         }
 
-        // 포커스를 다시 얻었을 경우 GlobalHook 를 활성화 하고, 임시변수 값들과 텍스트박스를 초기화함.
+        // 포커스를 다시 얻었을 경우 GlobalHook를 활성화 하고, 임시변수 값들과 텍스트박스를 초기화함.
         [RelayCommand]
         private void TextBox_bindKey_GotFocus()
         {
-            HookImplement.UnInstallGlobalHook();
+            Hook.UnInstall();
 
             key1 = Key.None;
             key2 = Key.None;
 
-            Text_textBox_keybind = string.Empty;
+            KeybindText = string.Empty;
         }
 
-        // 포커스를 잃어버릴경우 appdata 기반으로 키를 설정하고 UI를 재설정함.
+        // 포커스를 잃어버릴경우 저장된 setting에 키를 설정하고 UI를 재설정함.
         [RelayCommand]
         private void TextBox_bindKey_LostFocus()
         {
@@ -118,11 +119,13 @@ namespace DeleteNewline.ViewModel
                 setting.bindKey_2 = Key.F1;
             }
 
-            Settings.Apply(setting);
-            HookImplement.SetHookKeys(setting.bindKey_1, setting.bindKey_2);
+            Hook.SetKeys(setting.bindKey_1, setting.bindKey_2);
             SetUI_keybind(setting.bindKey_1, setting.bindKey_2);
 
-            HookImplement.InstallGlobalHook();
+            // GlobalHook 재활성화
+            Hook.Install();
+
+            Settings.ApplyLoadedSettings(setting);
         }
 
         public void SetUI_keybind(Key key1, Key key2)
@@ -133,23 +136,25 @@ namespace DeleteNewline.ViewModel
             if (key2 == Key.None)
             {
                 key1_text = keyConverter.ConvertToString(key1)!;
-                Text_textBox_keybind = key1_text;
+                KeybindText = key1_text;
             }
             else
             {
                 key1_text = keyConverter.ConvertToString(key1)!;
                 key2_text = keyConverter.ConvertToString(key2)!;
-                Text_textBox_keybind = key1_text + " + " + key2_text;
+                KeybindText = key1_text + " + " + key2_text;
             }
         }
 
+
+        // 구조 개선 필요.
         public (List<string>, List<string>) GetAdditionalRegexAndReplace()
         {
             List<string> regex_expressions = new List<string>();
             List<string> regex_replaces = new List<string>();
 
-            regex_expressions.Add(Text_textBox_regexExpression);
-            regex_replaces.Add(Text_textBox_regexReplace);
+            regex_expressions.Add(RegexExpression);
+            regex_replaces.Add(RegexReplace);
 
             if (additionalRegex != null)
             {
@@ -165,8 +170,8 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void button_RegexDefault_Click()
         {
-            Text_textBox_regexExpression = @"\r\n|\n";
-            Text_textBox_regexReplace = " ";
+            RegexExpression = @"\r\n|\n";
+            RegexReplace = " ";
 
             Update_RegexOutput();
         }
@@ -174,26 +179,38 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void TextBox_regexExpression_TextChanged()
         {
-            setting.regexExpression = Text_textBox_regexExpression;
-            setting.regexReplace = Text_textBox_regexReplace;
-            setting.inputRegex = Text_textBox_inputRegex;
-            setting.outputRegex = Text_textBox_outputRegex;
+            setting.regexExpression = RegexExpression;
+            setting.regexReplace = RegexReplace;
+            setting.inputRegex = InputTestRegex;
+            setting.outputRegex = OutputTestRegex;
 
             Update_RegexOutput();
-            Settings.Apply(setting);
+            Settings.ApplyLoadedSettings(setting);
+        }
+
+        [RelayCommand]
+        private void SetTopMost()
+        {
+            Application.Current.MainWindow.Topmost = (IsTopMost == true) ? true : false; 
         }
 
         [RelayCommand]
         private void SetNotifier()
         {
-            HookImplement.execute = (IsChecked_checkBox_notification == true) ? 
+            Hook.execute = (IsNotificationEnabled == true) ? 
                 Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
+
+            setting.notification = IsNotificationEnabled;
+            Settings.ApplyLoadedSettings(setting);
         }
 
+
+        // Text_textBox_inputRegex 및 지정된 Regex Expression, Regex Replace를 적용한 뒤
+        // textBox_outputRegex에 출력합니다.
         public void Update_RegexOutput()
         {
             var regexAndReplace = GetAdditionalRegexAndReplace();
-            (var success, Text_textBox_outputRegex) = RegexManager.Replace(Text_textBox_inputRegex, regexAndReplace.Item1, regexAndReplace.Item2);
+            (var success, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
         }
 
         public class GenericParameter_OC
@@ -214,6 +231,25 @@ namespace DeleteNewline.ViewModel
         }
 
         public int gp_count = 1;
+
+        [RelayCommand]
+        private void Button_addRegex_Click()
+        {
+            additionalRegex.Add(new ViewModel_Setting.GenericParameter_OC("Regex " + gp_count, "Replace " + gp_count, gp_count++));
+        }
+
+        [RelayCommand]
+        private void Button_deleteRegex_Click(object sender)
+        {
+            if (sender is Button button && button.CommandParameter is ViewModel_Setting.GenericParameter_OC gp_oc)
+            {
+                // machineFunction의 index 및 다른 속성에 접근할 수 있다.
+                int index = gp_oc.index;
+
+                // 이 정보를 사용하여 작업을 수행한다.
+                additionalRegex.Remove(additionalRegex.Where(i => i.index == index).Single());
+            }
+        }
 
         public ObservableCollection<GenericParameter_OC> additionalRegex { get; set; }
     }

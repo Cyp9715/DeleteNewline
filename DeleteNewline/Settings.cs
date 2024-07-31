@@ -8,29 +8,18 @@ using System.Windows.Input;
 
 namespace DeleteNewline
 {
-    class InitialSetting
+    public static class Genesis
     {
-        private static InitialSetting? instance = null;
         private static Mutex singleProcess = new Mutex(true, "260bf0b2-4dae-4146-9c0b-f794ad868790");
 
-        public static void Init()
-        {
-            if(instance == null)
-            {
-                instance = new InitialSetting();
-            }
-        }
-
-        private InitialSetting()
+        public static void Initialize()
         {
             PreventMultipleRun();
             ApplySettingFile();
-
-            // Init GlobalHook
-            HookImplement.InstallGlobalHook();
+            Hook.Install();
         }
 
-        private void PreventMultipleRun()
+        private static void PreventMultipleRun()
         {
             if (!singleProcess.WaitOne(TimeSpan.Zero, true))
             {
@@ -45,7 +34,7 @@ namespace DeleteNewline
          * 존재하지 않는다면 기본 Setting 파일을 생성하며
          * 존재한다면 셋팅사항을 프로그램에 적용.
          */
-        private void ApplySettingFile()
+        private static void ApplySettingFile()
         {
             if (File.Exists(Settings.settingFilePath) == false)
             {
@@ -54,15 +43,27 @@ namespace DeleteNewline
             }
             else
             {
-                string str_settings = File.ReadAllText(Settings.settingFilePath);
-                var loadedSettings = JsonConvert.DeserializeObject<Settings>(str_settings);
-
-                if (loadedSettings != null)
+                try
                 {
-                    Settings.Apply(loadedSettings);
-                    HookImplement.SetHookKeys(loadedSettings.bindKey_1, loadedSettings.bindKey_2);
+                    Settings? loadedSettings = JsonConvert.DeserializeObject<Settings>(
+                        File.ReadAllText(Settings.settingFilePath));
+
+                    if (loadedSettings != null)
+                    {
+                        Settings.ApplyLoadedSettings(loadedSettings);
+                    }
+                }
+                catch(Newtonsoft.Json.JsonSerializationException)
+                {
+                    MessageBox.Show("The saved JSON file is corrupted. Please delete the file or modify it, then run DeleteNewline again",
+                        "Delete Newline");
+
+                    Application.Current.Shutdown();
                 }
             }
+
+            var setting = Settings.GetInstance();
+            Hook.SetKeys(setting.bindKey_1, setting.bindKey_2);
         }
     }
 
@@ -86,7 +87,7 @@ namespace DeleteNewline
         }
 
         // Loaded Setting 호출시 깊은복사가 필요.
-        public static void Apply(Settings source)
+        public static void ApplyLoadedSettings(Settings source)
         {
             if (instance == null)
             {

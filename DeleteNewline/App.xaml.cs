@@ -49,8 +49,9 @@ namespace DeleteNewline
             base.OnStartup(e);
 
             var mainWindow = GetService<Page_MainWindow>();
-
             this.MainWindow = mainWindow;
+
+            Genesis.Initialize(); // 초기설정 지정
 
             // Delete Newline 은 시작과 동시에 Hidden.
             //mainWindow.Show();

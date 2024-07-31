@@ -10,11 +10,7 @@ namespace DeleteNewline.ViewModel
     {
         ViewModel_Setting? vm_setting;
 
-        [ObservableProperty]
-        private string? textboxContent;
-
-        [ObservableProperty]
-        private bool scrollToEnd;
+        [ObservableProperty] private string? textboxContent;
 
         [RelayCommand]
         private void Textbox_MenuItemPaste()

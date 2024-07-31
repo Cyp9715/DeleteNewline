@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Input;
-using DeleteNewline;
+using System.Collections.Generic;
 using DeleteNewline.ViewModel;
+using DeleteNewline;
 using Windows;
 
 namespace GlobalHook
 {
-    static class HookImplement
+    static class Hook
     {
         static GlobalKeyHook? globalKeyHook;
         static bool isSetHook = false;
         public static Action<List<string>, List<string>>? execute;
         private const int NotificationDuration = 300;
 
-        public static void InstallGlobalHook()
+        public static void Install()
         {
             globalKeyHook ??= new GlobalKeyHook();
 
@@ -27,7 +27,7 @@ namespace GlobalHook
             }
         }
 
-        public static void UnInstallGlobalHook()
+        public static void UnInstall()
         {
             if(isSetHook == true)
             {
@@ -37,17 +37,14 @@ namespace GlobalHook
             }
         }
 
-        static VirtualKeycodes key1 = VirtualKeycodes.LeftAlt;
-        static VirtualKeycodes key2 = VirtualKeycodes.F1;
+        static readonly VirtualKeycodes default_key1 = VirtualKeycodes.LeftAlt;
+        static readonly VirtualKeycodes default_key2 = VirtualKeycodes.F1;
+
+        public static VirtualKeycodes key1 { get; private set; } = default_key1;
+        public static VirtualKeycodes key2 { get; private set; } = default_key2;
 
         static Dictionary<VirtualKeycodes, uint> pressedKeys = new Dictionary<VirtualKeycodes, uint>();
         static uint pressedCount = 0;
-
-        private static void SetKeys(VirtualKeycodes key1_, VirtualKeycodes key2_)
-        {
-            key1 = key1_;
-            key2 = key2_;
-        }
 
         // 혹시라도 해당 로직부분에서 단 하나라도 제대로 인식되지 않을경우 프로그램 작동에 문제가 생길 여지가 있음.
         private static void GlobalKeyHook_OnKeyDown(object? sender, GlobalKeyEventArgs e)
@@ -91,12 +88,20 @@ namespace GlobalHook
             }
         }
 
-        public static void SetHookKeys(Key bindKey_1, Key bindKey_2)
+        public static void SetKeys(Key bindKey_1, Key bindKey_2)
         {
-            var Virtual_Key1 = KeyInterop.VirtualKeyFromKey(bindKey_1);
-            var Virtual_Key2 = KeyInterop.VirtualKeyFromKey(bindKey_2);
+            var virtual_key1 = KeyInterop.VirtualKeyFromKey(bindKey_1);
+            var virtual_key2 = KeyInterop.VirtualKeyFromKey(bindKey_2);
 
-            HookImplement.SetKeys((VirtualKeycodes)Virtual_Key1, (VirtualKeycodes)Virtual_Key2);
+            if (Enum.IsDefined(typeof(VirtualKeycodes), virtual_key1) ||
+                Enum.IsDefined(typeof(VirtualKeycodes), virtual_key2))
+            {
+                virtual_key1 = (int)default_key1;
+                virtual_key2 = (int)default_key2;
+            }
+
+            key1 = (VirtualKeycodes)virtual_key1;
+            key2 = (VirtualKeycodes)virtual_key2;
         }
     }
 }
