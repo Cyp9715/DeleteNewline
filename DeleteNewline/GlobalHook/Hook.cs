@@ -79,7 +79,7 @@ namespace GlobalHook
 
                     (List<string>, List<string>) regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
 
-                    execute(regexAndReplace.Item1, regexAndReplace.Item2);
+                    execute?.Invoke(regexAndReplace.Item1, regexAndReplace.Item2);
                 }
             }
             else
@@ -93,8 +93,9 @@ namespace GlobalHook
             var virtual_key1 = KeyInterop.VirtualKeyFromKey(bindKey_1);
             var virtual_key2 = KeyInterop.VirtualKeyFromKey(bindKey_2);
 
-            if (Enum.IsDefined(typeof(VirtualKeycodes), virtual_key1) ||
-                Enum.IsDefined(typeof(VirtualKeycodes), virtual_key2))
+            if (!Enum.IsDefined(typeof(VirtualKeycodes), virtual_key1) || virtual_key1 == 0 ||
+                !Enum.IsDefined(typeof(VirtualKeycodes), virtual_key2) || virtual_key2 == 0 ||
+                virtual_key1 == virtual_key2)
             {
                 virtual_key1 = (int)default_key1;
                 virtual_key2 = (int)default_key2;
