@@ -44,7 +44,7 @@ namespace DeleteNewline.ViewModel
             MainWindowSize_width = setting.mainWindowSize_width;
             MainWindowSize_height = setting.mainWindowSize_height;
 
-            // NavigationItem 기본설적을 Input_Text 로 지정.
+            // NavigationItem 기본설정을 Input_Text 로 지정.
             var mainWindow = Application.Current.MainWindow as Page_MainWindow;
             SelectedNavigationItem = mainWindow.NavigationViewItem_InputText;
 
