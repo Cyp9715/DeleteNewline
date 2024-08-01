@@ -14,8 +14,7 @@
         Height="{Binding MainWindowSize_height, Mode=TwoWay}"
         MinWidth="650"
         MinHeight="365"
-        Visibility="{Binding WindowVisibility, Mode=TwoWay}"
-        Topmost="{Binding TopMost, Mode=TwoWay}">
+        Visibility="{Binding WindowVisibility, Mode=TwoWay}">
 
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">

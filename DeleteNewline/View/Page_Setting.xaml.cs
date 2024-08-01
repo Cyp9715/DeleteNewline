@@ -1,4 +1,5 @@
-﻿using DeleteNewline.ViewModel;
+﻿using CommunityToolkit.Mvvm.Input;
+using DeleteNewline.ViewModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,10 +8,10 @@ namespace DeleteNewline
 {
     public partial class Page_Setting
     {
-        public Page_Setting(ViewModel_Setting vm_setting_) 
+        public Page_Setting(ViewModel_Setting vm_setting) 
         {
             InitializeComponent();
-            DataContext = vm_setting_;
+            DataContext = vm_setting;
         }
     }
 }
