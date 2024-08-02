@@ -1,4 +1,5 @@
 ﻿using DeleteNewline.ViewModel;
+using DeleteNewline.View;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;

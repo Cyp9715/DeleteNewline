@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace DeleteNewline
+namespace DeleteNewline.View
 {
     public partial class Page_Setting
     {

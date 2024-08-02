@@ -1,11 +1,6 @@
-﻿using System;
-using System.Data;
-using System.Windows;
-using DeleteNewline.ViewModel;
-using GlobalHook;
-using ModernWpf.Controls;
+﻿using DeleteNewline.ViewModel;
 
-namespace DeleteNewline
+namespace DeleteNewline.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

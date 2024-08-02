@@ -1,4 +1,4 @@
-﻿<Page x:Class="DeleteNewline.Page_Setting"
+﻿<Page x:Class="DeleteNewline.View.Page_Setting"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

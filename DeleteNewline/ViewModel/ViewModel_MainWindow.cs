@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ModernWpf.Controls;
+
 
 namespace DeleteNewline.ViewModel
 {
@@ -45,10 +45,10 @@ namespace DeleteNewline.ViewModel
             MainWindowSize_height = setting.mainWindowSize_height;
 
             // NavigationItem 기본설정을 Input_Text 로 지정.
-            var mainWindow = Application.Current.MainWindow as Page_MainWindow;
+            var mainWindow = Application.Current.MainWindow as View.Page_MainWindow;
             SelectedNavigationItem = mainWindow.NavigationViewItem_InputText;
 
-            CurrentPage = App.GetService<Page_InputText>();
+            CurrentPage = App.GetService<View.Page_InputText>();
         }
 
         [RelayCommand]
@@ -72,14 +72,14 @@ namespace DeleteNewline.ViewModel
 
             if (args.IsSettingsInvoked)
             {
-                CurrentPage = App.GetService<Page_Setting>();
+                CurrentPage = App.GetService<View.Page_Setting>();
             }
             else if (args.InvokedItemContainer is ModernWpf.Controls.NavigationViewItem navigationViewItem)
             {
                 switch(navigationViewItem.Tag)
                 {
                     case "InputText":
-                        CurrentPage = App.GetService<Page_InputText>();
+                        CurrentPage = App.GetService<View.Page_InputText>();
                         break;
                 }
 

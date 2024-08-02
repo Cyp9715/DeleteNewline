@@ -1,17 +1,13 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using DeleteNewline.ViewModel;
-using System;
-using System.Windows;
-using System.Windows.Input;
+﻿using DeleteNewline.ViewModel;
 
-namespace DeleteNewline
+namespace DeleteNewline.View
 {
     public partial class Page_InputText
     {
-        public Page_InputText(ViewModel_InputText? vm_inputText_)
+        public Page_InputText(ViewModel_InputText? vm_inputText)
         {
             InitializeComponent();
-            DataContext = vm_inputText_;
+            DataContext = vm_inputText;
         }
     }
 }
