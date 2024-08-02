@@ -25,7 +25,7 @@ namespace DeleteNewline.ViewModel
             InitNotifyIcon();
         }
 
-        public void Action_ContextMenu_Exit(object? sender, EventArgs e)
+        public void Exit(object? sender, EventArgs e)
         {
             // window 사이즈를 비롯한 setting 정보를 파일에 저장.
             setting.mainWindowSize_width = MainWindowSize_width;
@@ -107,7 +107,7 @@ namespace DeleteNewline.ViewModel
 
             // notifyIcon 내부 ContentMenu 설정
             notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            notifyIcon.ContextMenuStrip.Items.Add("Exit DeleteNewline", null, Action_ContextMenu_Exit);
+            notifyIcon.ContextMenuStrip.Items.Add("Exit DeleteNewline", null, Exit);
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using DeleteNewline.ViewModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
+﻿using DeleteNewline.ViewModel;
 
 namespace DeleteNewline.View
 {

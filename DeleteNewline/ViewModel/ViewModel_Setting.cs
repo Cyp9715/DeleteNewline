@@ -130,8 +130,8 @@ namespace DeleteNewline.ViewModel
 
         public void SetUI_keybind(Key key1, Key key2)
         {
-            string key1_text = string.Empty;
-            string key2_text = string.Empty;
+            string key1_text;
+            string key2_text;
 
             if (key2 == Key.None)
             {
@@ -191,7 +191,8 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void SetTopMost()
         {
-            Application.Current.MainWindow.Topmost = (IsTopMost == true) ? true : false; 
+            if (Application.Current.MainWindow != null)
+                Application.Current.MainWindow.Topmost = IsTopMost == true ? true : false;
         }
 
         [RelayCommand]
@@ -210,13 +211,13 @@ namespace DeleteNewline.ViewModel
         public void Update_RegexOutput()
         {
             var regexAndReplace = GetAdditionalRegexAndReplace();
-            (var success, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
+            (_, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
         }
 
         public class GenericParameter_OC
         {
-            public string label_expression { get; set; } = string.Empty;
-            public string label_replace { get; set; } = string.Empty;
+            public string label_expression { get; set; }
+            public string label_replace { get; set; }
             public string text_textBox_addtionalRegexExpression { get; set; } = string.Empty;
             public string text_textBox_additionalRegexReplace { get; set; } = string.Empty;
 
@@ -241,13 +242,13 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void Button_deleteRegex_Click(object sender)
         {
-            if (sender is Button button && button.CommandParameter is ViewModel_Setting.GenericParameter_OC gp_oc)
+            if (sender is Button { CommandParameter: ViewModel_Setting.GenericParameter_OC gpOc })
             {
                 // machineFunction의 index 및 다른 속성에 접근할 수 있다.
-                int index = gp_oc.index;
+                int index = gpOc.index;
 
                 // 이 정보를 사용하여 작업을 수행한다.
-                additionalRegex.Remove(additionalRegex.Where(i => i.index == index).Single());
+                additionalRegex.Remove(additionalRegex.Single(i => i.index == index));
             }
         }
 

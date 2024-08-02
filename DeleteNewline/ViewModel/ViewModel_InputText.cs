@@ -15,16 +15,14 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void Textbox_MenuItemPaste()
         {
-            string originalText = string.Empty;
-
             if (ClipboardManager.ContainText() == true)
             {
-                originalText = ClipboardManager.GetText();
+                var originalText = ClipboardManager.GetText();
                 TextboxContent += originalText;
 
                 var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
 
-                (bool success, string replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
+                var (_, replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
                 ClipboardManager.SetText(replacedText);
             }
             else
@@ -43,7 +41,7 @@ namespace DeleteNewline.ViewModel
                 {
                     var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
 
-                    (bool success, string replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
+                    var (_, replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
                     ClipboardManager.SetText(replacedText);
                 }
                 else
