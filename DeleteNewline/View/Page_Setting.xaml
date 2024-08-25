@@ -209,7 +209,7 @@
                 </Grid>
 
                 <ItemsControl x:Name="ItemsControl_addRegex"
-                              ItemsSource="{Binding additionalRegex}">
+                              ItemsSource="{Binding AdditionalRegex}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Width="450">

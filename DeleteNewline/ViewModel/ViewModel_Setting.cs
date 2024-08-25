@@ -21,7 +21,6 @@ namespace DeleteNewline.ViewModel
             setting = Settings.GetInstance();
 
             ImportSettingToUI();
-            additionalRegex = new ObservableCollection<GenericParameter_OC>();
         }
 
         [ObservableProperty] bool isTopMost;
@@ -33,6 +32,8 @@ namespace DeleteNewline.ViewModel
 
         [ObservableProperty] string inputTestRegex = string.Empty;
         [ObservableProperty] string outputTestRegex = string.Empty;
+
+        [ObservableProperty] ObservableCollection<AdditionalRegexConfig> additionalRegex = new ObservableCollection<AdditionalRegexConfig>();
 
         public void ImportSettingToUI()
         {
@@ -156,9 +157,9 @@ namespace DeleteNewline.ViewModel
             regex_expressions.Add(RegexExpression);
             regex_replaces.Add(RegexReplace);
 
-            if (additionalRegex != null)
+            if (AdditionalRegex != null)
             {
-                foreach (var i in additionalRegex)
+                foreach (var i in AdditionalRegex)
                 {
                     regex_expressions.Add(i.text_textBox_addtionalRegexExpression);
                     regex_replaces.Add(i.text_textBox_additionalRegexReplace);
@@ -214,7 +215,7 @@ namespace DeleteNewline.ViewModel
             (_, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
         }
 
-        public class GenericParameter_OC
+        public class AdditionalRegexConfig
         {
             public string label_expression { get; set; }
             public string label_replace { get; set; }
@@ -223,7 +224,7 @@ namespace DeleteNewline.ViewModel
 
             public int index { get; set; }
 
-            public GenericParameter_OC(string content_expression, string content_replace, int index_)
+            public AdditionalRegexConfig(string content_expression, string content_replace, int index_)
             {
                 label_expression = content_expression;
                 label_replace = content_replace;
@@ -236,22 +237,20 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void Button_addRegex_Click()
         {
-            additionalRegex.Add(new ViewModel_Setting.GenericParameter_OC("Regex " + gp_count, "Replace " + gp_count, gp_count++));
+            AdditionalRegex.Add(new AdditionalRegexConfig("Regex " + gp_count, "Replace " + gp_count, gp_count++));
         }
 
         [RelayCommand]
         private void Button_deleteRegex_Click(object sender)
         {
-            if (sender is Button { CommandParameter: ViewModel_Setting.GenericParameter_OC gpOc })
+            if (sender is Button { CommandParameter: AdditionalRegexConfig gpOc })
             {
                 // machineFunction의 index 및 다른 속성에 접근할 수 있다.
                 int index = gpOc.index;
 
                 // 이 정보를 사용하여 작업을 수행한다.
-                additionalRegex.Remove(additionalRegex.Single(i => i.index == index));
+                AdditionalRegex.Remove(AdditionalRegex.Single(i => i.index == index));
             }
         }
-
-        public ObservableCollection<GenericParameter_OC> additionalRegex { get; set; }
     }
 }
