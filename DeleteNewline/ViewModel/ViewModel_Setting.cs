@@ -51,7 +51,7 @@ namespace DeleteNewline.ViewModel
             RegexReplace = setting.regexReplace;
 
             InputTestRegex = setting.inputRegex;
-            Update_RegexOutput();
+            UpdateRegexOutput();
         }
 
         Key key1 = Key.None;
@@ -148,8 +148,6 @@ namespace DeleteNewline.ViewModel
             }
         }
 
-
-        // 구조 개선 필요.
         public (List<string>, List<string>) GetAdditionalRegexAndReplace()
         {
             List<string> regex_expressions = new List<string>();
@@ -169,28 +167,20 @@ namespace DeleteNewline.ViewModel
             return (regex_expressions, regex_replaces);
         }
 
-        [RelayCommand]
-        private void TextBox_regexExpression_TextChanged(AdditionalRegexConfig? config = null)
-        {
-            setting.regexExpression = RegexExpression;
-            setting.regexReplace = RegexReplace;
-            setting.inputRegex = InputTestRegex;
-            setting.outputRegex = OutputTestRegex;
+    // 전체 종료할 때 같이 종료.
 
-            if (config != null)
-            {
-                // AdditionalRegex 컬렉션에서 config를 찾아 업데이트
-                var itemToUpdate = AdditionalRegex.FirstOrDefault(x => x.Index == config.Index);
-                if (itemToUpdate != null)
-                {
-                    itemToUpdate.RegexExpression_additional = config.RegexExpression_additional;
-                    itemToUpdate.RegexReplace_additional = config.RegexReplace_additional;
-                }
-            }
+    //    setting.regexExpression = RegexExpression;
+    //        setting.regexReplace = RegexReplace;
+    //        setting.inputRegex = InputTestRegex;
+    //        setting.outputRegex = OutputTestRegex;
 
-            Update_RegexOutput();
-            Settings.CopySetting(setting);
-        }
+    //        // Regex Chain UI 업데이트.
+    //        if (config != null && config.Index == selectedItem.Index)
+    //        {
+    //            setting.AdditionalRegexes = AdditionalRegex.ToList();
+    //        }
+
+    //  Settings.CopySetting(setting);
 
         [RelayCommand]
         private void SetSaveTopMost()
@@ -212,10 +202,8 @@ namespace DeleteNewline.ViewModel
             Settings.CopySetting(setting);
         }
 
-
-        // Text_textBox_inputRegex 및 지정된 Regex Expression, Regex Replace를 적용한 뒤
-        // textBox_outputRegex에 출력합니다.
-        public void Update_RegexOutput()
+        [RelayCommand]
+        public void UpdateRegexOutput()
         {
             var regexAndReplace = GetAdditionalRegexAndReplace();
             (_, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
@@ -254,12 +242,8 @@ namespace DeleteNewline.ViewModel
         {
             if (additionalRegexConfig != null)
             {
-                var itemToRemove = AdditionalRegex.FirstOrDefault(i => i.Index == additionalRegexConfig.Index);
-
-                if (itemToRemove != null)
-                    AdditionalRegex.Remove(itemToRemove);
-
-                TextBox_regexExpression_TextChanged();
+                AdditionalRegex.Remove(additionalRegexConfig);
+                UpdateRegexOutput();
             }
         }
     }

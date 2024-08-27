@@ -76,9 +76,7 @@ namespace GlobalHook
                 if (onlyTwoKeys && isSequential)
                 {
                     ViewModel_Setting vm_setting = App.GetService<ViewModel_Setting>();
-
                     (List<string>, List<string>) regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
-
                     execute?.Invoke(regexAndReplace.Item1, regexAndReplace.Item2);
                 }
             }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using static DeleteNewline.ViewModel.ViewModel_Setting;
 
 namespace DeleteNewline
 {
@@ -68,6 +69,12 @@ namespace DeleteNewline
         }
     }
 
+    public class AdditionalRegex
+    {
+        public int Index { get; set; }
+        public string RegexExpression { get; set; } = string.Empty;
+        public string RegexReplace { get; set; } = string.Empty;
+    }
 
     class Settings
     {
@@ -101,8 +108,7 @@ namespace DeleteNewline
             instance.bindKey_2 = source.bindKey_2;
             instance.regexExpression = source.regexExpression;
             instance.regexReplace = source.regexReplace;
-            instance.regexExpression_additional = source.regexExpression_additional;
-            instance.regexReplace_additional = source.regexReplace_additional;
+            
             instance.inputRegex = source.inputRegex;
             instance.outputRegex = source.outputRegex;
         }
@@ -130,8 +136,7 @@ namespace DeleteNewline
         public string regexExpression { get; set; } = String.Empty;
         public string regexReplace { get; set; } = String.Empty;
 
-        public List<string> regexExpression_additional = new List<string>();
-        public List<string> regexReplace_additional = new List<string>();
+        public List<AdditionalRegex> AdditionalRegexes { get; set; }
 
         public string inputRegex { get; set; } = String.Empty;
         public string outputRegex { get; set; } = String.Empty;

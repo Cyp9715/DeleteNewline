@@ -21,19 +21,19 @@ namespace DeleteNewline
             {
                 isTextForm = true;
 
+                // Regex Chain 적용
                 (success, replacedText) = ClipboardManager.ReplaceText(regex, replace);
+                // 결과를 Clipboard 에 Setting.
                 ClipboardManager.SetText(replacedText);
 
+
+                // Notifier는 최대 100 자만
                 int limitLen = 100;
 
                 if (replacedText.Length > limitLen)
-                {
                     notifyContent = replacedText.Substring(0, limitLen) + " ...";
-                }
                 else
-                {
                     notifyContent = replacedText;
-                }
             }
 
             if(isTextForm == false)
