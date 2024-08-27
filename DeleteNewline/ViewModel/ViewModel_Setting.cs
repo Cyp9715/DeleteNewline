@@ -20,7 +20,7 @@ namespace DeleteNewline.ViewModel
             keyConverter = new KeyConverter();
             setting = Settings.GetInstance();
 
-            ImportSettingToUI();
+            ApplySettingFileToUI();
         }
 
         [ObservableProperty] bool isTopMost;
@@ -35,12 +35,13 @@ namespace DeleteNewline.ViewModel
 
         [ObservableProperty] ObservableCollection<AdditionalRegexConfig> additionalRegex = new ObservableCollection<AdditionalRegexConfig>();
 
-        public void ImportSettingToUI()
+        public void ApplySettingFileToUI()
         {
+            // topMost
             IsTopMost = setting.topMost;
-            SetTopMost();
+            SetSaveTopMost();
             IsNotificationEnabled = setting.notification;
-            SetNotifier();
+            SetSaveNotifier();
 
             // 가상 키 코드를 WPF Key 타입으로 변환
             SetUI_keybind(KeyInterop.KeyFromVirtualKey((int)Hook.key1),
@@ -48,9 +49,9 @@ namespace DeleteNewline.ViewModel
 
             RegexExpression = setting.regexExpression;
             RegexReplace = setting.regexReplace;
+
             InputTestRegex = setting.inputRegex;
             Update_RegexOutput();
-
         }
 
         Key key1 = Key.None;
@@ -126,7 +127,7 @@ namespace DeleteNewline.ViewModel
             // GlobalHook 재활성화
             Hook.Install();
 
-            Settings.ApplyLoadedSettings(setting);
+            Settings.CopySetting(setting);
         }
 
         public void SetUI_keybind(Key key1, Key key2)
@@ -188,24 +189,27 @@ namespace DeleteNewline.ViewModel
             }
 
             Update_RegexOutput();
-            Settings.ApplyLoadedSettings(setting);
+            Settings.CopySetting(setting);
         }
 
         [RelayCommand]
-        private void SetTopMost()
+        private void SetSaveTopMost()
         {
             if (Application.Current.MainWindow != null)
-                Application.Current.MainWindow.Topmost = IsTopMost == true ? true : false;
+                Application.Current.MainWindow.Topmost = IsTopMost;
+
+            setting.topMost = IsTopMost;
+            Settings.CopySetting(setting);
         }
 
         [RelayCommand]
-        private void SetNotifier()
+        private void SetSaveNotifier()
         {
             Hook.execute = (IsNotificationEnabled == true) ? 
                 Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
 
             setting.notification = IsNotificationEnabled;
-            Settings.ApplyLoadedSettings(setting);
+            Settings.CopySetting(setting);
         }
 
 

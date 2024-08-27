@@ -51,7 +51,7 @@
                         
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding SetTopMostCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding SetSaveTopMostCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
 
@@ -76,7 +76,7 @@
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding SetNotifierCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding SetSaveNotifierCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                         

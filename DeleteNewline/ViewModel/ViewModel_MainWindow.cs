@@ -31,7 +31,7 @@ namespace DeleteNewline.ViewModel
             setting.mainWindowSize_width = MainWindowSize_width;
             setting.mainWindowSize_height = MainWindowSize_height;
 
-            Settings.ApplyLoadedSettings(setting);
+            Settings.CopySetting(setting);
             Settings.Save();
 
             System.Environment.Exit(0);
@@ -58,7 +58,7 @@ namespace DeleteNewline.ViewModel
             setting.mainWindowSize_width = MainWindowSize_width;
             setting.mainWindowSize_height = MainWindowSize_height;
 
-            Settings.ApplyLoadedSettings(setting);
+            Settings.CopySetting(setting);
             Settings.Save();
 
             // 창 닫기 취소(프로세스 종료방지) 및 숨기기

@@ -1,6 +1,7 @@
 ﻿using GlobalHook;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -50,7 +51,7 @@ namespace DeleteNewline
 
                     if (loadedSettings != null)
                     {
-                        Settings.ApplyLoadedSettings(loadedSettings);
+                        Settings.CopySetting(loadedSettings);
                     }
                 }
                 catch(Newtonsoft.Json.JsonSerializationException)
@@ -87,12 +88,10 @@ namespace DeleteNewline
         }
 
         // Loaded Setting 호출시 깊은복사가 필요.
-        public static void ApplyLoadedSettings(Settings source)
+        public static void CopySetting(Settings source)
         {
             if (instance == null)
-            {
                 GetInstance();
-            }
 
             instance.mainWindowSize_width = source.mainWindowSize_width;
             instance.mainWindowSize_height = source.mainWindowSize_height;
@@ -102,6 +101,8 @@ namespace DeleteNewline
             instance.bindKey_2 = source.bindKey_2;
             instance.regexExpression = source.regexExpression;
             instance.regexReplace = source.regexReplace;
+            instance.regexExpression_additional = source.regexExpression_additional;
+            instance.regexReplace_additional = source.regexReplace_additional;
             instance.inputRegex = source.inputRegex;
             instance.outputRegex = source.outputRegex;
         }
@@ -111,9 +112,7 @@ namespace DeleteNewline
         public static void Save()
         {
             if(instance == null)
-            {
                 GetInstance();
-            }
 
             string serialized = JsonConvert.SerializeObject(instance, Formatting.Indented);
             File.WriteAllText(settingFilePath, serialized);
@@ -130,6 +129,9 @@ namespace DeleteNewline
 
         public string regexExpression { get; set; } = String.Empty;
         public string regexReplace { get; set; } = String.Empty;
+
+        public List<string> regexExpression_additional = new List<string>();
+        public List<string> regexReplace_additional = new List<string>();
 
         public string inputRegex { get; set; } = String.Empty;
         public string outputRegex { get; set; } = String.Empty;
