@@ -146,7 +146,7 @@
                                    Width="410"
                                    ToolTip="{StaticResource toolTipText_regexExpression}">
 
-                            <Label Content="Expression"
+                            <Label Content="Regex Expression"
                                    VerticalAlignment="Center" />
 
                             <TextBox x:Name="TextBox_regexExpression"

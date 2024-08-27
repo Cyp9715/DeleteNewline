@@ -242,7 +242,7 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void Button_addRegex_Click()
         {
-            AdditionalRegex.Add(new AdditionalRegexConfig("Regex", "Replace", indexCounter_AR++));
+            AdditionalRegex.Add(new AdditionalRegexConfig("Regex Expression", "Replace", indexCounter_AR++));
         }
 
         [RelayCommand]
