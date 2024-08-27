@@ -109,8 +109,8 @@ namespace DeleteNewline
             instance.regexExpression = source.regexExpression;
             instance.regexReplace = source.regexReplace;
             
-            instance.inputRegex = source.inputRegex;
-            instance.outputRegex = source.outputRegex;
+            instance.inputTestRegex = source.inputTestRegex;
+            instance.outputTestRegex = source.outputTestRegex;
         }
 
         public const string settingFilePath = "setting.json";
@@ -138,7 +138,7 @@ namespace DeleteNewline
 
         public List<AdditionalRegex> AdditionalRegexes { get; set; }
 
-        public string inputRegex { get; set; } = String.Empty;
-        public string outputRegex { get; set; } = String.Empty;
+        public string inputTestRegex { get; set; } = String.Empty;
+        public string outputTestRegex { get; set; } = String.Empty;
     }
 }
