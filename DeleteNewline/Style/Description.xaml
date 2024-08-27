@@ -16,8 +16,6 @@
 	<bcl:String x:Key="toolTipText_inputRegex">Input the source string to test the Regex on.</bcl:String>
 	<bcl:String x:Key="toolTipText_outputRegex">Displays Regex test result.</bcl:String>
 
-	<bcl:String x:Key="toolTipText_defaultRegexSettings">Delete Newline!</bcl:String>
-
 	<!-- TextBlock water mark -->
 	<bcl:String x:Key="waterMark_inputRegex">Input the source string to test Regex.</bcl:String>
 	<bcl:String x:Key="waterMark_ouputRegex">The Regex applied string is output.</bcl:String>

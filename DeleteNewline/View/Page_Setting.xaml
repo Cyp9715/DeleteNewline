@@ -127,7 +127,7 @@
 
 
                 <!-- REGEX -->
-                <Label Content="Regex"
+                <Label Content="Regex Chain"
                        Margin="{StaticResource margin_mainCategory}"
                        FontSize="{StaticResource LargeSize}"
                        FontWeight="Bold" />
@@ -224,18 +224,21 @@
                                                Width="410"
                                                ToolTip="{StaticResource toolTipText_regexExpression}">
 
-                                        <Label Content="{Binding label_expression}"
+                                        <Label Content="{Binding Label_expression}"
                                                VerticalAlignment="Center" />
 
                                         <TextBox Width="235"
                                                  Height="32"
-                                                 Text="{Binding text_textBox_addtionalRegexExpression}"
+                                                 Text="{Binding RegexExpression_additional, UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Center"
                                                  HorizontalAlignment="Right">
 
+                                            <!-- ItemTemplate 내부 각 요소들의 DataContext는 AdditionalRegex 컬렉션의 개별 항목, 즉 AdditionalRegexConfig 인스턴스 -->
+                                            <!-- 단, 여기서 RelativeSource로 ItemControl을 지정하였으므로, 기본 DataContext인 AdditionalRegexConfig를 무시하고 ItemControl의 DataContext에 접근.-->
                                             <b:Interaction.Triggers>
                                                 <b:EventTrigger EventName="TextChanged">
-                                                    <b:InvokeCommandAction Command="{Binding TextBox_regexExpression_TextChangedCommand}"/>
+                                                    <b:InvokeCommandAction Command="{Binding DataContext.TextBox_regexExpression_TextChangedCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                           CommandParameter="{Binding}"/>
                                                 </b:EventTrigger>
                                             </b:Interaction.Triggers>
 
@@ -246,18 +249,19 @@
                                                Width="410"
                                                ToolTip="{StaticResource toolTipText_regexReplace}">
 
-                                        <Label Content="{Binding label_replace}"
+                                        <Label Content="{Binding Label_replace}"
                                                VerticalAlignment="Center" />
 
                                         <TextBox Width="235"
                                                  HorizontalAlignment="Right"
-                                                 Text="{Binding text_textBox_additionalRegexReplace}"
+                                                 Text="{Binding RegexReplace_additional, UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Center"
                                                  Foreground="Yellow">
 
                                             <b:Interaction.Triggers>
                                                 <b:EventTrigger EventName="TextChanged">
-                                                    <b:InvokeCommandAction Command="{Binding TextBox_regexExpression_TextChangedCommand}"/>
+                                                    <b:InvokeCommandAction Command="{Binding DataContext.TextBox_regexExpression_TextChangedCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                           CommandParameter="{Binding}"/>
                                                 </b:EventTrigger>
                                             </b:Interaction.Triggers>
                                         </TextBox>
@@ -266,18 +270,13 @@
 
 
                                 <Button Grid.Column="1"
-                                        Width="30"
-                                        Height="30"
-                                        Margin="{StaticResource margin_internalRegex}"
-                                        HorizontalAlignment="Right">
-
-                                    <b:Interaction.Triggers>
-                                        <b:EventTrigger EventName="Click">
-                                            <b:InvokeCommandAction Command="{Binding DataContext.Button_deleteRegex_ClickCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding}"/>
-                                        </b:EventTrigger>
-                                    </b:Interaction.Triggers>
-
+                                    Width="30"
+                                    Height="30"
+                                    Margin="{StaticResource margin_internalRegex}"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding DataContext.Button_deleteRegex_ClickCommand, 
+                                              RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}">
                                     <iconPacks:PackIconMicrons Width="10"
                                                                Height="10"
                                                                Kind="Minus" />
@@ -361,26 +360,6 @@
                              IsReadOnly="True"
                              Text="{Binding OutputTestRegex}"
                              ToolTip="{StaticResource toolTipText_outputRegex}" />
-
-                    <Button x:Name="button_RegexDefault"
-                            Grid.Row="4"
-                            Width="{Binding Path=Width, ElementName=Grid_RegexExample}"
-                            Content="Default Regex Settings"
-                            HorizontalAlignment="Center"
-                            ToolTip="{StaticResource toolTipText_defaultRegexSettings}">
-                        <Button.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius"
-                                        Value="10" />
-                            </Style>
-                        </Button.Resources>
-
-                        <b:Interaction.Triggers>
-                            <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding button_RegexDefault_ClickCommand}"/>
-                            </b:EventTrigger>
-                        </b:Interaction.Triggers>
-                    </Button>
                 </Grid>
 
 

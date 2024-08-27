@@ -161,29 +161,31 @@ namespace DeleteNewline.ViewModel
             {
                 foreach (var i in AdditionalRegex)
                 {
-                    regex_expressions.Add(i.text_textBox_addtionalRegexExpression);
-                    regex_replaces.Add(i.text_textBox_additionalRegexReplace);
+                    regex_expressions.Add(i.RegexExpression_additional);
+                    regex_replaces.Add(i.RegexReplace_additional);
                 }
             }
             return (regex_expressions, regex_replaces);
         }
 
         [RelayCommand]
-        private void button_RegexDefault_Click()
-        {
-            RegexExpression = @"\r\n|\n";
-            RegexReplace = " ";
-
-            Update_RegexOutput();
-        }
-
-        [RelayCommand]
-        private void TextBox_regexExpression_TextChanged()
+        private void TextBox_regexExpression_TextChanged(AdditionalRegexConfig? config = null)
         {
             setting.regexExpression = RegexExpression;
             setting.regexReplace = RegexReplace;
             setting.inputRegex = InputTestRegex;
             setting.outputRegex = OutputTestRegex;
+
+            if (config != null)
+            {
+                // AdditionalRegex 컬렉션에서 config를 찾아 업데이트
+                var itemToUpdate = AdditionalRegex.FirstOrDefault(x => x.Index == config.Index);
+                if (itemToUpdate != null)
+                {
+                    itemToUpdate.RegexExpression_additional = config.RegexExpression_additional;
+                    itemToUpdate.RegexReplace_additional = config.RegexReplace_additional;
+                }
+            }
 
             Update_RegexOutput();
             Settings.ApplyLoadedSettings(setting);
@@ -215,14 +217,13 @@ namespace DeleteNewline.ViewModel
             (_, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
         }
 
-        public class AdditionalRegexConfig
+        public partial class AdditionalRegexConfig : ObservableObject
         {
-            public string label_expression { get; set; }
-            public string label_replace { get; set; }
-            public string text_textBox_addtionalRegexExpression { get; set; } = string.Empty;
-            public string text_textBox_additionalRegexReplace { get; set; } = string.Empty;
-
-            public int index { get; set; }
+            [ObservableProperty] string label_expression;
+            [ObservableProperty] string label_replace;
+            [ObservableProperty] string regexExpression_additional = string.Empty;
+            [ObservableProperty] string regexReplace_additional = string.Empty;
+            [ObservableProperty] int index;
 
             public AdditionalRegexConfig(string content_expression, string content_replace, int index_)
             {
@@ -232,24 +233,29 @@ namespace DeleteNewline.ViewModel
             }
         }
 
-        public int gp_count = 1;
+        // 이러한 Index는 Regex 개수 제한을 위해 부여하려 한 것이나, 굳이 의미가 있나 싶음.
+        // 검증해 보진 않았으나 Regex Chain 10,000 개 까지는 인텔 샐러론 Windows PC 환경에서 제대로 구동될것임.
+        // 구현할바에 풀어두는게 나을것 같아서 주석과 함께 풀어둠.
+        // 하드하게 사용하는 경우 int32 Range를 넘어서서 StackOverFlow 와 중복 제거 오류가 발생할 여지도 있음.
+        public int indexCounter_AR = 1;
 
         [RelayCommand]
         private void Button_addRegex_Click()
         {
-            AdditionalRegex.Add(new AdditionalRegexConfig("Regex " + gp_count, "Replace " + gp_count, gp_count++));
+            AdditionalRegex.Add(new AdditionalRegexConfig("Regex", "Replace", indexCounter_AR++));
         }
 
         [RelayCommand]
-        private void Button_deleteRegex_Click(object sender)
+        private void Button_deleteRegex_Click(AdditionalRegexConfig additionalRegexConfig)
         {
-            if (sender is Button { CommandParameter: AdditionalRegexConfig gpOc })
+            if (additionalRegexConfig != null)
             {
-                // machineFunction의 index 및 다른 속성에 접근할 수 있다.
-                int index = gpOc.index;
+                var itemToRemove = AdditionalRegex.FirstOrDefault(i => i.Index == additionalRegexConfig.Index);
 
-                // 이 정보를 사용하여 작업을 수행한다.
-                AdditionalRegex.Remove(AdditionalRegex.Single(i => i.index == index));
+                if (itemToRemove != null)
+                    AdditionalRegex.Remove(itemToRemove);
+
+                TextBox_regexExpression_TextChanged();
             }
         }
     }
