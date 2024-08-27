@@ -13,10 +13,7 @@ namespace DeleteNewline
             {
                 for(int i = 0; i < regexs.Count; ++i)
                 {
-                    var regex = Regex.Unescape(regexs[i]);
-                    var replace = Regex.Unescape(replaces[i]);
-
-                    text = Regex.Replace(text, regex, replace);
+                    text = Regex.Replace(text, @regexs[i], @replaces[i]);
                 }
             }
             catch (Exception)
