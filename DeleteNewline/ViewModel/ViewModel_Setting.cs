@@ -11,16 +11,29 @@ using System;
 
 namespace DeleteNewline.ViewModel
 {
+    public partial class AdditionalRegexConfig : ObservableObject
+    {
+        [ObservableProperty] string label_expression;
+        [ObservableProperty] string label_replace;
+        [ObservableProperty] string textBox_regexExpression = string.Empty;
+        [ObservableProperty] string textBox_regexReplace = string.Empty;
+        [ObservableProperty] int index;
+
+        public AdditionalRegexConfig(string content_expression, string content_replace, int index_)
+        {
+            label_expression = content_expression;
+            label_replace = content_replace;
+            index = index_;
+        }
+    }
+
     public partial class ViewModel_Setting : ObservableValidator
     {
         Settings setting;
-        KeyConverter keyConverter;
 
         public ViewModel_Setting()
         {
-            keyConverter = new KeyConverter();
             setting = Settings.GetInstance();
-
             ApplySettingFileToUI();
         }
 
@@ -52,9 +65,46 @@ namespace DeleteNewline.ViewModel
             SetKeybindUI(KeyInterop.KeyFromVirtualKey((int)Hook.key1),
                           KeyInterop.KeyFromVirtualKey((int)Hook.key2));
 
-            
+
+            if (setting.AdditionalRegexes != null)
+            {
+                foreach (var regex in setting.AdditionalRegexes)
+                {
+                    AdditionalRegex.Add(new AdditionalRegexConfig(
+                        $"Regex Expression {regex.Index}",
+                        $"Replace {regex.Index}",
+                        regex.Index)
+                    {
+                        TextBox_regexExpression = regex.RegexExpression,
+                        TextBox_regexReplace = regex.RegexReplace
+                    });
+                }
+            }
+
             UpdateRegexOutput();
         }
+
+        [RelayCommand]
+        public void SaveSettings()
+        {
+            setting.topMost = IsTopMost;
+            setting.notification = IsNotificationEnabled;
+
+            setting.regexExpression = RegexExpression;
+            setting.regexReplace = RegexReplace;
+            setting.inputTestRegex = InputTestRegex;
+            setting.outputTestRegex = OutputTestRegex;
+
+            setting.AdditionalRegexes = AdditionalRegex.Select(arc => new AdditionalRegex
+            {
+                Index = arc.Index,
+                RegexExpression = arc.TextBox_regexExpression,
+                RegexReplace = arc.TextBox_regexReplace
+            }).ToList();
+
+            Settings.CopySetting(setting);
+        }
+
 
         Key key1 = Key.None;
         Key key2 = Key.None;
@@ -130,6 +180,8 @@ namespace DeleteNewline.ViewModel
             Hook.Install();
         }
 
+        KeyConverter keyConverter = new KeyConverter();
+
         public void SetKeybindUI(Key key1, Key key2)
         {
             string key1_text;
@@ -160,31 +212,11 @@ namespace DeleteNewline.ViewModel
             {
                 foreach (var i in AdditionalRegex)
                 {
-                    regex_expressions.Add(i.RegexExpression_additional);
-                    regex_replaces.Add(i.RegexReplace_additional);
+                    regex_expressions.Add(i.TextBox_regexExpression);
+                    regex_replaces.Add(i.TextBox_regexReplace);
                 }
             }
             return (regex_expressions, regex_replaces);
-        }
-
-        [RelayCommand]
-        public void SaveSettings()
-        {
-            setting.topMost = IsTopMost;
-            setting.notification = IsNotificationEnabled;
-
-            setting.regexExpression = RegexExpression;
-            setting.regexReplace = RegexReplace;
-            setting.inputTestRegex = InputTestRegex;
-            setting.outputTestRegex = OutputTestRegex;
-
-            //// Regex Chain UI 업데이트.
-            //if (config != null && config.Index == selectedItem.Index)
-            //{
-            //    setting.AdditionalRegexes = AdditionalRegex.ToList();
-            //}
-
-            Settings.CopySetting(setting);
         }
 
         [RelayCommand]
@@ -206,22 +238,6 @@ namespace DeleteNewline.ViewModel
         {
             var regexAndReplace = GetAdditionalRegexAndReplace();
             (_, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
-        }
-
-        public partial class AdditionalRegexConfig : ObservableObject
-        {
-            [ObservableProperty] string label_expression;
-            [ObservableProperty] string label_replace;
-            [ObservableProperty] string regexExpression_additional = string.Empty;
-            [ObservableProperty] string regexReplace_additional = string.Empty;
-            [ObservableProperty] int index;
-
-            public AdditionalRegexConfig(string content_expression, string content_replace, int index_)
-            {
-                label_expression = content_expression;
-                label_replace = content_replace;
-                index = index_;
-            }
         }
 
         // 이러한 Index는 Regex 개수 제한을 위해 부여하려 한 것이나, 굳이 의미가 있나 싶음.

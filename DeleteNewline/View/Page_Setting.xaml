@@ -235,7 +235,7 @@
 
                                         <TextBox Width="235"
                                                  Height="32"
-                                                 Text="{Binding RegexExpression_additional, UpdateSourceTrigger=PropertyChanged}"
+                                                 Text="{Binding TextBox_regexExpression, UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Center"
                                                  HorizontalAlignment="Right">
 
@@ -260,7 +260,7 @@
 
                                         <TextBox Width="235"
                                                  HorizontalAlignment="Right"
-                                                 Text="{Binding RegexReplace_additional, UpdateSourceTrigger=PropertyChanged}"
+                                                 Text="{Binding TextBox_regexReplace, UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Center"
                                                  Foreground="Yellow">
 

@@ -69,7 +69,6 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void Navigate(ModernWpf.Controls.NavigationViewItemInvokedEventArgs args)
         {
-
             if (args.IsSettingsInvoked)
             {
                 CurrentPage = App.GetService<View.Page_Setting>();

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -47,19 +48,33 @@ namespace DeleteNewline
             {
                 try
                 {
-                    Settings? loadedSettings = JsonConvert.DeserializeObject<Settings>(
-                        File.ReadAllText(Settings.settingFilePath));
+                    string jsonContent = File.ReadAllText(Settings.settingFilePath);
+                    Settings? loadedSettings= JsonConvert.DeserializeObject<Settings>(jsonContent, new JsonSerializerSettings
+                    {
+                        ObjectCreationHandling = ObjectCreationHandling.Replace,
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
 
                     if (loadedSettings != null)
                     {
+                        loadedSettings.AdditionalRegexes ??= new List<AdditionalRegex>();
                         Settings.CopySetting(loadedSettings);
                     }
+                    else
+                    {
+                        throw new JsonSerializationException("Failed to deserialize settings.");
+                    }
                 }
-                catch(Newtonsoft.Json.JsonSerializationException)
+                catch (JsonSerializationException ex)
                 {
-                    MessageBox.Show("The saved JSON file is corrupted. Please delete the file or modify it, then run DeleteNewline again",
+                    MessageBox.Show($"The saved JSON file is corrupted: {ex.Message}\nPlease delete the file or modify it, then run DeleteNewline again",
                         "Delete Newline");
-
+                    Application.Current.Shutdown();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occurred while loading settings: {ex.Message}\nPlease check the settings file and try again.",
+                        "Delete Newline");
                     Application.Current.Shutdown();
                 }
             }
@@ -108,7 +123,15 @@ namespace DeleteNewline
             instance.bindKey_2 = source.bindKey_2;
             instance.regexExpression = source.regexExpression;
             instance.regexReplace = source.regexReplace;
-            
+
+            // AdditionalRegexes Deep Copy.
+            instance.AdditionalRegexes = source.AdditionalRegexes?.Select(ar => new AdditionalRegex
+            {
+                Index = ar.Index,
+                RegexExpression = ar.RegexExpression,
+                RegexReplace = ar.RegexReplace
+            }).ToList() ?? new List<AdditionalRegex>();
+
             instance.inputTestRegex = source.inputTestRegex;
             instance.outputTestRegex = source.outputTestRegex;
         }
