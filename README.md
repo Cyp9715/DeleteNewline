@@ -1,4 +1,4 @@
-The initial purpose of DeleteNewline was simply to remove newlines. However, it has now evolved into a powerful utility that combines regular expressions, global hooks, and keybinds for enhanced convenience. 
+The initial purpose of DeleteNewline was simply to remove newlines. However, it has now evolved into a useful utility program that combines regular expressions, global hooks, and keybinds for enhanced convenience. 
 
 You can specify a regular expression and apply it through `Drag + Keybind` in any program, and the final output will be placed on your clipboard.
 
