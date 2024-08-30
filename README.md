@@ -1,5 +1,6 @@
-If you paste text with newlines, the text with the newlines deleted is automatically copied to the clipboard.
+The initial purpose of DeleteNewline was simply to remove newlines. However, it has now evolved into a powerful utility that combines regular expressions, global hooks, and keybinds for enhanced convenience.
 
+You can specify a regular expression and apply it through `Drag + Keybind` in any program, and the final output will be placed on your clipboard.
 ## Introduce
 
 <p align="center">
@@ -18,12 +19,12 @@ Currently, my personal use environment stays in Windows, so there is no plan to 
 ## How to Use?
 * Copy the text and copy it to the appropriate application window.  
 * Copy the text, right-click on the appropriate program window, and then click the Paste button.  
-* Drag the text and press the **Alt + F1** button. (called Keybind)
+* Drag the text and press the **`Left Alt + F1`** button. (called Keybind)
 
-Text with the applied regular expression is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.  
+Text with the applied regular expression is located on your 'clipboard'. You can check it by using the `Win + V` key or `Ctrl + V` key.  
 Users can conveniently extract the converted string using a combination of regular expressions and keybind options.
 
-Please note that the keybind option may not run in certain programs due to permission issues. (Ex:League of Legends Client, Etc...) In this case. Run the program with administrator privileges.
+Please note that the keybind option may not run in certain programs due to permission issues. In this case run the program with administrator privileges.
 
 ## Download
 
