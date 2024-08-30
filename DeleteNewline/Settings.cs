@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using static DeleteNewline.ViewModel.ViewModel_Setting;
+using Windows.Storage;
 
 namespace DeleteNewline
 {
@@ -94,7 +94,7 @@ namespace DeleteNewline
     class Settings
     {
         private static Settings? instance;
-
+        public static readonly string settingFilePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "setting.json");
         /* 
          * Setting 파일의 존재여부를 확인하여
          * 존재하지 않는다면 기본 Setting 파일을 생성하며
@@ -134,15 +134,12 @@ namespace DeleteNewline
         }
 
         // fixed file path.
-        public const string settingFilePath = "setting.json";
-
         public static void Save()
         {
             instance ??= new Settings();
-
-            string serialized = JsonConvert.SerializeObject(instance, Formatting.Indented);
-            File.WriteAllText(settingFilePath, serialized);
+            File.WriteAllText(settingFilePath, JsonConvert.SerializeObject(instance, Formatting.Indented));
         }
+
 
         public double mainWindowSize_width { get; set; }
         public double mainWindowSize_height { get; set; }
@@ -156,7 +153,7 @@ namespace DeleteNewline
         public string regexExpression { get; set; } = String.Empty;
         public string regexReplace { get; set; } = String.Empty;
 
-        public List<AdditionalRegex> AdditionalRegexes { get; set; }
+        public List<AdditionalRegex>? AdditionalRegexes { get; set; }
 
         public string inputTestRegex { get; set; } = String.Empty;
     }
