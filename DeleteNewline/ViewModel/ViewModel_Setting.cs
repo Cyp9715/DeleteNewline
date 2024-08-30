@@ -49,13 +49,14 @@ namespace DeleteNewline.ViewModel
             RegexReplace = setting.regexReplace;
             InputTestRegex = setting.inputTestRegex;
 
-            ApplyTopMost();
-            ApplyNotifier();
+            SetTopMost();
+            SetNotifier();
 
             // 가상 키 코드를 WPF Key 타입으로 변환
             SetKeybindUI(KeyInterop.KeyFromVirtualKey((int)Hook.key1),
                           KeyInterop.KeyFromVirtualKey((int)Hook.key2));
 
+            // settings에 저장된 추가 Regex를 UI 반영
             if (setting.AdditionalRegexes != null)
             {
                 foreach (var regex in setting.AdditionalRegexes)
@@ -68,7 +69,7 @@ namespace DeleteNewline.ViewModel
                 }
             }
 
-            UpdateRegexOutput();
+            UpdateTestRegexOutput();
         }
 
         public void ReadyToSaveSetting()
@@ -79,13 +80,14 @@ namespace DeleteNewline.ViewModel
             setting.regexExpression = RegexExpression;
             setting.regexReplace = RegexReplace;
             setting.inputTestRegex = InputTestRegex;
-            setting.outputTestRegex = OutputTestRegex;
 
             setting.AdditionalRegexes = AdditionalRegex.Select(arc => new AdditionalRegex
             {
                 RegexExpression = arc.TextBox_regexExpression,
                 RegexReplace = arc.TextBox_regexReplace
             }).ToList();
+
+            UpdateTestRegexOutput();
         }
 
         Key key1 = Key.None;
@@ -202,21 +204,21 @@ namespace DeleteNewline.ViewModel
         }
 
         [RelayCommand]
-        private void ApplyTopMost()
+        private void SetTopMost()
         {
             if (Application.Current.MainWindow != null)
                 Application.Current.MainWindow.Topmost = IsTopMost;
         }
 
         [RelayCommand]
-        private void ApplyNotifier()
+        private void SetNotifier()
         {
             Hook.execute = (IsNotificationEnabled == true) ? 
                 Execute.DeleteNewline_WithNotifier : Execute.DeleteNewline_WithoutNotifier;
         }
 
         [RelayCommand]
-        public void UpdateRegexOutput()
+        public void UpdateTestRegexOutput()
         {
             var regexAndReplace = GetAllRegexAndReplace();
             (_, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
@@ -234,7 +236,7 @@ namespace DeleteNewline.ViewModel
             if (additionalRegexConfig != null)
             {
                 AdditionalRegex.Remove(additionalRegexConfig);
-                UpdateRegexOutput();
+                UpdateTestRegexOutput();
             }
         }
     }

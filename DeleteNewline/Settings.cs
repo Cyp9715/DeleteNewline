@@ -18,7 +18,7 @@ namespace DeleteNewline
         public static void Initialize()
         {
             PreventMultipleRun();
-            ApplySettingFile();
+            SetSettingFile();
             Hook.Install();
         }
 
@@ -37,7 +37,7 @@ namespace DeleteNewline
          * 존재하지 않는다면 기본 Setting 파일을 생성하며
          * 존재한다면 셋팅사항을 프로그램에 적용.
          */
-        private static void ApplySettingFile()
+        private static void SetSettingFile()
         {
             if (File.Exists(Settings.settingFilePath) == false)
             {
@@ -59,7 +59,7 @@ namespace DeleteNewline
                     if (loadedSettings != null)
                     {
                         loadedSettings.AdditionalRegexes ??= new List<AdditionalRegex>();
-                        Settings.SetSetting(loadedSettings);
+                        Settings.DeepCopy(loadedSettings);
                     }
                     else
                     {
@@ -110,10 +110,9 @@ namespace DeleteNewline
         }
 
         // Loaded Setting 호출시 깊은복사가 필요.
-        public static void SetSetting(Settings source)
+        public static void DeepCopy(Settings source)
         {
-            if (instance == null)
-                GetInstance();
+            instance ??= new Settings();
 
             instance.mainWindowSize_width = source.mainWindowSize_width;
             instance.mainWindowSize_height = source.mainWindowSize_height;
@@ -124,7 +123,7 @@ namespace DeleteNewline
             instance.regexExpression = source.regexExpression;
             instance.regexReplace = source.regexReplace;
 
-            // AdditionalRegexes Deep Copy.
+            // List DeepCopy
             instance.AdditionalRegexes = source.AdditionalRegexes?.Select(ar => new AdditionalRegex
             {
                 RegexExpression = ar.RegexExpression,
@@ -132,7 +131,6 @@ namespace DeleteNewline
             }).ToList() ?? new List<AdditionalRegex>();
 
             instance.inputTestRegex = source.inputTestRegex;
-            instance.outputTestRegex = source.outputTestRegex;
         }
 
         // fixed file path.
@@ -140,8 +138,7 @@ namespace DeleteNewline
 
         public static void Save()
         {
-            if(instance == null)
-                GetInstance();
+            instance ??= new Settings();
 
             string serialized = JsonConvert.SerializeObject(instance, Formatting.Indented);
             File.WriteAllText(settingFilePath, serialized);
@@ -162,6 +159,5 @@ namespace DeleteNewline
         public List<AdditionalRegex> AdditionalRegexes { get; set; }
 
         public string inputTestRegex { get; set; } = String.Empty;
-        public string outputTestRegex { get; set; } = String.Empty;
     }
 }

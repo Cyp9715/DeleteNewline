@@ -51,7 +51,7 @@
                         
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding ApplyTopMostCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding SetTopMostCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
 
@@ -76,7 +76,7 @@
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding ApplyNotifierCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding SetNotifierCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                         
@@ -158,7 +158,7 @@
 
                                 <b:Interaction.Triggers>
                                     <b:EventTrigger EventName="TextChanged">
-                                        <b:InvokeCommandAction Command="{Binding UpdateRegexOutputCommand}"/>
+                                        <b:InvokeCommandAction Command="{Binding UpdateTestRegexOutputCommand}"/>
                                     </b:EventTrigger>
                                 </b:Interaction.Triggers>
                                 
@@ -181,7 +181,7 @@
 
                                 <b:Interaction.Triggers>
                                     <b:EventTrigger EventName="TextChanged">
-                                        <b:InvokeCommandAction Command="{Binding UpdateRegexOutputCommand}"/>
+                                        <b:InvokeCommandAction Command="{Binding UpdateTestRegexOutputCommand}"/>
                                     </b:EventTrigger>
                                 </b:Interaction.Triggers>
 
@@ -237,7 +237,7 @@
                                             <!-- 단, 여기서 RelativeSource로 ItemControl을 지정하였으므로, 기본 DataContext인 AdditionalRegexConfig를 무시하고 ItemControl의 DataContext에 접근.-->
                                             <b:Interaction.Triggers>
                                                 <b:EventTrigger EventName="TextChanged">
-                                                    <b:InvokeCommandAction Command="{Binding DataContext.UpdateRegexOutputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    <b:InvokeCommandAction Command="{Binding DataContext.UpdateTestRegexOutputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                                            CommandParameter="{Binding}"/>
                                                 </b:EventTrigger>
                                             </b:Interaction.Triggers>
@@ -260,7 +260,7 @@
 
                                             <b:Interaction.Triggers>
                                                 <b:EventTrigger EventName="TextChanged">
-                                                    <b:InvokeCommandAction Command="{Binding DataContext.UpdateRegexOutputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    <b:InvokeCommandAction Command="{Binding DataContext.UpdateTestRegexOutputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                                            CommandParameter="{Binding}"/>
                                                 </b:EventTrigger>
                                             </b:Interaction.Triggers>
@@ -318,7 +318,7 @@
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="TextChanged">
-                                <b:InvokeCommandAction Command="{Binding UpdateRegexOutputCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding UpdateTestRegexOutputCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
 
