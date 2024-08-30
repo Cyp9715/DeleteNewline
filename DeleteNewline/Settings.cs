@@ -94,7 +94,7 @@ namespace DeleteNewline
     class Settings
     {
         private static Settings? instance;
-        public static readonly string settingFilePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "setting.json");
+        public static readonly string settingFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "setting.json");
         /* 
          * Setting 파일의 존재여부를 확인하여
          * 존재하지 않는다면 기본 Setting 파일을 생성하며

@@ -104,7 +104,7 @@ namespace DeleteNewline.ViewModel
 
             // notifyIcon 내부 ContentMenu 설정
             notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            notifyIcon.ContextMenuStrip.Items.Add("Exit DeleteNewline", null, Exit);
+            notifyIcon.ContextMenuStrip.Items.Add("Exit Delete Newline", null, Exit);
         }
     }
 }
