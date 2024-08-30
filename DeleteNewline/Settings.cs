@@ -140,7 +140,6 @@ namespace DeleteNewline
             File.WriteAllText(settingFilePath, JsonConvert.SerializeObject(instance, Formatting.Indented));
         }
 
-
         public double mainWindowSize_width { get; set; }
         public double mainWindowSize_height { get; set; }
 
