@@ -31,5 +31,5 @@ Please note that the keybind option may not run in certain programs due to permi
 
 Delete Newline is free.
 
-The executable file (exe) of Delete Newline is provided only up to version 1.2.7. However, since the executable (exe) can be built, you can use the exe version if you build it yourself.
+The executable file (exe) of Delete Newline is provided only up to version 1.2.7. However, since the executable (exe) can be built, you can use the exe version if you build it yourself.  
 Starting from version 1.3.0, it can be downloaded using the [MS Store](https://apps.microsoft.com/store/detail/delete-newline/9NC17SL0VV5S).
