@@ -20,7 +20,7 @@ namespace DeleteNewline.ViewModel
                 var originalText = ClipboardManager.GetText();
                 TextboxContent += originalText;
 
-                var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
+                var regexAndReplace = vm_setting.GetAllRegexAndReplace();
 
                 var (_, replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
                 ClipboardManager.SetText(replacedText);
@@ -39,7 +39,7 @@ namespace DeleteNewline.ViewModel
             {
                 if (ClipboardManager.ContainText() == true)
                 {
-                    var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
+                    var regexAndReplace = vm_setting.GetAllRegexAndReplace();
 
                     var (_, replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
                     ClipboardManager.SetText(replacedText);

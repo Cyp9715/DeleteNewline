@@ -7,35 +7,21 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
 
 namespace DeleteNewline.ViewModel
 {
+    // label, replace 는 default 값으로 지정.
     public partial class AdditionalRegexConfig : ObservableObject
     {
-        [ObservableProperty] string label_expression;
-        [ObservableProperty] string label_replace;
+        [ObservableProperty] string label_expression = "Regex Expression";
+        [ObservableProperty] string label_replace = "Regex Replace";
         [ObservableProperty] string textBox_regexExpression = string.Empty;
         [ObservableProperty] string textBox_regexReplace = string.Empty;
-        [ObservableProperty] int index;
-
-        public AdditionalRegexConfig(string content_expression, string content_replace, int index_)
-        {
-            label_expression = content_expression;
-            label_replace = content_replace;
-            index = index_;
-        }
     }
 
     public partial class ViewModel_Setting : ObservableValidator
     {
         Settings setting;
-
-        public ViewModel_Setting()
-        {
-            setting = Settings.GetInstance();
-            ApplySettingFileToUI();
-        }
 
         [ObservableProperty] bool isTopMost;
         [ObservableProperty] bool isNotificationEnabled;
@@ -49,9 +35,14 @@ namespace DeleteNewline.ViewModel
 
         [ObservableProperty] ObservableCollection<AdditionalRegexConfig> additionalRegex = new ObservableCollection<AdditionalRegexConfig>();
 
+        public ViewModel_Setting()
+        {
+            setting = Settings.GetInstance();
+            ApplySettingFileToUI();
+        }
+
         public void ApplySettingFileToUI()
         {
-            // topMost
             IsTopMost = setting.topMost;
             IsNotificationEnabled = setting.notification;
             RegexExpression = setting.regexExpression;
@@ -65,15 +56,11 @@ namespace DeleteNewline.ViewModel
             SetKeybindUI(KeyInterop.KeyFromVirtualKey((int)Hook.key1),
                           KeyInterop.KeyFromVirtualKey((int)Hook.key2));
 
-
             if (setting.AdditionalRegexes != null)
             {
                 foreach (var regex in setting.AdditionalRegexes)
                 {
-                    AdditionalRegex.Add(new AdditionalRegexConfig(
-                        $"Regex Expression {regex.Index}",
-                        $"Replace {regex.Index}",
-                        regex.Index)
+                    AdditionalRegex.Add(new AdditionalRegexConfig()
                     {
                         TextBox_regexExpression = regex.RegexExpression,
                         TextBox_regexReplace = regex.RegexReplace
@@ -84,8 +71,7 @@ namespace DeleteNewline.ViewModel
             UpdateRegexOutput();
         }
 
-        [RelayCommand]
-        public void SaveSettings()
+        public void ReadyToSaveSetting()
         {
             setting.topMost = IsTopMost;
             setting.notification = IsNotificationEnabled;
@@ -97,14 +83,10 @@ namespace DeleteNewline.ViewModel
 
             setting.AdditionalRegexes = AdditionalRegex.Select(arc => new AdditionalRegex
             {
-                Index = arc.Index,
                 RegexExpression = arc.TextBox_regexExpression,
                 RegexReplace = arc.TextBox_regexReplace
             }).ToList();
-
-            Settings.CopySetting(setting);
         }
-
 
         Key key1 = Key.None;
         Key key2 = Key.None;
@@ -200,7 +182,7 @@ namespace DeleteNewline.ViewModel
             }
         }
 
-        public (List<string>, List<string>) GetAdditionalRegexAndReplace()
+        public (List<string>, List<string>) GetAllRegexAndReplace()
         {
             List<string> regex_expressions = new List<string>();
             List<string> regex_replaces = new List<string>();
@@ -236,20 +218,14 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         public void UpdateRegexOutput()
         {
-            var regexAndReplace = GetAdditionalRegexAndReplace();
+            var regexAndReplace = GetAllRegexAndReplace();
             (_, OutputTestRegex) = RegexManager.Replace(InputTestRegex, regexAndReplace.Item1, regexAndReplace.Item2);
         }
 
-        // 이러한 Index는 Regex 개수 제한을 위해 부여하려 한 것이나, 굳이 의미가 있나 싶음.
-        // 검증해 보진 않았으나 Regex Chain 10,000 개 까지는 인텔 샐러론 Windows PC 환경에서 제대로 구동될것임.
-        // 구현할바에 풀어두는게 나을것 같아서 주석과 함께 풀어둠.
-        // 하드하게 사용하는 경우 int32 Range를 넘어서서 StackOverFlow 와 중복 제거 오류가 발생할 여지도 있음.
-        public int indexCounter_AR = 1;
-
         [RelayCommand]
-        private void Button_addRegex_Click()
+        private void AddAdditionalRegex()
         {
-            AdditionalRegex.Add(new AdditionalRegexConfig("Regex Expression", "Replace", indexCounter_AR++));
+            AdditionalRegex.Add(new AdditionalRegexConfig());
         }
 
         [RelayCommand]

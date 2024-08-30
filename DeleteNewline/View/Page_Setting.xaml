@@ -11,12 +11,6 @@
       Title="Page_Setting"
       KeyboardNavigation.TabNavigation="None">
 
-    <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Unloaded">
-            <b:InvokeCommandAction Command="{Binding SaveSettingsCommand}"/>
-        </b:EventTrigger>
-    </b:Interaction.Triggers>
-
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Auto">
         <Grid>
@@ -208,7 +202,7 @@
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding Button_addRegex_ClickCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding AddAdditionalRegexCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                     </Button>
@@ -330,7 +324,7 @@
 
                     </TextBox>
 
-                        <TextBlock Grid.Row="1"
+                    <TextBlock Grid.Row="1"
                                IsHitTestVisible="False"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
@@ -367,23 +361,6 @@
                              Text="{Binding OutputTestRegex}"
                              ToolTip="{StaticResource toolTipText_outputRegex}" />
                 </Grid>
-
-                <Button x:Name="Button_Save"
-                            Grid.Column="1"
-                            Width="100"
-                            Height="30"
-                            Margin="{StaticResource margin_internalRegex}"
-                            Content="Save"
-                            HorizontalAlignment="Center">
-
-                    <b:Interaction.Triggers>
-                        <b:EventTrigger EventName="Click">
-                            <b:InvokeCommandAction Command="{Binding SaveSettingsCommand}"/>
-                        </b:EventTrigger>
-                    </b:Interaction.Triggers>
-                </Button>
-
-
             </StackPanel>
 
 

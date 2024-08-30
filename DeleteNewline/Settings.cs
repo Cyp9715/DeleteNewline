@@ -49,16 +49,17 @@ namespace DeleteNewline
                 try
                 {
                     string jsonContent = File.ReadAllText(Settings.settingFilePath);
-                    Settings? loadedSettings= JsonConvert.DeserializeObject<Settings>(jsonContent, new JsonSerializerSettings
+
+                    Settings? loadedSettings = JsonConvert.DeserializeObject<Settings>(jsonContent, new JsonSerializerSettings
                     {
+                        // ObjectCreationHandling.Replace를 사용하여 기존 객체를 새로운 객체로 대체
                         ObjectCreationHandling = ObjectCreationHandling.Replace,
-                        NullValueHandling = NullValueHandling.Ignore
                     });
 
                     if (loadedSettings != null)
                     {
                         loadedSettings.AdditionalRegexes ??= new List<AdditionalRegex>();
-                        Settings.CopySetting(loadedSettings);
+                        Settings.SetSetting(loadedSettings);
                     }
                     else
                     {
@@ -86,7 +87,6 @@ namespace DeleteNewline
 
     public class AdditionalRegex
     {
-        public int Index { get; set; }
         public string RegexExpression { get; set; } = string.Empty;
         public string RegexReplace { get; set; } = string.Empty;
     }
@@ -110,7 +110,7 @@ namespace DeleteNewline
         }
 
         // Loaded Setting 호출시 깊은복사가 필요.
-        public static void CopySetting(Settings source)
+        public static void SetSetting(Settings source)
         {
             if (instance == null)
                 GetInstance();
@@ -127,7 +127,6 @@ namespace DeleteNewline
             // AdditionalRegexes Deep Copy.
             instance.AdditionalRegexes = source.AdditionalRegexes?.Select(ar => new AdditionalRegex
             {
-                Index = ar.Index,
                 RegexExpression = ar.RegexExpression,
                 RegexReplace = ar.RegexReplace
             }).ToList() ?? new List<AdditionalRegex>();
@@ -136,6 +135,7 @@ namespace DeleteNewline
             instance.outputTestRegex = source.outputTestRegex;
         }
 
+        // fixed file path.
         public const string settingFilePath = "setting.json";
 
         public static void Save()
