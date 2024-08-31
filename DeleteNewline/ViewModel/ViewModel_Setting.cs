@@ -14,7 +14,7 @@ namespace DeleteNewline.ViewModel
     public partial class AdditionalRegexConfig : ObservableObject
     {
         [ObservableProperty] string label_expression = "Regex Expression";
-        [ObservableProperty] string label_replace = "Regex Replace";
+        [ObservableProperty] string label_replace = "Replace";
         [ObservableProperty] string textBox_regexExpression = string.Empty;
         [ObservableProperty] string textBox_regexReplace = string.Empty;
     }
