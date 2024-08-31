@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using Windows.Storage;
 
 namespace DeleteNewline
 {
@@ -94,7 +93,7 @@ namespace DeleteNewline
     class Settings
     {
         private static Settings? instance;
-        public static readonly string settingFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "setting.json");
+        public static readonly string settingFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "settings.json");
         /* 
          * Setting 파일의 존재여부를 확인하여
          * 존재하지 않는다면 기본 Setting 파일을 생성하며

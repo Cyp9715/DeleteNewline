@@ -13,7 +13,7 @@
         Width="{Binding MainWindowSize_width, Mode=TwoWay}"
         Height="{Binding MainWindowSize_height, Mode=TwoWay}"
         MinWidth="650"
-        MinHeight="365"
+        MinHeight="800"
         Visibility="{Binding WindowVisibility, Mode=TwoWay}">
 
     <b:Interaction.Triggers>
