@@ -20,9 +20,9 @@ Currently, my personal use environment stays in Windows, so there is no plan to 
 ## How to Use?
 * Copy the text and copy it to the appropriate application window.  
 * Copy the text, right-click on the appropriate program window, and then click the Paste button.  
-* **Drag the text and press the `Left Alt + F1` button. (called Keybind)**
+* **Drag the text and press the `Left Alt + F1` button. (It works with any draggable program on your PC.)**
 
-Text with the applied regular expression is located on your 'clipboard'. You can check it by using the `Win + V` key or `Ctrl + V` key.  
+Text with the applied regular expression is located on your 'clipboard'. You can check it by using the `Win + V` key or `Ctrl + V` key. 
 Users can conveniently extract the converted string using a combination of regular expressions and keybind options.
 
 Please note that the keybind option may not run in certain programs due to permission issues. In this case run the program with administrator privileges.
