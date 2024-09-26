@@ -5,7 +5,7 @@ You can specify a regular expression and apply it through `Drag + Keybind` in an
 ## Introduce
 
 <p align="center">
-<img width="488" alt="제목 없음" src="https://github.com/user-attachments/assets/93a808f3-c98e-4362-bfc6-c0f5a9a7432e">
+<img width="488" alt="Untitled" src="https://github.com/user-attachments/assets/70103785-c9c5-41d0-80a7-d99b3d3cc60b">
 </p>
 
 This app allows you to conveniently apply regular expressions.  
