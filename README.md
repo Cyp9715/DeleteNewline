@@ -34,6 +34,8 @@ Delete Newline is free.
 The .exe of Delete Newline is provided only up to version 1.2.7. However, since the .exe can be built, you can use the exe version if you build it yourself. Starting from version 1.3.0, it can be downloaded using the MS Store.
 
 <!-- display an HTML-only app badge. Useful when you can't execute JS, such as in Github markdown pages -->
+<p align="center">
 <a href="https://apps.microsoft.com/detail/9nc17sl0vv5s?mode=direct">
 	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
 </a>
+</p>
