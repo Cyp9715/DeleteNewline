@@ -1,0 +1,45 @@
+<Page
+    x:Class="Delete_Newline.Views.MemoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity">
+
+    <ScrollViewer>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Memo Page의 설정을 위한 영역 -->
+            <StackPanel Grid.Row="0" Grid.ColumnSpan="2" 
+                    Padding="10"
+                    MaxWidth="500"
+                    HorizontalAlignment="Stretch">
+
+                <Grid>
+                    <TextBlock x:Uid="MemoPage_AutoCopy" Padding="10" />
+                    <CheckBox HorizontalAlignment="Right" Style="{StaticResource Compact}"/>
+                </Grid>
+            </StackPanel>
+
+            <TextBox x:Name="TextBox_Input"
+                     Grid.Row="1"
+                     Grid.Column="0"
+                     TextWrapping="Wrap"
+                     Margin="15,0,5,10"/>
+            <TextBox x:Name="TextBox_Output"
+                     Grid.Row="1"
+                     Grid.Column="1"
+                     TextWrapping="Wrap"
+                     IsReadOnly="True"
+                     Margin="5,0,15,10"/>
+        </Grid>
+    </ScrollViewer>
+</Page>

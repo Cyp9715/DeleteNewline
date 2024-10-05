@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Delete Newline (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Delete Newline (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

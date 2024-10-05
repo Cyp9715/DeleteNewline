@@ -1,0 +1,63 @@
+<Page
+    x:Class="Delete_Newline.Views.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:helpers="using:Delete_Newline.Helpers"
+    xmlns:behaviors="using:Delete_Newline.Behaviors"
+    xmlns:i="using:Microsoft.Xaml.Interactivity">
+
+    <Grid>
+        <Grid x:Name="AppTitleBar"
+              Height="{Binding ElementName=NavigationViewControl, Path=CompactPaneLength}"
+              IsHitTestVisible="True"
+              VerticalAlignment="Top">
+            <Image Source="/Assets/favicon_64x64.ico"
+                   HorizontalAlignment="Left"
+                   Width="16"
+                   Height="16" />
+            <TextBlock x:Name="AppTitleBarText"
+                       VerticalAlignment="Center"
+                       TextWrapping="NoWrap"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Margin="28,0,0,0"/>
+        </Grid>
+        
+        <NavigationView
+            x:Name="NavigationViewControl"
+            IsBackButtonVisible="Visible"
+            IsSettingsVisible="False"
+            IsBackEnabled="{x:Bind ViewModel.IsBackEnabled, Mode=OneWay}"
+            SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}"
+            PaneDisplayMode="LeftCompact"
+            DisplayModeChanged="NavigationViewControl_DisplayModeChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Uid="Shell_Memo" helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.MemoViewModel">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE70B;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <!--
+                Settings 페이지를 WinUI 에서 자체 처리 (IsSettingsVisible True) 하면 
+                자동으로 한글 설정되고, 이를 Xaml 단에서 변경할 수 없는것으로 추측됨.
+                때문에 직접 FooterMenuItems를 통해 Settings Page를 추가하였음.
+            -->
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem x:Uid="Shell_Settings" helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.SettingsViewModel">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE713;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+
+            <Grid Margin="{StaticResource NavigationViewPageContentMargin}">
+                <Frame x:Name="NavigationFrame" />
+            </Grid>
+        </NavigationView>
+    </Grid>
+    
+</Page>

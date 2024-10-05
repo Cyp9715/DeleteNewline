@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en-US" target-language="ko-KR" original="DELETE NEWLINE/STRINGS/EN-US/RESOURCES.RESW" tool-id="MultilingualAppToolkit" product-name="n/a" product-version="n/a" build-num="n/a">
+    <header>
+      <tool tool-id="MultilingualAppToolkit" tool-name="Multilingual App Toolkit" tool-version="1.0.0.0" tool-company="Microsoft" />
+    </header>
+    <body>
+      <group id="DELETE NEWLINE/STRINGS/EN-US/RESOURCES.RESW" datatype="resx">
+        <trans-unit id="AppDisplayName" translate="yes" xml:space="preserve">
+          <source>Delete Newline</source>
+          <target state="new">Delete Newline</target>
+        </trans-unit>
+        <trans-unit id="Shell_Memo.Content" translate="yes" xml:space="preserve">
+          <source>Memo</source>
+          <target state="translated">메모</target>
+        </trans-unit>
+        <trans-unit id="Settings_Theme.Text" translate="yes" xml:space="preserve">
+          <source>Theme</source>
+          <target state="translated">테마</target>
+        </trans-unit>
+        <trans-unit id="Settings_Theme_Light.Content" translate="yes" xml:space="preserve">
+          <source>Light</source>
+          <target state="translated">라이트</target>
+        </trans-unit>
+        <trans-unit id="Settings_Theme_Dark.Content" translate="yes" xml:space="preserve">
+          <source>Dark</source>
+          <target state="translated">다크</target>
+        </trans-unit>
+        <trans-unit id="Settings_Theme_Default.Content" translate="yes" xml:space="preserve">
+          <source>Default</source>
+          <target state="translated">기본</target>
+        </trans-unit>
+        <trans-unit id="MemoPage_AutoCopy.Text" translate="yes" xml:space="preserve">
+          <source>Auto Copy to Clipboard</source>
+          <target state="translated">클립보드로 자동복사</target>
+        </trans-unit>
+        <trans-unit id="MemoPage_Title" translate="yes" xml:space="preserve">
+          <source>Memo</source>
+          <target state="translated">메모</target>
+        </trans-unit>
+        <trans-unit id="Shell_Settings.Content" translate="yes" xml:space="preserve">
+          <source>Settings</source>
+          <target state="translated">설정</target>
+        </trans-unit>
+        <trans-unit id="Settings_Language.Text" translate="yes" xml:space="preserve">
+          <source>Language</source>
+          <target state="translated">언어</target>
+        </trans-unit>
+        <trans-unit id="Settings_StartOnTray.Text" translate="yes" xml:space="preserve">
+          <source>Start on Tray</source>
+          <target state="translated">트레이에서 시작</target>
+        </trans-unit>
+      </group>
+    </body>
+  </file>
+</xliff>
