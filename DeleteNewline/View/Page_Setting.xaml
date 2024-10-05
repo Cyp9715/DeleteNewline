@@ -11,12 +11,6 @@
       Title="Page_Setting"
       KeyboardNavigation.TabNavigation="None">
 
-    <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Unloaded">
-            <b:InvokeCommandAction Command="{Binding SaveSettingsCommand}"/>
-        </b:EventTrigger>
-    </b:Interaction.Triggers>
-
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Auto">
         <Grid>
@@ -57,7 +51,7 @@
                         
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding ApplyTopMostCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding SetTopMostCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
 
@@ -82,7 +76,7 @@
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding ApplyNotifierCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding SetNotifierCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                         
@@ -164,7 +158,7 @@
 
                                 <b:Interaction.Triggers>
                                     <b:EventTrigger EventName="TextChanged">
-                                        <b:InvokeCommandAction Command="{Binding UpdateRegexOutputCommand}"/>
+                                        <b:InvokeCommandAction Command="{Binding UpdateTestRegexOutputCommand}"/>
                                     </b:EventTrigger>
                                 </b:Interaction.Triggers>
                                 
@@ -187,7 +181,7 @@
 
                                 <b:Interaction.Triggers>
                                     <b:EventTrigger EventName="TextChanged">
-                                        <b:InvokeCommandAction Command="{Binding UpdateRegexOutputCommand}"/>
+                                        <b:InvokeCommandAction Command="{Binding UpdateTestRegexOutputCommand}"/>
                                     </b:EventTrigger>
                                 </b:Interaction.Triggers>
 
@@ -208,7 +202,7 @@
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding Button_addRegex_ClickCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding AddAdditionalRegexCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                     </Button>
@@ -235,7 +229,7 @@
 
                                         <TextBox Width="235"
                                                  Height="32"
-                                                 Text="{Binding RegexExpression_additional, UpdateSourceTrigger=PropertyChanged}"
+                                                 Text="{Binding TextBox_regexExpression, UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Center"
                                                  HorizontalAlignment="Right">
 
@@ -243,7 +237,7 @@
                                             <!-- 단, 여기서 RelativeSource로 ItemControl을 지정하였으므로, 기본 DataContext인 AdditionalRegexConfig를 무시하고 ItemControl의 DataContext에 접근.-->
                                             <b:Interaction.Triggers>
                                                 <b:EventTrigger EventName="TextChanged">
-                                                    <b:InvokeCommandAction Command="{Binding DataContext.UpdateRegexOutputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    <b:InvokeCommandAction Command="{Binding DataContext.UpdateTestRegexOutputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                                            CommandParameter="{Binding}"/>
                                                 </b:EventTrigger>
                                             </b:Interaction.Triggers>
@@ -260,13 +254,13 @@
 
                                         <TextBox Width="235"
                                                  HorizontalAlignment="Right"
-                                                 Text="{Binding RegexReplace_additional, UpdateSourceTrigger=PropertyChanged}"
+                                                 Text="{Binding TextBox_regexReplace, UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Center"
                                                  Foreground="Yellow">
 
                                             <b:Interaction.Triggers>
                                                 <b:EventTrigger EventName="TextChanged">
-                                                    <b:InvokeCommandAction Command="{Binding DataContext.UpdateRegexOutputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    <b:InvokeCommandAction Command="{Binding DataContext.UpdateTestRegexOutputCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                                            CommandParameter="{Binding}"/>
                                                 </b:EventTrigger>
                                             </b:Interaction.Triggers>
@@ -324,13 +318,13 @@
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="TextChanged">
-                                <b:InvokeCommandAction Command="{Binding UpdateRegexOutputCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding UpdateTestRegexOutputCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
 
                     </TextBox>
 
-                        <TextBlock Grid.Row="1"
+                    <TextBlock Grid.Row="1"
                                IsHitTestVisible="False"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
@@ -367,23 +361,6 @@
                              Text="{Binding OutputTestRegex}"
                              ToolTip="{StaticResource toolTipText_outputRegex}" />
                 </Grid>
-
-                <Button x:Name="Button_Save"
-                            Grid.Column="1"
-                            Width="100"
-                            Height="30"
-                            Margin="{StaticResource margin_internalRegex}"
-                            Content="Save"
-                            HorizontalAlignment="Center">
-
-                    <b:Interaction.Triggers>
-                        <b:EventTrigger EventName="Click">
-                            <b:InvokeCommandAction Command="{Binding SaveSettingsCommand}"/>
-                        </b:EventTrigger>
-                    </b:Interaction.Triggers>
-                </Button>
-
-
             </StackPanel>
 
 

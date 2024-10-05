@@ -13,14 +13,14 @@ namespace DeleteNewline.ViewModel
         [ObservableProperty] private string? textboxContent;
 
         [RelayCommand]
-        private void Textbox_MenuItemPaste()
+        private void MenuItem_Paste_Click()
         {
             if (ClipboardManager.ContainText() == true)
             {
                 var originalText = ClipboardManager.GetText();
                 TextboxContent += originalText;
 
-                var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
+                var regexAndReplace = vm_setting.GetAllRegexAndReplace();
 
                 var (_, replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
                 ClipboardManager.SetText(replacedText);
@@ -33,13 +33,13 @@ namespace DeleteNewline.ViewModel
         }
 
         [RelayCommand]
-        private void Textbox_KeyUp(KeyEventArgs e)
+        private void Textbox_Ctrl_V_KeyUp(KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V || Keyboard.IsKeyDown(Key.V) && e.Key == Key.LeftCtrl)
             {
                 if (ClipboardManager.ContainText() == true)
                 {
-                    var regexAndReplace = vm_setting.GetAdditionalRegexAndReplace();
+                    var regexAndReplace = vm_setting.GetAllRegexAndReplace();
 
                     var (_, replacedText) = ClipboardManager.ReplaceText(regexAndReplace.Item1, regexAndReplace.Item2);
                     ClipboardManager.SetText(replacedText);

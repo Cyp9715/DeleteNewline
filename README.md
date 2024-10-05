@@ -1,47 +1,35 @@
-If you paste text with newlines, the text with the newlines deleted is automatically copied to the clipboard.
+The initial purpose of DeleteNewline was simply to remove newlines. However, it has now evolved into a useful utility program that combines regular expressions, global hooks, and keybinds for enhanced convenience. 
+
+You can specify a regular expression and apply it through `Drag + Keybind` in any program, and the final output will be placed on your clipboard.
 
 ## Introduce
 
-<img src=https://i.imgur.com/B5RI2uF.png>
+<p align="center">
+<img width="488" alt="제목 없음" src="https://github.com/user-attachments/assets/93a808f3-c98e-4362-bfc6-c0f5a9a7432e">
+</p>
 
-It is often necessary to insert the PDF text into a translator unless the research paper is written in your language.  
-Unfortunately, PDFs have newlines that prevent translator from recognizing the text.  
-this project was created to easily delete these newline characters.
-
+This app allows you to conveniently apply regular expressions.  
 You can use other programs or websites, but the convenience provided by DeleteNewline will be the best.
 
 ## Release environment
-* OS : Windows  
+* OS : Windows(10, 11)
 * .NET : 8.0 LTS
 
-Currently, my personal use environment stays in Windows, so there is no plan to support MAC environment.
+Currently, my personal use environment stays in Windows, so there is no plan to support MAC, Linux environment.
 
 ## How to Use?
 * Copy the text and copy it to the appropriate application window.  
 * Copy the text, right-click on the appropriate program window, and then click the Paste button.  
-* Drag the text and press the **Alt + F1** button. (called keybind)
+* **Drag the text and press the `Left Alt + F1` button. (called Keybind)**
 
-Text with Newline removed is located on your 'clipboard'. You can check it by using the Win + V key or Ctrl + V key.
-
-Additionally supports the Delete Newline regular expression.  
+Text with the applied regular expression is located on your 'clipboard'. You can check it by using the `Win + V` key or `Ctrl + V` key.  
 Users can conveniently extract the converted string using a combination of regular expressions and keybind options.
 
-Please note that the keybind option may not run in certain programs due to permission issues. (Ex:League of Legends Client, Etc...) In this case. Run the program with administrator privileges.
+Please note that the keybind option may not run in certain programs due to permission issues. In this case run the program with administrator privileges.
 
 ## Download
 
 Delete Newline is free.
 
-The executable file (exe) of Delete Newline is provided only up to version 1.2.7.  
+The executable file (exe) of Delete Newline is provided only up to version 1.2.7. However, since the executable (exe) can be built, you can use the exe version if you build it yourself.  
 Starting from version 1.3.0, it can be downloaded using the [MS Store](https://apps.microsoft.com/store/detail/delete-newline/9NC17SL0VV5S).
-
-## sneak peek Ver 2.0
-
-You will be able to apply Regex in Chain form as shown below.  
-
-![image](https://github.com/Cyp9715/DeleteNewline/assets/16573620/448f17f4-3ff8-4767-bb14-a487609c2061)
-
-The problem is that I am late in updating this due to my personal schedule.  
-If you are a programmer, you can use the feature by cloning and building the latest version.
-
-I plan to optimize the code written to date in version 1.4.0 and fix all bugs if possible, so it could be completed in the second half of 2024.

@@ -54,7 +54,7 @@ namespace DeleteNewline
 
             Genesis.Initialize(); // 초기설정 지정
 
-            // Delete Newline 은 시작과 동시에 Hidden.
+            // Delete Newline은 시작과 동시에 Hidden.
             //mainWindow.Show();
         }
 

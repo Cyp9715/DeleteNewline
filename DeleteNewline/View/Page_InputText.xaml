@@ -27,7 +27,7 @@
 
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="KeyUp">
-                    <b:InvokeCommandAction Command="{Binding Textbox_KeyUpCommand}" 
+                    <b:InvokeCommandAction Command="{Binding Textbox_Ctrl_V_KeyUpCommand}" 
                                            PassEventArgsToCommand="True"/>
                 </b:EventTrigger>
             </b:Interaction.Triggers>
@@ -42,7 +42,7 @@
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="Click">
-                                <b:InvokeCommandAction Command="{Binding Textbox_MenuItemPasteCommand}"/>
+                                <b:InvokeCommandAction Command="{Binding MenuItem_Paste_ClickCommand}"/>
                             </b:EventTrigger>
                         </b:Interaction.Triggers>
                     </MenuItem>

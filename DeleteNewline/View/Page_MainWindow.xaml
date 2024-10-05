@@ -12,8 +12,8 @@
         Title="Delete Newline"
         Width="{Binding MainWindowSize_width, Mode=TwoWay}"
         Height="{Binding MainWindowSize_height, Mode=TwoWay}"
-        MinWidth="650"
-        MinHeight="365"
+        MinWidth="450"
+        MinHeight="450"
         Visibility="{Binding WindowVisibility, Mode=TwoWay}">
 
     <b:Interaction.Triggers>

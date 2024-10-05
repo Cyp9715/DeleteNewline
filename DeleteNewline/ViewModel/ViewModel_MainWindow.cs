@@ -25,18 +25,6 @@ namespace DeleteNewline.ViewModel
             InitNotifyIcon();
         }
 
-        public void Exit(object? sender, EventArgs e)
-        {
-            // window 사이즈를 비롯한 setting 정보를 파일에 저장.
-            setting.mainWindowSize_width = MainWindowSize_width;
-            setting.mainWindowSize_height = MainWindowSize_height;
-
-            Settings.CopySetting(setting);
-            Settings.Save();
-
-            System.Environment.Exit(0);
-        }
-
         [RelayCommand]
         private void WindowLoaded(RoutedEventArgs e)
         {
@@ -51,14 +39,24 @@ namespace DeleteNewline.ViewModel
             CurrentPage = App.GetService<View.Page_InputText>();
         }
 
-        [RelayCommand]
-        private void WindowClosing(CancelEventArgs e)
+        public void Exit(object? sender, EventArgs e)
         {
-            // 설정 저장
             setting.mainWindowSize_width = MainWindowSize_width;
             setting.mainWindowSize_height = MainWindowSize_height;
 
-            Settings.CopySetting(setting);
+            App.GetService<ViewModel_Setting>().ReadyToSaveSetting();
+            Settings.Save();
+
+            System.Environment.Exit(0);
+        }
+
+        [RelayCommand]
+        private void WindowClosing(CancelEventArgs e)
+        {
+            setting.mainWindowSize_width = MainWindowSize_width;
+            setting.mainWindowSize_height = MainWindowSize_height;
+
+            App.GetService<ViewModel_Setting>().ReadyToSaveSetting();
             Settings.Save();
 
             // 창 닫기 취소(프로세스 종료방지) 및 숨기기
@@ -69,7 +67,6 @@ namespace DeleteNewline.ViewModel
         [RelayCommand]
         private void Navigate(ModernWpf.Controls.NavigationViewItemInvokedEventArgs args)
         {
-
             if (args.IsSettingsInvoked)
             {
                 CurrentPage = App.GetService<View.Page_Setting>();
@@ -107,7 +104,7 @@ namespace DeleteNewline.ViewModel
 
             // notifyIcon 내부 ContentMenu 설정
             notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            notifyIcon.ContextMenuStrip.Items.Add("Exit DeleteNewline", null, Exit);
+            notifyIcon.ContextMenuStrip.Items.Add("Exit Delete Newline", null, Exit);
         }
     }
 }
