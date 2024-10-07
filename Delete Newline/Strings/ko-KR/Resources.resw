@@ -42,4 +42,7 @@
   <data name="Settings_StartOnTray.Text" xml:space="preserve">
     <value>트레이에서 시작</value>
   </data>
+  <data name="Settings_Notification.Text" xml:space="preserve">
+    <value>알림</value>
+  </data>
 </root>

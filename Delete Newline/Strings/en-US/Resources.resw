@@ -150,4 +150,7 @@
   <data name="Settings_StartOnTray.Text" xml:space="preserve">
     <value>Start on Tray</value>
   </data>
+  <data name="Settings_Notification.Text" xml:space="preserve">
+    <value>Notification</value>
+  </data>
 </root>

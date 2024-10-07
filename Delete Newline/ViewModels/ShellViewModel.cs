@@ -3,7 +3,6 @@
 using Microsoft.UI.Xaml.Navigation;
 
 using Delete_Newline.Contracts.Services;
-using Delete_Newline.Views;
 
 namespace Delete_Newline.ViewModels;
 
@@ -13,7 +12,7 @@ public partial class ShellViewModel : ObservableRecipient
     private bool isBackEnabled;
 
     [ObservableProperty]
-    private object? selected;
+    private object? selectedItem;
 
     public INavigationService NavigationService
     {
@@ -32,20 +31,16 @@ public partial class ShellViewModel : ObservableRecipient
         NavigationViewService = navigationViewService;
     }
 
+    private bool _isInitialNavigation = true;
+
     private void OnNavigated(object sender, NavigationEventArgs e)
     {
         IsBackEnabled = NavigationService.CanGoBack;
 
-        if (e.SourcePageType == typeof(SettingsPage))
+        if (_isInitialNavigation)
         {
-            Selected = NavigationViewService.SettingsItem;
-            return;
-        }
-
-        var selectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
-        if (selectedItem != null)
-        {
-            Selected = selectedItem;
+            SelectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
+            _isInitialNavigation = false;
         }
     }
 }

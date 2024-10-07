@@ -15,12 +15,7 @@ public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
-
-    [ObservableProperty]
-    private string _selectedTheme;
-
-    [ObservableProperty]
-    private LanguageItem _selectedLanguage;
+    private readonly INotificationService _notificationService;
 
     [ObservableProperty]
     private bool _isLocalizationChanged;
@@ -31,15 +26,29 @@ public partial class SettingsViewModel : ObservableRecipient
     [ObservableProperty]
     private List<LanguageItem> _availableLanguages;
 
-    public SettingsViewModel(ILocalizationService localizationService, IThemeSelectorService themeSelectorService)
+    [ObservableProperty]
+    private LanguageItem _selectedLanguage;
+
+    [ObservableProperty]
+    private string _selectedTheme;
+
+    [ObservableProperty]
+    private bool _enableNotification;
+
+    public SettingsViewModel(ILocalizationService localizationService, IThemeSelectorService themeSelectorService, INotificationService notificationService)
     {
         _localizationService = localizationService;
         _themeSelectorService = themeSelectorService;
+        _notificationService = notificationService;
 
         AvailableLanguages = _localizationService.Languages;
         SelectedLanguage = _localizationService.GetCurrentLanguageItem();
         SelectedTheme = _themeSelectorService.Theme.ToString();
         _versionDescription = GetVersionDescription();
+        _enableNotification = _notificationService.GetEnableNotification();
+
+        // test
+        _notificationService.ShowNotification("Title", "this is test message");
     }
 
     [RelayCommand]
@@ -56,6 +65,13 @@ public partial class SettingsViewModel : ObservableRecipient
     {
         await _localizationService.SetLanguageAsync(param);
         IsLocalizationChanged = true;
+    }
+
+    [RelayCommand]
+    private async Task ToggleNotificationAsync(bool isChecked)
+    {
+        EnableNotification = isChecked;
+        await _notificationService.SetEnableNotificationAsync(isChecked);
     }
 
     private static string GetVersionDescription()

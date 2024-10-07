@@ -66,6 +66,23 @@
                         </behaviors:Interaction.Behaviors>
                     </ComboBox>
                 </Grid>
+
+                <Grid Padding="0,0,20,10">
+                    <TextBlock x:Uid="Settings_Notification"/>
+                    <CheckBox x:Name="NotificationCheckBox"
+                              IsChecked="{x:Bind ViewModel.EnableNotification}" 
+                              HorizontalAlignment="Right" 
+                              Style="{StaticResource Compact}">
+
+                        <behaviors:Interaction.Behaviors>
+                            <core:EventTriggerBehavior EventName="Click">
+                                <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleNotificationCommand}" 
+                                      CommandParameter="{Binding IsChecked, ElementName=NotificationCheckBox}"/>
+                            </core:EventTriggerBehavior>
+                        </behaviors:Interaction.Behaviors>
+
+                    </CheckBox>
+                </Grid>
             </StackPanel>
 
             <TextBlock

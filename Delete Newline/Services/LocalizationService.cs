@@ -6,7 +6,7 @@ namespace Delete_Newline.Services;
 
 public class LocalizationService : ILocalizationService
 {
-    private const string LocalizationTagSettingsKey = "AppBackgroundRequestedLocalization";
+    private const string LocalizationTagSettingsKey = "LocalizationTagKey";
     private readonly ILocalSettingsService _localSettingsService;
 
     private readonly ResourceManager _resourceManager;
@@ -27,7 +27,7 @@ public class LocalizationService : ILocalizationService
     {
         RegisterLanguageFromResource();
 
-        string languageTag = await GetLanguageTagFromSettingsAsync();
+        string? languageTag = await _localSettingsService.ReadSettingAsync<string>(LocalizationTagSettingsKey);
 
         if (languageTag is not null && GetLanguageItem(languageTag) is LanguageItem languageItem)
         {
@@ -58,11 +58,6 @@ public class LocalizationService : ILocalizationService
     {
         return Languages.FirstOrDefault(item => item.Tag == languageTag)
                 ?? Languages.First(item => item.Tag == "en-US");
-    }
-
-    private async Task<string> GetLanguageTagFromSettingsAsync()
-    {
-        return await _localSettingsService.ReadSettingAsync<string>(LocalizationTagSettingsKey);
     }
 
     private void RegisterLanguageFromResource()

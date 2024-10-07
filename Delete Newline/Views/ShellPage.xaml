@@ -28,12 +28,13 @@
             x:Name="NavigationViewControl"
             IsBackButtonVisible="Visible"
             IsSettingsVisible="False"
-            IsBackEnabled="{x:Bind ViewModel.IsBackEnabled, Mode=OneWay}"
-            SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}"
+            IsBackEnabled="{x:Bind ViewModel.IsBackEnabled}"
+            SelectedItem="{x:Bind ViewModel.SelectedItem}"
             PaneDisplayMode="LeftCompact"
             DisplayModeChanged="NavigationViewControl_DisplayModeChanged">
             <NavigationView.MenuItems>
-                <NavigationViewItem x:Uid="Shell_Memo" helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.MemoViewModel">
+                <NavigationViewItem x:Uid="Shell_Memo" 
+                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.MemoViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE70B;"/>
                     </NavigationViewItem.Icon>
@@ -46,7 +47,8 @@
                 때문에 직접 FooterMenuItems를 통해 Settings Page를 추가하였음.
             -->
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem x:Uid="Shell_Settings" helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.SettingsViewModel">
+                <NavigationViewItem x:Uid="Shell_Settings" 
+                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.SettingsViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE713;"/>
                     </NavigationViewItem.Icon>

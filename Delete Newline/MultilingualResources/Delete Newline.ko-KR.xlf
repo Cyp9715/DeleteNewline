@@ -50,6 +50,10 @@
           <source>Start on Tray</source>
           <target state="translated">트레이에서 시작</target>
         </trans-unit>
+        <trans-unit id="Settings_Notification.Text" translate="yes" xml:space="preserve">
+          <source>Notification</source>
+          <target state="translated">알림</target>
+        </trans-unit>
       </group>
     </body>
   </file>
