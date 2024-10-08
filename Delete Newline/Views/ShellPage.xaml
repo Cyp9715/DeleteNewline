@@ -27,7 +27,7 @@
         <NavigationView
             x:Name="NavigationViewControl"
             IsBackButtonVisible="Collapsed"
-            IsBackEnabled="{x:Bind ViewModel.IsBackEnabled}"
+            IsSettingsVisible="False"
             SelectedItem="{x:Bind ViewModel.SelectedItem}"
             PaneDisplayMode="LeftCompact"
             DisplayModeChanged="NavigationViewControl_DisplayModeChanged">
