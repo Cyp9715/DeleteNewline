@@ -3,6 +3,8 @@
 using Microsoft.UI.Xaml.Navigation;
 
 using Delete_Newline.Contracts.Services;
+using Delete_Newline.Views;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Delete_Newline.ViewModels;
 
@@ -37,10 +39,16 @@ public partial class ShellViewModel : ObservableRecipient
     {
         IsBackEnabled = NavigationService.CanGoBack;
 
-        if (_isInitialNavigation)
+        if (e.SourcePageType == typeof(SettingsPage))
         {
-            SelectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
-            _isInitialNavigation = false;
+            SelectedItem = NavigationViewService.SettingsItem;
+            return;
+        }
+
+        var item = NavigationViewService.GetSelectedItem(e.SourcePageType);
+        if (item != null)
+        {
+            SelectedItem = item;
         }
     }
 }
