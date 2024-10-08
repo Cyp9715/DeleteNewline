@@ -11,9 +11,6 @@ namespace Delete_Newline.ViewModels;
 public partial class ShellViewModel : ObservableRecipient
 {
     [ObservableProperty]
-    private bool isBackEnabled;
-
-    [ObservableProperty]
     private object? selectedItem;
 
     public INavigationService NavigationService
@@ -37,8 +34,6 @@ public partial class ShellViewModel : ObservableRecipient
 
     private void OnNavigated(object sender, NavigationEventArgs e)
     {
-        IsBackEnabled = NavigationService.CanGoBack;
-
         if (e.SourcePageType == typeof(SettingsPage))
         {
             SelectedItem = NavigationViewService.SettingsItem;
