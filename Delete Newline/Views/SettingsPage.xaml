@@ -40,7 +40,7 @@
                     <ComboBox Width="125"
                               x:Name="ThemeComboBox"
                               HorizontalAlignment="Right"
-                              SelectedValue="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}"
+                              SelectedValue="{x:Bind ViewModel.SelectedTheme}"
                               SelectedValuePath="Tag">
                         <behaviors:Interaction.Behaviors>
                             <core:EventTriggerBehavior EventName="SelectionChanged">
@@ -61,8 +61,8 @@
                     <ComboBox Width="125"
                               x:Name="LanguageComboBox"
                               HorizontalAlignment="Right"
-                              ItemsSource="{x:Bind ViewModel.AvailableLanguages, Mode=OneWay}"
-                              SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
+                              ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
+                              SelectedItem="{x:Bind ViewModel.SelectedLanguage}"
                               DisplayMemberPath="DisplayName">
                         <behaviors:Interaction.Behaviors>
                             <core:EventTriggerBehavior EventName="SelectionChanged">
