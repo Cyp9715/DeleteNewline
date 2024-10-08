@@ -57,14 +57,19 @@ public partial class App : Application
                 services.AddSingleton<IFileService, FileService>();
 
                 // Views and ViewModels
+                services.AddTransient<ShellViewModel>();
+                services.AddTransient<ShellPage>();
+
                 services.AddTransient<SettingsViewModel>();
                 services.AddTransient<SettingsPage>();
 
+                services.AddTransient<KeybindCollectViewModel>();
+                services.AddTransient<KeybindCollectPage>();
+                services.AddTransient<KeybindViewModel>();
+                services.AddTransient<KeybindPage>();
+
                 services.AddTransient<MemoViewModel>();
                 services.AddTransient<MemoPage>();
-
-                services.AddTransient<ShellViewModel>();
-                services.AddTransient<ShellPage>();
 
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             }).Build();

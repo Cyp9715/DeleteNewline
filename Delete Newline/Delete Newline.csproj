@@ -89,6 +89,8 @@
   <ItemGroup>
     <None Remove="MultilingualResources\Delete Newline.ko-KR.xlf" />
     <None Remove="Styles\CheckBox.xaml" />
+    <None Remove="Styles\ToggleSwitch.xaml" />
+    <None Remove="Views\KeybindCollectPage.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Styles\FontSizes.xaml">
@@ -105,11 +107,24 @@
     <Page Update="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Update="Views\KeybindCollectPage.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\KeybindPage.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="Styles\CheckBox.xaml" />
   </ItemGroup>
   <ItemGroup>
     <XliffResource Include="MultilingualResources\Delete Newline.ko-KR.xlf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Styles\ToggleSwitch.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

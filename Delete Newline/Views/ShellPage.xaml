@@ -38,12 +38,26 @@
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE70B;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+
+                <NavigationViewItem x:Uid="Shell_Keybinds" 
+                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.KeybindCollectViewModel">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF210;"/>
+                    </NavigationViewItem.Icon>
+                    
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem x:Uid="KeybindDefault" 
+                                            helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.KeybindViewModel"/>
+                        <NavigationViewItem Content="Test" />
+                    </NavigationViewItem.MenuItems>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <!--
-                Settings 페이지를 WinUI 에서 자체 처리 (IsSettingsVisible True) 하면 
-                자동으로 한글 설정되고, 이를 Xaml 단에서 변경할 수 없는것으로 추측됨.
-                때문에 직접 FooterMenuItems를 통해 Settings Page를 추가하였음.
+                When the Settings page is handled internally by WinUI (IsSettingsVisible set to True), 
+                it appears that the language is automatically set according to the PC's regional settings, 
+                and this cannot be changed at the XAML level. As a result, 
+                I have directly added the Settings Page through FooterMenuItems.
             -->
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem x:Uid="Shell_Settings" 

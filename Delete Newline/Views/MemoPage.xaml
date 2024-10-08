@@ -25,7 +25,8 @@
 
                 <Grid>
                     <TextBlock x:Uid="MemoPage_AutoCopy" Padding="10" />
-                    <CheckBox HorizontalAlignment="Right" Style="{StaticResource Compact}"/>
+                    <CheckBox HorizontalAlignment="Right" 
+                              Style="{StaticResource CompactCheckBox}"/>
                 </Grid>
             </StackPanel>
 

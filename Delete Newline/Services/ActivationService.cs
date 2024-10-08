@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using Delete_Newline.Activation;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
+using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
@@ -75,6 +76,7 @@ public class ActivationService : IActivationService
     private async Task StartupAsync()
     {
         await _themeSelectorService.SetRequestedThemeAsync();
+        await TopMostHelper.Initialize(App.MainWindow);
         await Task.CompletedTask;
     }
 }

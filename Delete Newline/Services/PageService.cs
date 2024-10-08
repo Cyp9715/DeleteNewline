@@ -14,6 +14,8 @@ public class PageService : IPageService
 
     public PageService()
     {
+        Configure<KeybindCollectViewModel, KeybindCollectPage>();
+        Configure<KeybindViewModel, KeybindPage>();
         Configure<MemoViewModel, MemoPage>();
         Configure<SettingsViewModel, SettingsPage>();
     }

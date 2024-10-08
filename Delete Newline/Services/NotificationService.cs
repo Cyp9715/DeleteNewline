@@ -6,7 +6,7 @@ namespace Delete_Newline.Services;
 
 class NotificationService : INotificationService
 {
-    private const string NotificationSettingsKey = "NotificationEnableKey";
+    private const string NotificationSettingsKey = "Notification";
     
     AppNotificationManager notificationManager;
 
@@ -22,9 +22,9 @@ class NotificationService : INotificationService
 
     public async Task InitializeAsync()
     {
-        // default true.
         bool? storedSetting = await _localSettingsService.ReadSettingAsync<bool?>(NotificationSettingsKey);
 
+        // default setting
         if (storedSetting.HasValue is false)
         {
             _enableNotification = true;

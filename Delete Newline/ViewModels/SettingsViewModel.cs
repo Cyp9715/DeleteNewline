@@ -35,7 +35,9 @@ public partial class SettingsViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _enableTopMost;
 
-    public SettingsViewModel(ILocalizationService localizationService, IThemeSelectorService themeSelectorService, INotificationService notificationService)
+    public SettingsViewModel(ILocalizationService localizationService, 
+        IThemeSelectorService themeSelectorService, 
+        INotificationService notificationService)
     {
         _localizationService = localizationService;
         _themeSelectorService = themeSelectorService;
@@ -44,8 +46,9 @@ public partial class SettingsViewModel : ObservableRecipient
         AvailableLanguages = _localizationService.Languages;
         SelectedLanguage = _localizationService.GetCurrentLanguageItem();
         SelectedTheme = _themeSelectorService.Theme.ToString();
-        _versionDescription = GetVersionDescription();
-        _enableNotification = _notificationService.GetEnableNotification();
+        VersionDescription = GetVersionDescription();
+        EnableNotification = _notificationService.GetEnableNotification();
+        EnableTopMost = TopMostHelper._enableTopMost;
     }
 
     [RelayCommand]

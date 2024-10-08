@@ -156,4 +156,10 @@
   <data name="Settings_TopMost.Text" xml:space="preserve">
     <value>Always on Top</value>
   </data>
+  <data name="Shell_Keybinds.Content" xml:space="preserve">
+    <value>Keybinds</value>
+  </data>
+  <data name="Shell_KeybindDefault.Content" xml:space="preserve">
+    <value>Keybind</value>
+  </data>
 </root>

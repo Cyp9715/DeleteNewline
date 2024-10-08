@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Navigation;
 
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
-using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Delete_Newline.ViewModels;
 

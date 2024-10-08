@@ -2,6 +2,6 @@
 
 namespace Delete_Newline.ViewModels;
 
-public partial class MemoViewModel : ObservableRecipient
+public partial class KeybindViewModel : ObservableRecipient
 {
 }

@@ -19,19 +19,23 @@
             <StackPanel Grid.Row="0"
                         MaxWidth="500">
 
-                <Grid Padding="0,20,20,10">
-                    <TextBlock x:Uid="Settings_StartOnTray"/>
-                    <CheckBox HorizontalAlignment="Right" Style="{StaticResource Compact}"/>
-                </Grid>
-
                 <Line
                     X1="0" Y1="0" X2="1000" Y2="0"
                     Stroke="{ThemeResource DividerStrokeColorDefaultBrush}"
                     StrokeThickness="1"
                     Margin="0,10,0,10"/>
 
-                <Grid Padding="0,0,20,10">
-                    <TextBlock x:Uid="Settings_Theme"/>
+                <Grid Height="40">
+                    <TextBlock x:Uid="Settings_StartOnTray"
+                               VerticalAlignment="Center"/>
+                    <ToggleSwitch HorizontalAlignment="Right" 
+                              Style="{StaticResource CompactToggleSwitch}"/>
+                </Grid>
+
+
+                <Grid Height="40">
+                    <TextBlock x:Uid="Settings_Theme"
+                               VerticalAlignment="Center"/>
 
                     <ComboBox Width="125"
                               x:Name="ThemeComboBox"
@@ -50,8 +54,9 @@
                     </ComboBox>
                 </Grid>
 
-                <Grid Padding="0,0,20,10">
-                    <TextBlock x:Uid="Settings_Language"/>
+                <Grid Height="40">
+                    <TextBlock x:Uid="Settings_Language"
+                               VerticalAlignment="Center"/>
 
                     <ComboBox Width="125"
                               x:Name="LanguageComboBox"
@@ -68,45 +73,41 @@
                     </ComboBox>
                 </Grid>
 
-                <Grid Padding="0,0,20,10">
-                    <TextBlock x:Uid="Settings_Notification"/>
-                    <CheckBox x:Name="NotificationCheckBox"
-                              IsChecked="{x:Bind ViewModel.EnableNotification}" 
-                              HorizontalAlignment="Right" 
-                              Style="{StaticResource Compact}">
+                <Grid Height="40">
+                    <TextBlock x:Uid="Settings_Notification"
+                               VerticalAlignment="Center"/>
+                    <ToggleSwitch x:Name="NotificationCheckBox"
+                              IsOn="{x:Bind ViewModel.EnableNotification}" 
+                              HorizontalAlignment="Right"
+                              Style="{StaticResource CompactToggleSwitch}">
 
                         <behaviors:Interaction.Behaviors>
-                            <core:EventTriggerBehavior EventName="Click">
+                            <core:EventTriggerBehavior EventName="Toggled">
                                 <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleNotificationCommand}" 
-                                      CommandParameter="{Binding IsChecked, ElementName=NotificationCheckBox}"/>
+                                      CommandParameter="{Binding IsOn, ElementName=NotificationCheckBox}"/>
                             </core:EventTriggerBehavior>
                         </behaviors:Interaction.Behaviors>
 
-                    </CheckBox>
+                    </ToggleSwitch>
                 </Grid>
 
-                <Grid Padding="0,0,20,10">
-                    <TextBlock x:Uid="Settings_TopMost"/>
-                    <CheckBox x:Name="TopMostCheckBox"
-                              IsChecked="{x:Bind ViewModel.EnableTopMost}" 
-                              HorizontalAlignment="Right" 
-                              Style="{StaticResource Compact}">
+                <Grid Height="40">
+                    <TextBlock x:Uid="Settings_TopMost"
+                               VerticalAlignment="Center"/>
+                    <ToggleSwitch x:Name="TopMostToggleSwitch"
+                              IsOn="{x:Bind ViewModel.EnableTopMost}" 
+                              HorizontalAlignment="Right"
+                              Style="{StaticResource CompactToggleSwitch}">
 
                         <behaviors:Interaction.Behaviors>
-                            <core:EventTriggerBehavior EventName="Click">
+                            <core:EventTriggerBehavior EventName="Toggled">
                                 <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleTopMostCommand}" 
-                                      CommandParameter="{Binding IsChecked, ElementName=TopMostCheckBox}"/>
+                                      CommandParameter="{Binding IsOn, ElementName=TopMostToggleSwitch}"/>
                             </core:EventTriggerBehavior>
                         </behaviors:Interaction.Behaviors>
-                    </CheckBox>
+                    </ToggleSwitch>
                 </Grid>
             </StackPanel>
-
-            <TextBlock
-                Text="Toast Message Test"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
-                Foreground="Red" />
 
             <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}"
                    Style="{ThemeResource BodyTextBlockStyle}"

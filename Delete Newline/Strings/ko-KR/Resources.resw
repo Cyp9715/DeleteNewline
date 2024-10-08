@@ -19,10 +19,10 @@
     <value>테마</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>라이트</value>
+    <value>밝게</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>다크</value>
+    <value>어둡게</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
     <value>기본</value>
@@ -47,5 +47,11 @@
   </data>
   <data name="Settings_TopMost.Text" xml:space="preserve">
     <value>항상 위에 표시</value>
+  </data>
+  <data name="Shell_Keybinds.Content" xml:space="preserve">
+    <value>단축키 목록</value>
+  </data>
+  <data name="Shell_KeybindDefault.Content" xml:space="preserve">
+    <value>단축키</value>
   </data>
 </root>

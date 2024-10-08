@@ -6,7 +6,7 @@ namespace Delete_Newline.Services;
 
 public class LocalizationService : ILocalizationService
 {
-    private const string LocalizationTagSettingsKey = "LocalizationTagKey";
+    private const string LocalizationTagSettingsKey = "Localization";
     private readonly ILocalSettingsService _localSettingsService;
 
     private readonly ResourceManager _resourceManager;
