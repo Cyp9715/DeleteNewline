@@ -9,7 +9,7 @@ namespace Delete_Newline.Helpers
         private static ILocalSettingsService? _localSettingsService;
 
         private const string TopMostSettingsKey = "TopMost";
-        public static bool _enableTopMost { get; set; } = false;
+        public static bool EnableTopMost { get; private set; } = false;
 
         public async static Task Initialize(Window window)
         {
@@ -19,13 +19,13 @@ namespace Delete_Newline.Helpers
             // default setting
             if (storedSetting.HasValue is false)
             {
-                _enableTopMost = false;
+                EnableTopMost = false;
                 await _localSettingsService.SaveSettingAsync(TopMostSettingsKey, false);
             }
             else
             {
-                _enableTopMost = storedSetting.Value;
-                await SetWindowTopMost(App.MainWindow, _enableTopMost);
+                EnableTopMost = storedSetting.Value;
+                await SetWindowTopMost(App.MainWindow, EnableTopMost);
             }
         }
 

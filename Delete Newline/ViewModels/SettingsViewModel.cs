@@ -8,6 +8,7 @@ using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
 
 using Delete_Newline.Models;
+using Delete_Newline.Services;
 
 namespace Delete_Newline.ViewModels;
 
@@ -48,7 +49,7 @@ public partial class SettingsViewModel : ObservableRecipient
         SelectedTheme = _themeSelectorService.Theme.ToString();
         VersionDescription = GetVersionDescription();
         EnableNotification = _notificationService.GetEnableNotification();
-        EnableTopMost = TopMostHelper._enableTopMost;
+        EnableTopMost = TopMostHelper.EnableTopMost;
     }
 
     [RelayCommand]
@@ -63,8 +64,12 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand] // need restart
     private async Task SwitchLanguageAsync(LanguageItem param)
     {
-        _notificationService.ShowNotification("Language Change", "The app needs to restart to apply the new language. Restart now?", force:true);
-        await _localizationService.SetLanguageAsync(param);
+        // Problems running immediately after installing the app.
+        if (param is not null)
+        {
+            _notificationService.ShowNotification("Language Change", "The app needs to restart to apply the new language. Restart now?", force: true);
+            await _localizationService.SetLanguageAsync(param);
+        }
     }
 
     [RelayCommand]
@@ -75,10 +80,10 @@ public partial class SettingsViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void ToggleTopMost(bool isChecked)
+    private async Task ToggleTopMostAsync(bool isChecked)
     {
         EnableTopMost = isChecked;
-        TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
+        await TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
     }
 
 
