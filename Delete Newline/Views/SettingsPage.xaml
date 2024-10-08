@@ -9,10 +9,6 @@
     xmlns:xaml="using:Microsoft.UI.Xaml"
     x:Uid="SettingsPage_Title">
 
-    <Page.Resources>
-        <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    </Page.Resources>
-
     <ScrollViewer>
         <Grid>
             <Grid.RowDefinitions>
@@ -28,6 +24,11 @@
                     <CheckBox HorizontalAlignment="Right" Style="{StaticResource Compact}"/>
                 </Grid>
 
+                <Line
+                    X1="0" Y1="0" X2="1000" Y2="0"
+                    Stroke="{ThemeResource DividerStrokeColorDefaultBrush}"
+                    StrokeThickness="1"
+                    Margin="0,10,0,10"/>
 
                 <Grid Padding="0,0,20,10">
                     <TextBlock x:Uid="Settings_Theme"/>
@@ -81,6 +82,22 @@
                             </core:EventTriggerBehavior>
                         </behaviors:Interaction.Behaviors>
 
+                    </CheckBox>
+                </Grid>
+
+                <Grid Padding="0,0,20,10">
+                    <TextBlock x:Uid="Settings_TopMost"/>
+                    <CheckBox x:Name="TopMostCheckBox"
+                              IsChecked="{x:Bind ViewModel.EnableTopMost}" 
+                              HorizontalAlignment="Right" 
+                              Style="{StaticResource Compact}">
+
+                        <behaviors:Interaction.Behaviors>
+                            <core:EventTriggerBehavior EventName="Click">
+                                <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleTopMostCommand}" 
+                                      CommandParameter="{Binding IsChecked, ElementName=TopMostCheckBox}"/>
+                            </core:EventTriggerBehavior>
+                        </behaviors:Interaction.Behaviors>
                     </CheckBox>
                 </Grid>
             </StackPanel>

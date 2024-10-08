@@ -153,4 +153,7 @@
   <data name="Settings_Notification.Text" xml:space="preserve">
     <value>Notification</value>
   </data>
+  <data name="Settings_TopMost.Text" xml:space="preserve">
+    <value>Always on Top</value>
+  </data>
 </root>

@@ -45,4 +45,7 @@
   <data name="Settings_Notification.Text" xml:space="preserve">
     <value>알림</value>
   </data>
+  <data name="Settings_TopMost.Text" xml:space="preserve">
+    <value>항상 위에 표시</value>
+  </data>
 </root>

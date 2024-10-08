@@ -18,9 +18,6 @@ public partial class SettingsViewModel : ObservableRecipient
     private readonly INotificationService _notificationService;
 
     [ObservableProperty]
-    private bool _isLocalizationChanged;
-
-    [ObservableProperty]
     private string _versionDescription;
 
     [ObservableProperty]
@@ -35,6 +32,9 @@ public partial class SettingsViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _enableNotification;
 
+    [ObservableProperty]
+    private bool _enableTopMost;
+
     public SettingsViewModel(ILocalizationService localizationService, IThemeSelectorService themeSelectorService, INotificationService notificationService)
     {
         _localizationService = localizationService;
@@ -46,9 +46,6 @@ public partial class SettingsViewModel : ObservableRecipient
         SelectedTheme = _themeSelectorService.Theme.ToString();
         _versionDescription = GetVersionDescription();
         _enableNotification = _notificationService.GetEnableNotification();
-
-        // test
-        _notificationService.ShowNotification("Title", "this is test message");
     }
 
     [RelayCommand]
@@ -63,8 +60,8 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand] // need restart
     private async Task SwitchLanguageAsync(LanguageItem param)
     {
+        _notificationService.ShowNotification("Language Change", "The app needs to restart to apply the new language. Restart now?", force:true);
         await _localizationService.SetLanguageAsync(param);
-        IsLocalizationChanged = true;
     }
 
     [RelayCommand]
@@ -73,6 +70,14 @@ public partial class SettingsViewModel : ObservableRecipient
         EnableNotification = isChecked;
         await _notificationService.SetEnableNotificationAsync(isChecked);
     }
+
+    [RelayCommand]
+    private void ToggleTopMost(bool isChecked)
+    {
+        EnableTopMost = isChecked;
+        TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
+    }
+
 
     private static string GetVersionDescription()
     {

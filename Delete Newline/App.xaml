@@ -12,6 +12,18 @@
                 <ResourceDictionary Source="/Styles/TextBlock.xaml" />
                 <ResourceDictionary Source="/Styles/CheckBox.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Sets the custom theme colors. -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="DividerLineBrush" Color="Red"/>
+                    <SolidColorBrush x:Key="RectBrush" Color="Blue"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="DividerLineBrush" Color="Blue"/>
+                    <SolidColorBrush x:Key="RectBrush" Color="Red"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
