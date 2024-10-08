@@ -8,19 +8,19 @@ namespace Delete_Newline.Helpers
     {
         private static ILocalSettingsService? _localSettingsService;
 
-        private const string TopMostSettingsKey = "TopMost";
+        private const string DefaultTopMostKey = "TopMost";
         public static bool EnableTopMost { get; private set; } = false;
 
-        public async static Task Initialize(Window window)
+        public async static Task Initialize(Window window, string topMostKey=DefaultTopMostKey)
         {
             _localSettingsService = App.GetService<ILocalSettingsService>();
-            bool? storedSetting = await _localSettingsService.ReadSettingAsync<bool?>(TopMostSettingsKey);
+            bool? storedSetting = await _localSettingsService.ReadSettingAsync<bool?>(topMostKey);
 
             // default setting
             if (storedSetting.HasValue is false)
             {
                 EnableTopMost = false;
-                await _localSettingsService.SaveSettingAsync(TopMostSettingsKey, false);
+                await _localSettingsService.SaveSettingAsync(topMostKey, false);
             }
             else
             {
@@ -29,7 +29,7 @@ namespace Delete_Newline.Helpers
             }
         }
 
-        public async static Task SetWindowTopMost(Window window, bool topMost)
+        public async static Task SetWindowTopMost(Window window, bool topMost, string topMostKey=DefaultTopMostKey)
         {
             if (window == null) return;
 
@@ -40,7 +40,7 @@ namespace Delete_Newline.Helpers
                 if (presenter != null)
                 {
                     presenter.IsAlwaysOnTop = topMost;
-                    await _localSettingsService!.SaveSettingAsync(TopMostSettingsKey, topMost);
+                    await _localSettingsService!.SaveSettingAsync(topMostKey, topMost);
                 }
             }
         }

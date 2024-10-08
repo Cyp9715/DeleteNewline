@@ -29,8 +29,6 @@ public partial class ShellViewModel : ObservableRecipient
         NavigationViewService = navigationViewService;
     }
 
-    private bool _isInitialNavigation = true;
-
     private void OnNavigated(object sender, NavigationEventArgs e)
     {
         if (e.SourcePageType == typeof(SettingsPage))
