@@ -14,10 +14,9 @@ public class FileService : IFileService
         if (File.Exists(path))
         {
             var json = File.ReadAllText(path);
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json) ?? throw new JsonException("Deserialization failed or resulted in null");
         }
-
-        return default;
+        throw new FileNotFoundException($"File not found: {path}");
     }
 
     public void Save<T>(string folderPath, string fileName, T content)

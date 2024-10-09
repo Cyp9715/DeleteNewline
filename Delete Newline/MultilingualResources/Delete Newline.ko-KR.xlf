@@ -56,8 +56,7 @@
         </trans-unit>
         <trans-unit id="Settings_TopMost.Text" translate="yes" xml:space="preserve">
           <source>Always on Top</source>
-          <target state="needs-review-translation">항상 위에 표시</target>
-          <note from="MultilingualUpdate" annotates="source" priority="2">Please verify the translation’s accuracy as the source string was updated after it was translated.</note>
+          <target state="translated">항상 위에 표시</target>
         </trans-unit>
         <trans-unit id="Shell_Keybinds.Content" translate="yes" xml:space="preserve">
           <source>Keybinds</source>
