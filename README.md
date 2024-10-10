@@ -6,5 +6,5 @@
 - Future versions of Delete Newline will be built based on WinUI3.
 - We plan to release version 3.0 based on WinUI 3.
 
-## Recommended Tools
+## Recommended Build Tools
 1. [Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=dts-publisher.mat2022)
