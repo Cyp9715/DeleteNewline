@@ -34,10 +34,6 @@
           <source>Auto Copy to Clipboard</source>
           <target state="translated">클립보드로 자동복사</target>
         </trans-unit>
-        <trans-unit id="MemoPage_Title" translate="yes" xml:space="preserve">
-          <source>Memo</source>
-          <target state="translated">메모</target>
-        </trans-unit>
         <trans-unit id="Shell_Settings.Content" translate="yes" xml:space="preserve">
           <source>Settings</source>
           <target state="translated">설정</target>

@@ -56,6 +56,9 @@ public partial class App : Application
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();
 
+                // Services, not need Interface.
+                services.AddSingleton<KeybindCollectManagerService>();
+
                 // Views and ViewModels
                 services.AddTransient<ShellViewModel>();
                 services.AddTransient<ShellPage>();

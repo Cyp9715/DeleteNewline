@@ -46,7 +46,7 @@
                     </NavigationViewItem.Icon>
                     
                     <NavigationViewItem.MenuItems>
-                        <NavigationViewItem x:Uid="KeybindDefault" 
+                        <NavigationViewItem x:Uid="Shell_KeybindDefault" 
                                             helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.KeybindViewModel"/>
                         <NavigationViewItem Content="Test" />
                     </NavigationViewItem.MenuItems>
