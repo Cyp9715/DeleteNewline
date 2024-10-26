@@ -29,15 +29,6 @@ public class RegexChain
         }
     }
 
-    public void UpdateRule(int index, string regexExpression, string replace)
-    {
-        if (index >= 0 && index < RegexExpressions.Count)
-        {
-            RegexExpressions[index] = regexExpression;
-            Replaces[index] = replace;
-        }
-    }
-
     public void SwapRules(int index1, int index2)
     {
         if (IsValidIndex(index1) && IsValidIndex(index2) && index1 != index2)
@@ -74,5 +65,4 @@ public class RegexChain
         list[index1] = list[index2];
         list[index2] = temp;
     }
-
 }

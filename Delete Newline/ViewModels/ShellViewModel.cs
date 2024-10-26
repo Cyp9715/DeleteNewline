@@ -4,6 +4,9 @@ using Microsoft.UI.Xaml.Navigation;
 
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
+using Delete_Newline.Services;
+using System.Collections.ObjectModel;
+using Delete_Newline.Contracts.Structures;
 
 namespace Delete_Newline.ViewModels;
 
@@ -12,21 +15,23 @@ public partial class ShellViewModel : ObservableRecipient
     [ObservableProperty]
     private object? selectedItem;
 
-    public INavigationService NavigationService
-    {
-        get;
-    }
+    [ObservableProperty]
+    private ObservableCollection<RegexChain> _regexChains;
 
-    public INavigationViewService NavigationViewService
-    {
-        get;
-    }
+    public INavigationService NavigationService { get; }
+    public INavigationViewService NavigationViewService { get; }
+    private KeybindCollectManagerService _keybindCollectManagerService;
 
-    public ShellViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
+    public ShellViewModel(KeybindCollectManagerService keybindCollectManagerService,
+        INavigationService navigationService,
+        INavigationViewService navigationViewService)
     {
+        _keybindCollectManagerService = keybindCollectManagerService;
         NavigationService = navigationService;
-        NavigationService.Navigated += OnNavigated;
         NavigationViewService = navigationViewService;
+
+        NavigationService.Navigated += OnNavigated;
+        _regexChains = _keybindCollectManagerService.RegexChains;
     }
 
     private void OnNavigated(object sender, NavigationEventArgs e)

@@ -4,7 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behaviors="using:Microsoft.Xaml.Interactions.Core"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:local="using:Delete_Newline.Contracts.Structures">
+    xmlns:local="using:Delete_Newline.Contracts.Structures"
+    DataContext="{x:Bind ViewModel}">
 
     <Grid>
         <VisualStateManager.VisualStateGroups>
@@ -17,7 +18,7 @@
                         <Setter Target="SamplesGridView.ItemsPanel">
                             <Setter.Value>
                                 <ItemsPanelTemplate>
-                                    <ItemsWrapGrid MaximumRowsOrColumns="10" Orientation="Horizontal"/>
+                                    <ItemsWrapGrid Orientation="Horizontal"/>
                                 </ItemsPanelTemplate>
                             </Setter.Value>
                         </Setter>
@@ -42,22 +43,43 @@
         </VisualStateManager.VisualStateGroups>
 
         <GridView x:Name="SamplesGridView" 
-          ItemsSource="{x:Bind ViewModel.RegexChains, Mode=OneWay}"
-          Padding="12">
+                  ItemsSource="{x:Bind ViewModel.RegexChains, Mode=OneWay}"
+                  Padding="12">
             <GridView.ItemTemplate>
-                <DataTemplate x:DataType="local:RegexChain">
+                <DataTemplate>
                     <Grid Width="310" Height="90" Margin="6" Padding="12" Background="#2D2D2D">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="TestRegexTitle" FontWeight="SemiBold" FontSize="16"/>
+                            <TextBlock Text="{Binding ChainName}" FontWeight="SemiBold" FontSize="16"/>
                             <TextBlock Text="Comment" FontSize="12" TextWrapping="Wrap"/>
                         </StackPanel>
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Remove" 
+                                                Icon="Delete" 
+                                                Command="{Binding DataContext.RemoveKeybindCommand, ElementName=SamplesGridView}"
+                                                CommandParameter="{Binding}">
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
                     </Grid>
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
+
+        <Button Grid.Row="1" 
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Bottom" 
+                Margin="0,0,24,24"
+                Width="56" 
+                Height="56" 
+                CornerRadius="28"
+                Background="{ThemeResource SystemAccentColor}"
+                Command="{x:Bind ViewModel.AddKeybindCommand}">
+            <FontIcon Glyph="&#xE710;" FontSize="20"/>
+        </Button>
     </Grid>
 </Page>

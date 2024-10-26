@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml.Controls;
 
 using Delete_Newline.Helpers;
 using Delete_Newline.ViewModels;
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Delete_Newline.Views;
 
@@ -12,6 +14,7 @@ public sealed partial class ShellPage : Page
     {
         get;
     }
+
 
     public ShellPage(ShellViewModel viewModel)
     {
