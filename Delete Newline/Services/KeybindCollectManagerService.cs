@@ -1,23 +1,27 @@
 ﻿using Delete_Newline.Contracts.Services;
 using Delete_Newline.Contracts.Structures;
 using System.Collections.ObjectModel;
+using System.Text.Json;
+
 
 namespace Delete_Newline.Services;
 
 public class KeybindCollectManagerService
 {
-    public ObservableCollection<RegexChain> RegexChains { get; }
+    private readonly ILocalSettingsService _localSettingsService;
+    private const string KeybindCollectionSettingsKey = "KeybindCollection";
+    public ObservableCollection<RegexChain> RegexChains { get; private set; }
 
-    public KeybindCollectManagerService()
+    public KeybindCollectManagerService(ILocalSettingsService localSettingsService)
     {
         RegexChains = new ObservableCollection<RegexChain>();
-        InitializeAsync();
+
+        _localSettingsService = localSettingsService;
     }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        RegexChains.Add(new RegexChain("Chain 1"));
-        return Task.CompletedTask;
+        RegexChains = await _localSettingsService.ReadSettingAsync<ObservableCollection<RegexChain>>(KeybindCollectionSettingsKey) ?? RegexChains;
     }
 
     public ObservableCollection<RegexChain> GetRegexChains()
@@ -25,7 +29,7 @@ public class KeybindCollectManagerService
         return RegexChains;
     }
 
-    public void AddRegexChain(RegexChain? regexChain = null)
+    public async Task AddRegexChain(RegexChain? regexChain = null)
     {
         if(regexChain is not null)
         {
@@ -35,26 +39,32 @@ public class KeybindCollectManagerService
         {
             RegexChains.Add(new RegexChain("New Chain"));
         }
+
+        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, RegexChains);
     }
 
-    public void RemoveRegexChain(RegexChain chain)
+    public async Task RemoveRegexChain(RegexChain chain)
     {
         if (RegexChains.Contains(chain))
         {
             RegexChains.Remove(chain);
         }
+
+        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, RegexChains);
     }
 
-    public void SwapChain(int index1, int index2)
+    public async Task SwapChain(int index1, int index2)
     {
         if (IsValidIndex(index1) && IsValidIndex(index2) && index1 != index2)
         {
             SwapElements(RegexChains, index1, index2);
         }
+
+        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, RegexChains);
     }
 
     // remove oldIndex, move new Index.
-    public void MoveChain(int oldIndex, int newIndex)
+    public async Task MoveChain(int oldIndex, int newIndex)
     {
         if (IsValidIndex(oldIndex) && IsValidIndex(newIndex) && oldIndex != newIndex)
         {
@@ -63,6 +73,8 @@ public class KeybindCollectManagerService
             RegexChains.RemoveAt(oldIndex);
             RegexChains.Insert(newIndex, regexExpression);
         }
+
+        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, RegexChains);
     }
 
     private bool IsValidIndex(int index)

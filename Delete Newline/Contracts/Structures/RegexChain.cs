@@ -3,8 +3,8 @@
 public class RegexChain
 {
     public string ChainName { get; set; }
-    private List<string> RegexExpressions { get; set; } = new List<string>();
-    private List<string> Replaces { get; set; } = new List<string>();
+    public List<string> RegexExpressions { get; set; } = new List<string>();
+    public List<string> Replaces { get; set; } = new List<string>();
 
     public RegexChain(string ruleName)
     {
