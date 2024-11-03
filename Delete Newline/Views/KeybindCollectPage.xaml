@@ -47,7 +47,7 @@
                   Padding="12">
             <GridView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Width="310" Height="90" Margin="6" Padding="12" Background="#2D2D2D">
+                    <Grid Width="310" Height="90" Margin="6" Padding="12" Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
