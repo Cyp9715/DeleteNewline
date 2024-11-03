@@ -24,7 +24,7 @@ public partial class KeybindCollectViewModel : ObservableRecipient
     [RelayCommand]
     public void AddKeybind()
     {
-        _ = _keybindCollectManagerService.AddRegexChain();
+        _keybindCollectManagerService.AddRegexChain();
     }
 
     [RelayCommand]
@@ -32,7 +32,7 @@ public partial class KeybindCollectViewModel : ObservableRecipient
     {
         if (chain is not null)
         {
-            _ = _keybindCollectManagerService.RemoveRegexChain(chain);
+            _keybindCollectManagerService.RemoveRegexChain(chain);
         }
     }
 }

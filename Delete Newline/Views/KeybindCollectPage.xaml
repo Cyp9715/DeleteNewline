@@ -44,7 +44,10 @@
 
         <GridView x:Name="SamplesGridView" 
                   ItemsSource="{x:Bind ViewModel.RegexChains, Mode=OneWay}"
-                  Padding="12">
+                  Padding="12"
+                  CanDrag="True"
+                  CanReorderItems="True"
+                  AllowDrop="True">
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <Grid Width="310" Height="90" Margin="6" Padding="12" Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
