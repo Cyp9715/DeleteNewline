@@ -5,6 +5,8 @@
     xmlns:behaviors="using:Microsoft.Xaml.Interactions.Core"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:Delete_Newline.Contracts.Structures"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
     DataContext="{x:Bind ViewModel}">
 
     <Grid>
@@ -48,6 +50,7 @@
                   CanDrag="True"
                   CanReorderItems="True"
                   AllowDrop="True">
+
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <Grid Width="310" Height="90" Margin="6" Padding="12" Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">

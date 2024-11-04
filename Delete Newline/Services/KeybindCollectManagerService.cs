@@ -1,8 +1,6 @@
 ﻿using Delete_Newline.Contracts.Services;
 using Delete_Newline.Contracts.Structures;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Text.Json;
 
 
 namespace Delete_Newline.Services;
@@ -84,6 +82,7 @@ public class KeybindCollectManagerService
         list[index1] = list[index2];
         list[index2] = temp;
     }
+
 
     private async void RegexChains_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {

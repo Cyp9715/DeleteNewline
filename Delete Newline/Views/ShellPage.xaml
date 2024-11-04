@@ -6,8 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:helpers="using:Delete_Newline.Helpers"
     xmlns:behaviors="using:Delete_Newline.Behaviors"
-    xmlns:structures="using:Delete_Newline.Contracts.Structures"
-    xmlns:i="using:Microsoft.Xaml.Interactivity">
+    xmlns:structures="using:Delete_Newline.Contracts.Structures">
 
     <Grid>
         <Grid x:Name="AppTitleBar"
