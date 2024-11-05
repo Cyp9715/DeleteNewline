@@ -1,7 +1,7 @@
 ﻿using Delete_Newline.Contracts.Services;
 using Delete_Newline.Contracts.Structures;
+using Delete_Newline.ViewModels;
 using System.Collections.ObjectModel;
-
 
 namespace Delete_Newline.Services;
 
@@ -83,9 +83,16 @@ public class KeybindCollectManagerService
         list[index2] = temp;
     }
 
-
     private async void RegexChains_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, RegexChains);
+        // Code used to prevent unnecessary SaveSettingAsync calls caused by rapid Remove and Add operations during Drag&Drop.
+        if (KeybindCollectViewModel.isDragEnded is true)
+        {
+            await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, RegexChains);
+        }
+        else
+        {
+            KeybindCollectViewModel.isDragEnded = true;
+        }
     }
 }

@@ -2,8 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Services;
-using Microsoft.UI.Xaml.Controls;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 
 namespace Delete_Newline.ViewModels;
@@ -34,5 +32,19 @@ public partial class KeybindCollectViewModel : ObservableRecipient
         {
             _keybindCollectManagerService.RemoveRegexChain(chain);
         }
+    }
+
+    public static bool isDragEnded = true;
+
+    [RelayCommand]
+    private void DragStarting()
+    {
+        isDragEnded = false;
+    }
+
+    [RelayCommand]
+    private void GridViewItem_DragEnter()
+    {
+        isDragEnded = true;
     }
 }

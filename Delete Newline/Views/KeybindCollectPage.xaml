@@ -47,13 +47,27 @@
         <GridView x:Name="SamplesGridView" 
                   ItemsSource="{x:Bind ViewModel.RegexChains, Mode=OneWay}"
                   Padding="12"
-                  CanDrag="True"
                   CanReorderItems="True"
+                  CanDragItems="True"
                   AllowDrop="True">
+
+            <i:Interaction.Behaviors>
+                <core:EventTriggerBehavior EventName="DragItemsStarting">
+                    <core:InvokeCommandAction Command="{x:Bind ViewModel.DragStartingCommand}" />
+                </core:EventTriggerBehavior>
+                <core:EventTriggerBehavior EventName="DragItemsCompleted">
+                    <core:InvokeCommandAction Command="{x:Bind ViewModel.GridViewItem_DragEnterCommand}" />
+                </core:EventTriggerBehavior>
+            </i:Interaction.Behaviors>
 
             <GridView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Width="310" Height="90" Margin="6" Padding="12" Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
+                    <Grid Width="310" 
+                          Height="90" 
+                          Margin="6" 
+                          Padding="12" 
+                          Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
+
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
