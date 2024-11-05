@@ -6,5 +6,27 @@
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity">
 
     <ScrollViewer>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="550" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel Orientation="Vertical"
+                        Grid.Column="1"
+                        VerticalAlignment="Top"
+                        Margin="0,0,0,40">
+
+                <TextBlock Text="테스트 페이지"/>
+
+            </StackPanel>
+
+        </Grid>
     </ScrollViewer>
 </Page>

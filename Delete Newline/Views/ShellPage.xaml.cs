@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 using Delete_Newline.Helpers;
 using Delete_Newline.ViewModels;
+using Microsoft.UI.Xaml.Input;
 
 namespace Delete_Newline.Views;
 
@@ -41,5 +42,11 @@ public sealed partial class ShellPage : Page
             Right = AppTitleBar.Margin.Right,
             Bottom = AppTitleBar.Margin.Bottom
         };
+    }
+
+    private void NavigationViewItem_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        // KeybindView로의 직접 내비게이션 코드 추가
+        NavigationFrame.Navigate(typeof(KeybindPage));
     }
 }

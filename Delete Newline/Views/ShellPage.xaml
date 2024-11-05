@@ -51,6 +51,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="structures:RegexChain">
                                     <NavigationViewItem Content="{x:Bind ChainName}" 
+                                                        Tapped="NavigationViewItem_Tapped"
                                                         helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.KeybindViewModel">
                                         <NavigationViewItem.Tag>
                                             <x:String>{x:Bind ChainName}</x:String>

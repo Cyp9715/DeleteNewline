@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -127,5 +127,11 @@
     <Page Update="Styles\ToggleSwitch.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\Cyphe\Filen\Project\Source Code\DeleteNewline\Delete Newline\.editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\Cyphe\Filen\Project\Source Code\DeleteNewline\Delete Newline\.editorconfig" />
   </ItemGroup>
 </Project>
