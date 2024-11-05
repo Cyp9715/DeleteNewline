@@ -1,4 +1,4 @@
-using Delete_Newline.Helpers;
+﻿using Delete_Newline.Helpers;
 using Windows.UI.ViewManagement;
 using WinUIEx;
 

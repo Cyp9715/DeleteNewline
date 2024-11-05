@@ -1,4 +1,4 @@
-using Delete_Newline.ViewModels;
+﻿using Delete_Newline.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Delete_Newline.Views;
