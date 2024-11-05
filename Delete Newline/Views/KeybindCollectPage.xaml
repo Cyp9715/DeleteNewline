@@ -53,10 +53,10 @@
 
             <i:Interaction.Behaviors>
                 <core:EventTriggerBehavior EventName="DragItemsStarting">
-                    <core:InvokeCommandAction Command="{x:Bind ViewModel.DragStartingCommand}" />
+                    <core:InvokeCommandAction Command="{x:Bind ViewModel.DragItemsStartingCommand}" />
                 </core:EventTriggerBehavior>
                 <core:EventTriggerBehavior EventName="DragItemsCompleted">
-                    <core:InvokeCommandAction Command="{x:Bind ViewModel.GridViewItem_DragEnterCommand}" />
+                    <core:InvokeCommandAction Command="{x:Bind ViewModel.DragItemsCompletedCommand}" />
                 </core:EventTriggerBehavior>
             </i:Interaction.Behaviors>
 

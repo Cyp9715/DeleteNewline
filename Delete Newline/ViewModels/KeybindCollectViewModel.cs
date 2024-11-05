@@ -37,13 +37,13 @@ public partial class KeybindCollectViewModel : ObservableRecipient
     public static bool isDragEnded = true;
 
     [RelayCommand]
-    private void DragStarting()
+    private void DragItemsStarting()
     {
         isDragEnded = false;
     }
 
     [RelayCommand]
-    private void GridViewItem_DragEnter()
+    private void DragItemsCompleted()
     {
         isDragEnded = true;
     }
