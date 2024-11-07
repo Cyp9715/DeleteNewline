@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Services;
@@ -11,26 +11,26 @@ public partial class KeybindCollectViewModel : ObservableRecipient
     private readonly KeybindCollectManagerService _keybindCollectManagerService;
 
     [ObservableProperty]
-    public ObservableCollection<RegexChain> _regexChains;
+    public ObservableCollection<KeybindInfo> _keybindInfos;
 
     public KeybindCollectViewModel(KeybindCollectManagerService keybindCollectManagerService)
     {
         _keybindCollectManagerService = keybindCollectManagerService;
-        RegexChains = _keybindCollectManagerService.RegexChains;
+        KeybindInfos = _keybindCollectManagerService.KeybindInfos;
     }
 
     [RelayCommand]
     private void AddKeybind()
     {
-        _keybindCollectManagerService.AddRegexChain();
+        _keybindCollectManagerService.AddKeybindInfo();
     }
 
     [RelayCommand]
-    private void RemoveKeybind(RegexChain chain)
+    private void RemoveKeybind(KeybindInfo keybindInfo)
     {
-        if (chain is not null)
+        if (keybindInfo is not null)
         {
-            _keybindCollectManagerService.RemoveRegexChain(chain);
+            _keybindCollectManagerService.RemoveKeybindInfo(keybindInfo);
         }
     }
 

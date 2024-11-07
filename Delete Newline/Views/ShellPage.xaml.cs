@@ -43,10 +43,4 @@ public sealed partial class ShellPage : Page
             Bottom = AppTitleBar.Margin.Bottom
         };
     }
-
-    private void NavigationViewItem_Tapped(object sender, TappedRoutedEventArgs e)
-    {
-        // KeybindView로의 직접 내비게이션 코드 추가
-        NavigationFrame.Navigate(typeof(KeybindPage));
-    }
 }

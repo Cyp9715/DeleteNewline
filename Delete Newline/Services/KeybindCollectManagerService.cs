@@ -1,4 +1,4 @@
-﻿using Delete_Newline.Contracts.Services;
+using Delete_Newline.Contracts.Services;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.ViewModels;
 using System.Collections.ObjectModel;
@@ -9,86 +9,60 @@ public class KeybindCollectManagerService
 {
     private readonly ILocalSettingsService _localSettingsService;
     private const string KeybindCollectionSettingsKey = "KeybindCollection";
-    public ObservableCollection<RegexChain> RegexChains { get; private set; }
+    public ObservableCollection<KeybindInfo> KeybindInfos { get; private set; }
 
     public KeybindCollectManagerService(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
-        RegexChains = new ObservableCollection<RegexChain>();
-        RegexChains.CollectionChanged += RegexChains_CollectionChanged;
+        KeybindInfos = new ObservableCollection<KeybindInfo>();
+        KeybindInfos.CollectionChanged += KeybindInfos_CollectionChanged;
     }
 
     public async Task InitializeAsync()
     {
-        var savedChains = await _localSettingsService.ReadSettingAsync<ObservableCollection<RegexChain>>(KeybindCollectionSettingsKey);
+        var savedChains = await _localSettingsService.ReadSettingAsync<ObservableCollection<KeybindInfo>>(KeybindCollectionSettingsKey);
         if (savedChains != null)
         {
-            RegexChains = savedChains;
-            RegexChains.CollectionChanged += RegexChains_CollectionChanged;
+            KeybindInfos = savedChains;
+            KeybindInfos.CollectionChanged += KeybindInfos_CollectionChanged;
         }
     }
 
-    public ObservableCollection<RegexChain> GetRegexChains()
+    public ObservableCollection<KeybindInfo> GetKeybindInfos()
     {
-        return RegexChains;
+        return KeybindInfos;
     }
 
-    public void AddRegexChain(RegexChain? regexChain = null)
+    public void AddKeybindInfo(KeybindInfo? keybindInfo = null)
     {
-        if (regexChain is not null)
+        if (keybindInfo is not null)
         {
-            RegexChains.Add(regexChain);
+            KeybindInfos.Add(keybindInfo);
         }
         else
         {
-            RegexChains.Add(new RegexChain("New Chain"));
+            KeybindInfos.Add(new KeybindInfo
+            {
+                Keybind = new Keybind(),
+                RegexChain = new RegexChain("New chain", "")
+            });
         }
     }
 
-    public void RemoveRegexChain(RegexChain chain)
+    public void RemoveKeybindInfo(KeybindInfo keybindInfo)
     {
-        if (RegexChains.Contains(chain))
+        if (KeybindInfos.Contains(keybindInfo))
         {
-            RegexChains.Remove(chain);
+            KeybindInfos.Remove(keybindInfo);
         }
     }
 
-    public void SwapChain(int index1, int index2)
-    {
-        if (IsValidIndex(index1) && IsValidIndex(index2) && index1 != index2)
-        {
-            SwapElements(RegexChains, index1, index2);
-        }
-    }
-
-    public void MoveChain(int oldIndex, int newIndex)
-    {
-        if (IsValidIndex(oldIndex) && IsValidIndex(newIndex) && oldIndex != newIndex)
-        {
-            var regexExpression = RegexChains[oldIndex];
-            RegexChains.RemoveAt(oldIndex);
-            RegexChains.Insert(newIndex, regexExpression);
-        }
-    }
-
-    private bool IsValidIndex(int index)
-    {
-        return index >= 0 && index < RegexChains.Count;
-    }
-
-    private void SwapElements<T>(ObservableCollection<T> list, int index1, int index2)
-    {
-        T temp = list[index1];
-        list[index1] = list[index2];
-        list[index2] = temp;
-    }
-
-    private async void RegexChains_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private async void KeybindInfos_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         // Code used to prevent unnecessary SaveSettingAsync calls caused by rapid Remove and Add operations during Drag&Drop.
         if (KeybindCollectViewModel.isDragEnded is true)
         {
-            await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, RegexChains);
+            await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, KeybindInfos);
         }
         else
         {

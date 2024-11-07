@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +10,8 @@ using Delete_Newline.Models;
 using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
 using Delete_Newline.Views;
+using Delete_Newline.Contracts.Structures;
+
 using WinUIEx;
 
 namespace Delete_Newline;

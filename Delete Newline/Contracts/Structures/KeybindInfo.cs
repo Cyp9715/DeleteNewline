@@ -1,14 +1,35 @@
-﻿namespace Delete_Newline.Contracts.Structures;
+using Windows.System;
+
+namespace Delete_Newline.Contracts.Structures;
+
+public class KeybindInfo
+{
+    public required Keybind Keybind;
+    public required RegexChain RegexChain;
+}
+
+public class Keybind
+{
+    public VirtualKey Key1 { get; set; } = VirtualKey.None;
+    public VirtualKey Key2 { get; set; } = VirtualKey.None;
+
+    public Keybind()
+    {
+
+    }
+}
 
 public class RegexChain
 {
     public string ChainName { get; set; }
+    public string ChainComment { get; set; }
     public List<string> RegexExpressions { get; set; } = new List<string>();
     public List<string> Replaces { get; set; } = new List<string>();
 
-    public RegexChain(string ruleName)
+    public RegexChain(string ruleName, string chainComment)
     {
         ChainName = ruleName;
+        ChainComment = chainComment;
     }
 
     public IReadOnlyList<string> GetRegexExpressions() => RegexExpressions.AsReadOnly();
