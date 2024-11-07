@@ -9,39 +9,39 @@ public class KeybindCollectManagerService
 {
     private readonly ILocalSettingsService _localSettingsService;
     private const string KeybindCollectionSettingsKey = "KeybindCollection";
-    public ObservableCollection<KeybindInfo> KeybindInfos { get; private set; }
+    public ObservableCollection<KeybindPageConfiguration> KeybindConfigs { get; private set; }
 
     public KeybindCollectManagerService(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
-        KeybindInfos = new ObservableCollection<KeybindInfo>();
-        KeybindInfos.CollectionChanged += KeybindInfos_CollectionChanged;
+        KeybindConfigs = new ObservableCollection<KeybindPageConfiguration>();
+        KeybindConfigs.CollectionChanged += KeybindConfigs_CollectionChanged;
     }
 
     public async Task InitializeAsync()
     {
-        var savedChains = await _localSettingsService.ReadSettingAsync<ObservableCollection<KeybindInfo>>(KeybindCollectionSettingsKey);
+        var savedChains = await _localSettingsService.ReadSettingAsync<ObservableCollection<KeybindPageConfiguration>>(KeybindCollectionSettingsKey);
         if (savedChains != null)
         {
-            KeybindInfos = savedChains;
-            KeybindInfos.CollectionChanged += KeybindInfos_CollectionChanged;
+            KeybindConfigs = savedChains;
+            KeybindConfigs.CollectionChanged += KeybindConfigs_CollectionChanged;
         }
     }
 
-    public ObservableCollection<KeybindInfo> GetKeybindInfos()
+    public ObservableCollection<KeybindPageConfiguration> GetKeybindConfigs()
     {
-        return KeybindInfos;
+        return KeybindConfigs;
     }
 
-    public void AddKeybindInfo(KeybindInfo? keybindInfo = null)
+    public void AddKeybindConfig(KeybindPageConfiguration? keybindConfig = null)
     {
-        if (keybindInfo is not null)
+        if (keybindConfig is not null)
         {
-            KeybindInfos.Add(keybindInfo);
+            KeybindConfigs.Add(keybindConfig);
         }
         else
         {
-            KeybindInfos.Add(new KeybindInfo
+            KeybindConfigs.Add(new KeybindPageConfiguration
             {
                 Keybind = new Keybind(),
                 RegexChain = new RegexChain("New chain", "")
@@ -49,20 +49,20 @@ public class KeybindCollectManagerService
         }
     }
 
-    public void RemoveKeybindInfo(KeybindInfo keybindInfo)
+    public void RemoveKeybindConfig(KeybindPageConfiguration keybindConfig)
     {
-        if (KeybindInfos.Contains(keybindInfo))
+        if (KeybindConfigs.Contains(keybindConfig))
         {
-            KeybindInfos.Remove(keybindInfo);
+            KeybindConfigs.Remove(keybindConfig);
         }
     }
 
-    private async void KeybindInfos_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private async void KeybindConfigs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         // Code used to prevent unnecessary SaveSettingAsync calls caused by rapid Remove and Add operations during Drag&Drop.
         if (KeybindCollectViewModel.isDragEnded is true)
         {
-            await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, KeybindInfos);
+            await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, KeybindConfigs);
         }
         else
         {

@@ -51,9 +51,9 @@
                     </NavigationViewItem.Icon>
 
                     <NavigationViewItem.MenuItems>
-                        <ItemsControl ItemsSource="{x:Bind ViewModel.KeybindInfos, Mode=OneWay}">
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.KeybindConfigs, Mode=OneWay}">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="structures:KeybindInfo">
+                                <DataTemplate x:DataType="structures:KeybindPageConfiguration">
                                     <NavigationViewItem Content="{x:Bind RegexChain.ChainName}">
                                         <i:Interaction.Behaviors>
                                             <core:EventTriggerBehavior EventName="Tapped">

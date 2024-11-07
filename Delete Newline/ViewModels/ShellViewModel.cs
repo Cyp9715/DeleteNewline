@@ -19,7 +19,7 @@ public partial class ShellViewModel : ObservableRecipient
     private object? selectedItem;
 
     [ObservableProperty]
-    private ObservableCollection<KeybindInfo> _keybindInfos;
+    private ObservableCollection<KeybindPageConfiguration> _keybindConfigs;
 
     public INavigationService NavigationService { get; }
     public INavigationViewService NavigationViewService { get; }
@@ -34,7 +34,7 @@ public partial class ShellViewModel : ObservableRecipient
         NavigationViewService = navigationViewService;
 
         NavigationService.Navigated += OnNavigated;
-        KeybindInfos = _keybindCollectManagerService.KeybindInfos;
+        KeybindConfigs = _keybindCollectManagerService.KeybindConfigs;
     }
 
     private void OnNavigated(object sender, NavigationEventArgs e)

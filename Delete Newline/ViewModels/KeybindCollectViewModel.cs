@@ -11,26 +11,26 @@ public partial class KeybindCollectViewModel : ObservableRecipient
     private readonly KeybindCollectManagerService _keybindCollectManagerService;
 
     [ObservableProperty]
-    public ObservableCollection<KeybindInfo> _keybindInfos;
+    public ObservableCollection<KeybindPageConfiguration> _keybindConfigs;
 
     public KeybindCollectViewModel(KeybindCollectManagerService keybindCollectManagerService)
     {
         _keybindCollectManagerService = keybindCollectManagerService;
-        KeybindInfos = _keybindCollectManagerService.KeybindInfos;
+        KeybindConfigs = _keybindCollectManagerService.KeybindConfigs;
     }
 
     [RelayCommand]
     private void AddKeybind()
     {
-        _keybindCollectManagerService.AddKeybindInfo();
+        _keybindCollectManagerService.AddKeybindConfig();
     }
 
     [RelayCommand]
-    private void RemoveKeybind(KeybindInfo keybindInfo)
+    private void RemoveKeybind(KeybindPageConfiguration keybindConfig)
     {
-        if (keybindInfo is not null)
+        if (keybindConfig is not null)
         {
-            _keybindCollectManagerService.RemoveKeybindInfo(keybindInfo);
+            _keybindCollectManagerService.RemoveKeybindConfig(keybindConfig);
         }
     }
 

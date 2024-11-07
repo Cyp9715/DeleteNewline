@@ -1,23 +1,4 @@
-using Windows.System;
-
 namespace Delete_Newline.Contracts.Structures;
-
-public class KeybindInfo
-{
-    public required Keybind Keybind;
-    public required RegexChain RegexChain;
-}
-
-public class Keybind
-{
-    public VirtualKey Key1 { get; set; } = VirtualKey.None;
-    public VirtualKey Key2 { get; set; } = VirtualKey.None;
-
-    public Keybind()
-    {
-
-    }
-}
 
 public class RegexChain
 {

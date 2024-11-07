@@ -12,7 +12,7 @@
     DataContext="{x:Bind ViewModel}">
 
     <Grid>
-        <GridView ItemsSource="{x:Bind ViewModel.KeybindInfos, Mode=OneWay}"
+        <GridView ItemsSource="{x:Bind ViewModel.KeybindConfigs, Mode=OneWay}"
                   Padding="12"
                   CanReorderItems="True"
                   CanDragItems="True"
@@ -28,7 +28,7 @@
             </i:Interaction.Behaviors>
 
             <GridView.ItemTemplate>
-                <DataTemplate x:DataType="structures:KeybindInfo">
+                <DataTemplate x:DataType="structures:KeybindPageConfiguration">
                     <Grid Width="310" 
                           Height="90" 
                           Margin="6" 
