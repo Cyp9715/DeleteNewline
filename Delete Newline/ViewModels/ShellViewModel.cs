@@ -33,23 +33,14 @@ public partial class ShellViewModel : ObservableRecipient
         NavigationService = navigationService;
         NavigationViewService = navigationViewService;
 
-        NavigationService.Navigated += OnNavigated;
         KeybindConfigs = _keybindCollectManagerService.KeybindConfigs;
     }
 
-    private void OnNavigated(object sender, NavigationEventArgs e)
+    [RelayCommand]
+    private void PageLoaded()
     {
-        if (e.SourcePageType == typeof(SettingsPage))
-        {
-            SelectedItem = NavigationViewService.SettingsItem;
-            return;
-        }
-
-        var item = NavigationViewService.GetSelectedItem(e.SourcePageType);
-        if (item != null)
-        {
-            SelectedItem = item;
-        }
+        // Set MemoPage as the default selected item
+        SelectedItem = NavigationViewService.GetSelectedItem(typeof(MemoPage));
     }
 
     [RelayCommand]

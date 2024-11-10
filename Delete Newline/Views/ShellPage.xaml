@@ -12,6 +12,12 @@
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     DataContext="{x:Bind ViewModel}">
 
+    <i:Interaction.Behaviors>
+        <core:EventTriggerBehavior EventName="Loaded">
+            <core:InvokeCommandAction Command="{x:Bind ViewModel.PageLoadedCommand}" />
+        </core:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+
     <Grid>
         <Grid x:Name="AppTitleBar"
               Height="{Binding ElementName=NavigationViewControl, Path=CompactPaneLength}"
@@ -32,12 +38,13 @@
             x:Name="NavigationViewControl"
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="False"
-            SelectedItem="{x:Bind ViewModel.SelectedItem}"
+            SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
             PaneDisplayMode="LeftCompact"
             DisplayModeChanged="NavigationViewControl_DisplayModeChanged">
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Uid="Shell_Memo" 
-                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.MemoViewModel">
+                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.MemoViewModel"
+                                    x:Name="MemoPageItem">>
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE70B;"/>
                     </NavigationViewItem.Icon>
@@ -54,17 +61,8 @@
                         <ItemsControl ItemsSource="{x:Bind ViewModel.KeybindConfigs, Mode=OneWay}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="structures:KeybindPageConfiguration">
-                                    <NavigationViewItem Content="{x:Bind RegexChain.ChainName}">
-                                        <i:Interaction.Behaviors>
-                                            <core:EventTriggerBehavior EventName="Tapped">
-                                                <core:InvokeCommandAction Command="{Binding DataContext.NavigationViewItem_TappedCommand, ElementName=RootPage}"
-                                                                          CommandParameter="{Binding}"/>
-                                            </core:EventTriggerBehavior>
-                                        </i:Interaction.Behaviors>
-                                        
-                                        <NavigationViewItem.Tag>
-                                            <x:String>{x:Bind RegexChain.ChainName}</x:String>
-                                        </NavigationViewItem.Tag>
+                                    <NavigationViewItem Content="{x:Bind RegexChain.ChainName}"
+                                                        helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.KeybindViewModel">
                                     </NavigationViewItem>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
