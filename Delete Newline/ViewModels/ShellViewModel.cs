@@ -10,6 +10,7 @@ using Delete_Newline.Contracts.Structures;
 using Microsoft.UI.Xaml.Controls;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Helpers;
+using System.Collections.Specialized;
 
 namespace Delete_Newline.ViewModels;
 
@@ -24,6 +25,7 @@ public partial class ShellViewModel : ObservableRecipient
     public INavigationService NavigationService { get; }
     public INavigationViewService NavigationViewService { get; }
     private KeybindCollectManagerService _keybindCollectManagerService;
+    private NavigationViewItem? _keybindsPageItem;
 
     public ShellViewModel(KeybindCollectManagerService keybindCollectManagerService,
         INavigationService navigationService,
@@ -34,13 +36,36 @@ public partial class ShellViewModel : ObservableRecipient
         NavigationViewService = navigationViewService;
 
         KeybindConfigs = _keybindCollectManagerService.KeybindConfigs;
+        KeybindConfigs.CollectionChanged += KeybindConfigs_CollectionChanged;
     }
 
-    [RelayCommand]
-    private void PageLoaded()
+    public void InitializeKeybindsPageItem(NavigationViewItem keybindsPageItem)
     {
-        // Set MemoPage as the default selected item
-        SelectedItem = NavigationViewService.GetSelectedItem(typeof(MemoPage));
+        _keybindsPageItem = keybindsPageItem;
+        SyncKeybindsPageItem();
+    }
+
+    private void KeybindConfigs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        SyncKeybindsPageItem();
+    }
+
+    private void SyncKeybindsPageItem()
+    {
+        if (_keybindsPageItem != null)
+        {
+            _keybindsPageItem.MenuItems.Clear();
+            foreach (var config in KeybindConfigs)
+            {
+                var item = new NavigationViewItem
+                {
+                    Content = config.RegexChain.ChainName,
+                    Icon = new FontIcon { Glyph = "\uE8D3" }
+                };
+                item.SetValue(NavigationHelper.NavigateToProperty, "Delete_Newline.ViewModels.KeybindViewModel");
+                _keybindsPageItem.MenuItems.Add(item);
+            }
+        }
     }
 
     [RelayCommand]

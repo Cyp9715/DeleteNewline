@@ -1,8 +1,10 @@
+using System.Collections.ObjectModel;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Services;
-using System.Collections.ObjectModel;
 
 namespace Delete_Newline.ViewModels;
 

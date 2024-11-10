@@ -1,19 +1,16 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using Delete_Newline.Helpers;
 using Delete_Newline.ViewModels;
-using Microsoft.UI.Xaml.Input;
+using Delete_Newline.Services;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Delete_Newline.Views;
 
 public sealed partial class ShellPage : Page
 {
-    public ShellViewModel ViewModel
-    {
-        get;
-    }
-
+    public ShellViewModel ViewModel { get; }
 
     public ShellPage(ShellViewModel viewModel)
     {
@@ -28,9 +25,13 @@ public sealed partial class ShellPage : Page
         AppTitleBarText.Text = "AppDisplayName".GetLocalized();
     }
 
-    private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        TitleBarHelper.UpdateTitleBar(RequestedTheme);
+        // Set MemoPage as the default selected item
+        ViewModel.SelectedItem = ViewModel.NavigationViewService.GetSelectedItem(typeof(MemoPage));
+
+        // Initialize KeybindsPageItem
+        ViewModel.InitializeKeybindsPageItem(KeybindsPageItem);
     }
 
     private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
