@@ -8,16 +8,16 @@
     <Thickness x:Key="CheckBoxCompactPadding">0</Thickness>
 
     <!-- 
-        ¾ÈÅ¸±õ°Ôµµ, WinUI3 ´Â Á¦´ë·ÎµÈ BasedOn À» Áö¿øÇÏÁö ¾Ê´Âµí ÇÕ´Ï´Ù.
+        ì•ˆíƒ€ê¹ê²Œë„, WinUI3 ëŠ” ì œëŒ€ë¡œëœ BasedOn ì„ ì§€ì›í•˜ì§€ ì•ŠëŠ”ë“¯ í•©ë‹ˆë‹¤.
         
         <ResourceDictionary.MergedDictionaries>
             <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
         </ResourceDictionary.MergedDictionaries>
         
-        À§¿Í °°Àº ¹æ½ÄÀ» »ç¿ëÇÏ¿© BasedOnÀ» Àû¿ë½ÃÅ³ ¼ö ÀÖÁö¸¸, Àü¿ªÀûÀ¸·Î Àû¿ëµÇ¾î TitleBar ¿µ¿ªÀ» Ä§¹üÇÏ´Â ¹®Á¦°¡ ÀÖ½À´Ï´Ù.
-        ¶§¹®¿¡ DefaultCheckBoxStyleÀ» ±×´ë·Î º¹»çÇÑµÚ, ÇÊ¿äÇÑ ºÎºÐ¸¸ º¯°æÇÏ´Â ÀýÂ÷¸¦ °ÅÃÆ½À´Ï´Ù.
+        ìœ„ì™€ ê°™ì€ ë°©ì‹ì„ ì‚¬ìš©í•˜ì—¬ BasedOnì„ ì ìš©ì‹œí‚¬ ìˆ˜ ìžˆì§€ë§Œ, ì „ì—­ì ìœ¼ë¡œ ì ìš©ë˜ì–´ TitleBar ì˜ì—­ì„ ì¹¨ë²”í•˜ëŠ” ë¬¸ì œê°€ ìžˆìŠµë‹ˆë‹¤.
+        ë•Œë¬¸ì— DefaultCheckBoxStyleì„ ê·¸ëŒ€ë¡œ ë³µì‚¬í•œë’¤, í•„ìš”í•œ ë¶€ë¶„ë§Œ ë³€ê²½í•˜ëŠ” ì ˆì°¨ë¥¼ ê±°ì³¤ìŠµë‹ˆë‹¤.
     
-        ÇØ´ç °úÁ¤À» °ÅÄ¡Áö ¾Ê°í, BasedOn ¾øÀÌ ÇØ´ç ¿É¼ÇÀÇ Style¸¸ ÁöÁ¤ÇÒ °æ¿ì Animation µîÀÌ Àû¿ëµÇÁö ¾ÊÀ½. 
+        í•´ë‹¹ ê³¼ì •ì„ ê±°ì¹˜ì§€ ì•Šê³ , BasedOn ì—†ì´ í•´ë‹¹ ì˜µì…˜ì˜ Styleë§Œ ì§€ì •í•  ê²½ìš° Animation ë“±ì´ ì ìš©ë˜ì§€ ì•ŠìŒ. 
     -->
     <Style x:Key="CompactCheckBox" TargetType="CheckBox">
         <Setter Property="Background" Value="{ThemeResource CheckBoxBackgroundUnchecked}" />

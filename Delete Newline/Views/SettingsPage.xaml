@@ -1,13 +1,12 @@
-﻿<Page
-    x:Class="Delete_Newline.Views.SettingsPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
-    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-    xmlns:models="using:Delete_Newline.Models"
-    xmlns:helpers="using:Delete_Newline.Helpers"
-    xmlns:xaml="using:Microsoft.UI.Xaml"
-    x:Uid="SettingsPage_Title">
+<Page x:Class="Delete_Newline.Views.SettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
+      xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+      xmlns:models="using:Delete_Newline.Models"
+      xmlns:helpers="using:Delete_Newline.Helpers"
+      xmlns:xaml="using:Microsoft.UI.Xaml"
+      x:Uid="SettingsPage_Title">
 
     <ScrollViewer>
         <Grid>
@@ -19,23 +18,24 @@
             <StackPanel Grid.Row="0"
                         MaxWidth="500">
 
-                <Line
-                    X1="0" Y1="0" X2="1000" Y2="0"
-                    Stroke="{ThemeResource DividerStrokeColorDefaultBrush}"
-                    StrokeThickness="1"
-                    Margin="0,10,0,10"/>
+                <Line X1="0"
+                      Y1="0"
+                      X2="1000"
+                      Y2="0"
+                      Stroke="{ThemeResource DividerStrokeColorDefaultBrush}"
+                      StrokeThickness="1"
+                      Margin="0,10,0,10" />
 
                 <Grid Height="40">
                     <TextBlock x:Uid="Settings_StartOnTray"
-                               VerticalAlignment="Center"/>
-                    <ToggleSwitch HorizontalAlignment="Right" 
-                              Style="{StaticResource CompactToggleSwitch}"/>
+                               VerticalAlignment="Center" />
+                    <ToggleSwitch HorizontalAlignment="Right"
+                                  Style="{StaticResource CompactToggleSwitch}" />
                 </Grid>
-
 
                 <Grid Height="40">
                     <TextBlock x:Uid="Settings_Theme"
-                               VerticalAlignment="Center"/>
+                               VerticalAlignment="Center" />
 
                     <ComboBox Width="125"
                               x:Name="ThemeComboBox"
@@ -48,15 +48,18 @@
                                                           CommandParameter="{Binding SelectedValue, ElementName=ThemeComboBox}" />
                             </core:EventTriggerBehavior>
                         </behaviors:Interaction.Behaviors>
-                        <ComboBoxItem x:Uid="Settings_Theme_Default" Tag="Default" />
-                        <ComboBoxItem x:Uid="Settings_Theme_Light" Tag="Light" />
-                        <ComboBoxItem x:Uid="Settings_Theme_Dark" Tag="Dark" />
+                        <ComboBoxItem x:Uid="Settings_Theme_Default"
+                                      Tag="Default" />
+                        <ComboBoxItem x:Uid="Settings_Theme_Light"
+                                      Tag="Light" />
+                        <ComboBoxItem x:Uid="Settings_Theme_Dark"
+                                      Tag="Dark" />
                     </ComboBox>
                 </Grid>
 
                 <Grid Height="40">
                     <TextBlock x:Uid="Settings_Language"
-                               VerticalAlignment="Center"/>
+                               VerticalAlignment="Center" />
 
                     <ComboBox Width="125"
                               x:Name="LanguageComboBox"
@@ -75,16 +78,16 @@
 
                 <Grid Height="40">
                     <TextBlock x:Uid="Settings_Notification"
-                               VerticalAlignment="Center"/>
+                               VerticalAlignment="Center" />
                     <ToggleSwitch x:Name="NotificationCheckBox"
-                              IsOn="{x:Bind ViewModel.EnableNotification}" 
-                              HorizontalAlignment="Right"
-                              Style="{StaticResource CompactToggleSwitch}">
+                                  IsOn="{x:Bind ViewModel.EnableNotification}"
+                                  HorizontalAlignment="Right"
+                                  Style="{StaticResource CompactToggleSwitch}">
 
                         <behaviors:Interaction.Behaviors>
                             <core:EventTriggerBehavior EventName="Toggled">
-                                <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleNotificationCommand}" 
-                                      CommandParameter="{Binding IsOn, ElementName=NotificationCheckBox}"/>
+                                <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleNotificationCommand}"
+                                                          CommandParameter="{Binding IsOn, ElementName=NotificationCheckBox}" />
                             </core:EventTriggerBehavior>
                         </behaviors:Interaction.Behaviors>
 
@@ -93,16 +96,16 @@
 
                 <Grid Height="40">
                     <TextBlock x:Uid="Settings_TopMost"
-                               VerticalAlignment="Center"/>
+                               VerticalAlignment="Center" />
                     <ToggleSwitch x:Name="TopMostToggleSwitch"
-                              IsOn="{x:Bind ViewModel.EnableTopMost}" 
-                              HorizontalAlignment="Right"
-                              Style="{StaticResource CompactToggleSwitch}">
+                                  IsOn="{x:Bind ViewModel.EnableTopMost}"
+                                  HorizontalAlignment="Right"
+                                  Style="{StaticResource CompactToggleSwitch}">
 
                         <behaviors:Interaction.Behaviors>
                             <core:EventTriggerBehavior EventName="Toggled">
-                                <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleTopMostCommand}" 
-                                      CommandParameter="{Binding IsOn, ElementName=TopMostToggleSwitch}"/>
+                                <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleTopMostCommand}"
+                                                          CommandParameter="{Binding IsOn, ElementName=TopMostToggleSwitch}" />
                             </core:EventTriggerBehavior>
                         </behaviors:Interaction.Behaviors>
                     </ToggleSwitch>
@@ -110,11 +113,11 @@
             </StackPanel>
 
             <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}"
-                   Style="{ThemeResource BodyTextBlockStyle}"
-                   Grid.Row="1"     
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom"
-                   Margin="500,0,0,20"/>
+                       Style="{ThemeResource BodyTextBlockStyle}"
+                       Grid.Row="1"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
+                       Margin="500,0,0,20" />
 
         </Grid>
     </ScrollViewer>

@@ -90,6 +90,7 @@
   <ItemGroup>
     <None Remove="MultilingualResources\Delete Newline.ko-KR.xlf" />
     <None Remove="Styles\CheckBox.xaml" />
+    <None Remove="Styles\TextBox.xaml" />
     <None Remove="Styles\ToggleSwitch.xaml" />
     <None Remove="Views\KeybindCollectPage.xaml" />
   </ItemGroup>
@@ -133,5 +134,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="C:\Users\Cyphe\Filen\Project\Source Code\DeleteNewline\Delete Newline\.editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Styles\TextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>
