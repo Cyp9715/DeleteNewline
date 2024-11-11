@@ -67,22 +67,4 @@ public partial class ShellViewModel : ObservableRecipient
             }
         }
     }
-
-    [RelayCommand]
-    private void NavigationViewItem_Tapped(object sender)
-    {
-        // sender가 NavigationViewItem 타입으로 캐스팅 가능한지 확인
-        if (sender is NavigationViewItem item)
-        {
-            // 선택된 아이템을 업데이트
-            SelectedItem = item;
-
-            // NavigationHelper에서 설정한 타겟 ViewModel로 내비게이션 수행
-            var targetViewModel = item.GetValue(NavigationHelper.NavigateToProperty) as Type;
-            if (targetViewModel != null)
-            {
-                SelectedItem = targetViewModel;
-            }
-        }
-    }
 }
