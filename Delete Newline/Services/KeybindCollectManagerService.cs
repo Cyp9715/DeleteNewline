@@ -44,7 +44,7 @@ public class KeybindCollectManagerService
             KeybindConfigs.Add(new KeybindPageConfiguration
             {
                 Keybind = new Keybind(),
-                RegexChain = new RegexChain("분노한한동교 chain", "")
+                RegexChain = new RegexChain("New Chain", "chain comment")
             });
         }
     }
