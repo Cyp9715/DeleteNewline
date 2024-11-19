@@ -29,9 +29,6 @@ public sealed partial class ShellPage : Page
     {
         // Set MemoPage as the default selected item
         ViewModel.SelectedItem = ViewModel.NavigationViewService.GetSelectedItem(typeof(MemoPage));
-
-        // Initialize KeybindsPageItem
-        ViewModel.InitializeKeybindsPageItem(KeybindsPageItem);
     }
 
     private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)

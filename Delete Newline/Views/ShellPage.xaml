@@ -33,6 +33,7 @@
                         SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
                         PaneDisplayMode="LeftCompact"
                         DisplayModeChanged="NavigationViewControl_DisplayModeChanged">
+            
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Uid="Shell_Memo"
                                     helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.MemoViewModel"
