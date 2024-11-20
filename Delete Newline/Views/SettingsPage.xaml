@@ -40,7 +40,7 @@
                     <ComboBox Width="125"
                               x:Name="ThemeComboBox"
                               HorizontalAlignment="Right"
-                              SelectedValue="{x:Bind ViewModel.SelectedTheme}"
+                              SelectedValue="{Binding ViewModel.SelectedTheme}"
                               SelectedValuePath="Tag">
                         <behaviors:Interaction.Behaviors>
                             <core:EventTriggerBehavior EventName="SelectionChanged">

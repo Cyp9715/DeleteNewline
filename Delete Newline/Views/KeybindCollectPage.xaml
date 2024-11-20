@@ -2,13 +2,11 @@
     x:Class="Delete_Newline.Views.KeybindCollectPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:behaviors="using:Microsoft.Xaml.Interactions.Core"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:Delete_Newline.Contracts.Structures"
-    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:structures="using:Delete_Newline.Contracts.Structures"
-    xmlns:i="using:Microsoft.Xaml.Interactivity"
-    DataContext="{x:Bind ViewModel}">
+    xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
     <Grid>
         <GridView ItemsSource="{x:Bind ViewModel.KeybindConfigs, Mode=OneWay}"
@@ -17,21 +15,21 @@
                   CanDragItems="True"
                   AllowDrop="True">
 
-            <i:Interaction.Behaviors>
+            <behaviors:Interaction.Behaviors>
                 <core:EventTriggerBehavior EventName="DragItemsStarting">
                     <core:InvokeCommandAction Command="{x:Bind ViewModel.DragItemsStartingCommand}" />
                 </core:EventTriggerBehavior>
                 <core:EventTriggerBehavior EventName="DragItemsCompleted">
                     <core:InvokeCommandAction Command="{x:Bind ViewModel.DragItemsCompletedCommand}" />
                 </core:EventTriggerBehavior>
-            </i:Interaction.Behaviors>
+            </behaviors:Interaction.Behaviors>
 
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="structures:KeybindPageConfiguration">
-                    <Grid Width="310" 
-                          Height="90" 
-                          Margin="6" 
-                          Padding="12" 
+                    <Grid Width="310"
+                          Height="90"
+                          Margin="6"
+                          Padding="12"
                           Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
 
                         <Grid.ColumnDefinitions>
@@ -49,13 +47,20 @@
                         </StackPanel>
                         <Grid.ContextFlyout>
                             <MenuFlyout>
-                                <MenuFlyoutItem Text="Remove" 
-                                                Icon="Delete" 
+                                <MenuFlyoutItem Text="Remove"
+                                                Icon="Delete"
                                                 Command="{Binding DataContext.RemoveKeybindCommand, ElementName=RootPage}"
                                                 CommandParameter="{Binding}">
                                 </MenuFlyoutItem>
                             </MenuFlyout>
                         </Grid.ContextFlyout>
+
+                        <behaviors:Interaction.Behaviors>
+                            <core:EventTriggerBehavior EventName="DoubleTapped">
+                                <core:InvokeCommandAction Command="{Binding DataContext.NavigateToKeybindPageCommand, ElementName=RootPage}"
+                                                          CommandParameter="{Binding}" />
+                            </core:EventTriggerBehavior>
+                        </behaviors:Interaction.Behaviors>
                     </Grid>
                 </DataTemplate>
             </GridView.ItemTemplate>

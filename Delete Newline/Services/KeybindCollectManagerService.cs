@@ -23,10 +23,14 @@ public class KeybindCollectManagerService
         var savedChains = await _localSettingsService.ReadSettingAsync<ObservableCollection<KeybindPageConfiguration>>(KeybindCollectionSettingsKey);
         if (savedChains != null)
         {
-            KeybindConfigs = savedChains;
-            KeybindConfigs.CollectionChanged += KeybindConfigs_CollectionChanged;
+            KeybindConfigs.Clear(); // 기존 아이템 제거
+            foreach (var chain in savedChains)
+            {
+                KeybindConfigs.Add(chain); // 새 아이템 추가
+            }
         }
     }
+
 
     public ObservableCollection<KeybindPageConfiguration> GetKeybindConfigs()
     {

@@ -1,11 +1,18 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace Delete_Newline.Contracts.Structures;
 
-public class RegexChain
+public partial class RegexChain : ObservableObject
 {
-    public string ChainName { get; set; }
-    public string ChainComment { get; set; }
-    public List<string> RegexExpressions { get; set; } = new List<string>();
-    public List<string> Replaces { get; set; } = new List<string>();
+    [ObservableProperty]
+    public string _chainName;
+    [ObservableProperty]
+    public string _chainComment;
+    [ObservableProperty]
+    public ObservableCollection<string> _regexExpressions = new ObservableCollection<string>();
+    [ObservableProperty]
+    public ObservableCollection<string> _replaces = new ObservableCollection<string>();
 
     public RegexChain(string ruleName, string chainComment)
     {
@@ -31,15 +38,6 @@ public class RegexChain
         }
     }
 
-    public void SwapRules(int index1, int index2)
-    {
-        if (IsValidIndex(index1) && IsValidIndex(index2) && index1 != index2)
-        {
-            SwapElements(RegexExpressions, index1, index2);
-            SwapElements(Replaces, index1, index2);
-        }
-    }
-
     // remove oldIndex, move new Index.
     public void MoveRule(int oldIndex, int newIndex)
     {
@@ -59,12 +57,5 @@ public class RegexChain
     private bool IsValidIndex(int index)
     {
         return index >= 0 && index < RegexExpressions.Count;
-    }
-
-    private void SwapElements<T>(List<T> list, int index1, int index2)
-    {
-        T temp = list[index1];
-        list[index1] = list[index2];
-        list[index2] = temp;
     }
 }

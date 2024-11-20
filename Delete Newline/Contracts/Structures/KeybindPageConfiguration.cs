@@ -1,7 +1,15 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Delete_Newline.Contracts.Structures;
 
-public class KeybindPageConfiguration
+public partial class KeybindPageConfiguration : ObservableObject
 {
-    public required Keybind Keybind { get; set; }
-    public required RegexChain RegexChain { get; set; }
+    [ObservableProperty]
+    public Keybind? _keybind;
+
+    [ObservableProperty]
+    public RegexChain? _regexChain;
+
+    [ObservableProperty]
+    public string? _testText;
 }

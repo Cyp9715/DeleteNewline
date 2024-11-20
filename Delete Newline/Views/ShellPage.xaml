@@ -5,10 +5,6 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:helpers="using:Delete_Newline.Helpers"
-      xmlns:behaviors="using:Delete_Newline.Behaviors"
-      xmlns:structures="using:Delete_Newline.Contracts.Structures"
-      xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-      xmlns:i="using:Microsoft.Xaml.Interactivity"
       Loaded="OnLoaded">
 
     <Grid>

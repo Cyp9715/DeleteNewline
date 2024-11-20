@@ -70,7 +70,7 @@ public partial class App : Application
 
                 services.AddTransient<KeybindCollectViewModel>();
                 services.AddTransient<KeybindCollectPage>();
-                services.AddTransient<KeybindViewModel>();
+                services.AddSingleton<KeybindViewModel>(); // KeybindViewModel is Singleton.
                 services.AddTransient<KeybindPage>();
 
                 services.AddTransient<MemoViewModel>();

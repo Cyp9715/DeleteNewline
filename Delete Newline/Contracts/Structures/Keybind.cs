@@ -1,11 +1,13 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Windows.System;
 
 namespace Delete_Newline.Contracts.Structures;
 
-public class Keybind
+public partial class Keybind : ObservableObject
 {
-    public VirtualKey Key1 { get; set; } = VirtualKey.None;
-    public VirtualKey Key2 { get; set; } = VirtualKey.None;
+    [ObservableProperty]
+    public VirtualKey _key1;
+    public VirtualKey _key2;
 
     public Keybind()
     {
