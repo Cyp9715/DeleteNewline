@@ -12,7 +12,7 @@ public sealed partial class MemoPage : Page
 
     public MemoPage()
     {
-        ViewModel = App.GetService<MemoViewModel>();
         InitializeComponent();
+        ViewModel = App.GetService<MemoViewModel>();
     }
 }

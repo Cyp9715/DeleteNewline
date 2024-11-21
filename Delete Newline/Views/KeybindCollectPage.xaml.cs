@@ -12,8 +12,8 @@ public sealed partial class KeybindCollectPage : Page
 
     public KeybindCollectPage()
     {
-        ViewModel = App.GetService<KeybindCollectViewModel>();
         InitializeComponent();
+        ViewModel = App.GetService<KeybindCollectViewModel>();
         DataContext = ViewModel;
     }
 }

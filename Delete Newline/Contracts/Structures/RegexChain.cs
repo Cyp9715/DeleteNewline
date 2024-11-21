@@ -6,18 +6,14 @@ namespace Delete_Newline.Contracts.Structures;
 public partial class RegexChain : ObservableObject
 {
     [ObservableProperty]
-    public string _chainName;
-    [ObservableProperty]
-    public string _chainComment;
-    [ObservableProperty]
     public ObservableCollection<string> _regexExpressions = new ObservableCollection<string>();
     [ObservableProperty]
     public ObservableCollection<string> _replaces = new ObservableCollection<string>();
 
-    public RegexChain(string ruleName, string chainComment)
+    public RegexChain(string firstRegexExpression = "", string firstReplace = "")
     {
-        ChainName = ruleName;
-        ChainComment = chainComment;
+        RegexExpressions.Add(firstRegexExpression);
+        Replaces.Add(firstReplace);
     }
 
     public IReadOnlyList<string> GetRegexExpressions() => RegexExpressions.AsReadOnly();

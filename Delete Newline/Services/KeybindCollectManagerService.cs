@@ -23,10 +23,10 @@ public class KeybindCollectManagerService
         var savedChains = await _localSettingsService.ReadSettingAsync<ObservableCollection<KeybindPageConfiguration>>(KeybindCollectionSettingsKey);
         if (savedChains != null)
         {
-            KeybindConfigs.Clear(); // 기존 아이템 제거
+            KeybindConfigs.Clear();
             foreach (var chain in savedChains)
             {
-                KeybindConfigs.Add(chain); // 새 아이템 추가
+                KeybindConfigs.Add(chain);
             }
         }
     }
@@ -48,7 +48,7 @@ public class KeybindCollectManagerService
             KeybindConfigs.Add(new KeybindPageConfiguration
             {
                 Keybind = new Keybind(),
-                RegexChain = new RegexChain("New Chain", "chain comment")
+                RegexChain = new RegexChain()
             });
         }
     }

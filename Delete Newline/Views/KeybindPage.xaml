@@ -7,8 +7,28 @@
     <ScrollViewer>
         <Grid>
             <StackPanel MaxWidth="550">
-                <!-- Keybind Input -->
+                <!-- Keybind Name -->
                 <Grid Margin="0,25,0,0">
+                    <TextBlock Text="Keybind Name"></TextBlock>
+                    <TextBox x:Name="TextBox_keybindName"
+                             Width="285"
+                             TextAlignment="Center"
+                             HorizontalAlignment="Right"
+                             Text="{Binding CurrentKeybindConfig.KeybindName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+
+                <!-- Keybind Comment -->
+                <Grid Margin="0,5,0,0">
+                    <TextBlock Text="Keybind Comment"></TextBlock>
+                    <TextBox x:Name="TextBox_keybindComment"
+                             Width="285"
+                             TextAlignment="Center"
+                             HorizontalAlignment="Right"
+                             Text="{Binding CurrentKeybindConfig.KeybindComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+
+                <!-- Keybind Input -->
+                <Grid Margin="0,5,0,0">
                     <TextBlock Text="Keybind"></TextBlock>
                     <TextBox x:Name="TextBox_keybind"
                              Width="285"

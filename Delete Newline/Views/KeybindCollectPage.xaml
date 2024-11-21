@@ -36,10 +36,10 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="1"
                                     VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind RegexChain.ChainName}"
+                            <TextBlock Text="{x:Bind KeybindName}"
                                        FontWeight="SemiBold"
                                        FontSize="16" />
-                            <TextBlock Text="{x:Bind RegexChain.ChainComment}"
+                            <TextBlock Text="{x:Bind KeybindComment}"
                                        FontSize="12"
                                        TextWrapping="Wrap" />
                         </StackPanel>
