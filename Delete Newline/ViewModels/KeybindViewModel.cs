@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
 
 namespace Delete_Newline.ViewModels;
@@ -6,5 +7,17 @@ namespace Delete_Newline.ViewModels;
 public partial class KeybindViewModel : ObservableRecipient
 {
     [ObservableProperty]
-    public KeybindPageConfiguration? _currentKeybindConfig;
+    private KeybindPageConfiguration _currentKeybindConfig;
+
+    [RelayCommand]
+    private void AddRegexItem()
+    {
+        CurrentKeybindConfig.RegexChain.AddChainItem();
+    }
+
+    [RelayCommand]
+    private void RemoveRegexItem(ChainItem item)
+    {
+        CurrentKeybindConfig.RegexChain.ChainItems.Remove(item);
+    }
 }

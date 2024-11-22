@@ -1,6 +1,8 @@
-<Page x:Class="Delete_Newline.Views.KeybindPage"
+<Page x:Name="RootPage"
+      x:Class="Delete_Newline.Views.KeybindPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:structures="using:Delete_Newline.Contracts.Structures"
       xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
@@ -37,65 +39,76 @@
                              Text="{Binding CurrentKeybindConfig.Keybind.Key1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
 
-                <!-- Regex Expression Group -->
-                <Grid Margin="0,25,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <!-- Additional Regex Items -->
+                <ItemsRepeater ItemsSource="{Binding CurrentKeybindConfig.RegexChain.ChainItems}">
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="structures:ChainItem">
+                            <Grid Margin="0,5,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                    <!-- Expression Group -->
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Regex Expression"
-                                   VerticalAlignment="Center"
-                                   Grid.Column="0" />
-                        <TextBox x:Name="TextBox_regexExpression"
-                                 Grid.Column="1"
-                                 Width="250"
-                                 TextAlignment="Center"
-                                 HorizontalAlignment="Right"
-                                 Text="{Binding CurrentKeybindConfig.RegexChain.RegexExpressions[0], Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </Grid>
+                                <!-- Regex Expression -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Regex Expression"
+                                               VerticalAlignment="Center"
+                                               Grid.Column="0" />
+                                    <TextBox Grid.Column="1"
+                                             Width="250"
+                                             TextAlignment="Center"
+                                             HorizontalAlignment="Right"
+                                             Text="{Binding RegexExpression, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
 
-                    <!-- Replace Group -->
-                    <Grid Grid.Row="1"
-                          Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Replace"
-                                   VerticalAlignment="Center"
-                                   Grid.Column="0" />
-                        <TextBox x:Name="TextBox_regexReplace"
-                                 Grid.Column="1"
-                                 Width="250"
-                                 HorizontalAlignment="Right"
-                                 TextAlignment="Center"
-                                 Foreground="Red"
-                                 Text="{Binding CurrentKeybindConfig.RegexChain.Replaces[0], Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </Grid>
+                                <!-- Replace -->
+                                <Grid Grid.Row="1"
+                                      Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="└ Replace"
+                                               VerticalAlignment="Center"
+                                               Grid.Column="0" />
+                                    <TextBox Grid.Column="1"
+                                             Width="250"
+                                             HorizontalAlignment="Right"
+                                             TextAlignment="Center"
+                                             Foreground="Red"
+                                             Text="{Binding Replace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
 
-                    <!-- Add Button -->
-                    <Button x:Name="Button_addRegex"
-                            Width="30"
-                            Height="30"
-                            Padding="0"
-                            Grid.RowSpan="2"
-                            Grid.Column="1"
-                            Margin="5,0,0,0">
-                        <FontIcon Glyph="&#xE710;"
-                                  FontSize="12" />
-                    </Button>
-                </Grid>
+                                <!-- Remove Button -->
+                                <Button Width="30"
+                                        Height="30"
+                                        Padding="0"
+                                        Grid.RowSpan="2"
+                                        Grid.Column="1"
+                                        Margin="5,0,0,0"
+                                        Command="{Binding DataContext.RemoveRegexItemCommand, ElementName=RootPage}"
+                                        CommandParameter="{Binding}">
+                                    <FontIcon Glyph="&#xE738;"
+                                              FontSize="12" />
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+
+                <!-- Add Button -->
+                <Button Content="Add Regex Item"
+                        Command="{Binding AddRegexItemCommand}"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Left" />
 
                 <!-- Regex Example Group -->
                 <Grid x:Name="Grid_RegexExample"

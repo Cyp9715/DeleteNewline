@@ -6,52 +6,21 @@ namespace Delete_Newline.Contracts.Structures;
 public partial class RegexChain : ObservableObject
 {
     [ObservableProperty]
-    public ObservableCollection<string> _regexExpressions = new ObservableCollection<string>();
-    [ObservableProperty]
-    public ObservableCollection<string> _replaces = new ObservableCollection<string>();
+    private ObservableCollection<ChainItem> _chainItems = new ObservableCollection<ChainItem>();
 
-    public RegexChain(string firstRegexExpression = "", string firstReplace = "")
+    public RegexChain()
     {
-        RegexExpressions.Add(firstRegexExpression);
-        Replaces.Add(firstReplace);
+        ChainItems.Add(new ChainItem());
     }
 
-    public IReadOnlyList<string> GetRegexExpressions() => RegexExpressions.AsReadOnly();
-    public IReadOnlyList<string> GetReplaces() => Replaces.AsReadOnly();
-
-    public void AddRule(string regexExpression, string replace)
+    public void AddChainItem()
     {
-        RegexExpressions.Add(regexExpression);
-        Replaces.Add(replace);
+        ChainItems.Add(new ChainItem());
     }
+}
 
-    public void RemoveRule(int index)
-    {
-        if (index >= 0 && index < RegexExpressions.Count)
-        {
-            RegexExpressions.RemoveAt(index);
-            Replaces.RemoveAt(index);
-        }
-    }
-
-    // remove oldIndex, move new Index.
-    public void MoveRule(int oldIndex, int newIndex)
-    {
-        if (IsValidIndex(oldIndex) && IsValidIndex(newIndex) && oldIndex != newIndex)
-        {
-            var regexExpression = RegexExpressions[oldIndex];
-            var replace = Replaces[oldIndex];
-
-            RegexExpressions.RemoveAt(oldIndex);
-            Replaces.RemoveAt(oldIndex);
-
-            RegexExpressions.Insert(newIndex, regexExpression);
-            Replaces.Insert(newIndex, replace);
-        }
-    }
-
-    private bool IsValidIndex(int index)
-    {
-        return index >= 0 && index < RegexExpressions.Count;
-    }
+public class ChainItem : ObservableObject
+{
+    public string? RegexExpression { get; set; }
+    public string? Replace { get; set; }
 }
