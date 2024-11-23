@@ -2,6 +2,8 @@ using Delete_Newline.Contracts.Services;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.ViewModels;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Delete_Newline.Services;
 
@@ -27,6 +29,12 @@ public class KeybindCollectManagerService
             foreach (var chain in savedChains)
             {
                 KeybindConfigs.Add(chain);
+            }
+
+            // 초기 항목들의 PropertyChanged 이벤트 구독
+            foreach (var item in KeybindConfigs)
+            {
+                SubscribeToKeybindConfig(item);
             }
         }
     }
@@ -63,14 +71,106 @@ public class KeybindCollectManagerService
 
     private async void KeybindConfigs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        // Code used to prevent unnecessary SaveSettingAsync calls caused by rapid Remove and Add operations during Drag&Drop.
-        if (KeybindCollectViewModel.isDragEnded is true)
+        if (e.NewItems != null)
         {
-            await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, KeybindConfigs);
+            foreach (KeybindPageConfiguration newItem in e.NewItems)
+            {
+                SubscribeToKeybindConfig(newItem);
+            }
         }
-        else
+
+        if (e.OldItems != null)
         {
-            KeybindCollectViewModel.isDragEnded = true;
+            foreach (KeybindPageConfiguration oldItem in e.OldItems)
+            {
+                UnsubscribeFromKeybindConfig(oldItem);
+            }
         }
+
+        await SaveSettingsAsync();
+    }
+    
+
+    private void SubscribeToKeybindConfig(KeybindPageConfiguration config)
+    {
+        config.PropertyChanged += KeybindConfig_PropertyChanged;
+
+        if (config.RegexChain != null)
+        {
+            SubscribeToRegexChain(config.RegexChain);
+        }
+    }
+
+    private void UnsubscribeFromKeybindConfig(KeybindPageConfiguration config)
+    {
+        config.PropertyChanged -= KeybindConfig_PropertyChanged;
+
+        if (config.RegexChain != null)
+        {
+            UnsubscribeFromRegexChain(config.RegexChain);
+        }
+    }
+
+    private void SubscribeToRegexChain(RegexChain chain)
+    {
+        chain.PropertyChanged += RegexChain_PropertyChanged;
+        chain.ChainItems.CollectionChanged += ChainItems_CollectionChanged;
+
+        foreach (var item in chain.ChainItems)
+        {
+            item.PropertyChanged += ChainItem_PropertyChanged;
+        }
+    }
+
+    private void UnsubscribeFromRegexChain(RegexChain chain)
+    {
+        chain.PropertyChanged -= RegexChain_PropertyChanged;
+        chain.ChainItems.CollectionChanged -= ChainItems_CollectionChanged;
+
+        foreach (var item in chain.ChainItems)
+        {
+            item.PropertyChanged -= ChainItem_PropertyChanged;
+        }
+    }
+
+    private async void ChainItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (ChainItem newItem in e.NewItems)
+            {
+                newItem.PropertyChanged += ChainItem_PropertyChanged;
+            }
+        }
+
+        if (e.OldItems != null)
+        {
+            foreach (ChainItem oldItem in e.OldItems)
+            {
+                oldItem.PropertyChanged -= ChainItem_PropertyChanged;
+            }
+        }
+
+        await SaveSettingsAsync();
+    }
+
+    private async Task SaveSettingsAsync()
+    {
+        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, KeybindConfigs);
+    }
+
+    private async void KeybindConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        await SaveSettingsAsync();
+    }
+
+    private async void ChainItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        await SaveSettingsAsync();
+    }
+
+    private async void RegexChain_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        await SaveSettingsAsync();
     }
 }
