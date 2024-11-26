@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Core.Contracts.Services;
@@ -7,6 +7,9 @@ using Delete_Newline.Helpers;
 using Delete_Newline.Models;
 
 using Windows.Storage;
+
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Delete_Newline.Services;
 
@@ -49,11 +52,17 @@ public class LocalSettingsService : ILocalSettingsService
 
     public async Task<T?> ReadSettingAsync<T>(string key)
     {
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new PublicPropertiesOnlyContractResolver(),
+            ObjectCreationHandling = ObjectCreationHandling.Replace,
+        };
+
         if (RuntimeHelper.IsMSIX)
         {
             if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
             {
-                return await Json.ToObjectAsync<T>((string)obj);
+                return await Json.ToObjectAsync<T>((string)obj, settings);
             }
         }
         else
@@ -62,7 +71,7 @@ public class LocalSettingsService : ILocalSettingsService
 
             if (_settings != null && _settings.TryGetValue(key, out var obj))
             {
-                return await Json.ToObjectAsync<T>((string)obj);
+                return await Json.ToObjectAsync<T>((string)obj, settings);
             }
         }
 
@@ -71,15 +80,21 @@ public class LocalSettingsService : ILocalSettingsService
 
     public async Task SaveSettingAsync<T>(string key, T value)
     {
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new PublicPropertiesOnlyContractResolver(),
+            Formatting = Formatting.Indented,
+        };
+
         if (RuntimeHelper.IsMSIX)
         {
-            ApplicationData.Current.LocalSettings.Values[key] = await Json.StringifyAsync(value!);
+            ApplicationData.Current.LocalSettings.Values[key] = await Json.StringifyAsync(value!, settings);
         }
         else
         {
             await InitializeAsync();
 
-            _settings[key] = await Json.StringifyAsync(value!);
+            _settings[key] = await Json.StringifyAsync(value!, settings);
 
             await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
         }

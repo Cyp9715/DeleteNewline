@@ -10,7 +10,10 @@ public partial class RegexChain : ObservableObject
 
     public RegexChain()
     {
-        ChainItems.Add(new ChainItem());
+        if(ChainItems.Count == 0)
+        {
+            AddChainItem();
+        }
     }
 
     public void AddChainItem()
@@ -19,8 +22,11 @@ public partial class RegexChain : ObservableObject
     }
 }
 
-public class ChainItem : ObservableObject
+public partial class ChainItem : ObservableObject
 {
-    public string? RegexExpression { get; set; }
-    public string? Replace { get; set; }
+    [ObservableProperty]
+    public string? _regexExpression;
+
+    [ObservableProperty]
+    public string? _replace;
 }

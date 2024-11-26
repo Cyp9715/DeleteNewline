@@ -1,6 +1,5 @@
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Contracts.Structures;
-using Delete_Newline.ViewModels;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -17,7 +16,6 @@ public class KeybindCollectManagerService
     {
         _localSettingsService = localSettingsService;
         KeybindConfigs = new ObservableCollection<KeybindPageConfiguration>();
-        KeybindConfigs.CollectionChanged += KeybindConfigs_CollectionChanged;
     }
 
     public async Task InitializeAsync()
@@ -37,12 +35,8 @@ public class KeybindCollectManagerService
                 SubscribeToKeybindConfig(item);
             }
         }
-    }
 
-
-    public ObservableCollection<KeybindPageConfiguration> GetKeybindConfigs()
-    {
-        return KeybindConfigs;
+        KeybindConfigs.CollectionChanged += KeybindConfigs_CollectionChanged;
     }
 
     public void AddKeybindConfig(KeybindPageConfiguration? keybindConfig = null)
@@ -154,11 +148,6 @@ public class KeybindCollectManagerService
         await SaveSettingsAsync();
     }
 
-    private async Task SaveSettingsAsync()
-    {
-        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, KeybindConfigs);
-    }
-
     private async void KeybindConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         await SaveSettingsAsync();
@@ -172,5 +161,10 @@ public class KeybindCollectManagerService
     private async void RegexChain_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         await SaveSettingsAsync();
+    }
+
+    private async Task SaveSettingsAsync()
+    {
+        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, KeybindConfigs);
     }
 }
