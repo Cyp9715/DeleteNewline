@@ -2,9 +2,9 @@
 
 public interface IFileService
 {
-    T Read<T>(string folderPath, string fileName);
+    Task<string> ReadAsStringAsync(string directory, string fileName);
 
-    void Save<T>(string folderPath, string fileName, T content);
+    Task SaveAsync(string directory, string fileName, string content);
 
     void Delete(string folderPath, string fileName);
 }

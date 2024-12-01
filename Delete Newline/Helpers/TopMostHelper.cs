@@ -1,4 +1,4 @@
-﻿using Delete_Newline.Contracts.Services;
+using Delete_Newline.Contracts.Services;
 using Delete_Newline.Services;
 using Microsoft.UI.Xaml;
 

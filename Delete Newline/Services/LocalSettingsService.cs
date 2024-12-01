@@ -1,102 +1,87 @@
-using Microsoft.Extensions.Options;
-
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Core.Helpers;
-using Delete_Newline.Helpers;
-using Delete_Newline.Models;
 
-using Windows.Storage;
-
-using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace Delete_Newline.Services;
-
-public class LocalSettingsService : ILocalSettingsService
+namespace Delete_Newline.Services
 {
-    private const string _defaultApplicationDataFolder = "Delete Newline";
-    private const string _defaultLocalSettingsFile = "Settings.json";
-
-    private readonly IFileService _fileService;
-    private readonly LocalSettingsOptions _options;
-
-    private readonly string _localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    private readonly string _applicationDataFolder;
-    private readonly string _localsettingsFile;
-
-    private IDictionary<string, object> _settings;
-
-    private bool _isInitialized;
-
-    public LocalSettingsService(IFileService fileService, IOptions<LocalSettingsOptions> options)
+    public class LocalSettingsService : ILocalSettingsService
     {
-        _fileService = fileService;
-        _options = options.Value;
+        private readonly IFileService _fileService;
+        private IDictionary<string, JToken> _settings;
 
-        _applicationDataFolder = Path.Combine(_localApplicationData, _options.ApplicationDataFolder ?? _defaultApplicationDataFolder);
-        _localsettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
+        private readonly string _applicationDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        private const string _settingsFileName = "Settings.json";
+        private bool _isInitialized = false;
 
-        _settings = new Dictionary<string, object>();
-    }
-
-    private async Task InitializeAsync()
-    {
-        if (!_isInitialized)
+        public LocalSettingsService(IFileService fileService)
         {
-            _settings = await Task.Run(() => _fileService.Read<IDictionary<string, object>>(_applicationDataFolder, _localsettingsFile)) ?? new Dictionary<string, object>();
+            _fileService = fileService;
+            _settings = new Dictionary<string, JToken>();
+        }
 
+        private async Task InitializeAsync()
+        {
+            if (_isInitialized)
+                return;
+            
+            if (File.Exists(Path.Combine(_applicationDataDirectory, _settingsFileName)) is false)
+                CreateSettingsFile(_applicationDataDirectory, _settingsFileName);
+
+            string? jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName);
+            _settings = string.IsNullOrWhiteSpace(jsonContent) ? new Dictionary<string, JToken>() : JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent) ?? new Dictionary<string, JToken>();
             _isInitialized = true;
+            
         }
-    }
 
-    public async Task<T?> ReadSettingAsync<T>(string key)
-    {
-        var settings = new JsonSerializerSettings
+        private void CreateSettingsFile(string directory, string fileName)
         {
-            ContractResolver = new PublicPropertiesOnlyContractResolver(),
-            ObjectCreationHandling = ObjectCreationHandling.Replace,
-        };
+            string filePath = Path.Combine(directory, fileName);
 
-        if (RuntimeHelper.IsMSIX)
-        {
-            if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
+            // check directory
+            if (!Directory.Exists(directory))
             {
-                return await Json.ToObjectAsync<T>((string)obj, settings);
+                Directory.CreateDirectory(directory);
             }
+
+            // Json.
+            File.WriteAllText(filePath, "{}");
         }
-        else
+
+        public async Task<T?> ReadSettingAsync<T>(string key)
         {
             await InitializeAsync();
 
-            if (_settings != null && _settings.TryGetValue(key, out var obj))
+            if (_settings.TryGetValue(key, out JToken? token))
             {
-                return await Json.ToObjectAsync<T>((string)obj, settings);
+                var settings = new JsonSerializerSettings
+                {
+                    ContractResolver = new PublicPropertiesOnlyContractResolver()
+                };
+                return token.ToObject<T>(JsonSerializer.Create(settings));
             }
+            return default;
         }
 
-        return default;
-    }
+        public async Task SaveSettingAsync<T>(string key, T value)
+        {
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
 
-    public async Task SaveSettingAsync<T>(string key, T value)
-    {
-        var settings = new JsonSerializerSettings
-        {
-            ContractResolver = new PublicPropertiesOnlyContractResolver(),
-            Formatting = Formatting.Indented,
-        };
-
-        if (RuntimeHelper.IsMSIX)
-        {
-            ApplicationData.Current.LocalSettings.Values[key] = await Json.StringifyAsync(value!, settings);
-        }
-        else
-        {
             await InitializeAsync();
 
-            _settings[key] = await Json.StringifyAsync(value!, settings);
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new PublicPropertiesOnlyContractResolver(),
+                Formatting = Formatting.Indented
+            };
 
-            await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
+            _settings[key] = JToken.FromObject(value, JsonSerializer.Create(settings));
+
+            var json = JsonConvert.SerializeObject(_settings, Formatting.Indented);
+            await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json);
         }
     }
 }

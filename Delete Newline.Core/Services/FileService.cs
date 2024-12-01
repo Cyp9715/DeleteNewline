@@ -1,40 +1,35 @@
-﻿using System.Text;
-
-using Newtonsoft.Json;
+﻿using System.Collections.Concurrent;
+using System.Text;
 
 using Delete_Newline.Core.Contracts.Services;
+
+using Newtonsoft.Json;
 
 namespace Delete_Newline.Core.Services;
 
 public class FileService : IFileService
 {
-    public T Read<T>(string folderPath, string fileName)
+    public async Task<string> ReadAsStringAsync(string directory, string fileName)
     {
-        var path = Path.Combine(folderPath, fileName);
-        if (File.Exists(path))
-        {
-            var json = File.ReadAllText(path);
-            return JsonConvert.DeserializeObject<T>(json) ?? throw new JsonException("Deserialization failed or resulted in null");
-        }
-        throw new FileNotFoundException($"File not found: {path}");
+        var path = Path.Combine(directory, fileName);
+        if (!File.Exists(path))
+            return string.Empty;
+        return await File.ReadAllTextAsync(path);
     }
 
-    public void Save<T>(string folderPath, string fileName, T content)
+    public async Task SaveAsync(string directory, string fileName, string content)
     {
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
-
-        var fileContent = JsonConvert.SerializeObject(content);
-        File.WriteAllText(Path.Combine(folderPath, fileName), fileContent, Encoding.UTF8);
+        var filePath = Path.Combine(directory, fileName);
+        await File.WriteAllTextAsync(filePath, content);
     }
 
     public void Delete(string folderPath, string fileName)
     {
-        if (fileName != null && File.Exists(Path.Combine(folderPath, fileName)))
-        {
-            File.Delete(Path.Combine(folderPath, fileName));
-        }
+        var path = Path.Combine(folderPath, fileName);
+
+        if (File.Exists(path) is false)
+            throw new FileNotFoundException($"The file '{fileName}' does not exist in the folder '{folderPath}'.", path);
+
+        File.Delete(path);
     }
 }

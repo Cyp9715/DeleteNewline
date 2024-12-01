@@ -20,19 +20,15 @@ public class KeybindCollectManagerService
 
     public async Task InitializeAsync()
     {
-        var savedChains = await _localSettingsService.ReadSettingAsync<ObservableCollection<KeybindPageConfiguration>>(KeybindCollectionSettingsKey);
-        if (savedChains != null)
+        var savedKeybindConfig = await _localSettingsService.ReadSettingAsync<ObservableCollection<KeybindPageConfiguration>>(KeybindCollectionSettingsKey);
+        if (savedKeybindConfig != null)
         {
-            KeybindConfigs.Clear();
-            foreach (var chain in savedChains)
-            {
-                KeybindConfigs.Add(chain);
-            }
+            KeybindConfigs = savedKeybindConfig;
 
-            // 초기 항목들의 PropertyChanged 이벤트 구독
-            foreach (var item in KeybindConfigs)
+            // Subscribe to PropertyChanged events for initial items
+            foreach (KeybindPageConfiguration keybindConfig in KeybindConfigs)
             {
-                SubscribeToKeybindConfig(item);
+                SubscribeToKeybindConfig(keybindConfig);
             }
         }
 
@@ -65,11 +61,12 @@ public class KeybindCollectManagerService
 
     private async void KeybindConfigs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        // Subscription and Unsubscribe processing of newly added and deleted Keybinds within KeybindConfigs.
         if (e.NewItems != null)
         {
-            foreach (KeybindPageConfiguration newItem in e.NewItems)
+            foreach (KeybindPageConfiguration keybindConfig in e.NewItems)
             {
-                SubscribeToKeybindConfig(newItem);
+                SubscribeToKeybindConfig(keybindConfig);
             }
         }
 
@@ -85,13 +82,13 @@ public class KeybindCollectManagerService
     }
     
 
-    private void SubscribeToKeybindConfig(KeybindPageConfiguration config)
+    private void SubscribeToKeybindConfig(KeybindPageConfiguration keybindConfig)
     {
-        config.PropertyChanged += KeybindConfig_PropertyChanged;
+        keybindConfig.PropertyChanged += KeybindConfig_PropertyChanged;
 
-        if (config.RegexChain != null)
+        if (keybindConfig.RegexChain != null)
         {
-            SubscribeToRegexChain(config.RegexChain);
+            SubscribeToRegexChain(keybindConfig.RegexChain);
         }
     }
 
