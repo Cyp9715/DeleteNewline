@@ -1,10 +1,9 @@
 using Delete_Newline.Contracts.Services;
-using Delete_Newline.Services;
 using Microsoft.UI.Xaml;
 
 namespace Delete_Newline.Helpers
 {
-    public static class TopMostHelper
+    public static class TopMost
     {
         private static ILocalSettingsService? _localSettingsService;
 
@@ -17,7 +16,7 @@ namespace Delete_Newline.Helpers
             bool? storedSetting = await _localSettingsService.ReadSettingAsync<bool?>(topMostKey);
 
             // default setting
-            if (storedSetting.HasValue is false)
+            if (storedSetting.HasValue == false)
             {
                 EnableTopMost = false;
                 await _localSettingsService.SaveSettingAsync(topMostKey, false);

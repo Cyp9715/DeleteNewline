@@ -30,7 +30,7 @@
             
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Uid="Shell_Memo"
-                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.MemoViewModel"
+                                    helpers:Navigation.NavigateTo="Delete_Newline.ViewModels.MemoViewModel"
                                     x:Name="MemoPageItem">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
@@ -40,7 +40,7 @@
 
                 <NavigationViewItem x:Uid="Shell_Keybinds"
                                     x:Name="KeybindsPageItem"
-                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.KeybindCollectViewModel">
+                                    helpers:Navigation.NavigateTo="Delete_Newline.ViewModels.KeybindCollectViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xF210;" />
@@ -50,7 +50,7 @@
 
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem x:Uid="Shell_Settings"
-                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.SettingsViewModel">
+                                    helpers:Navigation.NavigateTo="Delete_Newline.ViewModels.SettingsViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE713;" />

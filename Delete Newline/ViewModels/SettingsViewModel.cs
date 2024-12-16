@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Windows.ApplicationModel;
 using Microsoft.UI.Xaml;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -6,9 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
-
 using Delete_Newline.Models;
-using Delete_Newline.Services;
 
 namespace Delete_Newline.ViewModels;
 
@@ -49,7 +47,7 @@ public partial class SettingsViewModel : ObservableRecipient
         SelectedTheme = _themeSelectorService.Theme.ToString();
         VersionDescription = GetVersionDescription();
         EnableNotification = _notificationService.GetEnableNotification();
-        EnableTopMost = TopMostHelper.EnableTopMost;
+        EnableTopMost = TopMost.EnableTopMost;
     }
 
     [RelayCommand]
@@ -83,7 +81,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private async Task ToggleTopMostAsync(bool isChecked)
     {
         EnableTopMost = isChecked;
-        await TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
+        await TopMost.SetWindowTopMost(App.MainWindow, isChecked);
     }
 
 
@@ -91,7 +89,7 @@ public partial class SettingsViewModel : ObservableRecipient
     {
         Version version;
 
-        if (RuntimeHelper.IsMSIX)
+        if (Runtime.IsMSIX)
         {
             var packageVersion = Package.Current.Id.Version;
 

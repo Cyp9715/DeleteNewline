@@ -80,7 +80,7 @@ public class ActivationService : IActivationService
     private async Task StartupAsync()
     {
         await _themeSelectorService.SetRequestedThemeAsync();
-        await TopMostHelper.Initialize(App.MainWindow);
+        await TopMost.Initialize(App.MainWindow);
         await Task.CompletedTask;
     }
 }

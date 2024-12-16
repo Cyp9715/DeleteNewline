@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Services;
+using Windows.Devices.Enumeration;
 
 namespace Delete_Newline.ViewModels;
 
@@ -29,5 +31,10 @@ public partial class KeybindViewModel : ObservableRecipient
         }
 
         CurrentKeybindConfig.RegexChain.ChainItems.Remove(item);
+    }
+
+    public void SetKeybind(Hotkey hotkey, bool persist = true)
+    {
+        SetHotkey(hotkey, persist);
     }
 }

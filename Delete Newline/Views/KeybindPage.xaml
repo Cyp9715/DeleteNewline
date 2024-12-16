@@ -36,6 +36,7 @@
                              Width="285"
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
+                             ProcessKeyboardAccelerators="Keybind_KeyboardAccelerators"
                              Text="{Binding CurrentKeybindConfig.Keybind.Key1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
 

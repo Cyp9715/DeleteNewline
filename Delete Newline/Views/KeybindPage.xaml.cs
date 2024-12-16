@@ -1,5 +1,13 @@
 using Delete_Newline.ViewModels;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using System.Diagnostics;
+using Windows.System;
+
+using Delete_Newline.Services;
+using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Views;
 
@@ -15,5 +23,15 @@ public sealed partial class KeybindPage : Page
         InitializeComponent();
         ViewModel = App.GetService<KeybindViewModel>();
         DataContext = ViewModel;
+    }
+
+    private void Keybind_KeyboardAccelerators(UIElement sender, ProcessKeyboardAcceleratorEventArgs args)
+    {
+        if (Hotkey.Validate(args.Modifiers.ToKeyModifiers(), args.Key.ToKey()))
+            await ViewModel.TrySetHotkeyAsync(new(args.Modifiers.ToKeyModifiers(), args.Key.ToKey()));
+
+        args.Handled = true;
+
+        args.Handled = true;
     }
 }

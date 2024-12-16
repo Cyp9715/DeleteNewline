@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
@@ -38,7 +38,7 @@ public class ThemeSelectorService : IThemeSelectorService
         {
             rootElement.RequestedTheme = Theme;
 
-            TitleBarHelper.UpdateTitleBar(Theme);
+            TitleBar.UpdateTitleBar(Theme);
         }
 
         await Task.CompletedTask;
