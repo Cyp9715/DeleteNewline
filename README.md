@@ -12,7 +12,7 @@
 - Korean language support has been added.
 - Supports multiple RegexChains, allowing for multi-keybind functionality.
 - Instead of using `SetWindowsHookEx` based hooking, it operates based on `RegisterHotKey`.
-- The settings now operate based on a .json file, and functionality for importing and exporting has been added.
+- The settings now operate based on a `.json` file, and functionality for importing and exporting has been added.
 - A small advertisement window will be added to the bottom.
 
 ## Recommended Build Tools
