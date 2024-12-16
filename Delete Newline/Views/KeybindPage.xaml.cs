@@ -27,11 +27,6 @@ public sealed partial class KeybindPage : Page
 
     private void Keybind_KeyboardAccelerators(UIElement sender, ProcessKeyboardAcceleratorEventArgs args)
     {
-        if (Hotkey.Validate(args.Modifiers.ToKeyModifiers(), args.Key.ToKey()))
-            await ViewModel.TrySetHotkeyAsync(new(args.Modifiers.ToKeyModifiers(), args.Key.ToKey()));
-
-        args.Handled = true;
-
         args.Handled = true;
     }
 }
