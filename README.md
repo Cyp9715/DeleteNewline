@@ -11,6 +11,8 @@
 - Supports both Light and Dark themes.
 - Korean language support has been added.
 - Now supports multiple RegexChains, allowing for multi-keybind functionality.
+- The settings now operate based on a .json file, and functionality for importing and exporting has been added.
+- A small advertisement window will be added to the bottom.
 
 ## Recommended Build Tools
 1. [Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=dts-publisher.mat2022)
