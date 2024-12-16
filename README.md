@@ -10,8 +10,8 @@
 - Based on WinUI3.
 - Supports both Light and Dark themes.
 - Korean language support has been added.
-- Now supports multiple RegexChains, allowing for multi-keybind functionality.
-- Now, instead of using `SetWindowsHookEx` based hooking, it operates based on `RegisterHotKey`.
+- supports multiple RegexChains, allowing for multi-keybind functionality.
+- instead of using `SetWindowsHookEx` based hooking, it operates based on `RegisterHotKey`.
 - The settings now operate based on a .json file, and functionality for importing and exporting has been added.
 - A small advertisement window will be added to the bottom.
 
