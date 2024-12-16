@@ -37,7 +37,7 @@
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
                              ProcessKeyboardAccelerators="Keybind_KeyboardAccelerators"
-                             Text="{Binding CurrentKeybindConfig.Keybind.Key1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding CurrentKeybindConfig.Keybind.DisplayHotKeys, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
 
                 <!-- Additional Regex Items -->

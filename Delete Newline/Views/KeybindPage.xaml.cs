@@ -2,12 +2,8 @@ using Delete_Newline.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using System.Diagnostics;
-using Windows.System;
 
 using Delete_Newline.Services;
-using Delete_Newline.Contracts.Structures;
-using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Views;
 
@@ -27,6 +23,12 @@ public sealed partial class KeybindPage : Page
 
     private void Keybind_KeyboardAccelerators(UIElement sender, ProcessKeyboardAcceleratorEventArgs args)
     {
+        if (Hotkey.Validate(args.Modifiers, args.Key))
+        {
+            // Todo : make id Manager
+            //HotkeyManager.RegisterHotkey(Int ,args.Modifiers, args.Key);
+        }
+
         args.Handled = true;
     }
 }
