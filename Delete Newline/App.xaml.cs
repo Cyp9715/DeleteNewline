@@ -59,7 +59,7 @@ public partial class App : Application
                 services.AddSingleton<IFileService, FileService>();
 
                 // Services, not need Interface.
-                services.AddSingleton<KeybindCollectManagerService>();
+                services.AddSingleton<HotkeyCollectManagerService>();
 
                 // Views and ViewModels
                 services.AddTransient<ShellViewModel>();
@@ -68,10 +68,10 @@ public partial class App : Application
                 services.AddTransient<SettingsViewModel>();
                 services.AddTransient<SettingsPage>();
 
-                services.AddTransient<KeybindCollectViewModel>();
-                services.AddTransient<KeybindCollectPage>();
-                services.AddSingleton<KeybindViewModel>(); // KeybindViewModel is Singleton.
-                services.AddTransient<KeybindPage>();
+                services.AddTransient<HotkeyCollectViewModel>();
+                services.AddTransient<HotkeyCollectPage>();
+                services.AddSingleton<HotkeyViewModel>(); // HotkeyViewModel is Singleton.
+                services.AddTransient<HotkeyPage>();
 
                 services.AddTransient<MemoViewModel>();
                 services.AddTransient<MemoPage>();

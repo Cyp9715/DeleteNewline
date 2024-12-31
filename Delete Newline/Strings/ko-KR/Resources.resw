@@ -45,10 +45,10 @@
   <data name="Settings_TopMost.Text" xml:space="preserve">
     <value>항상 위에 표시</value>
   </data>
-  <data name="Shell_Keybinds.Content" xml:space="preserve">
+  <data name="Shell_Hotkeys.Content" xml:space="preserve">
     <value>단축키 목록</value>
   </data>
-  <data name="Shell_KeybindDefault.Content" xml:space="preserve">
+  <data name="Shell_HotkeyDefault.Content" xml:space="preserve">
     <value>단축키</value>
   </data>
 </root>

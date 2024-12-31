@@ -38,9 +38,9 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
-                <NavigationViewItem x:Uid="Shell_Keybinds"
-                                    x:Name="KeybindsPageItem"
-                                    helpers:Navigation.NavigateTo="Delete_Newline.ViewModels.KeybindCollectViewModel">
+                <NavigationViewItem x:Uid="Shell_Hotkeys"
+                                    x:Name="HotkeysPageItem"
+                                    helpers:Navigation.NavigateTo="Delete_Newline.ViewModels.HotkeyCollectViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xF210;" />

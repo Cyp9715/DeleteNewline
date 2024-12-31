@@ -15,7 +15,7 @@ public class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
     private readonly INotificationService _notificationService;
-    private readonly KeybindCollectManagerService _keybindCollectManagerService;
+    private readonly HotkeyCollectManagerService _HotkeyCollectManagerService;
 
     private UIElement? _shell = null;
 
@@ -24,14 +24,14 @@ public class ActivationService : IActivationService
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
         INotificationService notificationService,
-        KeybindCollectManagerService keybindCollectManagerService)
+        HotkeyCollectManagerService HotkeyCollectManagerService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
         _localizationService = localizationService;
         _notificationService = notificationService;
-        _keybindCollectManagerService = keybindCollectManagerService;
+        _HotkeyCollectManagerService = HotkeyCollectManagerService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -73,7 +73,7 @@ public class ActivationService : IActivationService
         await _localizationService.InitializeAsync().ConfigureAwait(false);
         await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
         await _notificationService.InitializeAsync().ConfigureAwait(false);
-        await _keybindCollectManagerService.InitializeAsync().ConfigureAwait(false);
+        await _HotkeyCollectManagerService.InitializeAsync().ConfigureAwait(false);
         await Task.CompletedTask;
     }
 

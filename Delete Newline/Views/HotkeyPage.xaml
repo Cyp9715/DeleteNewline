@@ -1,47 +1,52 @@
 <Page x:Name="RootPage"
-      x:Class="Delete_Newline.Views.KeybindPage"
+      x:Class="Delete_Newline.Views.HotkeyPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:structures="using:Delete_Newline.Contracts.Structures"
-      xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
+      xmlns:behaviors="using:Delete_Newline.Behaviors"
+      xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core">
-
+    
     <ScrollViewer>
         <Grid>
             <StackPanel MaxWidth="550">
-                <!-- Keybind Name -->
+                <!-- Hotkey Name -->
                 <Grid Margin="0,25,0,0">
-                    <TextBlock Text="Keybind Name"></TextBlock>
-                    <TextBox x:Name="TextBox_keybindName"
+                    <TextBlock Text="Hotkey Name"></TextBlock>
+                    <TextBox x:Name="TextBox_HotkeyName"
                              Width="285"
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
-                             Text="{Binding CurrentKeybindConfig.KeybindName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding CurrentHotkeyConfig.HotkeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
 
-                <!-- Keybind Comment -->
+                <!-- Hotkey Comment -->
                 <Grid Margin="0,5,0,0">
-                    <TextBlock Text="Keybind Comment"></TextBlock>
-                    <TextBox x:Name="TextBox_keybindComment"
+                    <TextBlock Text="Hotkey Comment"></TextBlock>
+                    <TextBox x:Name="TextBox_HotkeyComment"
                              Width="285"
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
-                             Text="{Binding CurrentKeybindConfig.KeybindComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding CurrentHotkeyConfig.HotkeyComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
 
-                <!-- Keybind Input -->
+                <!-- Hotkey Input -->
                 <Grid Margin="0,5,0,0">
-                    <TextBlock Text="Keybind"></TextBlock>
-                    <TextBox x:Name="TextBox_keybind"
+                    <TextBlock Text="Hotkey"></TextBlock>
+                    <TextBox x:Name="TextBox_Hotkey"
                              Width="285"
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
-                             ProcessKeyboardAccelerators="Keybind_KeyboardAccelerators"
-                             Text="{Binding CurrentKeybindConfig.Keybind.DisplayHotKeys, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             IsReadOnly="True"
+                             Text="{Binding CurrentHotkeyConfig.Hotkey.DisplayHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:KeyboardAcceleratorBehavior CommandName="HandleKeyboardAcceleratorCommand" />
+                        </interactivity:Interaction.Behaviors>
+                    </TextBox>
                 </Grid>
 
                 <!-- Additional Regex Items -->
-                <ItemsRepeater ItemsSource="{Binding CurrentKeybindConfig.RegexChain.ChainItems}">
+                <ItemsRepeater ItemsSource="{Binding CurrentHotkeyConfig.RegexChain.ChainItems}">
                     <ItemsRepeater.ItemTemplate>
                         <DataTemplate x:DataType="structures:ChainItem">
                             <Grid Margin="0,5,0,0">
@@ -133,7 +138,7 @@
                              Margin="0,5,0,0"
                              Height="150"
                              AcceptsReturn="True"
-                             Text="{Binding CurrentKeybindConfig.TestText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding CurrentHotkeyConfig.TestText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="2"
                                Text="Output Text"
                                Margin="0,5,0,0"

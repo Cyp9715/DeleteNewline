@@ -2,16 +2,16 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Delete_Newline.Contracts.Structures;
 
-public partial class KeybindPageConfiguration : ObservableObject
+public partial class HotkeyPageConfiguration : ObservableObject
 {
     [ObservableProperty]
-    public string _keybindName = "New Keybind";
+    public string _hotkeyName = "New Hotkey";
 
     [ObservableProperty]
-    public string _keybindComment = "Comment";
+    public string _hotkeyComment = "Comment";
 
     [ObservableProperty]
-    public Keybind? _keybind;
+    public Hotkey? _hotkey;
 
     [ObservableProperty]
     public RegexChain? _regexChain;

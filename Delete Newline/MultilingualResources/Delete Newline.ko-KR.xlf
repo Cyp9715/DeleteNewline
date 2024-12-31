@@ -54,12 +54,12 @@
           <source>Always on Top</source>
           <target state="translated">항상 위에 표시</target>
         </trans-unit>
-        <trans-unit id="Shell_Keybinds.Content" translate="yes" xml:space="preserve">
-          <source>Keybinds</source>
+        <trans-unit id="Shell_Hotkeys.Content" translate="yes" xml:space="preserve">
+          <source>Hotkeys</source>
           <target state="translated">단축키 목록</target>
         </trans-unit>
-        <trans-unit id="Shell_KeybindDefault.Content" translate="yes" xml:space="preserve">
-          <source>Keybind</source>
+        <trans-unit id="Shell_HotkeyDefault.Content" translate="yes" xml:space="preserve">
+          <source>Hotkey</source>
           <target state="translated">단축키</target>
         </trans-unit>
       </group>

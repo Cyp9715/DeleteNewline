@@ -6,75 +6,75 @@ using System.ComponentModel;
 
 namespace Delete_Newline.Services;
 
-public class KeybindCollectManagerService
+public class HotkeyCollectManagerService
 {
     private readonly ILocalSettingsService _localSettingsService;
-    private const string KeybindCollectionSettingsKey = "KeybindCollection";
-    public ObservableCollection<KeybindPageConfiguration> KeybindConfigs { get; private set; }
+    private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
+    public ObservableCollection<HotkeyPageConfiguration> HotkeyConfigs { get; private set; }
 
-    public KeybindCollectManagerService(ILocalSettingsService localSettingsService)
+    public HotkeyCollectManagerService(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
-        KeybindConfigs = new ObservableCollection<KeybindPageConfiguration>();
+        HotkeyConfigs = new ObservableCollection<HotkeyPageConfiguration>();
     }
 
     public async Task InitializeAsync()
     {
-        var savedKeybindConfig = await _localSettingsService.ReadSettingAsync<ObservableCollection<KeybindPageConfiguration>>(KeybindCollectionSettingsKey);
-        if (savedKeybindConfig != null)
+        var savedHotkeyConfig = await _localSettingsService.ReadSettingAsync<ObservableCollection<HotkeyPageConfiguration>>(HotkeyCollectionSettingsKey);
+        if (savedHotkeyConfig != null)
         {
-            KeybindConfigs = savedKeybindConfig;
+            HotkeyConfigs = savedHotkeyConfig;
 
             // Subscribe to PropertyChanged events for initial items
-            foreach (KeybindPageConfiguration keybindConfig in KeybindConfigs)
+            foreach (HotkeyPageConfiguration HotkeyConfig in HotkeyConfigs)
             {
-                SubscribeToKeybindConfig(keybindConfig);
+                SubscribeToHotkeyConfig(HotkeyConfig);
             }
         }
 
-        KeybindConfigs.CollectionChanged += KeybindConfigs_CollectionChanged;
+        HotkeyConfigs.CollectionChanged += HotkeyConfigs_CollectionChanged;
     }
 
-    public void AddKeybindConfig(KeybindPageConfiguration? keybindConfig = null)
+    public void AddHotkeyConfig(HotkeyPageConfiguration? HotkeyConfig = null)
     {
-        if (keybindConfig is not null)
+        if (HotkeyConfig is not null)
         {
-            KeybindConfigs.Add(keybindConfig);
+            HotkeyConfigs.Add(HotkeyConfig);
         }
         else
         {
-            KeybindConfigs.Add(new KeybindPageConfiguration
+            HotkeyConfigs.Add(new HotkeyPageConfiguration
             {
-                Keybind = new Keybind(),
+                Hotkey = new Hotkey(),
                 RegexChain = new RegexChain()
             });
         }
     }
 
-    public void RemoveKeybindConfig(KeybindPageConfiguration keybindConfig)
+    public void RemoveHotkeyConfig(HotkeyPageConfiguration HotkeyConfig)
     {
-        if (KeybindConfigs.Contains(keybindConfig))
+        if (HotkeyConfigs.Contains(HotkeyConfig))
         {
-            KeybindConfigs.Remove(keybindConfig);
+            HotkeyConfigs.Remove(HotkeyConfig);
         }
     }
 
-    private async void KeybindConfigs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private async void HotkeyConfigs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        // Subscription and Unsubscribe processing of newly added and deleted Keybinds within KeybindConfigs.
+        // Subscription and Unsubscribe processing of newly added and deleted Hotkey within HotkeyConfigs.
         if (e.NewItems != null)
         {
-            foreach (KeybindPageConfiguration keybindConfig in e.NewItems)
+            foreach (HotkeyPageConfiguration HotkeyConfig in e.NewItems)
             {
-                SubscribeToKeybindConfig(keybindConfig);
+                SubscribeToHotkeyConfig(HotkeyConfig);
             }
         }
 
         if (e.OldItems != null)
         {
-            foreach (KeybindPageConfiguration oldItem in e.OldItems)
+            foreach (HotkeyPageConfiguration oldItem in e.OldItems)
             {
-                UnsubscribeFromKeybindConfig(oldItem);
+                UnsubscribeFromHotkeyConfig(oldItem);
             }
         }
 
@@ -82,19 +82,19 @@ public class KeybindCollectManagerService
     }
     
 
-    private void SubscribeToKeybindConfig(KeybindPageConfiguration keybindConfig)
+    private void SubscribeToHotkeyConfig(HotkeyPageConfiguration HotkeyConfig)
     {
-        keybindConfig.PropertyChanged += KeybindConfig_PropertyChanged;
+        HotkeyConfig.PropertyChanged += HotkeyConfig_PropertyChanged;
 
-        if (keybindConfig.RegexChain != null)
+        if (HotkeyConfig.RegexChain != null)
         {
-            SubscribeToRegexChain(keybindConfig.RegexChain);
+            SubscribeToRegexChain(HotkeyConfig.RegexChain);
         }
     }
 
-    private void UnsubscribeFromKeybindConfig(KeybindPageConfiguration config)
+    private void UnsubscribeFromHotkeyConfig(HotkeyPageConfiguration config)
     {
-        config.PropertyChanged -= KeybindConfig_PropertyChanged;
+        config.PropertyChanged -= HotkeyConfig_PropertyChanged;
 
         if (config.RegexChain != null)
         {
@@ -145,7 +145,7 @@ public class KeybindCollectManagerService
         await SaveSettingsAsync();
     }
 
-    private async void KeybindConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private async void HotkeyConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         await SaveSettingsAsync();
     }
@@ -162,6 +162,6 @@ public class KeybindCollectManagerService
 
     private async Task SaveSettingsAsync()
     {
-        await _localSettingsService.SaveSettingAsync(KeybindCollectionSettingsKey, KeybindConfigs);
+        await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, HotkeyConfigs);
     }
 }

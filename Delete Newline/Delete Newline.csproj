@@ -92,7 +92,6 @@
     <None Remove="Styles\CheckBox.xaml" />
     <None Remove="Styles\TextBox.xaml" />
     <None Remove="Styles\ToggleSwitch.xaml" />
-    <None Remove="Views\KeybindCollectPage.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Styles\FontSizes.xaml">
@@ -109,11 +108,11 @@
     <Page Update="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\KeybindCollectPage.xaml">
+    <Page Update="Views\HotkeyCollectPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\KeybindPage.xaml">
+    <Page Update="Views\HotkeyPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </Page>
