@@ -36,9 +36,9 @@ public partial class HotkeyViewModel : ObservableRecipient
     public void HandleKeyboardAccelerator(KeyboardAcceleratorEventArgs args)
     {
         // HotkeyManager를 사용하여 핫키 등록 로직 구현
-        bool success = true;
+        var hotkeyManager = App.GetService<IHotkeyManager>();
 
-        if (success)
+        if (hotkeyManager.RegisterHotkey(1, (args.Modifiers, args.Key)))
         {
             // 성공적으로 등록된 경우 Hotkey 설정 업데이트
             if (CurrentHotkeyConfig?.Hotkey != null)

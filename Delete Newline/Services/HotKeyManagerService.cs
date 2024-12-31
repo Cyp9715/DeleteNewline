@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using Windows.System;
-using static Delete_Newline.Services.User32;
 
 namespace Delete_Newline.Services;
 
@@ -38,23 +37,5 @@ public sealed class HotkeyManager : IHotkeyManager
         while (User32.UnregisterHotKey(hwnd, id))
         {
         }
-    }
-}
-
-public sealed class HotKeyManagerService
-{
-    public static bool IsValidate(VirtualKeyModifiers modifiers, VirtualKey key)
-    {
-        if (modifiers is VirtualKeyModifiers.None || key is VirtualKey.None)
-            return false;
-
-        // IntPtr.Zero is used to register a global hotkey across the entire system, not tied to any specific window handle.
-        if (RegisterHotKey(IntPtr.Zero, 0, (uint)modifiers, (uint)key))
-        {
-            UnregisterHotKey(IntPtr.Zero, 0);
-            return true;
-        }
-
-        return false;
     }
 }

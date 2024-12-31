@@ -51,7 +51,7 @@ namespace Delete_Newline.Behaviors
             // Run the command only when the modifier key is pressed
             if (_currentModifiers != VirtualKeyModifiers.None)
             {
-                ProcessKey(e);
+                ExecuteCommand(e);
                 e.Handled = true;
             }
         }
@@ -111,7 +111,7 @@ namespace Delete_Newline.Behaviors
             }
         }
 
-        private void ProcessKey(KeyRoutedEventArgs e)
+        private void ExecuteCommand(KeyRoutedEventArgs e)
         {
             // Retrieve the DataContext from the associated UI element, typically the ViewModel
             var viewModel = (AssociatedObject as FrameworkElement)?.DataContext;

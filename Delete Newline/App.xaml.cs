@@ -10,7 +10,6 @@ using Delete_Newline.Models;
 using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
 using Delete_Newline.Views;
-using Delete_Newline.Contracts.Structures;
 
 using WinUIEx;
 
@@ -54,7 +53,7 @@ public partial class App : Application
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
                 services.AddSingleton<INotificationService, NotificationService>();
-                services.AddSingleton<IHotkeyManager, HotkeyManager>();
+                services.AddSingleton<IHotkeyManager, HotkeyManager>(x => new HotkeyManager(Delete_Newline.MainWindow.hwnd));
 
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();

@@ -1,16 +1,13 @@
-﻿using Delete_Newline.Helpers;
 using Windows.UI.ViewManagement;
+using WinRT.Interop;
 using WinUIEx;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Delete_Newline;
 
 public sealed partial class MainWindow : WindowEx
 {
     private Microsoft.UI.Dispatching.DispatcherQueue dispatcherQueue;
-
+    public static IntPtr hwnd;
     private UISettings settings;
 
     public MainWindow()
@@ -20,6 +17,8 @@ public sealed partial class MainWindow : WindowEx
         dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         settings = new UISettings();
         settings.ColorValuesChanged += Settings_ColorValuesChanged; // cannot use FrameworkElement.ActualThemeChanged event
+        
+        hwnd = WindowNative.GetWindowHandle(this);
     }
 
     // this handles updating the caption button colors correctly when indows system theme is changed while the app is open
