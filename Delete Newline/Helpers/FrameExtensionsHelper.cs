@@ -1,8 +1,8 @@
-﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Delete_Newline.Helpers;
 
-public static class FrameExtensions
+public static class FrameExtensionsHelper
 {
     public static object? GetPageViewModel(this Frame frame) => frame?.Content?.GetType().GetProperty("ViewModel")?.GetValue(frame.Content, null);
 }

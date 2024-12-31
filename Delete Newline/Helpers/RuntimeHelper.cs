@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Delete_Newline.Helpers;
 
-public class Runtime
+public class RuntimeHelper
 {
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder? packageFullName);

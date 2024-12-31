@@ -38,7 +38,7 @@ public class ThemeSelectorService : IThemeSelectorService
         {
             rootElement.RequestedTheme = Theme;
 
-            TitleBar.UpdateTitleBar(Theme);
+            TitleBarHelper.UpdateTitleBar(Theme);
         }
 
         await Task.CompletedTask;

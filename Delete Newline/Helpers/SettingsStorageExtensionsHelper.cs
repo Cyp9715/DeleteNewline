@@ -1,4 +1,4 @@
-﻿using Delete_Newline.Core.Helpers;
+using Delete_Newline.Core.Helpers;
 
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -7,7 +7,7 @@ namespace Delete_Newline.Helpers;
 
 // Use these extension methods to store and retrieve local and roaming app data
 // More details regarding storing and retrieving app data at https://docs.microsoft.com/windows/apps/design/app-settings/store-and-retrieve-app-data
-public static class SettingsStorageExtensions
+public static class SettingsStorageExtensionsHelper
 {
     private const string FileExtension = ".json";
 

@@ -13,7 +13,7 @@ public sealed partial class User32
     public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 }
 
-public sealed class HotkeyManager
+public sealed class HotkeyManager : IHotkeyManager
 {
     private readonly IntPtr hwnd;
 

@@ -47,7 +47,7 @@ public partial class SettingsViewModel : ObservableRecipient
         SelectedTheme = _themeSelectorService.Theme.ToString();
         VersionDescription = GetVersionDescription();
         EnableNotification = _notificationService.GetEnableNotification();
-        EnableTopMost = TopMost.EnableTopMost;
+        EnableTopMost = TopMostHelper.EnableTopMost;
     }
 
     [RelayCommand]
@@ -81,7 +81,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private async Task ToggleTopMostAsync(bool isChecked)
     {
         EnableTopMost = isChecked;
-        await TopMost.SetWindowTopMost(App.MainWindow, isChecked);
+        await TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
     }
 
 
@@ -89,7 +89,7 @@ public partial class SettingsViewModel : ObservableRecipient
     {
         Version version;
 
-        if (Runtime.IsMSIX)
+        if (RuntimeHelper.IsMSIX)
         {
             var packageVersion = Package.Current.Id.Version;
 

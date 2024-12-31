@@ -54,6 +54,7 @@ public partial class App : Application
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
                 services.AddSingleton<INotificationService, NotificationService>();
+                services.AddSingleton<IHotkeyManager, HotkeyManager>();
 
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();

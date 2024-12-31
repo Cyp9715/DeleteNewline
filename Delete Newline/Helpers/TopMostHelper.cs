@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml;
 
 namespace Delete_Newline.Helpers
 {
-    public static class TopMost
+    public static class TopMostHelper
     {
         private static ILocalSettingsService? _localSettingsService;
 

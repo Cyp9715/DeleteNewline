@@ -1,8 +1,8 @@
-﻿using Microsoft.Windows.ApplicationModel.Resources;
+using Microsoft.Windows.ApplicationModel.Resources;
 
 namespace Delete_Newline.Helpers;
 
-public static class ResourceExtensions
+public static class ResourceExtensionsHelper
 {
     private static readonly ResourceLoader _resourceLoader = new();
 
