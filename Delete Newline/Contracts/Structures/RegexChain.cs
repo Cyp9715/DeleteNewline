@@ -10,10 +10,6 @@ public partial class RegexChain : ObservableObject
 
     public RegexChain()
     {
-        if(ChainItems.Count == 0)
-        {
-            AddChainItem();
-        }
     }
 
     public void AddChainItem()
