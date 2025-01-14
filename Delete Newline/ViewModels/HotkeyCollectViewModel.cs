@@ -10,13 +10,13 @@ namespace Delete_Newline.ViewModels;
 
 public partial class HotkeyCollectViewModel : ObservableRecipient
 {
-    private readonly HotkeyCollectManagerService _HotkeyCollectManagerService;
+    private readonly HotkeyCollectService _HotkeyCollectManagerService;
     public INavigationService NavigationService { get; }
 
     [ObservableProperty]
     public ObservableCollection<HotkeyPageConfiguration> _HotkeyConfigs;
 
-    public HotkeyCollectViewModel(HotkeyCollectManagerService HotkeyCollectManagerService,
+    public HotkeyCollectViewModel(HotkeyCollectService HotkeyCollectManagerService,
         INavigationService navigationService)
     {
         _HotkeyCollectManagerService = HotkeyCollectManagerService;

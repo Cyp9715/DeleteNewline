@@ -1,3 +1,6 @@
+using Delete_Newline.Contracts.Services;
+using Delete_Newline.Contracts.Structures;
+using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using Windows.System;
 
@@ -12,11 +15,11 @@ public sealed partial class User32
     public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 }
 
-public sealed class HotkeyManager : IHotkeyManager
+public sealed class HotkeyRegister : IHotkeyManager
 {
     private readonly IntPtr hwnd;
 
-    public HotkeyManager(IntPtr hwnd)
+    public HotkeyRegister(IntPtr hwnd)
     {
         this.hwnd = hwnd;
     }

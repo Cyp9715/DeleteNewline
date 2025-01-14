@@ -45,7 +45,7 @@ public partial class HotkeyViewModel : ObservableRecipient
             {
                 VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
 
-                // 2) 현재 이벤트에서 전달된 Modifier 키들을 조합해서 OR 연산으로 설정
+                // 현재 이벤트에서 전달된 Modifier 키들을 조합해서 OR 연산으로 설정
                 if (args.Modifiers.HasFlag(VirtualKeyModifiers.Control))
                     tempModifiers |= VirtualKeyModifiers.Control;
                 if (args.Modifiers.HasFlag(VirtualKeyModifiers.Menu))

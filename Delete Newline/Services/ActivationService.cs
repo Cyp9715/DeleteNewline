@@ -15,7 +15,7 @@ public class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
     private readonly INotificationService _notificationService;
-    private readonly HotkeyCollectManagerService _HotkeyCollectManagerService;
+    private readonly HotkeyCollectService _HotkeyCollectManagerService;
 
     private UIElement? _shell = null;
 
@@ -24,7 +24,7 @@ public class ActivationService : IActivationService
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
         INotificationService notificationService,
-        HotkeyCollectManagerService HotkeyCollectManagerService)
+        HotkeyCollectService HotkeyCollectManagerService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;

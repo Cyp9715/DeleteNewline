@@ -6,13 +6,13 @@ using System.ComponentModel;
 
 namespace Delete_Newline.Services
 {
-    public class HotkeyCollectManagerService
+    public class HotkeyCollectService
     {
         private readonly ILocalSettingsService _localSettingsService;
         private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
         public ObservableCollection<HotkeyPageConfiguration> HotkeyConfigs { get; private set; }
 
-        public HotkeyCollectManagerService(ILocalSettingsService localSettingsService)
+        public HotkeyCollectService(ILocalSettingsService localSettingsService)
         {
             _localSettingsService = localSettingsService;
             HotkeyConfigs = new ObservableCollection<HotkeyPageConfiguration>();
@@ -36,7 +36,7 @@ namespace Delete_Newline.Services
         {
             var newConfig = config ?? new HotkeyPageConfiguration
             {
-                Hotkey = new Hotkey(),
+                Hotkey = new Hotkey(_localSettingsService),
                 RegexChain = new RegexChain()
             };
             HotkeyConfigs.Add(newConfig);
