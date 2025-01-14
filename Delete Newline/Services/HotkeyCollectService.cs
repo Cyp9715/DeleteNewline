@@ -12,7 +12,7 @@ namespace Delete_Newline.Services
 
         private readonly ILocalSettingsService _localSettingsService;
         private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
-        private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
         public HotkeyCollectService(ILocalSettingsService localSettingsService)
         {
