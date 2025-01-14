@@ -14,7 +14,7 @@ public partial class HotkeyCollectViewModel : ObservableRecipient
     public INavigationService NavigationService { get; }
 
     [ObservableProperty]
-    public ObservableCollection<HotkeyPageConfiguration> _HotkeyConfigs;
+    public ObservableCollection<HotkeyPageStructure> _HotkeyConfigs;
 
     public HotkeyCollectViewModel(HotkeyCollectService HotkeyCollectManagerService,
         INavigationService navigationService)
@@ -31,7 +31,7 @@ public partial class HotkeyCollectViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void RemoveHotkey(HotkeyPageConfiguration HotkeyConfig)
+    private void RemoveHotkey(HotkeyPageStructure HotkeyConfig)
     {
         if (HotkeyConfig is not null)
         {
@@ -40,7 +40,7 @@ public partial class HotkeyCollectViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void NavigateToHotkeyPage(HotkeyPageConfiguration HotkeyConfig)
+    private void NavigateToHotkeyPage(HotkeyPageStructure HotkeyConfig)
     {
         App.GetService<HotkeyViewModel>().CurrentHotkeyConfig = HotkeyConfig;
         NavigationService.NavigateTo(typeof(HotkeyViewModel).FullName!);

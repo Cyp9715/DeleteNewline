@@ -3,12 +3,12 @@ using System.Collections.ObjectModel;
 
 namespace Delete_Newline.Contracts.Structures;
 
-public partial class RegexChain : ObservableObject
+public partial class RegexChainStructure : ObservableObject
 {
     [ObservableProperty]
     private ObservableCollection<ChainItem> _chainItems = new ObservableCollection<ChainItem>();
 
-    public RegexChain()
+    public RegexChainStructure()
     {
     }
 

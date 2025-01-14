@@ -4,7 +4,7 @@ using Windows.System;
 
 namespace Delete_Newline.Contracts.Structures;
 
-public partial class Hotkey : ObservableRecipient
+public partial class HotkeyStructure : ObservableRecipient
 {
     [ObservableProperty]
     public VirtualKeyModifiers _modifiers;
@@ -20,7 +20,7 @@ public partial class Hotkey : ObservableRecipient
     private string HotkeyKeySettingsKey = "Key";
     private string HotkeyDisplaySettingsKey = "Display";
 
-    public Hotkey(ILocalSettingsService localSettingsService)
+    public HotkeyStructure(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
     }

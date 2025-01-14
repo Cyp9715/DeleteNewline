@@ -23,7 +23,7 @@
             </behaviors:Interaction.Behaviors>
 
             <GridView.ItemTemplate>
-                <DataTemplate x:DataType="structures:HotkeyPageConfiguration">
+                <DataTemplate x:DataType="structures:HotkeyPageStructure">
                     <Grid Width="310"
                           Height="90"
                           Margin="6"

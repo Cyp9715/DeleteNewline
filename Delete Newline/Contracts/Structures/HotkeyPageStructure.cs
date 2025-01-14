@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Delete_Newline.Contracts.Structures;
 
-public partial class HotkeyPageConfiguration : ObservableObject
+public partial class HotkeyPageStructure : ObservableObject
 {
     [ObservableProperty]
     public string _hotkeyName = "New Hotkey";
@@ -11,10 +11,10 @@ public partial class HotkeyPageConfiguration : ObservableObject
     public string _hotkeyComment = "Comment";
 
     [ObservableProperty]
-    public Hotkey? _hotkey;
+    public HotkeyStructure? _hotkey;
 
     [ObservableProperty]
-    public RegexChain? _regexChain;
+    public RegexChainStructure? _regexChain;
 
     [ObservableProperty]
     public string? _testText;

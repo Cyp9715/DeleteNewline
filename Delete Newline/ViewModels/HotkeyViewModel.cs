@@ -8,7 +8,7 @@ namespace Delete_Newline.ViewModels;
 public partial class HotkeyViewModel : ObservableRecipient
 {
     [ObservableProperty]
-    private HotkeyPageConfiguration? _currentHotkeyConfig;
+    private HotkeyPageStructure? _currentHotkeyConfig;
 
     [RelayCommand]
     private void AddRegexItem()
@@ -36,7 +36,7 @@ public partial class HotkeyViewModel : ObservableRecipient
     public void HandleKeyboardAccelerator(KeyboardAcceleratorEventArgs args)
     {
         // HotkeyManager를 사용하여 핫키 등록 로직 구현
-        var hotkeyManager = App.GetService<IHotkeyManager>();
+        var hotkeyManager = App.GetService<IHotkeyRegister>();
 
         if (hotkeyManager.RegisterHotkey(1, (args.Modifiers, args.Key)))
         {

@@ -10,17 +10,17 @@ namespace Delete_Newline.Services
     {
         private readonly ILocalSettingsService _localSettingsService;
         private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
-        public ObservableCollection<HotkeyPageConfiguration> HotkeyConfigs { get; private set; }
+        public ObservableCollection<HotkeyPageStructure> HotkeyConfigs { get; private set; }
 
         public HotkeyCollectService(ILocalSettingsService localSettingsService)
         {
             _localSettingsService = localSettingsService;
-            HotkeyConfigs = new ObservableCollection<HotkeyPageConfiguration>();
+            HotkeyConfigs = new ObservableCollection<HotkeyPageStructure>();
         }
 
         public async Task InitializeAsync()
         {
-            var savedHotkeyConfigs = await _localSettingsService.ReadSettingAsync<ObservableCollection<HotkeyPageConfiguration>>(HotkeyCollectionSettingsKey);
+            var savedHotkeyConfigs = await _localSettingsService.ReadSettingAsync<ObservableCollection<HotkeyPageStructure>>(HotkeyCollectionSettingsKey);
             if (savedHotkeyConfigs != null)
             {
                 HotkeyConfigs = savedHotkeyConfigs;
@@ -32,17 +32,17 @@ namespace Delete_Newline.Services
             HotkeyConfigs.CollectionChanged += OnHotkeyConfigsChanged;
         }
 
-        public void AddHotkeyConfig(HotkeyPageConfiguration? config = null)
+        public void AddHotkeyConfig(HotkeyPageStructure? config = null)
         {
-            var newConfig = config ?? new HotkeyPageConfiguration
+            var newConfig = config ?? new HotkeyPageStructure
             {
-                Hotkey = new Hotkey(_localSettingsService),
-                RegexChain = new RegexChain()
+                Hotkey = new HotkeyStructure(_localSettingsService),
+                RegexChain = new RegexChainStructure()
             };
             HotkeyConfigs.Add(newConfig);
         }
 
-        public void RemoveHotkeyConfig(HotkeyPageConfiguration config)
+        public void RemoveHotkeyConfig(HotkeyPageStructure config)
         {
             if (HotkeyConfigs.Remove(config))
             {
@@ -54,7 +54,7 @@ namespace Delete_Newline.Services
         {
             if (e.NewItems != null)
             {
-                foreach (HotkeyPageConfiguration config in e.NewItems)
+                foreach (HotkeyPageStructure config in e.NewItems)
                 {
                     Subscribe(config);
                 }
@@ -62,7 +62,7 @@ namespace Delete_Newline.Services
 
             if (e.OldItems != null)
             {
-                foreach (HotkeyPageConfiguration config in e.OldItems)
+                foreach (HotkeyPageStructure config in e.OldItems)
                 {
                     Unsubscribe(config);
                 }
@@ -71,25 +71,25 @@ namespace Delete_Newline.Services
             await SaveSettingsAsync();
         }
 
-        private void Subscribe(HotkeyPageConfiguration config)
+        private void Subscribe(HotkeyPageStructure config)
         {
             config.PropertyChanged += OnConfigPropertyChanged;
             if (config.RegexChain != null)
             {
-                Subscribe(config.RegexChain);
+                Subscribe((RegexChainStructure)config.RegexChain);
             }
         }
 
-        private void Unsubscribe(HotkeyPageConfiguration config)
+        private void Unsubscribe(HotkeyPageStructure config)
         {
             config.PropertyChanged -= OnConfigPropertyChanged;
             if (config.RegexChain != null)
             {
-                Unsubscribe(config.RegexChain);
+                Unsubscribe((RegexChainStructure)config.RegexChain);
             }
         }
 
-        private void Subscribe(RegexChain chain)
+        private void Subscribe(RegexChainStructure chain)
         {
             chain.PropertyChanged += OnConfigPropertyChanged;
             chain.ChainItems.CollectionChanged += OnChainItemsChanged;
@@ -99,7 +99,7 @@ namespace Delete_Newline.Services
             }
         }
 
-        private void Unsubscribe(RegexChain chain)
+        private void Unsubscribe(RegexChainStructure chain)
         {
             chain.PropertyChanged -= OnConfigPropertyChanged;
             chain.ChainItems.CollectionChanged -= OnChainItemsChanged;
