@@ -26,12 +26,6 @@ public sealed class HotkeyRegister : IHotkeyRegister
 
     public bool RegisterHotkey(int id, (VirtualKeyModifiers, VirtualKey) hotKey)
     {
-        if (Enum.IsDefined(typeof(VirtualKeyModifiers), hotKey.Item1) is false ||
-            Enum.IsDefined(typeof(VirtualKey), hotKey.Item2) is false)
-        {
-            throw new ArgumentOutOfRangeException(nameof(hotKey.Item1), "Invalid VirtualKey value.");
-        }
-
         return User32.RegisterHotKey(hwnd, id, (uint)hotKey.Item1, (uint)hotKey.Item2);
     }
 
@@ -40,5 +34,22 @@ public sealed class HotkeyRegister : IHotkeyRegister
         while (User32.UnregisterHotKey(hwnd, id))
         {
         }
+    }
+}
+
+public sealed class HotkeySaver
+{
+    private ILocalSettingsService _localSettingsService;
+    private const string HotkeyModifiersSettingsKey = "Modifiers";
+    private const string HotkeyKeySettingsKey = "Key";
+
+    public HotkeySaver(ILocalSettingsService localSettingsService)
+    {
+        _localSettingsService = localSettingsService;
+    }
+
+    public void SaveHoykey(VirtualKeyModifiers modifiers, VirtualKey key)
+    {
+        
     }
 }

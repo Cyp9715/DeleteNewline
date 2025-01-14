@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
-using System.Diagnostics;
+using Delete_Newline.Services;
 using Windows.System;
 
 namespace Delete_Newline.ViewModels;
@@ -35,17 +35,14 @@ public partial class HotkeyViewModel : ObservableRecipient
     [RelayCommand]
     public void HandleKeyboardAccelerator(KeyboardAcceleratorEventArgs args)
     {
-        // HotkeyManager를 사용하여 핫키 등록 로직 구현
         var hotkeyManager = App.GetService<IHotkeyRegister>();
 
         if (hotkeyManager.RegisterHotkey(1, (args.Modifiers, args.Key)))
         {
-            // 성공적으로 등록된 경우 Hotkey 설정 업데이트
             if (CurrentHotkeyConfig?.Hotkey != null)
             {
                 VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
 
-                // 현재 이벤트에서 전달된 Modifier 키들을 조합해서 OR 연산으로 설정
                 if (args.Modifiers.HasFlag(VirtualKeyModifiers.Control))
                     tempModifiers |= VirtualKeyModifiers.Control;
                 if (args.Modifiers.HasFlag(VirtualKeyModifiers.Menu))
@@ -57,12 +54,13 @@ public partial class HotkeyViewModel : ObservableRecipient
 
                 CurrentHotkeyConfig.Hotkey.Modifiers = tempModifiers;
                 CurrentHotkeyConfig.Hotkey.Key = args.Key;
+
+                //App.GetService<HotkeySaver>().SaveHoykey(CurrentHotkeyConfig);
             }
         }
         else
         {
-            // 핫키 등록 실패 시 처리 로직 추가 (예: 사용자에게 알림)
-            Debug.WriteLine("핫키 등록에 실패했습니다.");
+            // Add Toast Message.
         }
     }
 

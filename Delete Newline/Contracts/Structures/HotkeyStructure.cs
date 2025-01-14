@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Delete_Newline.Contracts.Services;
 using Windows.System;
 
 namespace Delete_Newline.Contracts.Structures;
@@ -15,14 +14,8 @@ public partial class HotkeyStructure : ObservableRecipient
     [ObservableProperty]
     public string? _displayHotkey;
 
-    private readonly ILocalSettingsService _localSettingsService;
-    private string HotkeyModifiersSettingsKey = "Modifiers";
-    private string HotkeyKeySettingsKey = "Key";
-    private string HotkeyDisplaySettingsKey = "Display";
-
-    public HotkeyStructure(ILocalSettingsService localSettingsService)
+    public HotkeyStructure()
     {
-        _localSettingsService = localSettingsService;
     }
 
     partial void OnKeyChanged(VirtualKey value)
@@ -61,10 +54,6 @@ public partial class HotkeyStructure : ObservableRecipient
         var keyString = GetKeyString(Key);
 
         DisplayHotkey = string.Join(" + ", modifierStrings.Concat(new[] { keyString }));
-
-        _localSettingsService.SaveSettingAsync(HotkeyModifiersSettingsKey, Modifiers);
-        _localSettingsService.SaveSettingAsync(HotkeyKeySettingsKey, Key);
-        _localSettingsService.SaveSettingAsync(HotkeyDisplaySettingsKey, DisplayHotkey);
     }
 
 

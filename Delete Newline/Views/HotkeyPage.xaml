@@ -133,12 +133,6 @@
                                Text="Input Text"
                                HorizontalAlignment="Right"
                                FontSize="12" />
-                    <TextBox x:Name="TextBox_regexInput"
-                             Grid.Row="1"
-                             Margin="0,5,0,0"
-                             Height="150"
-                             AcceptsReturn="True"
-                             Text="{Binding CurrentHotkeyConfig.TestText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="2"
                                Text="Output Text"
                                Margin="0,5,0,0"

@@ -8,9 +8,11 @@ namespace Delete_Newline.Services
 {
     public class HotkeyCollectService
     {
+        public ObservableCollection<HotkeyPageStructure> HotkeyConfigs { get; private set; }
+
         private readonly ILocalSettingsService _localSettingsService;
         private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
-        public ObservableCollection<HotkeyPageStructure> HotkeyConfigs { get; private set; }
+        private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1, 1);
 
         public HotkeyCollectService(ILocalSettingsService localSettingsService)
         {
@@ -36,7 +38,7 @@ namespace Delete_Newline.Services
         {
             var newConfig = config ?? new HotkeyPageStructure
             {
-                Hotkey = new HotkeyStructure(_localSettingsService),
+                Hotkey = new HotkeyStructure(),
                 RegexChain = new RegexChainStructure()
             };
             HotkeyConfigs.Add(newConfig);
@@ -73,39 +75,48 @@ namespace Delete_Newline.Services
 
         private void Subscribe(HotkeyPageStructure config)
         {
+            // Name, Comment
             config.PropertyChanged += OnConfigPropertyChanged;
+
+            // Hotkey
+            if (config.Hotkey != null)
+            {
+                config.Hotkey.PropertyChanged += OnConfigPropertyChanged;
+            }
+
+            //RegexChain
             if (config.RegexChain != null)
             {
-                Subscribe((RegexChainStructure)config.RegexChain);
+                config.RegexChain.ChainItems.CollectionChanged += OnChainItemsChanged;
+
+                // each items.
+                foreach (var item in config.RegexChain.ChainItems)
+                {
+                    item.PropertyChanged += OnConfigPropertyChanged;
+                }
             }
         }
 
         private void Unsubscribe(HotkeyPageStructure config)
         {
             config.PropertyChanged -= OnConfigPropertyChanged;
+
+            // Hotkey
+            if (config.Hotkey != null)
+            {
+                config.Hotkey.PropertyChanged -= OnConfigPropertyChanged;
+            }
+
+            // RegexChain
             if (config.RegexChain != null)
             {
-                Unsubscribe((RegexChainStructure)config.RegexChain);
-            }
-        }
+                config.RegexChain.ChainItems.CollectionChanged -= OnChainItemsChanged;
 
-        private void Subscribe(RegexChainStructure chain)
-        {
-            chain.PropertyChanged += OnConfigPropertyChanged;
-            chain.ChainItems.CollectionChanged += OnChainItemsChanged;
-            foreach (var item in chain.ChainItems)
-            {
-                item.PropertyChanged += OnConfigPropertyChanged;
-            }
-        }
-
-        private void Unsubscribe(RegexChainStructure chain)
-        {
-            chain.PropertyChanged -= OnConfigPropertyChanged;
-            chain.ChainItems.CollectionChanged -= OnChainItemsChanged;
-            foreach (var item in chain.ChainItems)
-            {
-                item.PropertyChanged -= OnConfigPropertyChanged;
+                // each items.
+                foreach (var item in config.RegexChain.ChainItems)
+                {
+                    item.PropertyChanged -= OnConfigPropertyChanged;
+                }
             }
         }
 
@@ -135,9 +146,22 @@ namespace Delete_Newline.Services
             await SaveSettingsAsync();
         }
 
-        private async Task SaveSettingsAsync()
+        public async Task SaveSettingsAsync()
         {
-            await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, HotkeyConfigs);
+            await _saveLock.WaitAsync();
+            try
+            {
+                await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, HotkeyConfigs);
+            }
+            catch (Exception ex)
+            {
+                // Todo : Error logic.
+                System.Diagnostics.Debug.WriteLine($"Hotkeys 저장 중 오류 발생: {ex.Message}");
+            }
+            finally
+            {
+                _saveLock.Release();
+            }
         }
     }
 }

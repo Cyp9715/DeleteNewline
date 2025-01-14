@@ -60,6 +60,7 @@ public partial class App : Application
 
                 // Services, not need Interface.
                 services.AddSingleton<HotkeyCollectService>();
+                services.AddSingleton<HotkeySaver>();
 
                 // Views and ViewModels
                 services.AddTransient<ShellViewModel>();

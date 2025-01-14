@@ -15,7 +15,4 @@ public partial class HotkeyPageStructure : ObservableObject
 
     [ObservableProperty]
     public RegexChainStructure? _regexChain;
-
-    [ObservableProperty]
-    public string? _testText;
 }
