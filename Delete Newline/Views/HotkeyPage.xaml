@@ -31,7 +31,7 @@
                 </Grid>
 
                 <!-- Hotkey Input -->
-                <Grid Margin="0,5,0,0">
+                <Grid Margin="0,5,0,10">
                     <TextBlock Text="Hotkey"></TextBlock>
                     <TextBox x:Name="TextBox_Hotkey"
                              Width="285"
@@ -114,8 +114,9 @@
                     <!-- Add Button -->
                     <Button Content="Add Regex Item"
                             Command="{Binding AddRegexItemCommand}"
-                            Margin="0, 5, 0, 0"
-                            HorizontalAlignment="Center" />
+                            Height="50"
+                            Margin="0, 15, 0, 0"
+                            HorizontalAlignment="Stretch" />
                 </Grid>
                 
                 <!-- Regex Example Group -->
@@ -133,6 +134,12 @@
                                Text="Input Text"
                                HorizontalAlignment="Right"
                                FontSize="12" />
+                    <TextBox x:Name="TextBox_regexInput"
+                             Grid.Row="1"
+                             Margin="0,5,0,0"
+                             Height="150"
+                             AcceptsReturn="True"
+                             Text="{Binding CurrentHotkeyConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="2"
                                Text="Output Text"
                                Margin="0,5,0,0"

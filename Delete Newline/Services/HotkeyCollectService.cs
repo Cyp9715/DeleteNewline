@@ -4,164 +4,163 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace Delete_Newline.Services
+namespace Delete_Newline.Services;
+
+public class HotkeyCollectService
 {
-    public class HotkeyCollectService
+    public ObservableCollection<HotkeyPageStructure> HotkeyConfigs { get; private set; }
+
+    private readonly ILocalSettingsService _localSettingsService;
+    private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
+    private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
+
+    public HotkeyCollectService(ILocalSettingsService localSettingsService)
     {
-        public ObservableCollection<HotkeyPageStructure> HotkeyConfigs { get; private set; }
+        _localSettingsService = localSettingsService;
+        HotkeyConfigs = new ObservableCollection<HotkeyPageStructure>();
+    }
 
-        private readonly ILocalSettingsService _localSettingsService;
-        private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
-        private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
-
-        public HotkeyCollectService(ILocalSettingsService localSettingsService)
+    public async Task InitializeAsync()
+    {
+        var savedHotkeyConfigs = await _localSettingsService.ReadSettingAsync<ObservableCollection<HotkeyPageStructure>>(HotkeyCollectionSettingsKey);
+        if (savedHotkeyConfigs != null)
         {
-            _localSettingsService = localSettingsService;
-            HotkeyConfigs = new ObservableCollection<HotkeyPageStructure>();
-        }
-
-        public async Task InitializeAsync()
-        {
-            var savedHotkeyConfigs = await _localSettingsService.ReadSettingAsync<ObservableCollection<HotkeyPageStructure>>(HotkeyCollectionSettingsKey);
-            if (savedHotkeyConfigs != null)
+            HotkeyConfigs = savedHotkeyConfigs;
+            foreach (var config in HotkeyConfigs)
             {
-                HotkeyConfigs = savedHotkeyConfigs;
-                foreach (var config in HotkeyConfigs)
-                {
-                    Subscribe(config);
-                }
+                Subscribe(config);
             }
-            HotkeyConfigs.CollectionChanged += OnHotkeyConfigsChanged;
         }
+        HotkeyConfigs.CollectionChanged += OnHotkeyConfigsChanged;
+    }
 
-        public void AddHotkeyConfig(HotkeyPageStructure? config = null)
+    public void AddHotkeyConfig(HotkeyPageStructure? config = null)
+    {
+        var newConfig = config ?? new HotkeyPageStructure
         {
-            var newConfig = config ?? new HotkeyPageStructure
+            Hotkey = new HotkeyStructure(),
+            RegexChain = new RegexChainStructure()
+        };
+        HotkeyConfigs.Add(newConfig);
+    }
+
+    public void RemoveHotkeyConfig(HotkeyPageStructure config)
+    {
+        if (HotkeyConfigs.Remove(config))
+        {
+            Unsubscribe(config);
+        }
+    }
+
+    private async void OnHotkeyConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (HotkeyPageStructure config in e.NewItems)
             {
-                Hotkey = new HotkeyStructure(),
-                RegexChain = new RegexChainStructure()
-            };
-            HotkeyConfigs.Add(newConfig);
+                Subscribe(config);
+            }
         }
 
-        public void RemoveHotkeyConfig(HotkeyPageStructure config)
+        if (e.OldItems != null)
         {
-            if (HotkeyConfigs.Remove(config))
+            foreach (HotkeyPageStructure config in e.OldItems)
             {
                 Unsubscribe(config);
             }
         }
 
-        private async void OnHotkeyConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        await SaveSettingsAsync();
+    }
+
+    private void Subscribe(HotkeyPageStructure config)
+    {
+        // Name, Comment
+        config.PropertyChanged += OnConfigPropertyChanged;
+
+        // Hotkey
+        if (config.Hotkey != null)
         {
-            if (e.NewItems != null)
-            {
-                foreach (HotkeyPageStructure config in e.NewItems)
-                {
-                    Subscribe(config);
-                }
-            }
-
-            if (e.OldItems != null)
-            {
-                foreach (HotkeyPageStructure config in e.OldItems)
-                {
-                    Unsubscribe(config);
-                }
-            }
-
-            await SaveSettingsAsync();
+            config.Hotkey.PropertyChanged += OnConfigPropertyChanged;
         }
 
-        private void Subscribe(HotkeyPageStructure config)
+        //RegexChain
+        if (config.RegexChain != null)
         {
-            // Name, Comment
-            config.PropertyChanged += OnConfigPropertyChanged;
+            config.RegexChain.ChainItems.CollectionChanged += OnChainItemsChanged;
 
-            // Hotkey
-            if (config.Hotkey != null)
+            // each items.
+            foreach (var item in config.RegexChain.ChainItems)
             {
-                config.Hotkey.PropertyChanged += OnConfigPropertyChanged;
-            }
-
-            //RegexChain
-            if (config.RegexChain != null)
-            {
-                config.RegexChain.ChainItems.CollectionChanged += OnChainItemsChanged;
-
-                // each items.
-                foreach (var item in config.RegexChain.ChainItems)
-                {
-                    item.PropertyChanged += OnConfigPropertyChanged;
-                }
+                item.PropertyChanged += OnConfigPropertyChanged;
             }
         }
+    }
 
-        private void Unsubscribe(HotkeyPageStructure config)
+    private void Unsubscribe(HotkeyPageStructure config)
+    {
+        config.PropertyChanged -= OnConfigPropertyChanged;
+
+        // Hotkey
+        if (config.Hotkey != null)
         {
-            config.PropertyChanged -= OnConfigPropertyChanged;
+            config.Hotkey.PropertyChanged -= OnConfigPropertyChanged;
+        }
 
-            // Hotkey
-            if (config.Hotkey != null)
+        // RegexChain
+        if (config.RegexChain != null)
+        {
+            config.RegexChain.ChainItems.CollectionChanged -= OnChainItemsChanged;
+
+            // each items.
+            foreach (var item in config.RegexChain.ChainItems)
             {
-                config.Hotkey.PropertyChanged -= OnConfigPropertyChanged;
+                item.PropertyChanged -= OnConfigPropertyChanged;
             }
+        }
+    }
 
-            // RegexChain
-            if (config.RegexChain != null)
+    private async void OnChainItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (ChainItem item in e.NewItems)
             {
-                config.RegexChain.ChainItems.CollectionChanged -= OnChainItemsChanged;
-
-                // each items.
-                foreach (var item in config.RegexChain.ChainItems)
-                {
-                    item.PropertyChanged -= OnConfigPropertyChanged;
-                }
+                item.PropertyChanged += OnConfigPropertyChanged;
             }
         }
 
-        private async void OnChainItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        if (e.OldItems != null)
         {
-            if (e.NewItems != null)
+            foreach (ChainItem item in e.OldItems)
             {
-                foreach (ChainItem item in e.NewItems)
-                {
-                    item.PropertyChanged += OnConfigPropertyChanged;
-                }
+                item.PropertyChanged -= OnConfigPropertyChanged;
             }
-
-            if (e.OldItems != null)
-            {
-                foreach (ChainItem item in e.OldItems)
-                {
-                    item.PropertyChanged -= OnConfigPropertyChanged;
-                }
-            }
-
-            await SaveSettingsAsync();
         }
 
-        private async void OnConfigPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            await SaveSettingsAsync();
-        }
+        await SaveSettingsAsync();
+    }
 
-        public async Task SaveSettingsAsync()
+    private async void OnConfigPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        await SaveSettingsAsync();
+    }
+
+    public async Task SaveSettingsAsync()
+    {
+        await _saveLock.WaitAsync();
+        try
         {
-            await _saveLock.WaitAsync();
-            try
-            {
-                await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, HotkeyConfigs);
-            }
-            catch (Exception ex)
-            {
-                // Todo : Error logic.
-                System.Diagnostics.Debug.WriteLine($"Hotkeys 저장 중 오류 발생: {ex.Message}");
-            }
-            finally
-            {
-                _saveLock.Release();
-            }
+            await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, HotkeyConfigs);
+        }
+        catch (Exception ex)
+        {
+            // Todo : Error logic.
+            System.Diagnostics.Debug.WriteLine($"Hotkeys 저장 중 오류 발생: {ex.Message}");
+        }
+        finally
+        {
+            _saveLock.Release();
         }
     }
 }
