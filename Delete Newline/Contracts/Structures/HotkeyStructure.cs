@@ -3,7 +3,7 @@ using Windows.System;
 
 namespace Delete_Newline.Contracts.Structures;
 
-public partial class HotkeyStructure : ObservableRecipient
+public partial class HotKeyStructure : ObservableRecipient
 {
     [ObservableProperty]
     public VirtualKeyModifiers _modifiers;
@@ -12,27 +12,27 @@ public partial class HotkeyStructure : ObservableRecipient
     public VirtualKey _key;
 
     [ObservableProperty]
-    public string? _displayHotkey;
+    public string? _displayHotKey;
 
-    public HotkeyStructure()
+    public HotKeyStructure()
     {
     }
 
     partial void OnKeyChanged(VirtualKey value)
     {
-        UpdateDisplayHotkey();
+        UpdateDisplayHotKey();
     }
 
     partial void OnModifiersChanged(VirtualKeyModifiers value)
     {
-        UpdateDisplayHotkey();
+        UpdateDisplayHotKey();
     }
 
-    private void UpdateDisplayHotkey()
+    private void UpdateDisplayHotKey()
     {
         if (Modifiers == VirtualKeyModifiers.None || Key == VirtualKey.None)
         {
-            DisplayHotkey = string.Empty;
+            DisplayHotKey = string.Empty;
             return;
         }
 
@@ -53,7 +53,7 @@ public partial class HotkeyStructure : ObservableRecipient
         // Key to string
         var keyString = GetKeyString(Key);
 
-        DisplayHotkey = string.Join(" + ", modifierStrings.Concat(new[] { keyString }));
+        DisplayHotKey = string.Join(" + ", modifierStrings.Concat(new[] { keyString }));
     }
 
 

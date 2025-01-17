@@ -7,8 +7,6 @@ namespace Delete_Newline.Services;
 
 public sealed partial class User32
 {
-    public const int WM_Hotkey = 0x0312;
-
     [DllImport("user32.dll", SetLastError = true, EntryPoint = "RegisterHotKey")]
     public static extern bool RegisterHotKey(
         IntPtr hWnd,
@@ -23,48 +21,48 @@ public sealed partial class User32
 }
 
 
-public sealed class HotkeyRegister : IHotkeyRegister
+public sealed class HotKeyRegisterService : IHotKeyRegister
 {
     private readonly IntPtr _hwnd;
     private readonly string _salt = "Delete Newline";
 
-    public HotkeyRegister(IntPtr hwnd)
+    public HotKeyRegisterService(IntPtr hwnd)
     {
         this._hwnd = hwnd;
     }
 
-    private int HotkeyToHash((VirtualKeyModifiers, VirtualKey) Hotkey)
+    private int HotKeyToHash((VirtualKeyModifiers, VirtualKey) HotKey)
     {
-        string HotkeyString = $"{_salt}:{Hotkey.Item1}:{Hotkey.Item2}";
+        string HotKeyString = $"{_salt}:{HotKey.Item1}:{HotKey.Item2}";
 
         using (SHA256 sha256 = SHA256.Create())
         {
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(HotkeyString));
+            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(HotKeyString));
             int hashInt = BitConverter.ToInt32(hashBytes, 0);
             return Math.Abs(hashInt);
         }
     }
 
-    public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
+    public bool RegistHotKey((VirtualKeyModifiers, VirtualKey) HotKey)
     {
-        int hotkeyId = HotkeyToHash(Hotkey);
-        bool result = User32.RegisterHotKey(_hwnd, hotkeyId, (uint)Hotkey.Item1, (uint)Hotkey.Item2);
+        int HotKeyId = HotKeyToHash(HotKey);
+        bool result = User32.RegisterHotKey(_hwnd, HotKeyId, (uint)HotKey.Item1, (uint)HotKey.Item2);
         System.Diagnostics.Debug.WriteLine($"_hwnd : {_hwnd}");
         if (!result)
         {
             int errorCode = Marshal.GetLastWin32Error();
-            System.Diagnostics.Debug.WriteLine($"RegisterHotkey failed with error code: {errorCode}");
+            System.Diagnostics.Debug.WriteLine($"RegisterHotKey failed with error code: {errorCode}");
         }
         else
         {
-            System.Diagnostics.Debug.WriteLine($"RegisterHotkey result: {result}");
+            System.Diagnostics.Debug.WriteLine($"RegisterHotKey result: {result}");
         }
         return result;
     }
 
-    public void UnregisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
+    public void UnregistHotKey((VirtualKeyModifiers, VirtualKey) HotKey)
     {
-        while (User32.UnregisterHotKey(_hwnd, HotkeyToHash(Hotkey)))
+        while (User32.UnregisterHotKey(_hwnd, HotKeyToHash(HotKey)))
         {
         }
     }

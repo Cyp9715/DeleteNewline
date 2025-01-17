@@ -1,0 +1,38 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace Delete_Newline.Services;
+
+public class WndProcService
+{
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+    private const int WM_HOTKEY = 0x0312;
+    private const int GWL_WNDPROC = -4;
+
+    private delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    private static IntPtr _oldWndProc;
+    private static WndProc? _newWndProc;
+
+    public WndProcService(IntPtr _hwnd)
+    {
+        _newWndProc = NewWndProc;
+        IntPtr newWndProcPtr = Marshal.GetFunctionPointerForDelegate(_newWndProc);
+        _oldWndProc = SetWindowLongPtr(_hwnd, GWL_WNDPROC, newWndProcPtr);
+    }
+
+    private static IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
+    {
+        if (msg == WM_HOTKEY)
+        {
+            int hotkeyId = wParam.ToInt32();
+            // Todo 
+            Debug.WriteLine($"WM_HOTKEY received! ID={hotkeyId}");
+        }
+        return CallWindowProc(_oldWndProc, hWnd, (int)msg, wParam, lParam);
+    }
+}

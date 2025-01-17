@@ -5,41 +5,41 @@ using Delete_Newline.Services;
 using Windows.System;
 
 namespace Delete_Newline.ViewModels;
-public partial class HotkeyViewModel : ObservableRecipient
+public partial class HotKeyViewModel : ObservableRecipient
 {
     [ObservableProperty]
-    private HotkeyPageStructure? _currentHotkeyConfig;
+    private HotKeyPageStructure? _currentHotKeyConfig;
 
     [RelayCommand]
     private void AddRegexItem()
     {
-        if (CurrentHotkeyConfig is null || CurrentHotkeyConfig.RegexChain is null)
+        if (CurrentHotKeyConfig is null || CurrentHotKeyConfig.RegexChain is null)
         {
-            throw new InvalidOperationException("CurrentHotkeyConfig is null.");
+            throw new InvalidOperationException("CurrentHotKeyConfig is null.");
         }
 
-        CurrentHotkeyConfig.RegexChain.AddChainItem();
+        CurrentHotKeyConfig.RegexChain.AddChainItem();
     }
 
     [RelayCommand]
     private void RemoveRegexItem(ChainItem item)
     {
-        if (CurrentHotkeyConfig is null || CurrentHotkeyConfig.RegexChain is null)
+        if (CurrentHotKeyConfig is null || CurrentHotKeyConfig.RegexChain is null)
         {
-            throw new InvalidOperationException("CurrentHotkeyConfig is null.");
+            throw new InvalidOperationException("CurrentHotKeyConfig is null.");
         }
 
-        CurrentHotkeyConfig.RegexChain.ChainItems.Remove(item);
+        CurrentHotKeyConfig.RegexChain.ChainItems.Remove(item);
     }
 
     [RelayCommand]
     public void HandleKeyboardAccelerator(KeyboardAcceleratorEventArgs args)
     {
-        var HotkeyManager = App.GetService<IHotkeyRegister>();
+        var HotKeyManager = App.GetService<IHotKeyRegister>();
 
-        if (HotkeyManager.RegisterHotkey((args.Modifiers, args.Key)))
+        if (HotKeyManager.RegistHotKey((args.Modifiers, args.Key)))
         {
-            if (CurrentHotkeyConfig?.Hotkey != null)
+            if (CurrentHotKeyConfig?.HotKey != null)
             {
                 VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
 
@@ -52,10 +52,10 @@ public partial class HotkeyViewModel : ObservableRecipient
                 if (args.Modifiers.HasFlag(VirtualKeyModifiers.Windows))
                     tempModifiers |= VirtualKeyModifiers.Windows;
 
-                CurrentHotkeyConfig.Hotkey.Modifiers = tempModifiers;
-                CurrentHotkeyConfig.Hotkey.Key = args.Key;
+                CurrentHotKeyConfig.HotKey.Modifiers = tempModifiers;
+                CurrentHotKeyConfig.HotKey.Key = args.Key;
 
-                //App.GetService<HotkeySaver>().SaveHoykey(CurrentHotkeyConfig);
+                //App.GetService<HotKeySaver>().SaveHoykey(CurrentHotKeyConfig);
             }
         }
         else

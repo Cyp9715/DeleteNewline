@@ -153,10 +153,10 @@
   <data name="Settings_TopMost.Text" xml:space="preserve">
     <value>Always on Top</value>
   </data>
-  <data name="Shell_Hotkeys.Content" xml:space="preserve">
-    <value>Hotkeys</value>
+  <data name="Shell_HotKeys.Content" xml:space="preserve">
+    <value>HotKeys</value>
   </data>
-  <data name="Shell_HotkeyDefault.Content" xml:space="preserve">
-    <value>Hotkey</value>
+  <data name="Shell_HotKeyDefault.Content" xml:space="preserve">
+    <value>HotKey</value>
   </data>
 </root>

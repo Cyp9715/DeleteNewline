@@ -6,57 +6,57 @@ using System.ComponentModel;
 
 namespace Delete_Newline.Services;
 
-public class HotkeyCollectSaveService
+public class HotKeyCollectSaveService
 {
-    public ObservableCollection<HotkeyPageStructure> HotkeyConfigs { get; private set; }
+    public ObservableCollection<HotKeyPageStructure> HotKeyConfigs { get; private set; }
 
     private readonly ILocalSettingsService _localSettingsService;
-    private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
+    private const string HotKeyCollectionSettingsKey = "HotKeyCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
-    public HotkeyCollectSaveService(ILocalSettingsService localSettingsService)
+    public HotKeyCollectSaveService(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
-        HotkeyConfigs = new ObservableCollection<HotkeyPageStructure>();
+        HotKeyConfigs = new ObservableCollection<HotKeyPageStructure>();
     }
 
     public async Task InitializeAsync()
     {
-        var savedHotkeyConfigs = await _localSettingsService.ReadSettingAsync<ObservableCollection<HotkeyPageStructure>>(HotkeyCollectionSettingsKey);
-        if (savedHotkeyConfigs != null)
+        var savedHotKeyConfigs = await _localSettingsService.ReadSettingAsync<ObservableCollection<HotKeyPageStructure>>(HotKeyCollectionSettingsKey);
+        if (savedHotKeyConfigs != null)
         {
-            HotkeyConfigs = savedHotkeyConfigs;
-            foreach (var config in HotkeyConfigs)
+            HotKeyConfigs = savedHotKeyConfigs;
+            foreach (var config in HotKeyConfigs)
             {
                 Subscribe(config);
             }
         }
-        HotkeyConfigs.CollectionChanged += OnHotkeyConfigsChanged;
+        HotKeyConfigs.CollectionChanged += OnHotKeyConfigsChanged;
     }
 
-    public void AddHotkeyConfig(HotkeyPageStructure? config = null)
+    public void AddHotKeyConfig(HotKeyPageStructure? config = null)
     {
-        var newConfig = config ?? new HotkeyPageStructure
+        var newConfig = config ?? new HotKeyPageStructure
         {
-            Hotkey = new HotkeyStructure(),
+            HotKey = new HotKeyStructure(),
             RegexChain = new RegexChainStructure()
         };
-        HotkeyConfigs.Add(newConfig);
+        HotKeyConfigs.Add(newConfig);
     }
 
-    public void RemoveHotkeyConfig(HotkeyPageStructure config)
+    public void RemoveHotKeyConfig(HotKeyPageStructure config)
     {
-        if (HotkeyConfigs.Remove(config))
+        if (HotKeyConfigs.Remove(config))
         {
             Unsubscribe(config);
         }
     }
 
-    private async void OnHotkeyConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private async void OnHotKeyConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems != null)
         {
-            foreach (HotkeyPageStructure config in e.NewItems)
+            foreach (HotKeyPageStructure config in e.NewItems)
             {
                 Subscribe(config);
             }
@@ -64,7 +64,7 @@ public class HotkeyCollectSaveService
 
         if (e.OldItems != null)
         {
-            foreach (HotkeyPageStructure config in e.OldItems)
+            foreach (HotKeyPageStructure config in e.OldItems)
             {
                 Unsubscribe(config);
             }
@@ -73,15 +73,15 @@ public class HotkeyCollectSaveService
         await SaveSettingsAsync();
     }
 
-    private void Subscribe(HotkeyPageStructure config)
+    private void Subscribe(HotKeyPageStructure config)
     {
         // Name, Comment
         config.PropertyChanged += OnConfigPropertyChanged;
 
-        // Hotkey
-        if (config.Hotkey != null)
+        // HotKey
+        if (config.HotKey != null)
         {
-            config.Hotkey.PropertyChanged += OnConfigPropertyChanged;
+            config.HotKey.PropertyChanged += OnConfigPropertyChanged;
         }
 
         //RegexChain
@@ -97,14 +97,14 @@ public class HotkeyCollectSaveService
         }
     }
 
-    private void Unsubscribe(HotkeyPageStructure config)
+    private void Unsubscribe(HotKeyPageStructure config)
     {
         config.PropertyChanged -= OnConfigPropertyChanged;
 
-        // Hotkey
-        if (config.Hotkey != null)
+        // HotKey
+        if (config.HotKey != null)
         {
-            config.Hotkey.PropertyChanged -= OnConfigPropertyChanged;
+            config.HotKey.PropertyChanged -= OnConfigPropertyChanged;
         }
 
         // RegexChain
@@ -151,12 +151,12 @@ public class HotkeyCollectSaveService
         await _saveLock.WaitAsync();
         try
         {
-            await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, HotkeyConfigs);
+            await _localSettingsService.SaveSettingAsync(HotKeyCollectionSettingsKey, HotKeyConfigs);
         }
         catch (Exception ex)
         {
             // Todo : Error logic.
-            System.Diagnostics.Debug.WriteLine($"Hotkeys 저장 중 오류 발생: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"HotKeys 저장 중 오류 발생: {ex.Message}");
         }
         finally
         {

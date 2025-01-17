@@ -1,3 +1,5 @@
+using Delete_Newline.Services;
+using Microsoft.UI.Dispatching;
 using Windows.UI.ViewManagement;
 using WinRT.Interop;
 using WinUIEx;
@@ -6,26 +8,25 @@ namespace Delete_Newline;
 
 public sealed partial class MainWindow : WindowEx
 {
-    private Microsoft.UI.Dispatching.DispatcherQueue dispatcherQueue;
-    public static IntPtr hwnd;
-    private UISettings settings;
+    private readonly DispatcherQueue _dispatcherQueue;
+    private readonly UISettings _settings;
+
+    public static IntPtr _hwnd;
+
 
     public MainWindow()
     {
         InitializeComponent();
+        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+        _settings = new UISettings();
+        _settings.ColorValuesChanged += Settings_ColorValuesChanged;
 
-        dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
-        settings = new UISettings();
-        settings.ColorValuesChanged += Settings_ColorValuesChanged; // cannot use FrameworkElement.ActualThemeChanged event
-        
-        hwnd = WindowNative.GetWindowHandle(this);
+        _hwnd = WindowNative.GetWindowHandle(this);
     }
 
-    // this handles updating the caption button colors correctly when indows system theme is changed while the app is open
     private void Settings_ColorValuesChanged(UISettings sender, object args)
     {
-        // This calls comes off-thread, hence we will need to dispatch it to current app's thread
-        dispatcherQueue.TryEnqueue(() =>
+        _dispatcherQueue.TryEnqueue(() =>
         {
             Helpers.TitleBarHelper.ApplySystemThemeToCaptionButtons();
         });

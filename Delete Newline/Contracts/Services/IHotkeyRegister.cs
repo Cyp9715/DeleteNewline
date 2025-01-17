@@ -1,7 +1,7 @@
 using Windows.System;
 
-public interface IHotkeyRegister
+public interface IHotKeyRegister
 {
-    bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey);
-    void UnregisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey);
+    bool RegistHotKey((VirtualKeyModifiers, VirtualKey) HotKey);
+    void UnregistHotKey((VirtualKeyModifiers, VirtualKey) HotKey);
 }

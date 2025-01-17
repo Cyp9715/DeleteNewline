@@ -8,42 +8,42 @@ using Delete_Newline.Services;
 
 namespace Delete_Newline.ViewModels;
 
-public partial class HotkeyCollectViewModel : ObservableRecipient
+public partial class HotKeyCollectViewModel : ObservableRecipient
 {
-    private readonly HotkeyCollectSaveService _HotkeyCollectManagerService;
+    private readonly HotKeyCollectSaveService _HotKeyCollectManagerService;
     public INavigationService NavigationService { get; }
 
     [ObservableProperty]
-    public ObservableCollection<HotkeyPageStructure> _HotkeyConfigs;
+    public ObservableCollection<HotKeyPageStructure> _HotKeyConfigs;
 
-    public HotkeyCollectViewModel(HotkeyCollectSaveService HotkeyCollectManagerService,
+    public HotKeyCollectViewModel(HotKeyCollectSaveService HotKeyCollectManagerService,
         INavigationService navigationService)
     {
-        _HotkeyCollectManagerService = HotkeyCollectManagerService;
+        _HotKeyCollectManagerService = HotKeyCollectManagerService;
         NavigationService = navigationService;
-        HotkeyConfigs = _HotkeyCollectManagerService.HotkeyConfigs;
+        HotKeyConfigs = _HotKeyCollectManagerService.HotKeyConfigs;
     }
 
     [RelayCommand]
-    private void AddHotkey()
+    private void AddHotKey()
     {
-        _HotkeyCollectManagerService.AddHotkeyConfig();
+        _HotKeyCollectManagerService.AddHotKeyConfig();
     }
 
     [RelayCommand]
-    private void RemoveHotkey(HotkeyPageStructure HotkeyConfig)
+    private void RemoveHotKey(HotKeyPageStructure HotKeyConfig)
     {
-        if (HotkeyConfig is not null)
+        if (HotKeyConfig is not null)
         {
-            _HotkeyCollectManagerService.RemoveHotkeyConfig(HotkeyConfig);
+            _HotKeyCollectManagerService.RemoveHotKeyConfig(HotKeyConfig);
         }
     }
 
     [RelayCommand]
-    private void NavigateToHotkeyPage(HotkeyPageStructure HotkeyConfig)
+    private void NavigateToHotKeyPage(HotKeyPageStructure HotKeyConfig)
     {
-        App.GetService<HotkeyViewModel>().CurrentHotkeyConfig = HotkeyConfig;
-        NavigationService.NavigateTo(typeof(HotkeyViewModel).FullName!);
+        App.GetService<HotKeyViewModel>().CurrentHotKeyConfig = HotKeyConfig;
+        NavigationService.NavigateTo(typeof(HotKeyViewModel).FullName!);
     }
 
     public static bool isDragEnded = true;

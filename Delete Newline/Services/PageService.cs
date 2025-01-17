@@ -14,8 +14,8 @@ public class PageService : IPageService
 
     public PageService()
     {
-        Configure<HotkeyCollectViewModel, HotkeyCollectPage>();
-        Configure<HotkeyViewModel, HotkeyPage>();
+        Configure<HotKeyCollectViewModel, HotKeyCollectPage>();
+        Configure<HotKeyViewModel, HotKeyPage>();
         Configure<MemoViewModel, MemoPage>();
         Configure<SettingsViewModel, SettingsPage>();
     }

@@ -1,5 +1,5 @@
 <Page x:Name="RootPage"
-      x:Class="Delete_Newline.Views.HotkeyPage"
+      x:Class="Delete_Newline.Views.HotKeyPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:structures="using:Delete_Newline.Contracts.Structures"
@@ -10,35 +10,35 @@
     <ScrollViewer>
         <Grid>
             <StackPanel MaxWidth="550">
-                <!-- Hotkey Name -->
+                <!-- HotKey Name -->
                 <Grid Margin="0,25,0,0">
-                    <TextBlock Text="Hotkey Name"></TextBlock>
-                    <TextBox x:Name="TextBox_HotkeyName"
+                    <TextBlock Text="HotKey Name"></TextBlock>
+                    <TextBox x:Name="TextBox_HotKeyName"
                              Width="285"
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
-                             Text="{Binding CurrentHotkeyConfig.HotkeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding CurrentHotKeyConfig.HotKeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
 
-                <!-- Hotkey Comment -->
+                <!-- HotKey Comment -->
                 <Grid Margin="0,5,0,0">
-                    <TextBlock Text="Hotkey Comment"></TextBlock>
-                    <TextBox x:Name="TextBox_HotkeyComment"
+                    <TextBlock Text="HotKey Comment"></TextBlock>
+                    <TextBox x:Name="TextBox_HotKeyComment"
                              Width="285"
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
-                             Text="{Binding CurrentHotkeyConfig.HotkeyComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding CurrentHotKeyConfig.HotKeyComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
 
-                <!-- Hotkey Input -->
+                <!-- HotKey Input -->
                 <Grid Margin="0,5,0,10">
-                    <TextBlock Text="Hotkey"></TextBlock>
-                    <TextBox x:Name="TextBox_Hotkey"
+                    <TextBlock Text="HotKey"></TextBlock>
+                    <TextBox x:Name="TextBox_HotKey"
                              Width="285"
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
                              IsReadOnly="True"
-                             Text="{Binding CurrentHotkeyConfig.Hotkey.DisplayHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                             Text="{Binding CurrentHotKeyConfig.HotKey.DisplayHotKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <interactivity:Interaction.Behaviors>
                             <behaviors:KeyboardAcceleratorBehavior CommandName="HandleKeyboardAcceleratorCommand" />
                         </interactivity:Interaction.Behaviors>
@@ -46,7 +46,7 @@
                 </Grid>
 
                 <!-- Additional Regex Items -->
-                <ItemsRepeater ItemsSource="{Binding CurrentHotkeyConfig.RegexChain.ChainItems}">
+                <ItemsRepeater ItemsSource="{Binding CurrentHotKeyConfig.RegexChain.ChainItems}">
                     <ItemsRepeater.ItemTemplate>
                         <DataTemplate x:DataType="structures:ChainItem">
                             <Grid Margin="0,5,0,0">
@@ -139,7 +139,7 @@
                              Margin="0,5,0,0"
                              Height="150"
                              AcceptsReturn="True"
-                             Text="{Binding CurrentHotkeyConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding CurrentHotKeyConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="2"
                                Text="Output Text"
                                Margin="0,5,0,0"
