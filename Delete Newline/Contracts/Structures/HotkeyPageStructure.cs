@@ -5,13 +5,13 @@ namespace Delete_Newline.Contracts.Structures;
 public partial class HotkeyPageStructure : ObservableObject
 {
     [ObservableProperty]
-    public string _hotkeyName = "New Hotkey";
+    public string _HotkeyName = "New Hotkey";
 
     [ObservableProperty]
-    public string _hotkeyComment = "Comment";
+    public string _HotkeyComment = "Comment";
 
     [ObservableProperty]
-    public HotkeyStructure? _hotkey;
+    public HotkeyStructure? _Hotkey;
 
     [ObservableProperty]
     public RegexChainStructure? _regexChain;

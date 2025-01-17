@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace Delete_Newline.Services;
 
-public class HotkeyCollectService
+public class HotkeyCollectSaveService
 {
     public ObservableCollection<HotkeyPageStructure> HotkeyConfigs { get; private set; }
 
@@ -14,7 +14,7 @@ public class HotkeyCollectService
     private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
-    public HotkeyCollectService(ILocalSettingsService localSettingsService)
+    public HotkeyCollectSaveService(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
         HotkeyConfigs = new ObservableCollection<HotkeyPageStructure>();

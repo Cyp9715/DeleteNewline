@@ -35,9 +35,9 @@ public partial class HotkeyViewModel : ObservableRecipient
     [RelayCommand]
     public void HandleKeyboardAccelerator(KeyboardAcceleratorEventArgs args)
     {
-        var hotkeyManager = App.GetService<IHotkeyRegister>();
+        var HotkeyManager = App.GetService<IHotkeyRegister>();
 
-        if (hotkeyManager.RegisterHotkey(1, (args.Modifiers, args.Key)))
+        if (HotkeyManager.RegisterHotkey((args.Modifiers, args.Key)))
         {
             if (CurrentHotkeyConfig?.Hotkey != null)
             {

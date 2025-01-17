@@ -1,4 +1,4 @@
-﻿using Delete_Newline.Contracts.Services;
+using Delete_Newline.Contracts.Services;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 

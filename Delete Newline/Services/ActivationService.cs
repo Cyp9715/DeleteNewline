@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using Delete_Newline.Activation;
@@ -15,7 +15,8 @@ public class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
     private readonly INotificationService _notificationService;
-    private readonly HotkeyCollectService _HotkeyCollectManagerService;
+    private readonly HotkeyCollectSaveService _HotkeyCollectManagerService;
+    private readonly HotkeyProcessor _hotkeyProceesor;
 
     private UIElement? _shell = null;
 
@@ -24,7 +25,7 @@ public class ActivationService : IActivationService
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
         INotificationService notificationService,
-        HotkeyCollectService HotkeyCollectManagerService)
+        HotkeyCollectSaveService HotkeyCollectManagerService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
