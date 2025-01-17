@@ -53,14 +53,13 @@ public partial class App : Application
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
                 services.AddSingleton<INotificationService, NotificationService>();
-                services.AddSingleton<IHotkeyRegister, HotkeyRegister>();
+                services.AddSingleton<IHotkeyRegister, HotkeyRegister>(x => new HotkeyRegister(Delete_Newline.MainWindow.hwnd));
 
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();
 
                 // Services, not need Interface.
                 services.AddSingleton<HotkeyCollectSaveService>();
-                services.AddSingleton<HotkeyProcessor>();
 
                 // Views and ViewModels
                 services.AddTransient<ShellViewModel>();

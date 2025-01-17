@@ -16,7 +16,6 @@ public class ActivationService : IActivationService
     private readonly ILocalizationService _localizationService;
     private readonly INotificationService _notificationService;
     private readonly HotkeyCollectSaveService _HotkeyCollectManagerService;
-    private readonly HotkeyProcessor _hotkeyProceesor;
 
     private UIElement? _shell = null;
 
