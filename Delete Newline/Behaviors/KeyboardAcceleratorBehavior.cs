@@ -65,8 +65,14 @@ namespace Delete_Newline.Behaviors
         private bool IsModifierKey(VirtualKey key)
         {
             return key == VirtualKey.Control ||
+                   key == VirtualKey.LeftControl ||
+                   key == VirtualKey.RightControl ||
                    key == VirtualKey.Shift ||
+                   key == VirtualKey.LeftShift ||
+                   key == VirtualKey.RightShift ||
                    key == VirtualKey.Menu ||
+                   key == VirtualKey.LeftMenu ||
+                   key == VirtualKey.RightMenu ||
                    key == VirtualKey.LeftWindows ||
                    key == VirtualKey.RightWindows;
         }

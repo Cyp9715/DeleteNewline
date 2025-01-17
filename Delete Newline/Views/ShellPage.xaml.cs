@@ -3,8 +3,6 @@ using Microsoft.UI.Xaml.Controls;
 
 using Delete_Newline.Helpers;
 using Delete_Newline.ViewModels;
-using Delete_Newline.Services;
-using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Delete_Newline.Views;
 

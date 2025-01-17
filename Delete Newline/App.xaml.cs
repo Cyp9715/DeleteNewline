@@ -53,7 +53,7 @@ public partial class App : Application
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
                 services.AddSingleton<INotificationService, NotificationService>();
-                services.AddSingleton<IHotKeyRegister, HotKeyRegisterService>(x => new HotKeyRegisterService(Delete_Newline.MainWindow._hwnd));
+                services.AddSingleton<IHotKeyRegister, HotKeyRegisterService>(x => new HotKeyRegisterService(Delete_Newline.MainWindow.hwnd));
 
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();

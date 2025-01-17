@@ -54,13 +54,11 @@ public partial class HotKeyViewModel : ObservableRecipient
 
                 CurrentHotKeyConfig.HotKey.Modifiers = tempModifiers;
                 CurrentHotKeyConfig.HotKey.Key = args.Key;
-
-                //App.GetService<HotKeySaver>().SaveHoykey(CurrentHotKeyConfig);
             }
         }
         else
         {
-            // Add Toast Message.
+            // Todo
         }
     }
 

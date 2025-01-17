@@ -11,8 +11,8 @@ public sealed partial class MainWindow : WindowEx
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly UISettings _settings;
 
-    public static IntPtr _hwnd;
-
+    public static IntPtr hwnd;
+    public readonly WndProcService wndProcService;
 
     public MainWindow()
     {
@@ -21,7 +21,8 @@ public sealed partial class MainWindow : WindowEx
         _settings = new UISettings();
         _settings.ColorValuesChanged += Settings_ColorValuesChanged;
 
-        _hwnd = WindowNative.GetWindowHandle(this);
+        hwnd = WindowNative.GetWindowHandle(this);
+        wndProcService = new WndProcService(hwnd);
     }
 
     private void Settings_ColorValuesChanged(UISettings sender, object args)
