@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
-using Delete_Newline.Services;
+using System.Diagnostics;
 using Windows.System;
 
 namespace Delete_Newline.ViewModels;
@@ -37,24 +37,30 @@ public partial class HotKeyViewModel : ObservableRecipient
     {
         var HotKeyManager = App.GetService<IHotKeyRegister>();
 
+        if (CurrentHotKeyConfig!.HotKey!.Modifiers == VirtualKeyModifiers.None ||
+            CurrentHotKeyConfig!.HotKey!.Key == VirtualKey.None)
+        {
+            Debug.WriteLine("HotKey is not set.");
+            return;
+        }
+
+        HotKeyManager.UnregisterHotKey((CurrentHotKeyConfig.HotKey.Modifiers, CurrentHotKeyConfig.HotKey.Key));
+
         if (HotKeyManager.RegisterHotKey((args.Modifiers, args.Key)))
         {
-            if (CurrentHotKeyConfig?.HotKey != null)
-            {
-                VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
+            VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
 
-                if (args.Modifiers.HasFlag(VirtualKeyModifiers.Control))
-                    tempModifiers |= VirtualKeyModifiers.Control;
-                if (args.Modifiers.HasFlag(VirtualKeyModifiers.Menu))
-                    tempModifiers |= VirtualKeyModifiers.Menu;
-                if (args.Modifiers.HasFlag(VirtualKeyModifiers.Shift))
-                    tempModifiers |= VirtualKeyModifiers.Shift;
-                if (args.Modifiers.HasFlag(VirtualKeyModifiers.Windows))
-                    tempModifiers |= VirtualKeyModifiers.Windows;
+            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Control))
+                tempModifiers |= VirtualKeyModifiers.Control;
+            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Menu))
+                tempModifiers |= VirtualKeyModifiers.Menu;
+            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Shift))
+                tempModifiers |= VirtualKeyModifiers.Shift;
+            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Windows))
+                tempModifiers |= VirtualKeyModifiers.Windows;
 
-                CurrentHotKeyConfig.HotKey.Modifiers = tempModifiers;
-                CurrentHotKeyConfig.HotKey.Key = args.Key;
-            }
+            CurrentHotKeyConfig.HotKey.Modifiers = tempModifiers;
+            CurrentHotKeyConfig.HotKey.Key = args.Key;
         }
         else
         {

@@ -28,8 +28,6 @@ public class WndProcService
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
-        Debug.WriteLine($"msg received! {msg}");
-
         switch (msg)
         {
             case WM_ACTIVATE:
