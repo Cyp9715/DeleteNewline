@@ -2,6 +2,6 @@ using Windows.System;
 
 public interface IHotKeyRegister
 {
-    bool RegistHotKey((VirtualKeyModifiers, VirtualKey) HotKey);
-    void UnregistHotKey((VirtualKeyModifiers, VirtualKey) HotKey);
+    bool RegisterHotKey((VirtualKeyModifiers, VirtualKey) HotKey);
+    void UnregisterHotKey((VirtualKeyModifiers, VirtualKey) HotKey);
 }

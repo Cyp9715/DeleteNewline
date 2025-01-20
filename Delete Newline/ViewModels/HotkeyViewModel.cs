@@ -37,7 +37,7 @@ public partial class HotKeyViewModel : ObservableRecipient
     {
         var HotKeyManager = App.GetService<IHotKeyRegister>();
 
-        if (HotKeyManager.RegistHotKey((args.Modifiers, args.Key)))
+        if (HotKeyManager.RegisterHotKey((args.Modifiers, args.Key)))
         {
             if (CurrentHotKeyConfig?.HotKey != null)
             {
@@ -61,6 +61,5 @@ public partial class HotKeyViewModel : ObservableRecipient
             // Todo
         }
     }
-
 }
 
