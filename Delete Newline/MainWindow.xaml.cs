@@ -12,7 +12,6 @@ public sealed partial class MainWindow : WindowEx
     private readonly UISettings _settings;
 
     public static IntPtr hwnd;
-    public readonly WndProcService wndProcService;
 
     public MainWindow()
     {
@@ -22,7 +21,6 @@ public sealed partial class MainWindow : WindowEx
         _settings.ColorValuesChanged += Settings_ColorValuesChanged;
 
         hwnd = WindowNative.GetWindowHandle(this);
-        wndProcService = new WndProcService(hwnd);
     }
 
     private void Settings_ColorValuesChanged(UISettings sender, object args)

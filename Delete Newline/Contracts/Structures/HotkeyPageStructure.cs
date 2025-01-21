@@ -11,10 +11,10 @@ public partial class HotKeyPageStructure : ObservableObject
     public string _HotKeyComment = "Comment";
 
     [ObservableProperty]
-    public HotKeyStructure? _HotKey;
+    public HotKeyStructure _HotKey = new HotKeyStructure();
 
     [ObservableProperty]
-    public RegexChainStructure? _regexChain;
+    public RegexChainStructure _regexChain = new RegexChainStructure();
 
     [ObservableProperty]
     public string _inputText = "";

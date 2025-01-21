@@ -3,6 +3,7 @@ using Delete_Newline.Contracts.Structures;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using Windows.System;
 
 namespace Delete_Newline.Services;
 
@@ -11,12 +12,16 @@ public class HotKeyCollectSaveService
     public ObservableCollection<HotKeyPageStructure> HotKeyConfigs { get; private set; }
 
     private readonly ILocalSettingsService _localSettingsService;
+    private readonly HotKeyRegisterService _hotKeyRegisterService;
+
     private const string HotKeyCollectionSettingsKey = "HotKeyCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
-    public HotKeyCollectSaveService(ILocalSettingsService localSettingsService)
+    public HotKeyCollectSaveService(ILocalSettingsService localSettingsService, HotKeyRegisterService hotKeyRegisterService)
     {
         _localSettingsService = localSettingsService;
+        _hotKeyRegisterService = hotKeyRegisterService;
+
         HotKeyConfigs = new ObservableCollection<HotKeyPageStructure>();
     }
 
@@ -29,6 +34,13 @@ public class HotKeyCollectSaveService
             foreach (var config in HotKeyConfigs)
             {
                 Subscribe(config);
+
+                if(config.HotKey != null &&
+                    config.HotKey.Modifiers == VirtualKeyModifiers.None && 
+                    config.HotKey.Key == VirtualKey.None)
+                    continue;
+
+                _hotKeyRegisterService.RegisterHotKey((config.HotKey.Modifiers, config.HotKey.Key));
             }
         }
         HotKeyConfigs.CollectionChanged += OnHotKeyConfigsChanged;
@@ -36,11 +48,7 @@ public class HotKeyCollectSaveService
 
     public void AddHotKeyConfig(HotKeyPageStructure? config = null)
     {
-        var newConfig = config ?? new HotKeyPageStructure
-        {
-            HotKey = new HotKeyStructure(),
-            RegexChain = new RegexChainStructure()
-        };
+        var newConfig = config ?? new HotKeyPageStructure();
         HotKeyConfigs.Add(newConfig);
     }
 
@@ -49,6 +57,12 @@ public class HotKeyCollectSaveService
         if (HotKeyConfigs.Remove(config))
         {
             Unsubscribe(config);
+
+            // Unregister HotKey
+            if (config!.HotKey!.Modifiers != VirtualKeyModifiers.None && config.HotKey.Key != VirtualKey.None)
+            {
+                _hotKeyRegisterService.UnRegisterHotKey((config.HotKey.Modifiers, config.HotKey.Key));
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
-using System.Diagnostics;
+using Delete_Newline.Services;
 using Windows.System;
 
 namespace Delete_Newline.ViewModels;
@@ -29,22 +29,19 @@ public partial class HotKeyViewModel : ObservableRecipient
             throw new InvalidOperationException("CurrentHotKeyConfig is null.");
         }
 
-        CurrentHotKeyConfig.RegexChain.ChainItems.Remove(item);
+        CurrentHotKeyConfig.RegexChain.RemoveChainItem(item);
     }
 
     [RelayCommand]
     public void HandleKeyboardAccelerator(KeyboardAcceleratorEventArgs args)
     {
-        var HotKeyManager = App.GetService<IHotKeyRegister>();
+        var HotKeyManager = App.GetService<HotKeyRegisterService>();
 
-        if (CurrentHotKeyConfig!.HotKey!.Modifiers == VirtualKeyModifiers.None ||
-            CurrentHotKeyConfig!.HotKey!.Key == VirtualKey.None)
+        if (CurrentHotKeyConfig!.HotKey!.Modifiers != VirtualKeyModifiers.None &&
+            CurrentHotKeyConfig!.HotKey!.Key != VirtualKey.None)
         {
-            Debug.WriteLine("HotKey is not set.");
-            return;
+            HotKeyManager.UnRegisterHotKey((CurrentHotKeyConfig.HotKey.Modifiers, CurrentHotKeyConfig.HotKey.Key));
         }
-
-        HotKeyManager.UnregisterHotKey((CurrentHotKeyConfig.HotKey.Modifiers, CurrentHotKeyConfig.HotKey.Key));
 
         if (HotKeyManager.RegisterHotKey((args.Modifiers, args.Key)))
         {

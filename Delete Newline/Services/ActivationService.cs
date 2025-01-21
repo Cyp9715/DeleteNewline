@@ -15,23 +15,29 @@ public class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
     private readonly INotificationService _notificationService;
-    private readonly HotKeyCollectSaveService _HotKeyCollectManagerService;
+    private readonly HotKeyCollectSaveService _hotKeyCollectManagerService;
+    private readonly HotKeyRegisterService _hotKeyRegisterService;
+    private readonly WndProcService _wndProcService;
 
     private UIElement? _shell = null;
 
     public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
-        IEnumerable<IActivationHandler> activationHandlers, 
+        IEnumerable<IActivationHandler> activationHandlers,
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
         INotificationService notificationService,
-        HotKeyCollectSaveService HotKeyCollectManagerService)
+        HotKeyCollectSaveService hotKeyCollectManagerService,
+        HotKeyRegisterService hotKeyRegister,
+        WndProcService wndProcService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
         _localizationService = localizationService;
         _notificationService = notificationService;
-        _HotKeyCollectManagerService = HotKeyCollectManagerService;
+        _hotKeyCollectManagerService = hotKeyCollectManagerService;
+        _hotKeyRegisterService = hotKeyRegister;
+        _wndProcService = wndProcService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -48,6 +54,10 @@ public class ActivationService : IActivationService
 
         // Activate the MainWindow.
         App.MainWindow.Activate();
+
+        // Register Window Handle. is synchronized.
+        _hotKeyRegisterService.Initialize(MainWindow.hwnd);
+        _wndProcService.Initialize(MainWindow.hwnd);
 
         // Execute tasks after activation.
         await StartupAsync();
@@ -73,14 +83,13 @@ public class ActivationService : IActivationService
         await _localizationService.InitializeAsync().ConfigureAwait(false);
         await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
         await _notificationService.InitializeAsync().ConfigureAwait(false);
-        await _HotKeyCollectManagerService.InitializeAsync().ConfigureAwait(false);
         await Task.CompletedTask;
     }
 
     private async Task StartupAsync()
     {
         await _themeSelectorService.SetRequestedThemeAsync();
-        await TopMostHelper.Initialize(App.MainWindow);
-        await Task.CompletedTask;
+        await TopMostHelper.Initialize(App.MainWindow); // TopMostHelper is static class.
+        await _hotKeyCollectManagerService.InitializeAsync();
     }
 }

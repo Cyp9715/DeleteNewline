@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -8,7 +7,7 @@ using Windows.System;
 namespace Delete_Newline.Services
 {
     [Flags]
-    public enum Modifiers
+    public enum Win32Modifiers
     {
         None = 0x0000,
         MOD_ALT = 0x0001,
@@ -18,7 +17,7 @@ namespace Delete_Newline.Services
         MOD_NOREPEAT = 0x4000,
     }
 
-    public sealed class HotKeyRegisterService : IHotKeyRegister
+    public sealed class HotKeyRegisterService
     {
         [DllImport("user32.dll", SetLastError = true, EntryPoint = "RegisterHotKey")]
         private static extern bool RegisterHotKey(
@@ -32,10 +31,10 @@ namespace Delete_Newline.Services
             IntPtr hWnd,
             int id);
 
-        private readonly IntPtr _hwnd;
+        private IntPtr _hwnd;
         private readonly string _salt = "Delete Newline";
 
-        public HotKeyRegisterService(IntPtr hwnd)
+        public void Initialize(IntPtr hwnd)
         {
             _hwnd = hwnd;
         }
@@ -52,18 +51,18 @@ namespace Delete_Newline.Services
             }
         }
 
-        private Modifiers MapVirtualModifiersToWin32(VirtualKeyModifiers virtualModifiers)
+        private Win32Modifiers MapVirtualModifiersToWin32(VirtualKeyModifiers virtualModifiers)
         {
-            Modifiers win32Modifiers = Modifiers.None;
+            Win32Modifiers win32Modifiers = Win32Modifiers.None;
 
             if (virtualModifiers.HasFlag(VirtualKeyModifiers.Control))
-                win32Modifiers |= Modifiers.MOD_CONTROL;
+                win32Modifiers |= Win32Modifiers.MOD_CONTROL;
             if (virtualModifiers.HasFlag(VirtualKeyModifiers.Menu))
-                win32Modifiers |= Modifiers.MOD_ALT;
+                win32Modifiers |= Win32Modifiers.MOD_ALT;
             if (virtualModifiers.HasFlag(VirtualKeyModifiers.Shift))
-                win32Modifiers |= Modifiers.MOD_SHIFT;
+                win32Modifiers |= Win32Modifiers.MOD_SHIFT;
             if (virtualModifiers.HasFlag(VirtualKeyModifiers.Windows))
-                win32Modifiers |= Modifiers.MOD_WIN;
+                win32Modifiers |= Win32Modifiers.MOD_WIN;
 
             return win32Modifiers;
         }
@@ -71,14 +70,13 @@ namespace Delete_Newline.Services
         public bool RegisterHotKey((VirtualKeyModifiers, VirtualKey) hotKey)
         {
             int hotKeyId = HotKeyToHash(hotKey);
-            Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotKey.Item1);
+            Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotKey.Item1);
             bool result = RegisterHotKey(_hwnd, hotKeyId, (uint)win32Modifiers, (uint)hotKey.Item2);
 
-            Debug.WriteLine($"_hwnd : {_hwnd}");
             if (!result)
             {
                 int errorCode = Marshal.GetLastWin32Error();
-                Debug.WriteLine($"RegisterHotKey failed with error code: {errorCode}");
+                Debug.WriteLine($"RegisterHotKey failed with error code: {errorCode}, ID: {hotKeyId}, _hwnd: {_hwnd}");
             }
             else
             {
@@ -87,14 +85,13 @@ namespace Delete_Newline.Services
             return result;
         }
 
-        public void UnregisterHotKey((VirtualKeyModifiers, VirtualKey) hotKey)
+        public void UnRegisterHotKey((VirtualKeyModifiers, VirtualKey) hotKey)
         {
             int hotKeyId = HotKeyToHash(hotKey);
-            bool result = UnregisterHotKey(_hwnd, hotKeyId);
-            if (!result)
+            if (UnregisterHotKey(_hwnd, hotKeyId) is false)
             {
                 int errorCode = Marshal.GetLastWin32Error();
-                Debug.WriteLine($"UnregisterHotKey failed with error code: {errorCode}");
+                Debug.WriteLine($"UnregisterHotKey failed with error code: {errorCode}, ID: {hotKeyId}, _hwnd: {_hwnd}");
             }
             else
             {

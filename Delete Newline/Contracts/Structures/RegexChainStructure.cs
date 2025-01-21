@@ -16,6 +16,11 @@ public partial class RegexChainStructure : ObservableObject
     {
         ChainItems.Add(new ChainItem());
     }
+
+    public void RemoveChainItem(ChainItem item)
+    {
+        ChainItems.Remove(item);
+    }
 }
 
 public partial class ChainItem : ObservableObject

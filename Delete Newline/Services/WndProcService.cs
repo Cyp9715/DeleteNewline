@@ -19,7 +19,7 @@ public class WndProcService
     private static IntPtr _oldWndProc;
     private static WndProc? _newWndProc;
 
-    public WndProcService(IntPtr _hwnd)
+    public void Initialize(IntPtr _hwnd)
     {
         _newWndProc = NewWndProc;
         IntPtr newWndProcPtr = Marshal.GetFunctionPointerForDelegate(_newWndProc);
