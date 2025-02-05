@@ -48,8 +48,10 @@ namespace Delete_Newline.Behaviors
             if (IsModifierKey(e.Key))
                 return;
 
-            // Run the command only when the modifier key is pressed
-            if (_currentModifiers != VirtualKeyModifiers.None)
+            // Execute command only if a modifier is pressed, but ignore Shift alone
+            // to avoid confusion when using Shift as a hotkey.
+            if (_currentModifiers != VirtualKeyModifiers.None &&
+                _currentModifiers != VirtualKeyModifiers.Shift)
             {
                 ExecuteCommand(e);
                 e.Handled = true;

@@ -35,10 +35,9 @@ public class HotKeyCollectSaveService
             {
                 Subscribe(config);
 
-                if(config.HotKey != null &&
-                    config.HotKey.Modifiers == VirtualKeyModifiers.None && 
-                    config.HotKey.Key == VirtualKey.None)
-                    continue;
+                if(config.HotKey.Modifiers == VirtualKeyModifiers.None && 
+                   config.HotKey.Key == VirtualKey.None)
+                   continue;
 
                 _hotKeyRegisterService.RegisterHotKey((config.HotKey.Modifiers, config.HotKey.Key));
             }
