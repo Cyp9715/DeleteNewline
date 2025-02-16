@@ -1,6 +1,7 @@
 using Delete_Newline.Contracts.Services;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
+using System.Formats.Asn1;
 
 namespace Delete_Newline.Services;
 
@@ -45,7 +46,7 @@ class NotificationService : INotificationService
     
     public bool GetEnableNotification() => _enableNotification;
 
-    public void ShowNotification(string title, string message, bool force=false)
+    public void ShowNotification(string title, string message, bool force = false, bool tag = true)
     {
         if (_enableNotification is false && force is false) 
             return;
@@ -53,6 +54,8 @@ class NotificationService : INotificationService
         AppNotificationBuilder builder = new AppNotificationBuilder()
             .AddText(title)
             .AddText(message);
+
+        builder = tag ? builder.SetTag("Delete Newline") : builder;
 
         notificationManager.Show(builder.BuildNotification());
     }
