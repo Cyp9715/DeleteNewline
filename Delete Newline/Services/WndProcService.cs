@@ -39,7 +39,7 @@ public class WndProcService
 
             case WM_HOTKEY:
                 int hotkeyId = wParam.ToInt32();
-                // Todo, Hotkey process
+                // Todo, HotKey process
                 Debug.WriteLine($"WM_HOTKEY received! ID={hotkeyId}");
                 break;
         }
