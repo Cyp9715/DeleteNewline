@@ -1,4 +1,3 @@
-using Delete_Newline.Services;
 using Microsoft.UI.Dispatching;
 using Windows.UI.ViewManagement;
 using WinRT.Interop;

@@ -1,9 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Text;
-
-using Delete_Newline.Core.Contracts.Services;
-
-using Newtonsoft.Json;
+﻿using Delete_Newline.Core.Contracts.Services;
 
 namespace Delete_Newline.Core.Services;
 

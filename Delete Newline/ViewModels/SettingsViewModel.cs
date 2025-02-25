@@ -7,6 +7,9 @@ using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
 using Delete_Newline.Models;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using Delete_Newline.Core.Contracts.Services;
 
 namespace Delete_Newline.ViewModels;
 
@@ -15,6 +18,8 @@ public partial class SettingsViewModel : ObservableRecipient
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
     private readonly INotificationService _notificationService;
+    private readonly ISettingsService _localSettingsService;
+    private readonly IFilePickerService _filePickerService;
 
     [ObservableProperty]
     private string _versionDescription;
@@ -36,11 +41,15 @@ public partial class SettingsViewModel : ObservableRecipient
 
     public SettingsViewModel(ILocalizationService localizationService, 
         IThemeSelectorService themeSelectorService, 
-        INotificationService notificationService)
+        INotificationService notificationService,
+        ISettingsService localSettingsService,
+        IFilePickerService filePickerService)
     {
         _localizationService = localizationService;
         _themeSelectorService = themeSelectorService;
         _notificationService = notificationService;
+        _localSettingsService = localSettingsService;
+        _filePickerService = filePickerService;
 
         AvailableLanguages = _localizationService.Languages;
         SelectedLanguage = _localizationService.GetCurrentLanguageItem();
@@ -82,6 +91,27 @@ public partial class SettingsViewModel : ObservableRecipient
     {
         EnableTopMost = isChecked;
         await TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
+    }
+
+    [RelayCommand]
+    public async Task ImportSettingsAsync()
+    {
+        string? importFilePath = await _filePickerService.PickOpenFileAsync();
+        if (!string.IsNullOrEmpty(importFilePath))
+        {
+            await _localSettingsService.ImportSettingsAsync(importFilePath);
+        }
+    }
+
+
+    [RelayCommand]
+    public async Task ExportSettingsAsync()
+    {
+        string? exportFilePath = await _filePickerService.PickSaveFileAsync();
+        if (!string.IsNullOrEmpty(exportFilePath))
+        {
+            await _localSettingsService.ExportSettingsAsync(exportFilePath);
+        }
     }
 
 

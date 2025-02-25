@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Delete_Newline.Services;
 
-public class LocalSettingsService : ILocalSettingsService
+public class SettingsService : ISettingsService
 {
     private readonly IFileService _fileService;
     private IDictionary<string, JToken> _settings;
@@ -16,13 +16,13 @@ public class LocalSettingsService : ILocalSettingsService
     private const string _settingsFileName = "Settings.json";
     private bool _isInitialized = false;
 
-    public LocalSettingsService(IFileService fileService)
+    public SettingsService(IFileService fileService)
     {
         _fileService = fileService;
         _settings = new Dictionary<string, JToken>();
     }
 
-    private async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         if (_isInitialized)
             return;
@@ -33,7 +33,6 @@ public class LocalSettingsService : ILocalSettingsService
         string? jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName);
         _settings = string.IsNullOrWhiteSpace(jsonContent) ? new Dictionary<string, JToken>() : JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent) ?? new Dictionary<string, JToken>();
         _isInitialized = true;
-        
     }
 
     private void CreateSettingsFile(string directory, string fileName)
@@ -50,17 +49,15 @@ public class LocalSettingsService : ILocalSettingsService
         File.WriteAllText(filePath, "{}");
     }
 
-    public async Task<T?> ReadSettingAsync<T>(string key)
+    public T? ReadSetting<T>(string key)
     {
-        await InitializeAsync();
-
         if (_settings.TryGetValue(key, out JToken? token))
         {
             var settings = new JsonSerializerSettings
             {
                 ContractResolver = new PublicPropertiesOnlyContractResolver()
             };
-            return token.ToObject<T>(JsonSerializer.Create(settings));
+            return token.ToObject<T?>(JsonSerializer.Create(settings));
         }
         return default;
     }
@@ -82,5 +79,34 @@ public class LocalSettingsService : ILocalSettingsService
 
         var json = JsonConvert.SerializeObject(_settings, Formatting.Indented);
         await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json);
+    }
+
+    public async Task ExportSettingsAsync(string exportFilePath)
+    {
+        // Read the contents of the currently saved settings file.
+        string jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName);
+
+        // Separate the directory and file name from exportFilePath.
+        var exportDirectory = Path.GetDirectoryName(exportFilePath)!;
+        var exportFileName = Path.GetFileName(exportFilePath);
+
+        // Save the read JSON to the user-specified path.
+        await _fileService.SaveAsync(exportDirectory, exportFileName, jsonContent);
+    }
+
+    public async Task ImportSettingsAsync(string importFilePath)
+    {
+        // Separate the directory and file name from importFilePath.
+        var importDirectory = Path.GetDirectoryName(importFilePath)!;
+        var importFileName = Path.GetFileName(importFilePath);
+
+        // Read the JSON content from the specified file.
+        string jsonContent = await _fileService.ReadAsStringAsync(importDirectory, importFileName);
+
+        // Overwrite the current app settings file with the read content.
+        await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent);
+
+        // Update the in-memory _settings object as well.
+        _settings = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent) ?? new Dictionary<string, JToken>();
     }
 }

@@ -11,13 +11,13 @@ public class HotKeyCollectSaveService
 {
     public ObservableCollection<HotKeyPageStructure> HotKeyConfigs { get; private set; }
 
-    private readonly ILocalSettingsService _localSettingsService;
+    private readonly ISettingsService _localSettingsService;
     private readonly HotKeyRegisterService _hotKeyRegisterService;
 
     private const string HotKeyCollectionSettingsKey = "HotKeyCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
-    public HotKeyCollectSaveService(ILocalSettingsService localSettingsService, HotKeyRegisterService hotKeyRegisterService)
+    public HotKeyCollectSaveService(ISettingsService localSettingsService, HotKeyRegisterService hotKeyRegisterService)
     {
         _localSettingsService = localSettingsService;
         _hotKeyRegisterService = hotKeyRegisterService;
@@ -25,9 +25,9 @@ public class HotKeyCollectSaveService
         HotKeyConfigs = new ObservableCollection<HotKeyPageStructure>();
     }
 
-    public async Task InitializeAsync()
+    public void Initialize()
     {
-        var savedHotKeyConfigs = await _localSettingsService.ReadSettingAsync<ObservableCollection<HotKeyPageStructure>>(HotKeyCollectionSettingsKey);
+        var savedHotKeyConfigs = _localSettingsService.ReadSetting<ObservableCollection<HotKeyPageStructure>>(HotKeyCollectionSettingsKey);
         if (savedHotKeyConfigs != null)
         {
             HotKeyConfigs = savedHotKeyConfigs;

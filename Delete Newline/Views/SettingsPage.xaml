@@ -109,13 +109,27 @@
                 </Grid>
             </StackPanel>
 
-            <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}"
-                       Style="{ThemeResource BodyTextBlockStyle}"
-                       Grid.Row="1"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Bottom"
-                       Margin="500,0,0,20" />
+            <Grid Grid.Row="1">
+                <Button x:Uid="Settings_ImportSettings"
+                        Command="{x:Bind ViewModel.ImportSettingsCommand}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Content="Import"
+                        Margin="-500,0,0,20" />
 
+                <Button x:Uid="Settings_ExportSettings"
+                        Command="{x:Bind ViewModel.ExportSettingsCommand}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Content="Export"
+                        Margin="-350,0,0,20" />
+
+                <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}"
+                           Style="{ThemeResource BodyTextBlockStyle}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Margin="400,0,0,20" />
+            </Grid>
         </Grid>
     </ScrollViewer>
 </Page>

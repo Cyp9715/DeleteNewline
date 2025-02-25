@@ -44,7 +44,7 @@ public partial class App : Application
                 services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
 
                 // Services
-                services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
+                services.AddSingleton<ISettingsService, SettingsService>();
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
                 services.AddSingleton<INavigationViewService, NavigationViewService>();
                 services.AddSingleton<ILocalizationService, LocalizationService>();
@@ -56,6 +56,7 @@ public partial class App : Application
 
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();
+                services.AddSingleton<IFilePickerService, FilePickerService>();
 
                 // Services, not need Interface.
                 services.AddSingleton<HotKeyCollectSaveService>();

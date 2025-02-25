@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 
 namespace Delete_Newline.Contracts.Services;
 
@@ -9,9 +9,9 @@ public interface IThemeSelectorService
         get;
     }
 
-    Task InitializeAsync();
+    void Initialize();
 
     Task SetThemeAsync(ElementTheme theme);
 
-    Task SetRequestedThemeAsync();
+    void SetRequestedTheme();
 }

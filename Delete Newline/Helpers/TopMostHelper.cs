@@ -5,15 +5,15 @@ namespace Delete_Newline.Helpers
 {
     public static class TopMostHelper
     {
-        private static ILocalSettingsService? _localSettingsService;
+        private static ISettingsService? _localSettingsService;
 
         private const string DefaultTopMostKey = "TopMost";
         public static bool EnableTopMost { get; private set; } = false;
 
-        public async static Task Initialize(Window window, string topMostKey=DefaultTopMostKey)
+        public async static Task InitializeAsync(Window window, string topMostKey=DefaultTopMostKey)
         {
-            _localSettingsService = App.GetService<ILocalSettingsService>();
-            bool? storedSetting = await _localSettingsService.ReadSettingAsync<bool?>(topMostKey);
+            _localSettingsService = App.GetService<ISettingsService>();
+            bool? storedSetting = _localSettingsService.ReadSetting<bool?>(topMostKey);
 
             // default setting
             if (storedSetting.HasValue == false)

@@ -13,9 +13,9 @@ class NotificationService : INotificationService
 
     private bool _enableNotification; // default true.
 
-    private readonly ILocalSettingsService _localSettingsService;
+    private readonly ISettingsService _localSettingsService;
 
-    public NotificationService(ILocalSettingsService localSettingsService)
+    public NotificationService(ISettingsService localSettingsService)
     {
         notificationManager = AppNotificationManager.Default;
         _localSettingsService = localSettingsService;
@@ -23,7 +23,7 @@ class NotificationService : INotificationService
 
     public async Task InitializeAsync()
     {
-        bool? storedSetting = await _localSettingsService.ReadSettingAsync<bool?>(NotificationSettingsKey);
+        bool? storedSetting = _localSettingsService.ReadSetting<bool?>(NotificationSettingsKey);
 
         // default setting
         if (storedSetting.HasValue is false)

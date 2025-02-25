@@ -1,4 +1,4 @@
-﻿using Microsoft.Windows.ApplicationModel.Resources;
+using Microsoft.Windows.ApplicationModel.Resources;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Models;
 
@@ -7,7 +7,7 @@ namespace Delete_Newline.Services;
 public class LocalizationService : ILocalizationService
 {
     private const string LocalizationTagSettingsKey = "Localization";
-    private readonly ILocalSettingsService _localSettingsService;
+    private readonly ISettingsService _localSettingsService;
 
     private readonly ResourceManager _resourceManager;
     private readonly ResourceContext _resourceContext;
@@ -16,7 +16,7 @@ public class LocalizationService : ILocalizationService
 
     private LanguageItem _currentLanguageItem = new(Tag: "en-US", DisplayName: "English");
 
-    public LocalizationService(ILocalSettingsService localSettingsService)
+    public LocalizationService(ISettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
         _resourceManager = new();
@@ -27,7 +27,7 @@ public class LocalizationService : ILocalizationService
     {
         RegisterLanguageFromResource();
 
-        string? languageTag = await _localSettingsService.ReadSettingAsync<string>(LocalizationTagSettingsKey);
+        string? languageTag = _localSettingsService.ReadSetting<string>(LocalizationTagSettingsKey);
 
         if (languageTag is not null && GetLanguageItem(languageTag) is LanguageItem languageItem)
         {

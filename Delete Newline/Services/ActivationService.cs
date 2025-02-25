@@ -5,6 +5,7 @@ using Delete_Newline.Activation;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
 using Delete_Newline.Helpers;
+using Delete_Newline.Core.Contracts.Services;
 
 namespace Delete_Newline.Services;
 
@@ -14,7 +15,9 @@ public class ActivationService : IActivationService
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
+    private readonly ISettingsService _settingsService;
     private readonly INotificationService _notificationService;
+    private readonly IFilePickerService _filePickerService;
     private readonly HotKeyCollectSaveService _hotKeyCollectManagerService;
     private readonly HotKeyRegisterService _hotKeyRegisterService;
     private readonly WndProcService _wndProcService;
@@ -25,7 +28,9 @@ public class ActivationService : IActivationService
         IEnumerable<IActivationHandler> activationHandlers,
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
+        ISettingsService settingsService,
         INotificationService notificationService,
+        IFilePickerService filePickerService,
         HotKeyCollectSaveService hotKeyCollectManagerService,
         HotKeyRegisterService hotKeyRegister,
         WndProcService wndProcService)
@@ -34,7 +39,9 @@ public class ActivationService : IActivationService
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
         _localizationService = localizationService;
+        _settingsService = settingsService;
         _notificationService = notificationService;
+        _filePickerService = filePickerService;
         _hotKeyCollectManagerService = hotKeyCollectManagerService;
         _hotKeyRegisterService = hotKeyRegister;
         _wndProcService = wndProcService;
@@ -58,6 +65,7 @@ public class ActivationService : IActivationService
         // Register Window Handle. is synchronized.
         _hotKeyRegisterService.Initialize(MainWindow.hwnd);
         _wndProcService.Initialize(MainWindow.hwnd);
+        _filePickerService.Initialize(MainWindow.hwnd);
 
         // Execute tasks after activation.
         await StartupAsync();
@@ -81,15 +89,14 @@ public class ActivationService : IActivationService
     private async Task InitializeAsync()
     {
         await _localizationService.InitializeAsync().ConfigureAwait(false);
-        await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
         await _notificationService.InitializeAsync().ConfigureAwait(false);
-        await Task.CompletedTask;
+        _themeSelectorService.Initialize();
     }
 
     private async Task StartupAsync()
     {
-        await _themeSelectorService.SetRequestedThemeAsync();
-        await TopMostHelper.Initialize(App.MainWindow); // TopMostHelper is static class.
-        await _hotKeyCollectManagerService.InitializeAsync();
+        await TopMostHelper.InitializeAsync(App.MainWindow); // TopMostHelper is static class.
+        _themeSelectorService.SetRequestedTheme();
+        _hotKeyCollectManagerService.Initialize();
     }
 }
