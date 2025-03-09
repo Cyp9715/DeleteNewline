@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-
 using Delete_Newline.Activation;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
@@ -24,7 +23,7 @@ public class ActivationService : IActivationService
 
     private UIElement? _shell = null;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
+    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
         IEnumerable<IActivationHandler> activationHandlers,
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
@@ -49,54 +48,33 @@ public class ActivationService : IActivationService
 
     public async Task ActivateAsync(object activationArgs)
     {
-        // Execute tasks before activation.
-        await InitializeAsync();
-
-        // Set the MainWindow Content.
         _shell = App.GetService<ShellPage>();
         App.MainWindow.Content = _shell ?? new Frame();
-
-        // Handle activation via ActivationHandlers.
-        await HandleActivationAsync(activationArgs);
-
-        // Activate the MainWindow.
         App.MainWindow.Activate();
 
-        // Register Window Handle. is synchronized.
+        await _settingsService.InitializeAsync();
+
+        Task localizationTask = _localizationService.InitializeAsync();
+        Task activationTask = HandleActivationAsync(activationArgs);
+        Task notificationTask = _notificationService.InitializeAsync();
+        Task topMostTask = TopMostHelper.InitializeAsync(App.MainWindow);
+
+        await Task.WhenAll(activationTask, notificationTask, topMostTask);
+
+        _themeSelectorService.Initialize();
         _hotKeyRegisterService.Initialize(MainWindow.hwnd);
         _wndProcService.Initialize(MainWindow.hwnd);
         _filePickerService.Initialize(MainWindow.hwnd);
 
-        // Execute tasks after activation.
-        await StartupAsync();
+        _hotKeyCollectManagerService.Initialize();
+        _themeSelectorService.SetRequestedTheme();
     }
 
     private async Task HandleActivationAsync(object activationArgs)
     {
-        var activationHandler = _activationHandlers.FirstOrDefault(h => h.CanHandle(activationArgs));
+        Task? handlerTask = _activationHandlers.FirstOrDefault(h => h.CanHandle(activationArgs))?.HandleAsync(activationArgs);
+        Task? defaultHandlerTask = _defaultHandler.CanHandle(activationArgs) ? _defaultHandler.HandleAsync(activationArgs) : null;
 
-        if (activationHandler != null)
-        {
-            await activationHandler.HandleAsync(activationArgs);
-        }
-
-        if (_defaultHandler.CanHandle(activationArgs))
-        {
-            await _defaultHandler.HandleAsync(activationArgs);
-        }
-    }
-
-    private async Task InitializeAsync()
-    {
-        await _localizationService.InitializeAsync().ConfigureAwait(false);
-        await _notificationService.InitializeAsync().ConfigureAwait(false);
-        _themeSelectorService.Initialize();
-    }
-
-    private async Task StartupAsync()
-    {
-        await TopMostHelper.InitializeAsync(App.MainWindow); // TopMostHelper is static class.
-        _themeSelectorService.SetRequestedTheme();
-        _hotKeyCollectManagerService.Initialize();
+        await Task.WhenAll(handlerTask ?? Task.CompletedTask, defaultHandlerTask ?? Task.CompletedTask);
     }
 }

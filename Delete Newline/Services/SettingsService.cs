@@ -14,7 +14,6 @@ public class SettingsService : ISettingsService
 
     private readonly string _applicationDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     private const string _settingsFileName = "Settings.json";
-    private bool _isInitialized = false;
 
     public SettingsService(IFileService fileService)
     {
@@ -24,15 +23,11 @@ public class SettingsService : ISettingsService
 
     public async Task InitializeAsync()
     {
-        if (_isInitialized)
-            return;
-        
         if (File.Exists(Path.Combine(_applicationDataDirectory, _settingsFileName)) is false)
             CreateSettingsFile(_applicationDataDirectory, _settingsFileName);
 
         string? jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName);
         _settings = string.IsNullOrWhiteSpace(jsonContent) ? new Dictionary<string, JToken>() : JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent) ?? new Dictionary<string, JToken>();
-        _isInitialized = true;
     }
 
     private void CreateSettingsFile(string directory, string fileName)
