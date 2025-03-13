@@ -10,7 +10,7 @@
 	<Identity
 	  Name="62164CypSoft.DeleteNewline"
 	  Publisher="CN=0EB9F685-7CC3-4B9F-8F3E-BA45BA39030A"
-	  Version="2.0.0.0" />
+	  Version="2.1.0.0" />
 
 	<Properties>
 		<DisplayName>Delete Newline</DisplayName>

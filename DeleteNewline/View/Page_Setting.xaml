@@ -20,7 +20,7 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="550" />
+                <ColumnDefinition Width="650" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
@@ -89,7 +89,7 @@
                     <Label Content="Keybind"
                            VerticalAlignment="Center" />
                     <TextBox x:Name="TextBox_bindKey"
-                             Width="275"
+                             Width="340"
                              HorizontalAlignment="Right"
                              Text="{Binding KeybindText, Mode=TwoWay}"
                              TextAlignment="Center"
@@ -133,24 +133,24 @@
                        FontWeight="Bold" />
 
                 <Grid x:Name="Grid_RegexContents"
-                      Width="450">
+                      Width="550">
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="410" />
+                        <ColumnDefinition Width="510" />
                         <ColumnDefinition Width="40" />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel x:Name="StackPanel_RegexChainElement"
                                 Grid.Column="0">
                         <DockPanel Margin="{StaticResource margin_internalRegex}"
-                                   Width="410"
+                                   Width="510"
                                    ToolTip="{StaticResource toolTipText_regexExpression}">
 
                             <Label Content="Regex Expression"
                                    VerticalAlignment="Center" />
 
                             <TextBox x:Name="TextBox_regexExpression"
-                                     Width="235"
+                                     Width="300"
                                      Height="32"
                                      Text="{Binding RegexExpression, UpdateSourceTrigger=PropertyChanged}"
                                      TextAlignment="Center"
@@ -166,14 +166,14 @@
                         </DockPanel>
 
                         <DockPanel Margin="0,13,0,0"
-                                   Width="410"
+                                   Width="510"
                                    ToolTip="{StaticResource toolTipText_regexReplace}">
 
                             <Label Content="Replace"
                                    VerticalAlignment="Center" />
 
                             <TextBox x:Name="TextBox_regexReplace"
-                                     Width="235"
+                                     Width="300"
                                      HorizontalAlignment="Right"
                                      Text="{Binding RegexReplace, UpdateSourceTrigger=PropertyChanged}"
                                      TextAlignment="Center"
@@ -212,22 +212,22 @@
                               ItemsSource="{Binding AdditionalRegex}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Width="450">
+                            <Grid Width="550">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="410" />
+                                    <ColumnDefinition Width="510" />
                                     <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel x:Name="StackPanel_RegexElement"
                                             Grid.Column="0">
                                     <DockPanel Margin="{StaticResource margin_internalRegex}"
-                                               Width="410"
+                                               Width="510"
                                                ToolTip="{StaticResource toolTipText_regexExpression}">
 
                                         <Label Content="{Binding Label_expression}"
                                                VerticalAlignment="Center" />
 
-                                        <TextBox Width="235"
+                                        <TextBox Width="300"
                                                  Height="32"
                                                  Text="{Binding TextBox_regexExpression, UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Center"
@@ -246,13 +246,13 @@
                                     </DockPanel>
 
                                     <DockPanel Margin="0,13,0,0"
-                                               Width="410"
+                                               Width="510"
                                                ToolTip="{StaticResource toolTipText_regexReplace}">
 
                                         <Label Content="{Binding Label_replace}"
                                                VerticalAlignment="Center" />
 
-                                        <TextBox Width="235"
+                                        <TextBox Width="300"
                                                  HorizontalAlignment="Right"
                                                  Text="{Binding TextBox_regexReplace, UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Center"
@@ -291,7 +291,7 @@
 
                 <Grid x:Name="Grid_RegexExample"
                       Margin="40,20,40,0"
-                      Width="450">
+                      Width="550">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*" />
                         <RowDefinition Height="1*" />
@@ -311,10 +311,12 @@
                     <TextBox x:Name="TextBox_regexInput"
                              Grid.Row="1"
                              Margin="0,5,0,10"
-                             Height="150"
+                             Height="200"
                              Text="{Binding InputTestRegex, UpdateSourceTrigger=PropertyChanged}"
                              ToolTip="{StaticResource toolTipText_inputRegex}"
-                             AcceptsReturn="True">
+                             AcceptsReturn="True"
+                             HorizontalScrollBarVisibility="Auto"
+                             VerticalScrollBarVisibility="Auto">
 
                         <b:Interaction.Triggers>
                             <b:EventTrigger EventName="TextChanged">
@@ -359,7 +361,9 @@
                              Height="{Binding Height, ElementName=TextBox_regexInput}"
                              IsReadOnly="True"
                              Text="{Binding OutputTestRegex}"
-                             ToolTip="{StaticResource toolTipText_outputRegex}" />
+                             ToolTip="{StaticResource toolTipText_outputRegex}"
+                             HorizontalScrollBarVisibility="Auto"
+                             VerticalScrollBarVisibility="Auto" />
                 </Grid>
             </StackPanel>
 

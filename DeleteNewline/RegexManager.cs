@@ -12,7 +12,8 @@ namespace DeleteNewline
             {
                 for(int i = 0; i < regexs.Count; ++i)
                 {
-                    text = Regex.Replace(text, @regexs[i], @replaces[i]);
+                    string processedReplace = Regex.Unescape(replaces[i]);
+                    text = Regex.Replace(text, @regexs[i], processedReplace);
                 }
             }
             catch (Exception)

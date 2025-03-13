@@ -10,7 +10,7 @@
      <PlatformTarget>AnyCPU</PlatformTarget>
      <Platforms>AnyCPU;x86</Platforms>
      <NeutralLanguage>en</NeutralLanguage>
-     <AssemblyVersion>2.0.0</AssemblyVersion>
+     <AssemblyVersion>2.1.0</AssemblyVersion>
      <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
      <AssemblyName>Delete Newline</AssemblyName>
      <LangVersion>10</LangVersion>
