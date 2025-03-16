@@ -1,13 +1,12 @@
-﻿using Delete_Newline.Models;
+using Delete_Newline.Models;
 
 namespace Delete_Newline.Contracts.Services
 {
     public interface ILocalizationService
     {
         List<LanguageItem> Languages { get; }
-
+        void Initialize();
         LanguageItem GetCurrentLanguageItem();
-        Task InitializeAsync();
-        Task SetLanguageAsync(LanguageItem languageItem);
+        Task SetLanguage(LanguageItem languageItem);
     }
 }

@@ -75,7 +75,7 @@ public partial class SettingsViewModel : ObservableRecipient
         if (param is not null)
         {
             _notificationService.ShowNotification("Language Change", "The app needs to restart to apply the new language. Restart now?", force: true);
-            await _localizationService.SetLanguageAsync(param);
+            await _localizationService.SetLanguage(param);
         }
     }
 
@@ -87,10 +87,11 @@ public partial class SettingsViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private async Task ToggleTopMostAsync(bool isChecked)
+    private async Task ToggleTopMost(bool isChecked)
     {
         EnableTopMost = isChecked;
-        await TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
+        TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
+        await TopMostHelper.SaveTopMostSettingAsync();
     }
 
     [RelayCommand]

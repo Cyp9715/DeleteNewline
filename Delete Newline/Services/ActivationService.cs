@@ -54,17 +54,17 @@ public class ActivationService : IActivationService
 
         await _settingsService.InitializeAsync();
 
-        Task localizationTask = _localizationService.InitializeAsync();
         Task activationTask = HandleActivationAsync(activationArgs);
         Task notificationTask = _notificationService.InitializeAsync();
-        Task topMostTask = TopMostHelper.InitializeAsync(App.MainWindow);
 
-        await Task.WhenAll(activationTask, notificationTask, topMostTask);
+        await Task.WhenAll(activationTask, notificationTask);
 
+        _localizationService.Initialize();
         _themeSelectorService.Initialize();
         _hotKeyRegisterService.Initialize(MainWindow.hwnd);
         _wndProcService.Initialize(MainWindow.hwnd);
         _filePickerService.Initialize(MainWindow.hwnd);
+        TopMostHelper.Initialize(App.MainWindow);
 
         _hotKeyCollectManagerService.Initialize();
         _themeSelectorService.SetRequestedTheme();

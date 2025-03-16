@@ -23,7 +23,7 @@ public class LocalizationService : ILocalizationService
         _resourceContext = _resourceManager.CreateResourceContext();
     }
 
-    public async Task InitializeAsync()
+    public void Initialize()
     {
         RegisterLanguageFromResource();
 
@@ -31,24 +31,39 @@ public class LocalizationService : ILocalizationService
 
         if (languageTag is not null && GetLanguageItem(languageTag) is LanguageItem languageItem)
         {
-            await SetLanguageAsync(languageItem);
+            ApplyLanguage(languageItem);
         }
         else
         {
-            await SetLanguageAsync(_currentLanguageItem);
+            ApplyLanguage(_currentLanguageItem);
         }
     }
 
-    public async Task SetLanguageAsync(LanguageItem languageItem)
+    public void ApplyLanguage(LanguageItem languageItem)
     {
         if (Languages.Contains(languageItem) is true)
         {
             _currentLanguageItem = languageItem;
-
             Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = languageItem.Tag;
             _resourceContext.QualifierValues["Language"] = languageItem.Tag;
+        }
+    }
 
+    public async Task SaveLanguageSettingAsync(LanguageItem languageItem)
+    {
+        if (Languages.Contains(languageItem) is true)
+        {
             await _localSettingsService.SaveSettingAsync(LocalizationTagSettingsKey, languageItem.Tag);
+        }
+    }
+
+    // 기존 메서드는 두 메서드를 호출하는 형태로 수정
+    public async Task SetLanguage(LanguageItem languageItem)
+    {
+        if (Languages.Contains(languageItem) is true)
+        {
+            ApplyLanguage(languageItem);
+            await SaveLanguageSettingAsync(languageItem);
         }
     }
 

@@ -4,6 +4,7 @@ using Delete_Newline.Core.Helpers;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace Delete_Newline.Services;
 
@@ -27,7 +28,15 @@ public class SettingsService : ISettingsService
             CreateSettingsFile(_applicationDataDirectory, _settingsFileName);
 
         string? jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName);
-        _settings = string.IsNullOrWhiteSpace(jsonContent) ? new Dictionary<string, JToken>() : JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent) ?? new Dictionary<string, JToken>();
+
+        try
+        {
+            _settings = string.IsNullOrWhiteSpace(jsonContent) ? new Dictionary<string, JToken>() : JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent) ?? new Dictionary<string, JToken>();
+        }
+        catch // json is wrong format 
+        {
+            _settings = new Dictionary<string, JToken>();
+        }
     }
 
     private void CreateSettingsFile(string directory, string fileName)
@@ -62,7 +71,8 @@ public class SettingsService : ISettingsService
         if (value is null)
             throw new ArgumentNullException(nameof(value));
 
-        await InitializeAsync();
+        //await InitializeAsync();
+        Debug.WriteLine($"SaveSettingAsync : {key} |a| {value}");
 
         var settings = new JsonSerializerSettings
         {
