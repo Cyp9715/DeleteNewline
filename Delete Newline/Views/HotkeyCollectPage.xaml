@@ -24,43 +24,52 @@
 
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="structures:HotKeyPageStructure">
-                    <Grid Width="310"
-                          Height="90"
-                          Margin="6"
-                          Padding="12"
-                          Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
+                    <Border CornerRadius="5"
+                            Margin="2"
+                            Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
+                        <Grid Width="310"
+                              Height="90"
+                              Padding="12"
+                              Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="1"
-                                    VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind HotKeyName}"
-                                       FontWeight="SemiBold"
-                                       FontSize="16" />
-                            <TextBlock Text="{x:Bind HotKeyComment}"
-                                       FontSize="12"
-                                       TextWrapping="Wrap" />
-                        </StackPanel>
-                        <Grid.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="Remove"
-                                                Icon="Delete"
-                                                Command="{Binding DataContext.RemoveHotKeyCommand, ElementName=RootPage}"
-                                                CommandParameter="{Binding}">
-                                </MenuFlyoutItem>
-                            </MenuFlyout>
-                        </Grid.ContextFlyout>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="1"
+                                        VerticalAlignment="Top">
+                                <TextBlock Text="{x:Bind HotKey.DisplayHotKey}"
+                                           FontWeight="SemiBold"
+                                           FontSize="12"
+                                           HorizontalAlignment="Right"
+                                           Foreground="{ThemeResource SystemChromeGrayColor}" />
+                                <TextBlock Text="{x:Bind HotKeyName}"
+                                           FontWeight="SemiBold"
+                                           FontSize="16" />
+                                <TextBlock Text="{x:Bind HotKeyComment}"
+                                           FontSize="12"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                            <Grid.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Remove"
+                                                    Icon="Delete"
+                                                    Command="{Binding DataContext.RemoveHotKeyCommand, ElementName=RootPage}"
+                                                    CommandParameter="{Binding}">
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Grid.ContextFlyout>
 
-                        <behaviors:Interaction.Behaviors>
-                            <core:EventTriggerBehavior EventName="DoubleTapped">
-                                <core:InvokeCommandAction Command="{Binding DataContext.NavigateToHotKeyPageCommand, ElementName=RootPage}"
-                                                          CommandParameter="{Binding}" />
-                            </core:EventTriggerBehavior>
-                        </behaviors:Interaction.Behaviors>
-                    </Grid>
-                </DataTemplate>
+                            <behaviors:Interaction.Behaviors>
+                                <core:EventTriggerBehavior EventName="DoubleTapped">
+                                    <core:InvokeCommandAction Command="{Binding DataContext.NavigateToHotKeyPageCommand, ElementName=RootPage}"
+                                                              CommandParameter="{Binding}" />
+                                </core:EventTriggerBehavior>
+                            </behaviors:Interaction.Behaviors>
+                        </Grid>
+                    </Border>
+                </DataTemplate>                    
             </GridView.ItemTemplate>
         </GridView>
 
