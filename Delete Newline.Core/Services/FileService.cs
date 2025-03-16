@@ -9,13 +9,13 @@ public class FileService : IFileService
         var path = Path.Combine(directory, fileName);
         if (!File.Exists(path))
             return string.Empty;
-        return await File.ReadAllTextAsync(path);
+        return await File.ReadAllTextAsync(path).ConfigureAwait(false);
     }
 
     public async Task SaveAsync(string directory, string fileName, string content)
     {
         var filePath = Path.Combine(directory, fileName);
-        await File.WriteAllTextAsync(filePath, content);
+        await File.WriteAllTextAsync(filePath, content).ConfigureAwait(false);
     }
 
     public void Delete(string folderPath, string fileName)

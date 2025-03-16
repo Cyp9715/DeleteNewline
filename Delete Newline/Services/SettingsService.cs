@@ -83,20 +83,20 @@ public class SettingsService : ISettingsService
         _settings[key] = JToken.FromObject(value, JsonSerializer.Create(settings));
 
         var json = JsonConvert.SerializeObject(_settings, Formatting.Indented);
-        await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json);
+        await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json).ConfigureAwait(false);
     }
 
     public async Task ExportSettingsAsync(string exportFilePath)
     {
         // Read the contents of the currently saved settings file.
-        string jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName);
+        string jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName).ConfigureAwait(false);
 
         // Separate the directory and file name from exportFilePath.
         var exportDirectory = Path.GetDirectoryName(exportFilePath)!;
         var exportFileName = Path.GetFileName(exportFilePath);
 
         // Save the read JSON to the user-specified path.
-        await _fileService.SaveAsync(exportDirectory, exportFileName, jsonContent);
+        await _fileService.SaveAsync(exportDirectory, exportFileName, jsonContent).ConfigureAwait(false);
     }
 
     public async Task ImportSettingsAsync(string importFilePath)
@@ -106,10 +106,10 @@ public class SettingsService : ISettingsService
         var importFileName = Path.GetFileName(importFilePath);
 
         // Read the JSON content from the specified file.
-        string jsonContent = await _fileService.ReadAsStringAsync(importDirectory, importFileName);
+        string jsonContent = await _fileService.ReadAsStringAsync(importDirectory, importFileName).ConfigureAwait(false);
 
         // Overwrite the current app settings file with the read content.
-        await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent);
+        await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent).ConfigureAwait(false);
 
         // Update the in-memory _settings object as well.
         _settings = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent) ?? new Dictionary<string, JToken>();

@@ -57,7 +57,6 @@ public class LocalizationService : ILocalizationService
         }
     }
 
-    // 기존 메서드는 두 메서드를 호출하는 형태로 수정
     public async Task SetLanguage(LanguageItem languageItem)
     {
         if (Languages.Contains(languageItem) is true)
