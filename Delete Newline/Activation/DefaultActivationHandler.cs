@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.ViewModels;

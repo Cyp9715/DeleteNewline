@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 namespace Delete_Newline.Activation;
 
 public interface IActivationHandler

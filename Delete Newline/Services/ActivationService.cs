@@ -20,6 +20,7 @@ public class ActivationService : IActivationService
     private readonly HotKeyCollectSaveService _hotKeyCollectManagerService;
     private readonly HotKeyRegisterService _hotKeyRegisterService;
     private readonly WndProcService _wndProcService;
+    private readonly TrayIconService _trayIconService;
 
     private UIElement? _shell = null;
 
@@ -32,7 +33,8 @@ public class ActivationService : IActivationService
         IFilePickerService filePickerService,
         HotKeyCollectSaveService hotKeyCollectManagerService,
         HotKeyRegisterService hotKeyRegister,
-        WndProcService wndProcService)
+        WndProcService wndProcService,
+        TrayIconService trayIconService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
@@ -44,6 +46,7 @@ public class ActivationService : IActivationService
         _hotKeyCollectManagerService = hotKeyCollectManagerService;
         _hotKeyRegisterService = hotKeyRegister;
         _wndProcService = wndProcService;
+        _trayIconService = trayIconService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -64,6 +67,7 @@ public class ActivationService : IActivationService
         _hotKeyRegisterService.Initialize(MainWindow.hwnd);
         _wndProcService.Initialize(MainWindow.hwnd);
         _filePickerService.Initialize(MainWindow.hwnd);
+        _trayIconService.Initialize(MainWindow.hwnd);
         TopMostHelper.Initialize(App.MainWindow);
 
         _hotKeyCollectManagerService.Initialize();

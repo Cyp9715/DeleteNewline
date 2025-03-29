@@ -62,6 +62,7 @@ public partial class App : Application
                 services.AddSingleton<HotKeyCollectSaveService>();
                 services.AddSingleton<HotKeyRegisterService>();
                 services.AddSingleton<WndProcService>();
+                services.AddSingleton<TrayIconService>();
 
                 // Views and ViewModels
                 services.AddTransient<ShellViewModel>();
