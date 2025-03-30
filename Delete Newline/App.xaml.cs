@@ -107,5 +107,6 @@ public partial class App : Application
     {
         base.OnLaunched(args);
         await App.GetService<IActivationService>().ActivateAsync(args);
+        
     }
 }

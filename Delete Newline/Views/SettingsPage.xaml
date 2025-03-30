@@ -77,7 +77,7 @@
                     <TextBlock x:Uid="Settings_Notification"
                                VerticalAlignment="Center" />
                     <ToggleSwitch x:Name="NotificationCheckBox"
-                                  IsOn="{x:Bind ViewModel.EnableNotification}"
+                                  IsOn="{x:Bind ViewModel.EnableNotification, Mode=TwoWay}"
                                   HorizontalAlignment="Right"
                                   Style="{StaticResource CompactToggleSwitch}">
 

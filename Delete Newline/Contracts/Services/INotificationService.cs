@@ -1,12 +1,13 @@
 
-namespace Delete_Newline.Contracts.Services
-{
-    public interface INotificationService
-    {
-        Task InitializeAsync();
-        void ShowNotification(string title, string message, bool force = false, bool tag = true);
+namespace Delete_Newline.Contracts.Services;
 
-        Task SetEnableNotificationAsync(bool enable);
-        bool GetEnableNotification();
-    }
+public interface INotificationService
+{
+    event EventHandler<bool> EnableNotificationChanged;
+
+    Task InitializeAsync();
+    void ShowNotification(string title, string message, bool force = false, bool tag = true);
+
+    Task SetEnableNotificationAsync(bool enable);
+    bool GetEnableNotification();
 }

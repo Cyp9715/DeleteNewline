@@ -57,6 +57,13 @@ public partial class SettingsViewModel : ObservableRecipient
         VersionDescription = GetVersionDescription();
         EnableNotification = _notificationService.GetEnableNotification();
         EnableTopMost = TopMostHelper.EnableTopMost;
+
+        _notificationService.EnableNotificationChanged += OnNotificationEnabledChanged!;
+    }
+
+    private void OnNotificationEnabledChanged(object sender, bool isEnabled)
+    {
+        EnableNotification = isEnabled;
     }
 
     [RelayCommand]
@@ -80,7 +87,7 @@ public partial class SettingsViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private async Task ToggleNotificationAsync(bool isChecked)
+    public async Task ToggleNotificationAsync(bool isChecked)
     {
         EnableNotification = isChecked;
         await _notificationService.SetEnableNotificationAsync(isChecked);

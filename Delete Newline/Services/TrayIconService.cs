@@ -1,3 +1,4 @@
+using Delete_Newline.Contracts.Services;
 using System.Runtime.InteropServices;
 namespace Delete_Newline.Services;
 
@@ -41,6 +42,12 @@ public class TrayIconService
     private const uint LR_LOADFROMFILE = 0x00000010;
 
     private IntPtr _hwnd;
+    private readonly INotificationService _notificationService;
+
+    public TrayIconService(INotificationService notificationService)
+    {
+        _notificationService = notificationService;
+    }
 
     public void Initialize(IntPtr hwnd)
     {
@@ -103,7 +110,7 @@ public class TrayIconService
 
 
     /* 
-     * Context Menu Sector.s
+     * Context Menu Sector.
      */
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr CreatePopupMenu();
@@ -131,12 +138,20 @@ public class TrayIconService
         public int Y;
     }
 
+    private const uint MF_CHECKED = 0x00000008;
+    private const uint MF_STRING = 0x00000000;
+
     public const int ID_EXIT = 1;
+    public const int ID_NOTIFICATION = 2;
 
     public void ShowContextMenu()
     {
         IntPtr hMenu = CreatePopupMenu();
         AppendMenu(hMenu, 0, (IntPtr)ID_EXIT, "Exit Delete Newline");
+
+        // Notification 메뉴 추가 (체크 상태 적용)
+        uint notificationFlags = MF_STRING | (_notificationService.GetEnableNotification() ? MF_CHECKED : 0);
+        AppendMenu(hMenu, notificationFlags, (IntPtr)ID_NOTIFICATION, "Notification");
 
         GetCursorPos(out POINT pt);
         SetForegroundWindow(_hwnd);

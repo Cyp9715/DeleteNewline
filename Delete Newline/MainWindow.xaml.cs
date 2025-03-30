@@ -1,6 +1,6 @@
+using Delete_Newline.Contracts.Services;
 using Delete_Newline.Services;
 using Microsoft.UI.Dispatching;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Windows.UI.ViewManagement;
 using WinRT.Interop;
@@ -50,7 +50,7 @@ public sealed partial class MainWindow : WindowEx
     private const int WM_CLOSE = 0x0010;
     private const int WM_COMMAND = 0x0111;
 
-    private void MessageMonitor_WindowMessageReceived(object sender, WindowMessageEventArgs e)
+    private async void MessageMonitor_WindowMessageReceived(object sender, WindowMessageEventArgs e)
     {
         var trayIconService = App.GetService<TrayIconService>();
 
@@ -81,6 +81,11 @@ public sealed partial class MainWindow : WindowEx
                     case TrayIconService.ID_EXIT:
                         trayIconService.RemoveTrayIcon();
                         this.Close();
+                        break;
+
+                    case TrayIconService.ID_NOTIFICATION:
+                        var notificationService = App.GetService<INotificationService>();
+                        await notificationService.SetEnableNotificationAsync(!notificationService.GetEnableNotification());
                         break;
                 }
                 break;
