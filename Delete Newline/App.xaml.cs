@@ -44,7 +44,6 @@ public partial class App : Application
                 services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
 
                 // Services
-                services.AddSingleton<ISettingsService, SettingsService>();
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
                 services.AddSingleton<INavigationViewService, NavigationViewService>();
                 services.AddSingleton<ILocalizationService, LocalizationService>();
@@ -58,6 +57,7 @@ public partial class App : Application
                 services.AddSingleton<IFilePickerService, FilePickerService>();
 
                 // Services, not need Interface.
+                services.AddSingleton<SettingsService>();
                 services.AddSingleton<HotKeyCollectSaveService>();
                 services.AddSingleton<HotKeyRegisterService>();
                 services.AddSingleton<WndProcService>();
@@ -95,7 +95,7 @@ public partial class App : Application
         // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
 
         System.Diagnostics.Debug.WriteLine($"Unhandled exception: {e.Exception}");
-        // 또는 파일에 로그 작성
+        // or write log.
         // System.IO.File.AppendAllText("error.log", $"Unhandled exception: {e.Exception}\n");
     }
 

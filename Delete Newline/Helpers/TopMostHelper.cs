@@ -1,17 +1,17 @@
-using Delete_Newline.Contracts.Services;
+using Delete_Newline.Services;
 using Microsoft.UI.Xaml;
 
 namespace Delete_Newline.Helpers;
 
 public static class TopMostHelper
 {
-    private static ISettingsService? _localSettingsService;
+    private static SettingsService? _localSettingsService;
     private const string DefaultTopMostKey = "TopMost";
     public static bool EnableTopMost { get; private set; } = false;
 
     public static void Initialize(Window window)
     {
-        _localSettingsService = App.GetService<ISettingsService>();
+        _localSettingsService = App.GetService<SettingsService>();
         bool? storedSetting = _localSettingsService.ReadSetting<bool?>(DefaultTopMostKey);
 
         if (storedSetting.HasValue)

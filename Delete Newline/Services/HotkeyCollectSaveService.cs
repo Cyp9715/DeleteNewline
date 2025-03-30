@@ -11,13 +11,13 @@ public sealed class HotKeyCollectSaveService
 {
     public ObservableCollection<HotKeyPageStructure> HotKeyConfigs { get; private set; }
 
-    private readonly ISettingsService _localSettingsService;
+    private readonly SettingsService _localSettingsService;
     private readonly HotKeyRegisterService _hotKeyRegisterService;
 
     private const string HotKeyCollectionSettingsKey = "HotKeyCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
-    public HotKeyCollectSaveService(ISettingsService localSettingsService, HotKeyRegisterService hotKeyRegisterService)
+    public HotKeyCollectSaveService(SettingsService localSettingsService, HotKeyRegisterService hotKeyRegisterService)
     {
         _localSettingsService = localSettingsService;
         _hotKeyRegisterService = hotKeyRegisterService;

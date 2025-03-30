@@ -16,8 +16,8 @@ public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
-    private readonly ISettingsService _localSettingsService;
     private readonly IFilePickerService _filePickerService;
+    private readonly SettingsService _localSettingsService;
     private readonly NotificationService _notificationService;
 
 
@@ -40,10 +40,10 @@ public partial class SettingsViewModel : ObservableRecipient
     private bool _enableTopMost;
 
     public SettingsViewModel(ILocalizationService localizationService, 
-        IThemeSelectorService themeSelectorService, 
+        IThemeSelectorService themeSelectorService,
+        IFilePickerService filePickerService,
         NotificationService notificationService,
-        ISettingsService localSettingsService,
-        IFilePickerService filePickerService)
+        SettingsService localSettingsService)
     {
         _localizationService = localizationService;
         _themeSelectorService = themeSelectorService;

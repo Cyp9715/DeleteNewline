@@ -7,7 +7,7 @@ namespace Delete_Newline.Services;
 public sealed class LocalizationService : ILocalizationService
 {
     private const string LocalizationTagSettingsKey = "Localization";
-    private readonly ISettingsService _localSettingsService;
+    private readonly SettingsService _localSettingsService;
 
     private readonly ResourceManager _resourceManager;
     private readonly ResourceContext _resourceContext;
@@ -16,7 +16,7 @@ public sealed class LocalizationService : ILocalizationService
 
     private LanguageItem _currentLanguageItem = new(Tag: "en-US", DisplayName: "English");
 
-    public LocalizationService(ISettingsService localSettingsService)
+    public LocalizationService(SettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
         _resourceManager = new();

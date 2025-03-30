@@ -12,9 +12,9 @@ public sealed class NotificationService
 
     private bool _enableNotification; // default true.
 
-    private readonly ISettingsService _localSettingsService;
+    private readonly SettingsService _localSettingsService;
 
-    public NotificationService(ISettingsService localSettingsService)
+    public NotificationService(SettingsService localSettingsService)
     {
         notificationManager = AppNotificationManager.Default;
         _localSettingsService = localSettingsService;

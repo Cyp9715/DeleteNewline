@@ -14,8 +14,8 @@ public sealed class ActivationService : IActivationService
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
-    private readonly ISettingsService _settingsService;
     private readonly IFilePickerService _filePickerService;
+    private readonly SettingsService _settingsService;
     private readonly NotificationService _notificationService;
     private readonly HotKeyCollectSaveService _hotKeyCollectManagerService;
     private readonly HotKeyRegisterService _hotKeyRegisterService;
@@ -28,8 +28,8 @@ public sealed class ActivationService : IActivationService
         IEnumerable<IActivationHandler> activationHandlers,
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
-        ISettingsService settingsService,
         IFilePickerService filePickerService,
+        SettingsService settingsService,
         NotificationService notificationService,
         HotKeyCollectSaveService hotKeyCollectManagerService,
         HotKeyRegisterService hotKeyRegister,
@@ -51,26 +51,36 @@ public sealed class ActivationService : IActivationService
 
     public async Task ActivateAsync(object activationArgs)
     {
+        // UI initialization (must run first)
         _shell = App.GetService<ShellPage>();
         App.MainWindow.Content = _shell ?? new Frame();
         App.MainWindow.Activate();
 
+        // Initialize essential settings service
         await _settingsService.InitializeAsync();
 
-        Task activationTask = HandleActivationAsync(activationArgs);
-        Task notificationTask = _notificationService.InitializeAsync();
+        // Parallel execution of non-blocking async tasks
+        var asyncTasks = new List<Task>
+        {
+            HandleActivationAsync(activationArgs),
+            _notificationService.InitializeAsync()
+        };
+        await Task.WhenAll(asyncTasks);
 
-        await Task.WhenAll(activationTask, notificationTask);
+        // Initialize services that depend on window handle
+        var hwnd = MainWindow.hwnd;
+        _hotKeyRegisterService.Initialize(hwnd);
+        _wndProcService.Initialize(hwnd);
+        _filePickerService.Initialize(hwnd);
+        _trayIconService.Initialize(hwnd);
 
+        // Initialize remaining services
         _localizationService.Initialize();
         _themeSelectorService.Initialize();
-        _hotKeyRegisterService.Initialize(MainWindow.hwnd);
-        _wndProcService.Initialize(MainWindow.hwnd);
-        _filePickerService.Initialize(MainWindow.hwnd);
-        _trayIconService.Initialize(MainWindow.hwnd);
         TopMostHelper.Initialize(App.MainWindow);
-
         _hotKeyCollectManagerService.Initialize();
+
+        // Apply theme (executed last as it affects UI appearance)
         _themeSelectorService.SetRequestedTheme();
     }
 

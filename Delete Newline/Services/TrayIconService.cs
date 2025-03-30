@@ -147,11 +147,12 @@ public sealed class TrayIconService
     public void ShowContextMenu()
     {
         IntPtr hMenu = CreatePopupMenu();
-        AppendMenu(hMenu, 0, (IntPtr)ID_EXIT, "Exit Delete Newline");
 
-        // Notification 메뉴 추가 (체크 상태 적용)
+        // Add Notification Menu
         uint notificationFlags = MF_STRING | (_notificationService.GetEnableNotification() ? MF_CHECKED : 0);
         AppendMenu(hMenu, notificationFlags, (IntPtr)ID_NOTIFICATION, "Notification");
+
+        AppendMenu(hMenu, 0, (IntPtr)ID_EXIT, "Exit Delete Newline");
 
         GetCursorPos(out POINT pt);
         SetForegroundWindow(_hwnd);
