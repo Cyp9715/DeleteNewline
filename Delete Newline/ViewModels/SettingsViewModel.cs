@@ -7,9 +7,8 @@ using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
 using Delete_Newline.Models;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using Delete_Newline.Core.Contracts.Services;
+using Delete_Newline.Services;
 
 namespace Delete_Newline.ViewModels;
 
@@ -17,9 +16,10 @@ public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
-    private readonly INotificationService _notificationService;
     private readonly ISettingsService _localSettingsService;
     private readonly IFilePickerService _filePickerService;
+    private readonly NotificationService _notificationService;
+
 
     [ObservableProperty]
     private string _versionDescription;
@@ -41,7 +41,7 @@ public partial class SettingsViewModel : ObservableRecipient
 
     public SettingsViewModel(ILocalizationService localizationService, 
         IThemeSelectorService themeSelectorService, 
-        INotificationService notificationService,
+        NotificationService notificationService,
         ISettingsService localSettingsService,
         IFilePickerService filePickerService)
     {
@@ -87,7 +87,7 @@ public partial class SettingsViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public async Task ToggleNotificationAsync(bool isChecked)
+    private async Task ToggleNotificationAsync(bool isChecked)
     {
         EnableNotification = isChecked;
         await _notificationService.SetEnableNotificationAsync(isChecked);

@@ -84,7 +84,7 @@ public sealed partial class MainWindow : WindowEx
                         break;
 
                     case TrayIconService.ID_NOTIFICATION:
-                        var notificationService = App.GetService<INotificationService>();
+                        var notificationService = App.GetService<NotificationService>();
                         await notificationService.SetEnableNotificationAsync(!notificationService.GetEnableNotification());
                         break;
                 }

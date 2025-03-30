@@ -15,8 +15,8 @@ public class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
     private readonly ISettingsService _settingsService;
-    private readonly INotificationService _notificationService;
     private readonly IFilePickerService _filePickerService;
+    private readonly NotificationService _notificationService;
     private readonly HotKeyCollectSaveService _hotKeyCollectManagerService;
     private readonly HotKeyRegisterService _hotKeyRegisterService;
     private readonly WndProcService _wndProcService;
@@ -29,8 +29,8 @@ public class ActivationService : IActivationService
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
         ISettingsService settingsService,
-        INotificationService notificationService,
         IFilePickerService filePickerService,
+        NotificationService notificationService,
         HotKeyCollectSaveService hotKeyCollectManagerService,
         HotKeyRegisterService hotKeyRegister,
         WndProcService wndProcService,

@@ -42,9 +42,9 @@ public class TrayIconService
     private const uint LR_LOADFROMFILE = 0x00000010;
 
     private IntPtr _hwnd;
-    private readonly INotificationService _notificationService;
+    private readonly NotificationService _notificationService;
 
-    public TrayIconService(INotificationService notificationService)
+    public TrayIconService(NotificationService notificationService)
     {
         _notificationService = notificationService;
     }

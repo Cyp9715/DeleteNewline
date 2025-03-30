@@ -52,7 +52,6 @@ public partial class App : Application
                 services.AddSingleton<IActivationService, ActivationService>();
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
-                services.AddSingleton<INotificationService, NotificationService>();
 
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();
@@ -62,6 +61,7 @@ public partial class App : Application
                 services.AddSingleton<HotKeyCollectSaveService>();
                 services.AddSingleton<HotKeyRegisterService>();
                 services.AddSingleton<WndProcService>();
+                services.AddSingleton<NotificationService>();
                 services.AddSingleton<TrayIconService>();
 
                 // Views and ViewModels

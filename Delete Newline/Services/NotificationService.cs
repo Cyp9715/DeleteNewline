@@ -4,7 +4,7 @@ using Microsoft.Windows.AppNotifications.Builder;
 
 namespace Delete_Newline.Services;
 
-class NotificationService : INotificationService
+public class NotificationService
 {
     private const string NotificationSettingsKey = "Notification";
     
@@ -42,7 +42,7 @@ class NotificationService : INotificationService
     {
         _enableNotification = enable;
         await _localSettingsService.SaveSettingAsync(NotificationSettingsKey, enable);
-        EnableNotificationChanged?.Invoke(this, enable); // 이벤트 발생
+        EnableNotificationChanged?.Invoke(this, enable); // Synchronize to change the ViewModel code as well.
     }
 
     public bool GetEnableNotification() => _enableNotification;
