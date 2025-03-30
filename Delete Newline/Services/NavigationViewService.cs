@@ -8,7 +8,7 @@ using Delete_Newline.ViewModels;
 
 namespace Delete_Newline.Services;
 
-public class NavigationViewService : INavigationViewService
+public sealed class NavigationViewService : INavigationViewService
 {
     private readonly INavigationService _navigationService;
 

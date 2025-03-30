@@ -4,7 +4,7 @@ using Microsoft.Windows.AppNotifications.Builder;
 
 namespace Delete_Newline.Services;
 
-public class NotificationService
+public sealed class NotificationService
 {
     private const string NotificationSettingsKey = "Notification";
     

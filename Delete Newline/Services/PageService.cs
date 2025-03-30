@@ -8,7 +8,7 @@ using Delete_Newline.Views;
 
 namespace Delete_Newline.Services;
 
-public class PageService : IPageService
+public sealed class PageService : IPageService
 {
     private readonly Dictionary<string, Type> _pages = new();
 

@@ -5,7 +5,7 @@ using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
-public class ThemeSelectorService : IThemeSelectorService
+public sealed class ThemeSelectorService : IThemeSelectorService
 {
     private const string SettingsKey = "AppBackgroundRequestedTheme";
 

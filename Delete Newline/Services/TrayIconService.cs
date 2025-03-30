@@ -23,7 +23,7 @@ public struct NOTIFYICONDATA
     public int dwInfoFlags;
 }
 
-public class TrayIconService
+public sealed class TrayIconService
 {
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr LoadImage(IntPtr hInstance, string lpszName, uint uType, int cxDesired, int cyDesired, uint fuLoad);

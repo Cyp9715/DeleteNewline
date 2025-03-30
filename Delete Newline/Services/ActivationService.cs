@@ -8,7 +8,7 @@ using Delete_Newline.Core.Contracts.Services;
 
 namespace Delete_Newline.Services;
 
-public class ActivationService : IActivationService
+public sealed class ActivationService : IActivationService
 {
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;

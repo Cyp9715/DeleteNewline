@@ -4,7 +4,7 @@ using Delete_Newline.Models;
 
 namespace Delete_Newline.Services;
 
-public class LocalizationService : ILocalizationService
+public sealed class LocalizationService : ILocalizationService
 {
     private const string LocalizationTagSettingsKey = "Localization";
     private readonly ISettingsService _localSettingsService;

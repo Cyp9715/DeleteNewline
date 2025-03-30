@@ -9,7 +9,7 @@ using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
-public class NavigationService : INavigationService
+public sealed class NavigationService : INavigationService
 {
     private readonly IPageService _pageService;
     private object? _lastParameterUsed;

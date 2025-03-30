@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Delete_Newline.Services;
 
-public class SettingsService : ISettingsService
+public sealed class SettingsService : ISettingsService
 {
     private readonly IFileService _fileService;
     private IDictionary<string, JToken> _settings;

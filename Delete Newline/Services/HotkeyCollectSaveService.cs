@@ -7,7 +7,7 @@ using Windows.System;
 
 namespace Delete_Newline.Services;
 
-public class HotKeyCollectSaveService
+public sealed class HotKeyCollectSaveService
 {
     public ObservableCollection<HotKeyPageStructure> HotKeyConfigs { get; private set; }
 
