@@ -63,6 +63,7 @@ public partial class App : Application
                 services.AddSingleton<WndProcService>();
                 services.AddSingleton<NotificationService>();
                 services.AddSingleton<TrayIconService>();
+                services.AddSingleton<TopMostService>();
 
                 // Views and ViewModels
                 services.AddTransient<ShellViewModel>();

@@ -5,6 +5,8 @@ using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
 using Delete_Newline.Helpers;
 using Delete_Newline.Core.Contracts.Services;
+using Delete_Newline.ViewModels;
+using WinUIEx;
 
 namespace Delete_Newline.Services;
 
@@ -20,6 +22,7 @@ public sealed class ActivationService : IActivationService
     private readonly HotKeyCollectSaveService _hotKeyCollectManagerService;
     private readonly HotKeyRegisterService _hotKeyRegisterService;
     private readonly WndProcService _wndProcService;
+    private readonly TopMostService _topMostService;
     private readonly TrayIconService _trayIconService;
 
     private UIElement? _shell = null;
@@ -34,6 +37,7 @@ public sealed class ActivationService : IActivationService
         HotKeyCollectSaveService hotKeyCollectManagerService,
         HotKeyRegisterService hotKeyRegister,
         WndProcService wndProcService,
+        TopMostService topMostService,
         TrayIconService trayIconService)
     {
         _defaultHandler = defaultHandler;
@@ -46,6 +50,7 @@ public sealed class ActivationService : IActivationService
         _hotKeyCollectManagerService = hotKeyCollectManagerService;
         _hotKeyRegisterService = hotKeyRegister;
         _wndProcService = wndProcService;
+        _topMostService = topMostService;
         _trayIconService = trayIconService;
     }
 
@@ -54,7 +59,6 @@ public sealed class ActivationService : IActivationService
         // UI initialization (must run first)
         _shell = App.GetService<ShellPage>();
         App.MainWindow.Content = _shell ?? new Frame();
-        App.MainWindow.Activate();
 
         // Initialize essential settings service
         await _settingsService.InitializeAsync();
@@ -77,11 +81,20 @@ public sealed class ActivationService : IActivationService
         // Initialize remaining services
         _localizationService.Initialize();
         _themeSelectorService.Initialize();
-        TopMostHelper.Initialize(App.MainWindow);
+        _topMostService.Initialize(App.MainWindow);
         _hotKeyCollectManagerService.Initialize();
 
         // Apply theme (executed last as it affects UI appearance)
         _themeSelectorService.SetRequestedTheme();
+
+        bool startOnTray = _settingsService.ReadSetting<bool>(SettingsViewModel.DefaultStartOnTray);
+
+        if (!startOnTray)
+        {
+            // StartOnTray가 false이면 창을 표시
+            App.MainWindow.Show();
+            App.MainWindow.Activate();
+        }
     }
 
     private async Task HandleActivationAsync(object activationArgs)

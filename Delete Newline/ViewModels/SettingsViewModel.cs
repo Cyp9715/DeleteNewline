@@ -9,6 +9,7 @@ using Delete_Newline.Helpers;
 using Delete_Newline.Models;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Services;
+using System.Diagnostics;
 
 namespace Delete_Newline.ViewModels;
 
@@ -19,7 +20,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private readonly IFilePickerService _filePickerService;
     private readonly SettingsService _localSettingsService;
     private readonly NotificationService _notificationService;
-
+    private readonly TopMostService _topMostService;
 
     [ObservableProperty]
     private string _versionDescription;
@@ -37,26 +38,33 @@ public partial class SettingsViewModel : ObservableRecipient
     private bool _enableNotification;
 
     [ObservableProperty]
+    private bool _enableStartOnTray;
+
+    [ObservableProperty]
     private bool _enableTopMost;
 
     public SettingsViewModel(ILocalizationService localizationService, 
         IThemeSelectorService themeSelectorService,
         IFilePickerService filePickerService,
         NotificationService notificationService,
-        SettingsService localSettingsService)
+        SettingsService localSettingsService,
+        TopMostService topMostService)
     {
         _localizationService = localizationService;
         _themeSelectorService = themeSelectorService;
         _notificationService = notificationService;
         _localSettingsService = localSettingsService;
         _filePickerService = filePickerService;
+        _topMostService = topMostService;
 
+        // get initial settings
         AvailableLanguages = _localizationService.Languages;
         SelectedLanguage = _localizationService.GetCurrentLanguageItem();
         SelectedTheme = _themeSelectorService.Theme.ToString();
         VersionDescription = GetVersionDescription();
         EnableNotification = _notificationService.GetEnableNotification();
-        EnableTopMost = TopMostHelper.EnableTopMost;
+        EnableTopMost = _topMostService.EnableTopMost;
+        EnableStartOnTray = _localSettingsService.ReadSetting<bool>(DefaultStartOnTray);
 
         _notificationService.EnableNotificationChanged += OnNotificationEnabledChanged!;
     }
@@ -89,7 +97,7 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand]
     private async Task ToggleNotificationAsync(bool isChecked)
     {
-        EnableNotification = isChecked;
+        Debug.WriteLine($"ToggleNotificationAsync : {EnableNotification}");
         await _notificationService.SetEnableNotificationAsync(isChecked);
     }
 
@@ -97,8 +105,17 @@ public partial class SettingsViewModel : ObservableRecipient
     private async Task ToggleTopMost(bool isChecked)
     {
         EnableTopMost = isChecked;
-        TopMostHelper.SetWindowTopMost(App.MainWindow, isChecked);
-        await TopMostHelper.SaveTopMostSettingAsync();
+        _topMostService.SetWindowTopMost(App.MainWindow, isChecked);
+        await _topMostService.SaveTopMostSettingAsync();
+    }
+
+    public const string DefaultStartOnTray = "StartOnTray";
+
+    [RelayCommand]
+    private async Task ToggleStartOnTray(bool isChecked)
+    {
+        EnableStartOnTray = isChecked;
+        await _localSettingsService.SaveSettingAsync(DefaultStartOnTray, isChecked);
     }
 
     [RelayCommand]

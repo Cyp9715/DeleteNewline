@@ -1,11 +1,13 @@
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Services;
+using Delete_Newline.ViewModels;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using System.Runtime.InteropServices;
 using Windows.UI.ViewManagement;
 using WinRT.Interop;
 using WinUIEx;
-using WinUIEx.Messaging; // 메시지 처리용
+using WinUIEx.Messaging;
 
 namespace Delete_Newline;
 

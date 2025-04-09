@@ -26,8 +26,17 @@
                 <Grid Height="40">
                     <TextBlock x:Uid="Settings_StartOnTray"
                                VerticalAlignment="Center" />
-                    <ToggleSwitch HorizontalAlignment="Right"
-                                  Style="{StaticResource CompactToggleSwitch}" />
+                    <ToggleSwitch x:Name="StartOnTrayToggleSwitch"
+                                  HorizontalAlignment="Right"
+                                  IsOn="{x:Bind ViewModel.EnableStartOnTray}"
+                                  Style="{StaticResource CompactToggleSwitch}">
+                        <behaviors:Interaction.Behaviors>
+                            <core:EventTriggerBehavior EventName="Toggled">
+                                <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleStartOnTrayCommand}"
+                                                          CommandParameter="{Binding IsOn, ElementName=StartOnTrayToggleSwitch}" />
+                            </core:EventTriggerBehavior>
+                        </behaviors:Interaction.Behaviors>
+                    </ToggleSwitch>
                 </Grid>
 
                 <Grid Height="40">
@@ -76,7 +85,7 @@
                 <Grid Height="40">
                     <TextBlock x:Uid="Settings_Notification"
                                VerticalAlignment="Center" />
-                    <ToggleSwitch x:Name="NotificationCheckBox"
+                    <ToggleSwitch x:Name="NotificationToggleSwitch"
                                   IsOn="{x:Bind ViewModel.EnableNotification, Mode=TwoWay}"
                                   HorizontalAlignment="Right"
                                   Style="{StaticResource CompactToggleSwitch}">
@@ -84,7 +93,7 @@
                         <behaviors:Interaction.Behaviors>
                             <core:EventTriggerBehavior EventName="Toggled">
                                 <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleNotificationCommand}"
-                                                          CommandParameter="{Binding IsOn, ElementName=NotificationCheckBox}" />
+                                                          CommandParameter="{Binding IsOn, ElementName=NotificationToggleSwitch}" />
                             </core:EventTriggerBehavior>
                         </behaviors:Interaction.Behaviors>
 

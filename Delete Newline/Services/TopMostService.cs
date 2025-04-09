@@ -1,15 +1,14 @@
-using Delete_Newline.Services;
 using Microsoft.UI.Xaml;
 
-namespace Delete_Newline.Helpers;
+namespace Delete_Newline.Services;
 
-public static class TopMostHelper
+public class TopMostService
 {
     private static SettingsService? _localSettingsService;
-    private const string DefaultTopMostKey = "TopMost";
-    public static bool EnableTopMost { get; private set; } = false;
+    public const string DefaultTopMostKey = "TopMost";
+    public bool EnableTopMost { get; private set; } = false;
 
-    public static void Initialize(Window window)
+    public void Initialize(Window window)
     {
         _localSettingsService = App.GetService<SettingsService>();
         bool? storedSetting = _localSettingsService.ReadSetting<bool?>(DefaultTopMostKey);
@@ -21,7 +20,7 @@ public static class TopMostHelper
         }
     }
 
-    public static void SetWindowTopMost(Window window, bool topMost)
+    public void SetWindowTopMost(Window window, bool topMost)
     {
         if (window == null) return;
 
@@ -37,13 +36,13 @@ public static class TopMostHelper
         }
     }
 
-    public async static Task SaveTopMostSettingAsync()
+    public async Task SaveTopMostSettingAsync()
     {
         if (_localSettingsService == null) return;
         await _localSettingsService.SaveSettingAsync(DefaultTopMostKey, EnableTopMost);
     }
 
-    private static Microsoft.UI.Windowing.AppWindow GetAppWindow(Window window)
+    private Microsoft.UI.Windowing.AppWindow GetAppWindow(Window window)
     {
         var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
         var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);

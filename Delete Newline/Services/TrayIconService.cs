@@ -42,6 +42,8 @@ public sealed class TrayIconService
     private const uint LR_LOADFROMFILE = 0x00000010;
 
     private IntPtr _hwnd;
+
+    // sync notification
     private readonly NotificationService _notificationService;
 
     public TrayIconService(NotificationService notificationService)
