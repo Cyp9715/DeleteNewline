@@ -66,6 +66,7 @@ public partial class SettingsViewModel : ObservableRecipient
         EnableTopMost = _topMostService.EnableTopMost;
         EnableStartOnTray = _localSettingsService.ReadSetting<bool>(DefaultStartOnTray);
 
+        // Tray option.
         _notificationService.EnableNotificationChanged += OnNotificationEnabledChanged!;
     }
 
@@ -97,14 +98,13 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand]
     private async Task ToggleNotificationAsync(bool isChecked)
     {
-        Debug.WriteLine($"ToggleNotificationAsync : {EnableNotification}");
+        // Todo. Notification.
         await _notificationService.SetEnableNotificationAsync(isChecked);
     }
 
     [RelayCommand]
     private async Task ToggleTopMost(bool isChecked)
     {
-        EnableTopMost = isChecked;
         _topMostService.SetWindowTopMost(App.MainWindow, isChecked);
         await _topMostService.SaveTopMostSettingAsync();
     }
@@ -114,7 +114,6 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand]
     private async Task ToggleStartOnTray(bool isChecked)
     {
-        EnableStartOnTray = isChecked;
         await _localSettingsService.SaveSettingAsync(DefaultStartOnTray, isChecked);
     }
 
@@ -128,7 +127,6 @@ public partial class SettingsViewModel : ObservableRecipient
         }
     }
 
-
     [RelayCommand]
     public async Task ExportSettingsAsync()
     {
@@ -138,7 +136,6 @@ public partial class SettingsViewModel : ObservableRecipient
             await _localSettingsService.ExportSettingsAsync(exportFilePath);
         }
     }
-
 
     private static string GetVersionDescription()
     {
