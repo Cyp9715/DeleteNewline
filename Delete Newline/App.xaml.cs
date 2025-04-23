@@ -86,7 +86,7 @@ public partial class App : Application
         UnhandledException += App_UnhandledException;
     }
 
-    public static WindowEx MainWindow { get; } = new MainWindow();
+    public static MainWindow MainWindow { get; } = new MainWindow();
 
     public static UIElement? AppTitlebar { get; set; }
 
@@ -108,6 +108,7 @@ public partial class App : Application
     {
         base.OnLaunched(args);
         await App.GetService<IActivationService>().ActivateAsync(args);
-        
+
+        MainWindow.StartOnTray();
     }
 }

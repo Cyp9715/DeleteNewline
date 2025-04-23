@@ -9,7 +9,6 @@ using Delete_Newline.Helpers;
 using Delete_Newline.Models;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Services;
-using System.Diagnostics;
 
 namespace Delete_Newline.ViewModels;
 

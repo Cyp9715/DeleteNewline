@@ -2,7 +2,6 @@ using Delete_Newline.Contracts.Services;
 using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
 using System.Runtime.InteropServices;
 using Windows.UI.ViewManagement;
 using WinRT.Interop;
@@ -38,6 +37,15 @@ public sealed partial class MainWindow : WindowEx
         {
             Helpers.TitleBarHelper.ApplySystemThemeToCaptionButtons();
         });
+    }
+
+    public static void StartOnTray()
+    {
+        if (App.GetService<SettingsService>().ReadSetting<bool>(SettingsViewModel.DefaultStartOnTray) is false)
+        {
+            App.MainWindow.Show();
+            App.MainWindow.Activate();
+        }
     }
 
     /* 

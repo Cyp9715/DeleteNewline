@@ -86,15 +86,6 @@ public sealed class ActivationService : IActivationService
 
         // Apply theme (executed last as it affects UI appearance)
         _themeSelectorService.SetRequestedTheme();
-
-        bool startOnTray = _settingsService.ReadSetting<bool>(SettingsViewModel.DefaultStartOnTray);
-
-        if (!startOnTray)
-        {
-            // StartOnTray가 false이면 창을 표시
-            App.MainWindow.Show();
-            App.MainWindow.Activate();
-        }
     }
 
     private async Task HandleActivationAsync(object activationArgs)
