@@ -9,9 +9,7 @@
 
   <Identity
     Publisher="CN=Cyphe"
-    Version="3.0.0.0"  Name="fc025a8f-2233-4d1b-b83e-cf973b438b64"/>
-
-  <mp:PhoneIdentity PhoneProductId="fc025a8f-2233-4d1b-b83e-cf973b438b64" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+    Version="3.0.0.0"  Name="DeleteNewline"/>
 
   <Properties>
     <DisplayName>Delete Newline</DisplayName>

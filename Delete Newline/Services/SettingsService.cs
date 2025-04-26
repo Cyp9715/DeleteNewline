@@ -13,7 +13,7 @@ public sealed class SettingsService
     private readonly IFileService _fileService;
     private IDictionary<string, JToken> _settings;
 
-    private readonly string _applicationDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    private readonly string _applicationDataDirectory = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
     private const string _settingsFileName = "Settings.json";
 
     public SettingsService(IFileService fileService)
@@ -101,17 +101,26 @@ public sealed class SettingsService
 
     public async Task ImportSettingsAsync(string importFilePath)
     {
-        // Separate the directory and file name from importFilePath.
         var importDirectory = Path.GetDirectoryName(importFilePath)!;
         var importFileName = Path.GetFileName(importFilePath);
 
-        // Read the JSON content from the specified file.
         string jsonContent = await _fileService.ReadAsStringAsync(importDirectory, importFileName).ConfigureAwait(false);
 
-        // Overwrite the current app settings file with the read content.
-        await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent).ConfigureAwait(false);
+        var backupSettings = new Dictionary<string, JToken>(_settings); // copy original settings.
 
-        // Update the in-memory _settings object as well.
-        _settings = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent) ?? new Dictionary<string, JToken>();
+        try
+        {
+            var tempSettings = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent);
+            // if success
+            _settings = tempSettings ?? new Dictionary<string, JToken>();
+            await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent).ConfigureAwait(false);
+            App.GetService<NotificationService>().ShowNotification("Success", "success", true);
+        }
+        catch (Newtonsoft.Json.JsonReaderException)
+        {
+            // recover settings
+            App.GetService<NotificationService>().ShowNotification("Error", "fail import. file invalid", true);
+        }
+
     }
 }

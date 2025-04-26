@@ -97,7 +97,6 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand]
     private async Task ToggleNotificationAsync(bool isChecked)
     {
-        // Todo. Notification.
         await _notificationService.SetEnableNotificationAsync(isChecked);
     }
 
@@ -153,5 +152,4 @@ public partial class SettingsViewModel : ObservableRecipient
 
         return $"{"AppDisplayName".GetLocalized()} {version.Major}.{version.Minor}.{version.Build}";
     }
-
 }
