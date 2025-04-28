@@ -1,6 +1,6 @@
-using Delete_Newline.Contracts.Services;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Core.Helpers;
+using Microsoft.UI.Xaml.Controls;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -114,13 +114,15 @@ public sealed class SettingsService
             // if success
             _settings = tempSettings ?? new Dictionary<string, JToken>();
             await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent).ConfigureAwait(false);
-            App.GetService<NotificationService>().ShowNotification("Success", "success", true);
+            
+            // Show both Windows notification and in-app notification
+            App.GetService<InAppNotificationService>().ShowNotification("Settings Imported", "The app needs to restart to apply the new settings.", InfoBarSeverity.Warning);
         }
         catch (Newtonsoft.Json.JsonReaderException)
         {
             // recover settings
-            App.GetService<NotificationService>().ShowNotification("Error", "fail import. file invalid", true);
+            _settings = backupSettings;
+            App.GetService<InAppNotificationService>().ShowNotification("Import Failed", "Failed to import settings. The file format is invalid.", InfoBarSeverity.Error);
         }
-
     }
 }

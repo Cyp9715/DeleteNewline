@@ -64,6 +64,7 @@ public partial class App : Application
                 services.AddSingleton<NotificationService>();
                 services.AddSingleton<TrayIconService>();
                 services.AddSingleton<TopMostService>();
+                services.AddSingleton<InAppNotificationService>();
 
                 // Views and ViewModels
                 services.AddTransient<ShellViewModel>();

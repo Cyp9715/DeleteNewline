@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 using Delete_Newline.Helpers;
 using Delete_Newline.ViewModels;
+using Delete_Newline.Services;
 
 namespace Delete_Newline.Views;
 
@@ -10,9 +11,9 @@ public sealed partial class ShellPage : Page
 {
     public ShellViewModel ViewModel { get; }
 
-    public ShellPage(ShellViewModel viewModel)
+    public ShellPage()
     {
-        ViewModel = viewModel;
+        ViewModel = App.GetService<ShellViewModel>();
         InitializeComponent();
 
         ViewModel.NavigationService.Frame = NavigationFrame;
@@ -21,6 +22,9 @@ public sealed partial class ShellPage : Page
         App.MainWindow.ExtendsContentIntoTitleBar = true;
         App.MainWindow.SetTitleBar(AppTitleBar);
         AppTitleBarText.Text = "AppDisplayName".GetLocalized();
+
+        // Initialize InAppNotificationService
+        App.GetService<InAppNotificationService>().Initialize(this);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -38,5 +42,18 @@ public sealed partial class ShellPage : Page
             Right = AppTitleBar.Margin.Right,
             Bottom = AppTitleBar.Margin.Bottom
         };
+    }
+
+    public void ShowNotification(string title, string message, InfoBarSeverity severity = InfoBarSeverity.Informational)
+    {
+        GlobalInfoBar.Title = title;
+        GlobalInfoBar.Message = message;
+        GlobalInfoBar.Severity = severity;
+        GlobalInfoBar.IsOpen = true;
+    }
+
+    public void HideNotification()
+    {
+        GlobalInfoBar.IsOpen = false;
     }
 }

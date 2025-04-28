@@ -62,5 +62,18 @@
                 <Frame x:Name="NavigationFrame" />
             </Grid>
         </NavigationView>
+
+        <Grid>
+            <InfoBar x:Name="GlobalInfoBar"
+                     IsOpen="False"
+                     IsClosable="True"
+                     Title="Notification"
+                     Message=""
+                     Severity="Informational"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Bottom"
+                     Margin="0,0,0,75"
+                     Width="500"/>
+        </Grid>
     </Grid>
 </Page>
