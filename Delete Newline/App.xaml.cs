@@ -12,11 +12,41 @@ using Delete_Newline.ViewModels;
 using Delete_Newline.Views;
 
 using WinUIEx;
+using System.Threading;
+using Windows.ApplicationModel;
+using System.Runtime.InteropServices;
 
 namespace Delete_Newline;
 
 public partial class App : Application
 {
+    private static Mutex? _mutex;
+    private const string MutexName = "Cyp:DeleteNewlineMutex";
+    private const string WindowTitle = "Delete Newline";
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
+
+    [DllImport("user32.dll")]
+    private static extern bool IsIconic(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+    private const int SW_RESTORE = 9;
+    private const int SW_SHOW = 5;
+    private const uint WM_SYSCOMMAND = 0x0112;
+    private const int SC_RESTORE = 0xF120;
+
     public IHost Host
     {
         get;
@@ -34,6 +64,35 @@ public partial class App : Application
 
     public App()
     {
+        // Check if another instance is already running
+        _mutex = new Mutex(true, MutexName, out bool createdNew);
+        if (createdNew is false)
+        {
+            // Find the existing window by title
+            IntPtr existingWindow = FindWindow(null, WindowTitle);
+            if (existingWindow != IntPtr.Zero)
+            {
+                // Check if window is minimized
+                if (IsIconic(existingWindow))
+                {
+                    // Restore the window if it's minimized
+                    ShowWindow(existingWindow, SW_RESTORE);
+                }
+                // Check if window is hidden (in tray)
+                else if (IsWindowVisible(existingWindow) is false)
+                {
+                    // Send restore message to the window
+                    PostMessage(existingWindow, WM_SYSCOMMAND, (IntPtr)SC_RESTORE, IntPtr.Zero);
+                    ShowWindow(existingWindow, SW_SHOW);
+                }
+                // Bring the window to foreground
+                SetForegroundWindow(existingWindow);
+            }
+            
+            Environment.Exit(0);
+            return;
+        }
+
         this.InitializeComponent();
 
         Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder().
@@ -87,7 +146,18 @@ public partial class App : Application
         UnhandledException += App_UnhandledException;
     }
 
-    public static MainWindow MainWindow { get; } = new MainWindow();
+    private static MainWindow? _mainWindow;
+    public static MainWindow MainWindow
+    {
+        get
+        {
+            if (_mainWindow == null)
+            {
+                _mainWindow = new MainWindow();
+            }
+            return _mainWindow;
+        }
+    }
 
     public static UIElement? AppTitlebar { get; set; }
 

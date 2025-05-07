@@ -18,6 +18,12 @@ public sealed partial class MainWindow : WindowEx
     public static IntPtr hwnd;
     private WindowMessageMonitor _messageMonitor;
 
+    private const int WM_LBUTTONDBLCLK = 0x0203;
+    private const int WM_RBUTTONDOWN = 0x0204;
+    private const uint WM_TRAYICON = 0x8000;
+    private const int WM_CLOSE = 0x0010;
+    private const int WM_COMMAND = 0x0111;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -26,6 +32,9 @@ public sealed partial class MainWindow : WindowEx
         _settings.ColorValuesChanged += Settings_ColorValuesChanged;
 
         hwnd = WindowNative.GetWindowHandle(this);
+        
+        // Set the window title
+        this.Title = "Delete Newline";
 
         _messageMonitor = new WindowMessageMonitor(this);
         _messageMonitor.WindowMessageReceived += MessageMonitor_WindowMessageReceived!;
@@ -53,12 +62,6 @@ public sealed partial class MainWindow : WindowEx
      */
     [DllImport("user32.dll")]
     private static extern int GetMenuItemID(IntPtr hMenu, int nPos);
-
-    private const int WM_LBUTTONDBLCLK = 0x0203;
-    private const int WM_RBUTTONDOWN = 0x0204;
-    private const uint WM_TRAYICON = 0x8000;
-    private const int WM_CLOSE = 0x0010;
-    private const int WM_COMMAND = 0x0111;
 
     private async void MessageMonitor_WindowMessageReceived(object sender, WindowMessageEventArgs e)
     {
