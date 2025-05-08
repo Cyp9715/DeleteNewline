@@ -126,19 +126,19 @@ public partial class App : Application
                 services.AddSingleton<InAppNotificationService>();
 
                 // Views and ViewModels
-                services.AddTransient<ShellViewModel>();
+                services.AddSingleton<ShellViewModel>();
                 services.AddTransient<ShellPage>();
 
-                services.AddTransient<SettingsViewModel>();
+                services.AddSingleton<SettingsViewModel>();
                 services.AddTransient<SettingsPage>();
 
-                services.AddTransient<HotKeyCollectViewModel>();
+                services.AddSingleton<HotKeyCollectViewModel>();
                 services.AddTransient<HotKeyCollectPage>();
-                services.AddSingleton<HotKeyViewModel>(); // HotKeyViewModel is Singleton.
+                services.AddSingleton<HotKeyViewModel>();
                 services.AddTransient<HotKeyPage>();
 
-                services.AddTransient<MemoViewModel>();
-                services.AddTransient<MemoPage>();
+                services.AddSingleton<OCRViewModel>();
+                services.AddTransient<OCRPage>();
 
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             }).Build();

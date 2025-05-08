@@ -3,16 +3,16 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Delete_Newline.Views;
 
-public sealed partial class MemoPage : Page
+public sealed partial class OCRPage : Page
 {
-    public MemoViewModel ViewModel
+    public OCRViewModel ViewModel
     {
         get;
     }
 
-    public MemoPage()
+    public OCRPage()
     {
+        ViewModel = App.GetService<OCRViewModel>();
         InitializeComponent();
-        ViewModel = App.GetService<MemoViewModel>();
     }
-}
+} 

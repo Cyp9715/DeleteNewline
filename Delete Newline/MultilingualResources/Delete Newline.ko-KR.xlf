@@ -10,10 +10,6 @@
           <source>Delete Newline</source>
           <target state="new">Delete Newline</target>
         </trans-unit>
-        <trans-unit id="Shell_Memo.Content" translate="yes" xml:space="preserve">
-          <source>Memo</source>
-          <target state="translated">메모</target>
-        </trans-unit>
         <trans-unit id="Settings_Theme.Text" translate="yes" xml:space="preserve">
           <source>Theme</source>
           <target state="translated">테마</target>
@@ -29,10 +25,6 @@
         <trans-unit id="Settings_Theme_Default.Content" translate="yes" xml:space="preserve">
           <source>Default</source>
           <target state="translated">기본</target>
-        </trans-unit>
-        <trans-unit id="MemoPage_AutoCopy.Text" translate="yes" xml:space="preserve">
-          <source>Auto Copy to Clipboard</source>
-          <target state="translated">클립보드로 자동복사</target>
         </trans-unit>
         <trans-unit id="Shell_Settings.Content" translate="yes" xml:space="preserve">
           <source>Settings</source>
@@ -61,6 +53,10 @@
         <trans-unit id="Shell_HotKeyDefault.Content" translate="yes" xml:space="preserve">
           <source>HotKey</source>
           <target state="translated">단축키</target>
+        </trans-unit>
+        <trans-unit id="Shell_OCR.Content" translate="yes" xml:space="preserve">
+          <source>OCR</source>
+          <target state="translated">OCR</target>
         </trans-unit>
       </group>
     </body>

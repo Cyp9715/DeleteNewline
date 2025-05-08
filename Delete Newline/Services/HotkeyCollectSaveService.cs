@@ -27,12 +27,13 @@ public sealed class HotKeyCollectSaveService
 
     public void Initialize()
     {
-        var savedHotKeyConfigs = _localSettingsService.ReadSetting<ObservableCollection<HotKeyPageStructure>>(HotKeyCollectionSettingsKey);
+        var savedHotKeyConfigs = _localSettingsService.ReadSetting<List<HotKeyPageStructure>>(HotKeyCollectionSettingsKey);
         if (savedHotKeyConfigs != null)
         {
-            HotKeyConfigs = savedHotKeyConfigs;
-            foreach (var config in HotKeyConfigs)
+            HotKeyConfigs.Clear();
+            foreach (var config in savedHotKeyConfigs)
             {
+                HotKeyConfigs.Add(config);
                 Subscribe(config);
 
                 if(config.HotKey.Modifiers == VirtualKeyModifiers.None && 
@@ -164,12 +165,14 @@ public sealed class HotKeyCollectSaveService
         await _saveLock.WaitAsync();
         try
         {
-            await _localSettingsService.SaveSettingAsync(HotKeyCollectionSettingsKey, HotKeyConfigs);
+            // Convert ObservableCollection to List for serialization
+            var configsList = HotKeyConfigs.ToList();
+            await _localSettingsService.SaveSettingAsync(HotKeyCollectionSettingsKey, configsList);
         }
         catch (Exception ex)
         {
             // Todo : Error logic.
-            System.Diagnostics.Debug.WriteLine($"HotKeys 저장 중 오류 발생: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error saving HotKeys: {ex.Message}");
         }
         finally
         {

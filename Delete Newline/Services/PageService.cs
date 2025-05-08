@@ -16,7 +16,7 @@ public sealed class PageService : IPageService
     {
         Configure<HotKeyCollectViewModel, HotKeyCollectPage>();
         Configure<HotKeyViewModel, HotKeyPage>();
-        Configure<MemoViewModel, MemoPage>();
+        Configure<OCRViewModel, OCRPage>();
         Configure<SettingsViewModel, SettingsPage>();
     }
 

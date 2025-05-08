@@ -18,7 +18,7 @@ public sealed class WndProcService
     private delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
     private static IntPtr _oldWndProc;
     private static WndProc? _newWndProc;
-
+    
     public void Initialize(IntPtr _hwnd)
     {
         _newWndProc = NewWndProc;
@@ -39,7 +39,6 @@ public sealed class WndProcService
 
             case WM_HOTKEY:
                 int hotkeyId = wParam.ToInt32();
-                // Todo, HotKey process
                 Debug.WriteLine($"WM_HOTKEY received! ID={hotkeyId}");
                 break;
         }

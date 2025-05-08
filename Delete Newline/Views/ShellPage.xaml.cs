@@ -29,8 +29,8 @@ public sealed partial class ShellPage : Page
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        // Set MemoPage as the default selected item
-        ViewModel.SelectedItem = ViewModel.NavigationViewService.GetSelectedItem(typeof(MemoPage));
+        // Set HotKeyCollectPage as the default selected item
+        ViewModel.SelectedItem = ViewModel.NavigationViewService.GetSelectedItem(typeof(HotKeyCollectPage));
     }
 
     private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)

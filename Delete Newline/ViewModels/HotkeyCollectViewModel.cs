@@ -14,7 +14,7 @@ public partial class HotKeyCollectViewModel : ObservableRecipient
     public INavigationService NavigationService { get; }
 
     [ObservableProperty]
-    public ObservableCollection<HotKeyPageStructure> _HotKeyConfigs;
+    private ObservableCollection<HotKeyPageStructure> _HotKeyConfigs;
 
     public HotKeyCollectViewModel(HotKeyCollectSaveService HotKeyCollectManagerService,
         INavigationService navigationService)

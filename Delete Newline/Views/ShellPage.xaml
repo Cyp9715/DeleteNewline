@@ -29,21 +29,21 @@
                         DisplayModeChanged="NavigationViewControl_DisplayModeChanged">
             
             <NavigationView.MenuItems>
-                <NavigationViewItem x:Uid="Shell_Memo"
-                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.MemoViewModel"
-                                    x:Name="MemoPageItem">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                  Glyph="&#xE70B;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-
                 <NavigationViewItem x:Uid="Shell_HotKeys"
                                     x:Name="HotKeysPageItem"
                                     helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.HotKeyCollectViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xF210;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:Uid="Shell_OCR"
+                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.OCRViewModel"
+                                    x:Name="OCRPageItem">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                  Glyph="&#xE8A5;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
