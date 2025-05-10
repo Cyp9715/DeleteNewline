@@ -49,7 +49,7 @@ namespace Delete_Newline.Behaviors
                 return;
 
             // Execute command only if a modifier is pressed, but ignore Shift alone
-            // to avoid confusion when using Shift as a hotkey.
+            // to avoid confusion when using Shift as a Hotkey.
             if (_currentModifiers != VirtualKeyModifiers.None &&
                 _currentModifiers != VirtualKeyModifiers.Shift)
             {

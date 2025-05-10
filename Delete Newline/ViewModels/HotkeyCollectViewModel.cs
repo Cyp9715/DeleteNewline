@@ -1,49 +1,55 @@
 using System.Collections.ObjectModel;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Helpers;
 using Delete_Newline.Services;
+// using Delete_Newline.Services;
 
 namespace Delete_Newline.ViewModels;
 
-public partial class HotKeyCollectViewModel : ObservableRecipient
+public partial class HotkeyCollectViewModel : ObservableRecipient
 {
-    private readonly HotKeyCollectSaveService _HotKeyCollectManagerService;
+    private readonly HotkeyCollectSaveService _HotkeyCollectManagerService;
     public INavigationService NavigationService { get; }
 
     [ObservableProperty]
-    private ObservableCollection<HotKeyPageStructure> _HotKeyConfigs;
+    private ObservableCollection<HotkeyPageStructure> _HotkeyConfigs;
 
-    public HotKeyCollectViewModel(HotKeyCollectSaveService HotKeyCollectManagerService,
+    public HotkeyCollectViewModel(HotkeyCollectSaveService HotkeyCollectManagerService,
         INavigationService navigationService)
     {
-        _HotKeyCollectManagerService = HotKeyCollectManagerService;
+        _HotkeyCollectManagerService = HotkeyCollectManagerService;
         NavigationService = navigationService;
-        HotKeyConfigs = _HotKeyCollectManagerService.HotKeyConfigs;
+        HotkeyConfigs = _HotkeyCollectManagerService.HotkeyConfigs;
+    }
+
+    public string GetHotkeyDisplayText(HotkeyPageStructure config)
+    {
+        return HotkeyDisplayHelper.GetDisplayText(config);
     }
 
     [RelayCommand]
-    private void AddHotKey()
+    private void AddHotkey()
     {
-        _HotKeyCollectManagerService.AddHotKeyConfig();
+        _HotkeyCollectManagerService.AddHotkeyConfig();
     }
 
     [RelayCommand]
-    private void RemoveHotKey(HotKeyPageStructure HotKeyConfig)
+    private void RemoveHotkey(HotkeyPageStructure HotkeyConfig)
     {
-        if (HotKeyConfig is not null)
+        if (HotkeyConfig is not null)
         {
-            _HotKeyCollectManagerService.RemoveHotKeyConfig(HotKeyConfig);
+            _HotkeyCollectManagerService.RemoveHotkeyConfig(HotkeyConfig);
         }
     }
 
     [RelayCommand]
-    private void NavigateToHotKeyPage(HotKeyPageStructure HotKeyConfig)
+    private void NavigateToHotkeyPage(HotkeyPageStructure HotkeyConfig)
     {
-        App.GetService<HotKeyViewModel>().CurrentHotKeyConfig = HotKeyConfig;
-        NavigationService.NavigateTo(typeof(HotKeyViewModel).FullName!);
+        App.GetService<HotkeyViewModel>().CurrentHotkeyConfig = HotkeyConfig;
+        NavigationService.NavigateTo(typeof(HotkeyViewModel).FullName!);
     }
 
     public static bool isDragEnded = true;

@@ -38,8 +38,8 @@ public sealed class WndProcService
                 break;
 
             case WM_HOTKEY:
-                int hotkeyId = wParam.ToInt32();
-                Debug.WriteLine($"WM_HOTKEY received! ID={hotkeyId}");
+                int HotkeyId = wParam.ToInt32();
+                Debug.WriteLine($"WM_Hotkey received! ID={HotkeyId}");
                 break;
         }
         return CallWindowProc(_oldWndProc, hWnd, (int)msg, wParam, lParam);

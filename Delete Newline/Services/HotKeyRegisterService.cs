@@ -17,7 +17,7 @@ public enum Win32Modifiers
     MOD_NOREPEAT = 0x4000,
 }
 
-public sealed class HotKeyRegisterService
+public sealed class HotkeyRegisterService
 {
     [DllImport("user32.dll", SetLastError = true, EntryPoint = "RegisterHotKey")]
     private static extern bool RegisterHotKey(
@@ -39,13 +39,13 @@ public sealed class HotKeyRegisterService
         _hwnd = hwnd;
     }
 
-    private int HotKeyToHash((VirtualKeyModifiers, VirtualKey) hotKey)
+    private int HotkeyToHash((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
-        string hotKeyString = $"{_salt}:{hotKey.Item1}:{hotKey.Item2}";
+        string HotkeyString = $"{_salt}:{Hotkey.Item1}:{Hotkey.Item2}";
 
         using (SHA256 sha256 = SHA256.Create())
         {
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(hotKeyString));
+            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(HotkeyString));
             int hashInt = BitConverter.ToInt32(hashBytes, 0);
             return Math.Abs(hashInt);
         }
@@ -67,42 +67,39 @@ public sealed class HotKeyRegisterService
         return win32Modifiers;
     }
 
-    public bool RegisterHotKey((VirtualKeyModifiers, VirtualKey) hotKey)
+    public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
-        // First unregister the hotkey if it exists
-        UnRegisterHotKey(hotKey);
-
-        int hotKeyId = HotKeyToHash(hotKey);
-        Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotKey.Item1);
+        int HotkeyId = HotkeyToHash(Hotkey);
+        Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(Hotkey.Item1);
         
-        // Try to unregister any existing hotkey with this ID first
-        UnregisterHotKey(_hwnd, hotKeyId);
+        // Try to unregister any existing Hotkey with this ID first
+        UnregisterHotKey(_hwnd, HotkeyId);
         
-        bool result = RegisterHotKey(_hwnd, hotKeyId, (uint)win32Modifiers, (uint)hotKey.Item2);
+        bool result = RegisterHotKey(_hwnd, HotkeyId, (uint)win32Modifiers, (uint)Hotkey.Item2);
 
         if (!result)
         {
             int errorCode = Marshal.GetLastWin32Error();
-            Debug.WriteLine($"RegisterHotKey failed with error code: {errorCode}, ID: {hotKeyId}, _hwnd: {_hwnd}");
+            Debug.WriteLine($"RegisterHotkey failed with error code: {errorCode}, ID: {HotkeyId}, _hwnd: {_hwnd}");
         }
         else
         {
-            Debug.WriteLine($"RegisterHotKey succeeded. ID={hotKeyId}");
+            Debug.WriteLine($"RegisterHotkey succeeded. ID={HotkeyId}");
         }
         return result;
     }
 
-    public void UnRegisterHotKey((VirtualKeyModifiers, VirtualKey) hotKey)
+    public void UnRegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
-        int hotKeyId = HotKeyToHash(hotKey);
-        if (UnregisterHotKey(_hwnd, hotKeyId) is false)
+        int HotkeyId = HotkeyToHash(Hotkey);
+        if (UnregisterHotKey(_hwnd, HotkeyId) is false)
         {
             int errorCode = Marshal.GetLastWin32Error();
-            Debug.WriteLine($"UnregisterHotKey failed with error code: {errorCode}, ID: {hotKeyId}, _hwnd: {_hwnd}");
+            Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {HotkeyId}, _hwnd: {_hwnd}");
         }
         else
         {
-            Debug.WriteLine($"UnregisterHotKey succeeded. ID={hotKeyId}");
+            Debug.WriteLine($"UnregisterHotkey succeeded. ID={HotkeyId}");
         }
     }
 }

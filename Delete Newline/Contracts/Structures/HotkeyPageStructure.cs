@@ -1,17 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Delete_Newline.Contracts.Structures;
 
-public partial class HotKeyPageStructure : ObservableObject
+public partial class HotkeyPageStructure : ObservableObject
 {
     [ObservableProperty]
-    public string _HotKeyName = "New HotKey";
+    public string _HotkeyName = "New Hotkey";
 
     [ObservableProperty]
-    public string _HotKeyComment = "Comment";
+    public string _HotkeyComment = "Comment";
 
     [ObservableProperty]
-    public HotKeyStructure _HotKey = new HotKeyStructure();
+    public HotkeyStructure _Hotkey = new HotkeyStructure();
 
     [ObservableProperty]
     public RegexChainStructure _regexChain = new RegexChainStructure();

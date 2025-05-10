@@ -5,21 +5,21 @@ using Microsoft.UI.Xaml.Input;
 
 namespace Delete_Newline.Views;
 
-public sealed partial class HotKeyPage : Page
+public sealed partial class HotkeyPage : Page
 {
-    public HotKeyViewModel ViewModel
+    public HotkeyViewModel ViewModel
     {
         get;
     }
 
-    public HotKeyPage()
+    public HotkeyPage()
     {
         InitializeComponent();
-        ViewModel = App.GetService<HotKeyViewModel>();
+        ViewModel = App.GetService<HotkeyViewModel>();
         DataContext = ViewModel;
     }
 
-    private void HotKeyPage_PointerPressed(object sender, PointerRoutedEventArgs e)
+    private void HotkeyPage_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
         // Retrieve the current pointer event data.
         var point = e.GetCurrentPoint(this);
@@ -28,7 +28,7 @@ public sealed partial class HotKeyPage : Page
         if (point.Properties.PointerUpdateKind == PointerUpdateKind.XButton1Pressed)
         {
             e.Handled = true;
-            Frame.Navigate(typeof(HotKeyCollectPage));
+            Frame.Navigate(typeof(HotkeyCollectPage));
         }
     }
 }

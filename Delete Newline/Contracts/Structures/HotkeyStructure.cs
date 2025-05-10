@@ -1,9 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Delete_Newline.Helpers;
+using System.Text.Json.Serialization;
 using Windows.System;
+using System.Runtime.InteropServices;
 
 namespace Delete_Newline.Contracts.Structures;
 
-public partial class HotKeyStructure : ObservableRecipient
+public partial class HotkeyStructure : ObservableRecipient
 {
     [ObservableProperty]
     public VirtualKeyModifiers _modifiers;
@@ -11,75 +14,19 @@ public partial class HotKeyStructure : ObservableRecipient
     [ObservableProperty]
     public VirtualKey _key;
 
-    [ObservableProperty]
-    public string? _displayHotKey;
+    [JsonIgnore]
+    public new bool IsActive
+    {
+        get => base.IsActive;
+        set => base.IsActive = value;
+    }
 
-    public HotKeyStructure()
+    public HotkeyStructure()
     {
     }
 
-    partial void OnKeyChanged(VirtualKey value)
+    public override string ToString()
     {
-        UpdateDisplayHotKey();
-    }
-
-    partial void OnModifiersChanged(VirtualKeyModifiers value)
-    {
-        UpdateDisplayHotKey();
-    }
-
-    private void UpdateDisplayHotKey()
-    {
-        if (Modifiers == VirtualKeyModifiers.None || Key == VirtualKey.None)
-        {
-            DisplayHotKey = string.Empty;
-            return;
-        }
-
-        var allModifiers = new[]
-        {
-            VirtualKeyModifiers.Control,
-            VirtualKeyModifiers.Menu,
-            VirtualKeyModifiers.Shift,
-            VirtualKeyModifiers.Windows
-        };
-
-        // Modifier to string
-        var modifierStrings = allModifiers
-            .Where(flag => Modifiers.HasFlag(flag))
-            .Select(mod => GetModifierString(mod))
-            .Where(str => !string.IsNullOrEmpty(str));
-
-        // Key to string
-        var keyString = GetKeyString(Key);
-
-        DisplayHotKey = string.Join(" + ", modifierStrings.Concat(new[] { keyString }));
-    }
-
-
-    // Modifier to string
-    private string GetModifierString(VirtualKeyModifiers modifier)
-    {
-        return modifier switch
-        {
-            VirtualKeyModifiers.Control => "Ctrl",
-            VirtualKeyModifiers.Menu => "Alt",
-            VirtualKeyModifiers.Shift => "Shift",
-            VirtualKeyModifiers.Windows => "Win",
-            _ => string.Empty,
-        };
-    }
-
-    // Key to string
-    private string GetKeyString(VirtualKey key)
-    {
-        return key switch
-        {
-            VirtualKey.Space => "Space",
-            VirtualKey.Escape => "Esc",
-            VirtualKey.Left => "Left Arrow",
-            VirtualKey.Right => "Right Arrow",
-            _ => key.ToString(),
-        };
+        return HotkeyDisplayHelper.FormatHotkey(this);
     }
 }
