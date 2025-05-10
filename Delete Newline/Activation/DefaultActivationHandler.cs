@@ -27,9 +27,6 @@ public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventAr
 
     protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
     {
-        // Initialize HotKeyCollectSaveService to load saved hotkey configurations
-        _hotKeyCollectSaveService.Initialize();
-        
         // Navigate to HotKeyCollectPage as the initial page
         _navigationService.NavigateTo(typeof(HotKeyCollectViewModel).FullName!, args.Arguments);
 

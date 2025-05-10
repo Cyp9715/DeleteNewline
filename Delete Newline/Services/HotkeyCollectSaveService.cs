@@ -30,6 +30,17 @@ public sealed class HotKeyCollectSaveService
         var savedHotKeyConfigs = _localSettingsService.ReadSetting<List<HotKeyPageStructure>>(HotKeyCollectionSettingsKey);
         if (savedHotKeyConfigs != null)
         {
+            // First, unregister all existing hotkeys
+            foreach (var config in savedHotKeyConfigs)
+            {
+                if (config.HotKey != null && 
+                    config.HotKey.Modifiers != VirtualKeyModifiers.None && 
+                    config.HotKey.Key != VirtualKey.None)
+                {
+                    _hotKeyRegisterService.UnRegisterHotKey((config.HotKey.Modifiers, config.HotKey.Key));
+                }
+            }
+
             HotKeyConfigs.Clear();
             foreach (var config in savedHotKeyConfigs)
             {
@@ -37,8 +48,8 @@ public sealed class HotKeyCollectSaveService
                 Subscribe(config);
 
                 if(config.HotKey.Modifiers == VirtualKeyModifiers.None && 
-                   config.HotKey.Key == VirtualKey.None)
-                   continue;
+                    config.HotKey.Key == VirtualKey.None)
+                    continue;
 
                 _hotKeyRegisterService.RegisterHotKey((config.HotKey.Modifiers, config.HotKey.Key));
             }

@@ -82,6 +82,8 @@ public sealed class ActivationService : IActivationService
         _localizationService.Initialize();
         _themeSelectorService.Initialize();
         _topMostService.Initialize(App.MainWindow);
+        
+        // Initialize HotKeyCollectSaveService after HotKeyRegisterService
         _hotKeyCollectManagerService.Initialize();
 
         // Apply theme (executed last as it affects UI appearance)

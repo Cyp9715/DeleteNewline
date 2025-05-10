@@ -69,8 +69,15 @@ public sealed class HotKeyRegisterService
 
     public bool RegisterHotKey((VirtualKeyModifiers, VirtualKey) hotKey)
     {
+        // First unregister the hotkey if it exists
+        UnRegisterHotKey(hotKey);
+
         int hotKeyId = HotKeyToHash(hotKey);
         Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotKey.Item1);
+        
+        // Try to unregister any existing hotkey with this ID first
+        UnregisterHotKey(_hwnd, hotKeyId);
+        
         bool result = RegisterHotKey(_hwnd, hotKeyId, (uint)win32Modifiers, (uint)hotKey.Item2);
 
         if (!result)
