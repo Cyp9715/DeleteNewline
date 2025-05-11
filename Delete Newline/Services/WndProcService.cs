@@ -19,15 +19,12 @@ public sealed class WndProcService
     private delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
     private static IntPtr _oldWndProc;
     private static WndProc? _newWndProc;
-    private RegexService? _regexService;
     
     public void Initialize(IntPtr _hwnd)
     {
         _newWndProc = NewWndProc;
         IntPtr newWndProcPtr = Marshal.GetFunctionPointerForDelegate(_newWndProc);
         _oldWndProc = SetWindowLongPtr(_hwnd, GWL_WNDPROC, newWndProcPtr);
-
-        _regexService = App.GetService<RegexService>();
     }
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)

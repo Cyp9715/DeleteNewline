@@ -6,24 +6,17 @@ namespace Delete_Newline.Services;
 
 public class RegexService
 {
-    private readonly List<(string Pattern, string Replacement)> _defaultRules;
     private readonly HotkeyCollectSaveService _hotkeyCollectSaveService;
 
     public RegexService(HotkeyCollectSaveService hotkeyCollectSaveService)
     {
         _hotkeyCollectSaveService = hotkeyCollectSaveService ?? throw new ArgumentNullException(nameof(hotkeyCollectSaveService));
-
-        _defaultRules = new List<(string Pattern, string Replacement)>
-        {
-            (@"\r?\n+", "\r\n")
-        };
     }
 
-    // 일반 클립보드 변경 시 (기본 규칙 적용)
+    // 일반 클립보드 변경 시 (기본 Windows 동작 사용)
     public string ProcessText(string inputText)
     {
-        Debug.WriteLine("[RegexService] Applying default rules.");
-        return ApplyRules(inputText, _defaultRules);
+        return inputText;  // 기본 Windows 클립보드 동작 사용
     }
 
     // 단축키로 특정 규칙 적용 시
@@ -48,17 +41,10 @@ public class RegexService
                 Debug.WriteLine($"[RegexService] Found {rulesToApply.Count} rules for Hotkey ID: {hotkeyId}. Applying sequentially...");
                 return ApplyRulesSequentially(inputText, rulesToApply);
             }
-            else
-            {
-                Debug.WriteLine($"[RegexService] No valid patterns in RegexChain for Hotkey ID: {hotkeyId}. Falling back to default rules.");
-                return ApplyRules(inputText, _defaultRules);
-            }
         }
-        else
-        {
-            Debug.WriteLine($"[RegexService] No RegexChain found or chain is empty for Hotkey ID: {hotkeyId}. Falling back to default rules.");
-            return ApplyRules(inputText, _defaultRules);
-        }
+        
+        Debug.WriteLine($"[RegexService] No valid rules found for Hotkey ID: {hotkeyId}. Using original text.");
+        return inputText;
     }
 
     private string ApplyRulesSequentially(string text, List<(string Pattern, string Replacement)> rules)
@@ -84,34 +70,6 @@ public class RegexService
         {
             Debug.WriteLine($"[RegexService] Regex processing error: {ex.Message}. Input text: {text.Substring(0, Math.Min(text.Length, 50))}...");
             return $"{text} [Regex Error: Invalid Pattern in Chain]";
-        }
-        
-        return processedText;
-    }
-
-    private string ApplyRules(string text, List<(string Pattern, string Replacement)> rules)
-    {
-        if (string.IsNullOrEmpty(text) || rules == null || rules.Count == 0)
-        {
-            return text;
-        }
-
-        string processedText = text;
-
-        try
-        {
-            foreach (var rule in rules)
-            {
-                if (string.IsNullOrEmpty(rule.Pattern) == false)
-                {
-                    processedText = Regex.Replace(processedText, rule.Pattern, Regex.Unescape(rule.Replacement ?? string.Empty));
-                }
-            }
-        }
-        catch (ArgumentException ex) 
-        {
-            Debug.WriteLine($"[RegexService] Regex processing error in default rules: {ex.Message}.");
-            return $"{text} [Regex Error: Invalid Default Pattern]"; 
         }
         
         return processedText;
