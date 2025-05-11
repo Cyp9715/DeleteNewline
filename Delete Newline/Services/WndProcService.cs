@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Windows.ApplicationModel.DataTransfer;
-using System;
 using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
@@ -21,7 +19,7 @@ public sealed class WndProcService
     private delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
     private static IntPtr _oldWndProc;
     private static WndProc? _newWndProc;
-    private IRegexService? _regexService;
+    private RegexService? _regexService;
     
     public void Initialize(IntPtr _hwnd)
     {
@@ -29,7 +27,7 @@ public sealed class WndProcService
         IntPtr newWndProcPtr = Marshal.GetFunctionPointerForDelegate(_newWndProc);
         _oldWndProc = SetWindowLongPtr(_hwnd, GWL_WNDPROC, newWndProcPtr);
 
-        _regexService = App.GetService<IRegexService>();
+        _regexService = App.GetService<RegexService>();
     }
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)

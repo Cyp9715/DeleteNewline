@@ -129,7 +129,7 @@ public partial class App : Application
                 services.AddSingleton<InAppNotificationService>();
 
                 // Add RegexService
-                services.AddSingleton<IRegexService, RegexService>();
+                services.AddSingleton<RegexService>();
 
                 // Add ClipboardMonitorService
                 services.AddSingleton<ClipboardMonitorService>();

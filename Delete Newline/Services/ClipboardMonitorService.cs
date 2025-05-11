@@ -7,9 +7,9 @@ namespace Delete_Newline.Services
 {
     public class ClipboardMonitorService
     {
-        private readonly IRegexService _regexService;
+        private readonly RegexService _regexService;
 
-        public ClipboardMonitorService(IRegexService regexService)
+        public ClipboardMonitorService(RegexService regexService)
         {
             _regexService = regexService ?? throw new ArgumentNullException(nameof(regexService));
         }
