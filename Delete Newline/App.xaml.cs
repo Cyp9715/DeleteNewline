@@ -69,7 +69,7 @@ public partial class App : Application
     {
         // Check if another instance is already running
         _mutex = new Mutex(true, MutexName, out bool createdNew);
-        if (createdNew is false)
+        if (createdNew == false)
         {
             // Find the existing window by title
             IntPtr existingWindow = FindWindow(null, WindowTitle);
@@ -82,7 +82,7 @@ public partial class App : Application
                     ShowWindow(existingWindow, SW_RESTORE);
                 }
                 // Check if window is hidden (in tray)
-                else if (IsWindowVisible(existingWindow) is false)
+                else if (IsWindowVisible(existingWindow) == false)
                 {
                     // Send restore message to the window
                     PostMessage(existingWindow, WM_SYSCOMMAND, (IntPtr)SC_RESTORE, IntPtr.Zero);

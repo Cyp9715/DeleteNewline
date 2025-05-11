@@ -41,7 +41,7 @@ public sealed class LocalizationService : ILocalizationService
 
     public void ApplyLanguage(LanguageItem languageItem)
     {
-        if (Languages.Contains(languageItem) is true)
+        if (Languages.Contains(languageItem) == true)
         {
             _currentLanguageItem = languageItem;
             Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = languageItem.Tag;
@@ -51,7 +51,7 @@ public sealed class LocalizationService : ILocalizationService
 
     public async Task SaveLanguageSettingAsync(LanguageItem languageItem)
     {
-        if (Languages.Contains(languageItem) is true)
+        if (Languages.Contains(languageItem) == true)
         {
             await _localSettingsService.SaveSettingAsync(LocalizationTagSettingsKey, languageItem.Tag);
         }
@@ -59,7 +59,7 @@ public sealed class LocalizationService : ILocalizationService
 
     public async Task SetLanguage(LanguageItem languageItem)
     {
-        if (Languages.Contains(languageItem) is true)
+        if (Languages.Contains(languageItem) == true)
         {
             ApplyLanguage(languageItem);
             await SaveLanguageSettingAsync(languageItem);

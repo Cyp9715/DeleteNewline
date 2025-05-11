@@ -24,7 +24,7 @@ public sealed class SettingsService
 
     public async Task InitializeAsync()
     {
-        if (File.Exists(Path.Combine(_applicationDataDirectory, _settingsFileName)) is false)
+        if (File.Exists(Path.Combine(_applicationDataDirectory, _settingsFileName)) == false)
             CreateSettingsFile(_applicationDataDirectory, _settingsFileName);
 
         string? jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName);

@@ -25,7 +25,7 @@ public sealed class NotificationService
         bool? storedSetting = _localSettingsService.ReadSetting<bool?>(NotificationSettingsKey);
 
         // default setting
-        if (storedSetting.HasValue is false)
+        if (storedSetting.HasValue == false)
         {
             _enableNotification = true;
             await _localSettingsService.SaveSettingAsync(NotificationSettingsKey, true);
@@ -49,7 +49,7 @@ public sealed class NotificationService
 
     public void ShowNotification(string title, string message, bool force = false, bool tag = true)
     {
-        if (_enableNotification is false && force is false) 
+        if (_enableNotification == false && force == false) 
             return;
 
         AppNotificationBuilder builder = new AppNotificationBuilder()

@@ -47,7 +47,7 @@ namespace Delete_Newline.Services
                     }
                 }
 
-                if (rulesToApply.Any())
+                if (rulesToApply.Count != 0)
                 {
                     Debug.WriteLine($"[RegexService] Found {rulesToApply.Count} rules for Hotkey ID: {hotkeyId}. Applying sequentially...");
                     return ApplyRulesSequentially(inputText, rulesToApply);
@@ -67,7 +67,7 @@ namespace Delete_Newline.Services
 
         private string ApplyRulesSequentially(string text, List<(string Pattern, string Replacement)> rules)
         {
-            if (string.IsNullOrEmpty(text) || rules == null || !rules.Any())
+            if (string.IsNullOrEmpty(text) || rules == null || rules.Any() == false)
             {
                 return text;
             }
@@ -106,7 +106,7 @@ namespace Delete_Newline.Services
             {
                 foreach (var rule in rules)
                 {
-                    if (string.IsNullOrEmpty(rule.Pattern) is false)
+                    if (string.IsNullOrEmpty(rule.Pattern) == false)
                     {
                         processedText = Regex.Replace(processedText, rule.Pattern, Regex.Unescape(rule.Replacement ?? string.Empty));
                     }

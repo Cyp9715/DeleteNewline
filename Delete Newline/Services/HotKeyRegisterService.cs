@@ -163,7 +163,7 @@ public sealed class HotkeyRegisterService
     public void UnRegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
         int HotkeyId = HotkeyToHash(Hotkey);
-        if (UnregisterHotKey(_hwnd, HotkeyId) is false)
+        if (UnregisterHotKey(_hwnd, HotkeyId) == false)
         {
             int errorCode = Marshal.GetLastWin32Error();
             Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {HotkeyId}, _hwnd: {_hwnd}");

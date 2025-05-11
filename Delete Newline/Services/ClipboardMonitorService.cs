@@ -8,13 +8,10 @@ namespace Delete_Newline.Services
     public class ClipboardMonitorService
     {
         private readonly IRegexService _regexService;
-        private readonly DispatcherQueue? _dispatcherQueue; 
-
 
         public ClipboardMonitorService(IRegexService regexService)
         {
             _regexService = regexService ?? throw new ArgumentNullException(nameof(regexService));
-            _dispatcherQueue = DispatcherQueue.GetForCurrentThread(); 
         }
 
         public void StartMonitoring()
@@ -40,7 +37,7 @@ namespace Delete_Newline.Services
         {
             // Check if there's content and if it's text.
             DataPackageView dataPackageView = Clipboard.GetContent();
-            if (dataPackageView.Contains(StandardDataFormats.Text) is false)
+            if (dataPackageView.Contains(StandardDataFormats.Text) == false)
             {
                 Debug.WriteLine("[ClipboardMonitorService] is not text");
 
@@ -57,13 +54,13 @@ namespace Delete_Newline.Services
                 int? triggeredHotkeyId = null;
 
                 // Assuming App.ActiveHotkeyIdForCopy is a static property in the App class.
-                if (App.ActiveHotkeyIdForCopy.HasValue is true) 
+                if (App.ActiveHotkeyIdForCopy.HasValue == true) 
                 {
                     triggeredHotkeyId = App.ActiveHotkeyIdForCopy.Value;
                     App.ActiveHotkeyIdForCopy = null; // Reset
                 }
 
-                if (triggeredHotkeyId.HasValue is true)
+                if (triggeredHotkeyId.HasValue == true)
                 {
                     Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId.Value}. Applying specific rules.");
                     cleanedText = _regexService.ProcessText(rawText, triggeredHotkeyId.Value);
@@ -88,22 +85,6 @@ namespace Delete_Newline.Services
                         // This can happen if the clipboard is busy or unavailable.
                         Debug.WriteLine($"[ClipboardMonitorService] Error setting clipboard content: {exSetContent.Message}. Text was: {cleanedText.Substring(0, Math.Min(cleanedText.Length,50))}...");
                     }
-                }
-                
-                // UI Update: Best practice is to raise an event that the UI layer (MainWindow/ViewModel) subscribes to.
-                // For direct update (if _dispatcherQueue is valid and on UI thread, or for logging):
-                if (_dispatcherQueue != null)
-                {
-                    _dispatcherQueue.TryEnqueue(() =>
-                    {
-                        Debug.WriteLine($"[ClipboardMonitorService] Clipboard processed (UI thread): [{DateTime.Now:HH:mm:ss}] {cleanedText.Substring(0, Math.Min(cleanedText.Length, 100))}...");
-                        // ProcessedTextAvailable?.Invoke(this, new ProcessedTextEventArgs(cleanedText, triggeredHotkeyId));
-                    });
-                }
-                else
-                {
-                     Debug.WriteLine($"[ClipboardMonitorService] Clipboard processed (non-UI thread context): [{DateTime.Now:HH:mm:ss}] {cleanedText.Substring(0, Math.Min(cleanedText.Length, 100))}...");
-                     // ProcessedTextAvailable?.Invoke(this, new ProcessedTextEventArgs(cleanedText, triggeredHotkeyId));
                 }
             }
             catch (Exception ex)

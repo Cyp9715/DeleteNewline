@@ -119,7 +119,6 @@ namespace Delete_Newline.Helpers
             SendKeyInput(VK_RCONTROL, false, true);
             SendKeyInput(VK_RSHIFT,   false, true);
             SendKeyInput(VK_RMENU,    false, true);
-            System.Diagnostics.Debug.WriteLine("Finished resetting modifier keys.");
         }
 
         public static void SendCtrlC()
@@ -132,8 +131,6 @@ namespace Delete_Newline.Helpers
             SendKeyInput(VK_C,        true,  false); // Press C
             SendKeyInput(VK_C,        false, false); // Release C
             SendKeyInput(VK_LCONTROL, false, false); // Release Left Control
-
-            System.Diagnostics.Debug.WriteLine("SendCtrlC sequence finished.");
         }
     }
 } 

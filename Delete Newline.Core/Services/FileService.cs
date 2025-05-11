@@ -22,7 +22,7 @@ public class FileService : IFileService
     {
         var path = Path.Combine(folderPath, fileName);
 
-        if (File.Exists(path) is false)
+        if (File.Exists(path) == false)
             throw new FileNotFoundException($"The file '{fileName}' does not exist in the folder '{folderPath}'.", path);
 
         File.Delete(path);
