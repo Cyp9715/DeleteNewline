@@ -24,6 +24,9 @@ public partial class App : Application
     private const string MutexName = "Cyp:DeleteNewlineMutex";
     private const string WindowTitle = "Delete Newline";
 
+    // State for currently triggered hotkey expecting a copy action
+    public static int? ActiveHotkeyIdForCopy { get; set; }
+
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
 
@@ -125,6 +128,12 @@ public partial class App : Application
                 services.AddSingleton<TopMostService>();
                 services.AddSingleton<InAppNotificationService>();
 
+                // Add RegexService
+                services.AddSingleton<IRegexService, RegexService>();
+
+                // Add ClipboardMonitorService
+                services.AddSingleton<ClipboardMonitorService>();
+
                 // Views and ViewModels
                 services.AddSingleton<ShellViewModel>();
                 services.AddTransient<ShellPage>();
@@ -142,6 +151,9 @@ public partial class App : Application
 
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             }).Build();
+
+        // Start clipboard monitoring after services are built and available
+        App.GetService<ClipboardMonitorService>().StartMonitoring();
 
         UnhandledException += App_UnhandledException;
     }
