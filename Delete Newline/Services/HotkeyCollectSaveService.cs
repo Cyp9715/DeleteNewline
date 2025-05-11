@@ -190,4 +190,23 @@ public sealed class HotkeyCollectSaveService
             _saveLock.Release();
         }
     }
+
+    public RegexChainStructure? GetRegexChainByHotkeyId(int hotkeyId)
+    {
+        foreach (var config in HotkeyConfigs)
+        {
+            if (config.Hotkey != null && 
+                config.Hotkey.Modifiers != VirtualKeyModifiers.None && 
+                config.Hotkey.Key != VirtualKey.None)
+            {
+                // _HotkeyRegisterService is an injected instance of HotkeyRegisterService
+                int currentConfigHotkeyId = _HotkeyRegisterService.HotkeyToHash((config.Hotkey.Modifiers, config.Hotkey.Key));
+                if (currentConfigHotkeyId == hotkeyId)
+                {
+                    return config.RegexChain;
+                }
+            }
+        }
+        return null;
+    }
 }

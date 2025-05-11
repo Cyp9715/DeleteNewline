@@ -1,32 +1,20 @@
-using Delete_Newline.Services; // For IRegexService, assuming App.ActiveHotkeyIdForCopy is accessible via App class
-using Microsoft.UI.Dispatching; 
-using System;
 using System.Diagnostics;
+
+using Microsoft.UI.Dispatching; 
 using Windows.ApplicationModel.DataTransfer;
 
-namespace Delete_Newline.Services // Namespace should match your project structure
+namespace Delete_Newline.Services
 {
     public class ClipboardMonitorService
     {
         private readonly IRegexService _regexService;
-        private readonly DispatcherQueue? _dispatcherQueue; // Nullable if not always on UI thread
+        private readonly DispatcherQueue? _dispatcherQueue; 
 
-        // It's better to get ActiveHotkeyIdForCopy directly from App class if it's static there.
-        // Passing App instance or specific properties around can complicate things.
 
         public ClipboardMonitorService(IRegexService regexService)
         {
             _regexService = regexService ?? throw new ArgumentNullException(nameof(regexService));
-            
-            // Attempt to get DispatcherQueue for the current thread.
-            // This is crucial if this service is created on the main UI thread.
-            // If created on a background thread and UI updates are needed from here,
-            // the DispatcherQueue from App.MainWindow.DispatcherQueue should be injected.
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread(); 
-            if (_dispatcherQueue == null)
-            {
-                Debug.WriteLine("[ClipboardMonitorService WARNING] DispatcherQueue.GetForCurrentThread() returned null. UI updates from here might fail or need explicit dispatching to main thread.");
-            }
         }
 
         public void StartMonitoring()
@@ -39,7 +27,6 @@ namespace Delete_Newline.Services // Namespace should match your project structu
             catch (Exception ex)
             {
                 Debug.WriteLine($"[ClipboardMonitorService] Error starting clipboard monitoring: {ex.Message}");
-                // Potentially re-throw or handle more gracefully depending on requirements
             }
         }
 
@@ -54,7 +41,11 @@ namespace Delete_Newline.Services // Namespace should match your project structu
             // Check if there's content and if it's text.
             DataPackageView dataPackageView = Clipboard.GetContent();
             if (dataPackageView.Contains(StandardDataFormats.Text) is false)
+            {
+                Debug.WriteLine("[ClipboardMonitorService] is not text");
+
                 return;
+            }
 
             string rawText = string.Empty;
             try
@@ -64,11 +55,12 @@ namespace Delete_Newline.Services // Namespace should match your project structu
 
                 // Critical section for ActiveHotkeyIdForCopy: Read and immediately reset.
                 int? triggeredHotkeyId = null;
+
                 // Assuming App.ActiveHotkeyIdForCopy is a static property in the App class.
                 if (App.ActiveHotkeyIdForCopy.HasValue is true) 
                 {
                     triggeredHotkeyId = App.ActiveHotkeyIdForCopy.Value;
-                    App.ActiveHotkeyIdForCopy = null; // Reset it
+                    App.ActiveHotkeyIdForCopy = null; // Reset
                 }
 
                 if (triggeredHotkeyId.HasValue is true)
@@ -120,14 +112,5 @@ namespace Delete_Newline.Services // Namespace should match your project structu
                 Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content. Raw text snippet was '{rawText.Substring(0, Math.Min(rawText.Length,50))}...': {ex.Message}");
             }
         }
-
-        // Optional: Define EventArgs and Event for UI updates
-        // public class ProcessedTextEventArgs : EventArgs
-        // {
-        // public string ProcessedText { get; }
-        // public int? HotkeyId { get; }
-        // public ProcessedTextEventArgs(string text, int? hotkeyId) { ProcessedText = text; HotkeyId = hotkeyId; }
-        // }
-        // public event EventHandler<ProcessedTextEventArgs> ProcessedTextAvailable;
     }
 } 

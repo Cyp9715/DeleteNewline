@@ -39,7 +39,7 @@ public sealed class HotkeyRegisterService
         _hwnd = hwnd;
     }
 
-    private int HotkeyToHash((VirtualKeyModifiers, VirtualKey) Hotkey)
+    public int HotkeyToHash((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
         string HotkeyString = $"{_salt}:{Hotkey.Item1}:{Hotkey.Item2}";
 

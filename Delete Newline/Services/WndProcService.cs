@@ -55,7 +55,7 @@ public sealed class WndProcService
                 Debug.WriteLine($"Simulated Ctrl+C for Hotkey ID: {hotkeyId}");
 
                 // We no longer process clipboard directly here.
-                // OnClipboardContentChanged in MainWindow (or other handler) will pick it up.
+                // check ClipboardMonitorService.cs
                 break;
         }
         return CallWindowProc(_oldWndProc, hWnd, (int)msg, wParam, lParam);
