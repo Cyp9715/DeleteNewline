@@ -97,6 +97,10 @@ public partial class HotkeyViewModel : ObservableRecipient
             throw new InvalidOperationException("CurrentHotkeyConfig is null.");
         }
 
+        // Clear the properties before removing to ensure proper UI update
+        item.RegexExpression = null;
+        item.Replace = null;
+        
         CurrentHotkeyConfig.RegexChain.RemoveChainItem(item);
     }
 
