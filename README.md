@@ -17,5 +17,8 @@
 - will be able to convert images to text using OCR and immediately apply regular expressions to the extracted text.
 - ~~A small advertisement window will be added to the bottom.~~ 
 
+![image](https://github.com/user-attachments/assets/79b8ff23-951e-497c-81b4-48cfd1fdcc93)
+
+
 ## Recommended Build Tools
 1. [Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=dts-publisher.mat2022)
