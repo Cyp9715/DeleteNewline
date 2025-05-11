@@ -107,8 +107,8 @@ namespace Delete_Newline.Services
                 }
             }
             catch (Exception ex)
-            {
-                // Catching exceptions from GetTextAsync() or _regexService processing.
+                {
+                    // Catching exceptions from GetTextAsync() or _regexService processing.
                 Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content. Raw text snippet was '{rawText.Substring(0, Math.Min(rawText.Length,50))}...': {ex.Message}");
             }
         }

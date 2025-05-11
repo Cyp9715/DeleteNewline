@@ -39,7 +39,9 @@
                              TextAlignment="Center"
                              HorizontalAlignment="Right"
                              IsReadOnly="True"
-                             Text="{Binding DisplayHotkey, Mode=OneWay}">
+                             Text="{Binding DisplayHotkey, Mode=OneWay}"
+                             GotFocus="TextBox_Hotkey_GotFocus"
+                             LostFocus="TextBox_Hotkey_LostFocus">
                         <interactivity:Interaction.Behaviors>
                             <behaviors:KeyboardAcceleratorBehavior CommandName="HandleKeyboardAcceleratorCommand" />
                         </interactivity:Interaction.Behaviors>
@@ -152,6 +154,12 @@
                              IsReadOnly="True" />
                 </Grid>
             </StackPanel>
+            <!-- Dummy button for focus removal -->
+            <Button x:Name="DummyFocusButton"
+                    Opacity="0"
+                    IsHitTestVisible="False"
+                    IsTabStop="True"
+                    Width="1" Height="1" />
         </Grid>
     </ScrollViewer>
 </Page>

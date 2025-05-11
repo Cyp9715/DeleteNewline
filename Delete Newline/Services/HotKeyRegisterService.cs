@@ -33,6 +33,9 @@ public sealed class HotkeyRegisterService
 
     private IntPtr _hwnd;
     private readonly string _salt = "Delete Newline";
+    private bool _isRegisteringHotkey = false;
+    private readonly HashSet<(VirtualKeyModifiers, VirtualKey)> _registeredHotkeys = new();
+    private readonly HashSet<int> _registeredHotkeyIds = new();
 
     public void Initialize(IntPtr hwnd)
     {
@@ -67,8 +70,75 @@ public sealed class HotkeyRegisterService
         return win32Modifiers;
     }
 
+    public bool IsSystemHotkey((VirtualKeyModifiers, VirtualKey) hotkey)
+    {
+        // Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+Y, Ctrl+A
+        if (hotkey.Item1.HasFlag(VirtualKeyModifiers.Control))
+        {
+            return hotkey.Item2 switch
+            {
+                VirtualKey.C or VirtualKey.V or VirtualKey.X or 
+                VirtualKey.Z or VirtualKey.Y or VirtualKey.A => true,
+                _ => false
+            };
+        }
+        return false;
+    }
+
+    public bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey)
+    {
+        return _registeredHotkeys.Contains(hotkey);
+    }
+
+    // unregister all hotkeys
+    public void StartHotkeyRegistration()
+    {
+        _isRegisteringHotkey = true;
+        foreach (var hotkey in _registeredHotkeys.ToList())
+        {
+            int hotkeyId = HotkeyToHash(hotkey);
+            if (UnregisterHotKey(_hwnd, hotkeyId))
+            {
+                _registeredHotkeyIds.Add(hotkeyId);
+            }
+        }
+    }
+
+    // register all hotkeys
+    public void EndHotkeyRegistration()
+    {
+        _isRegisteringHotkey = false;
+        foreach (var hotkey in _registeredHotkeys.ToList())
+        {
+            int hotkeyId = HotkeyToHash(hotkey);
+            if (_registeredHotkeyIds.Contains(hotkeyId))
+            {
+                Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
+                RegisterHotKey(_hwnd, hotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
+                _registeredHotkeyIds.Remove(hotkeyId);
+            }
+        }
+    }
+
+    public bool IsRegisteringHotkey()
+    {
+        return _isRegisteringHotkey;
+    }
+
     public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
+        if (IsSystemHotkey(Hotkey))
+        {
+            Debug.WriteLine($"Cannot register system hotkey: {Hotkey.Item1} + {Hotkey.Item2}");
+            return false;
+        }
+
+        if (IsHotkeyRegistered(Hotkey))
+        {
+            Debug.WriteLine($"Hotkey already registered: {Hotkey.Item1} + {Hotkey.Item2}");
+            return false;
+        }
+
         int HotkeyId = HotkeyToHash(Hotkey);
         Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(Hotkey.Item1);
         
@@ -85,6 +155,7 @@ public sealed class HotkeyRegisterService
         else
         {
             Debug.WriteLine($"RegisterHotkey succeeded. ID={HotkeyId}");
+            _registeredHotkeys.Add(Hotkey);
         }
         return result;
     }
@@ -100,6 +171,7 @@ public sealed class HotkeyRegisterService
         else
         {
             Debug.WriteLine($"UnregisterHotkey succeeded. ID={HotkeyId}");
+            _registeredHotkeys.Remove(Hotkey);
         }
     }
 }

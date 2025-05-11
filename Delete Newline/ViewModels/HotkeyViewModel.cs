@@ -3,16 +3,50 @@ using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Helpers;
 using Delete_Newline.Services;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Windows.System;
 
 namespace Delete_Newline.ViewModels;
 public partial class HotkeyViewModel : ObservableRecipient
 {
+    private readonly HotkeyRegisterService _hotkeyManager;
+    private readonly InAppNotificationService _notificationService;
+    private TextBox? _hotkeyTextBox;
+    private Button? _dummyFocusButton;
+    private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
+
     [ObservableProperty]
     private HotkeyPageStructure? _currentHotkeyConfig;
 
     [ObservableProperty]
     private string? _displayHotkey;
+
+    public HotkeyViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService)
+    {
+        _hotkeyManager = hotkeyManager;
+        _notificationService = notificationService;
+        try
+        {
+            _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        }
+        catch
+        {
+            // If not on UI thread, set to null
+            _dispatcherQueue = null;
+        }
+    }
+
+    public void SetHotkeyTextBox(TextBox textBox)
+    {
+        _hotkeyTextBox = textBox;
+    }
+
+    public void SetDummyFocusButton(Button btn)
+    {
+        _dummyFocusButton = btn;
+    }
 
     partial void OnCurrentHotkeyConfigChanged(HotkeyPageStructure? oldValue, HotkeyPageStructure? newValue)
     {
@@ -69,15 +103,43 @@ public partial class HotkeyViewModel : ObservableRecipient
     [RelayCommand]
     public void HandleKeyboardAccelerator(KeyboardAcceleratorEventArgs args)
     {
-        var HotkeyManager = App.GetService<HotkeyRegisterService>();
+        // Ignore if not in hotkey registration mode
+        if (!_hotkeyManager.IsRegisteringHotkey())
+        {
+            return;
+        }
 
+        // Unregister previous hotkey if exists
         if (CurrentHotkeyConfig!.Hotkey!.Modifiers != VirtualKeyModifiers.None &&
             CurrentHotkeyConfig!.Hotkey!.Key != VirtualKey.None)
         {
-            HotkeyManager.UnRegisterHotkey((CurrentHotkeyConfig.Hotkey.Modifiers, CurrentHotkeyConfig.Hotkey.Key));
+            _hotkeyManager.UnRegisterHotkey((CurrentHotkeyConfig.Hotkey.Modifiers, CurrentHotkeyConfig.Hotkey.Key));
         }
 
-        if (HotkeyManager.RegisterHotkey((args.Modifiers, args.Key)))
+        // Check for system hotkey
+        if (_hotkeyManager.IsSystemHotkey((args.Modifiers, args.Key)))
+        {
+            _notificationService.ShowNotification(
+                "Invalid Hotkey",
+                "System hotkeys (Ctrl+C, Ctrl+V, etc.) cannot be registered.",
+                InfoBarSeverity.Error
+            );
+            return;
+        }
+
+        // Check if hotkey is already registered
+        if (_hotkeyManager.IsHotkeyRegistered((args.Modifiers, args.Key)))
+        {
+            _notificationService.ShowNotification(
+                "Invalid Hotkey",
+                "This hotkey combination is already registered.",
+                InfoBarSeverity.Error
+            );
+            return;
+        }
+
+        // Register new hotkey
+        if (_hotkeyManager.RegisterHotkey((args.Modifiers, args.Key)))
         {
             VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
 
@@ -93,21 +155,52 @@ public partial class HotkeyViewModel : ObservableRecipient
             CurrentHotkeyConfig.Hotkey.Modifiers = tempModifiers;
             CurrentHotkeyConfig.Hotkey.Key = args.Key;
             
-            // DisplayHotkey will be updated via property changed event
+            // Move focus to dummy button to remove focus from TextBox
+            if (_dummyFocusButton != null && _dispatcherQueue != null)
+            {
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    try
+                    {
+                        _dummyFocusButton.Focus(FocusState.Programmatic);
+                    }
+                    catch
+                    {
+                        // Ignore focus move failure
+                    }
+                    finally
+                    {
+                        _hotkeyManager.EndHotkeyRegistration();
+                    }
+                });
+            }
+            else
+            {
+                _hotkeyManager.EndHotkeyRegistration();
+            }
         }
         else
         {
-            // Reset Hotkey to None when registration fails
+            // Reset hotkey to None when registration fails
             CurrentHotkeyConfig.Hotkey.Modifiers = VirtualKeyModifiers.None;
             CurrentHotkeyConfig.Hotkey.Key = VirtualKey.None;
             
-            // Show error notification
-            App.GetService<NotificationService>().ShowNotification(
+            _notificationService.ShowNotification(
                 "Hotkey Registration Failed",
-                "This Hotkey combination is already in use by another application.",
-                force: true
+                "This hotkey combination is already in use by another application.",
+                InfoBarSeverity.Error
             );
         }
+    }
+
+    public void StartHotkeyRegistration()
+    {
+        _hotkeyManager.StartHotkeyRegistration();
+    }
+
+    public void EndHotkeyRegistration()
+    {
+        _hotkeyManager.EndHotkeyRegistration();
     }
 }
 
