@@ -1,5 +1,6 @@
 using System.Diagnostics;
-
+using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Helpers;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace Delete_Newline.Services;
@@ -7,10 +8,14 @@ namespace Delete_Newline.Services;
 public class ClipboardMonitorService
 {
     private readonly RegexService _regexService;
+    private readonly NotificationService _notificationService;
+    private readonly HotkeyCollectSaveService _hotkeyCollectSaveService;
 
-    public ClipboardMonitorService(RegexService regexService)
+    public ClipboardMonitorService(RegexService regexService, NotificationService notificationService, HotkeyCollectSaveService hotkeyCollectSaveService)
     {
         _regexService = regexService ?? throw new ArgumentNullException(nameof(regexService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
+        _hotkeyCollectSaveService = hotkeyCollectSaveService ?? throw new ArgumentNullException(nameof(hotkeyCollectSaveService));
     }
 
     public void StartMonitoring()
@@ -62,12 +67,12 @@ public class ClipboardMonitorService
             if (triggeredHotkeyId.HasValue == true)
             {
                 Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId.Value}. Applying specific rules.");
-                cleanedText = _regexService.ProcessText(rawText, triggeredHotkeyId.Value);
+                cleanedText = _regexService.ApplyHotkeyRules(rawText, triggeredHotkeyId.Value);
             }
             else
             {
                 Debug.WriteLine("[ClipboardMonitorService] General clipboard change. Applying default rules.");
-                cleanedText = _regexService.ProcessText(rawText);
+                cleanedText = rawText;
             }
 
             if (rawText != cleanedText)
@@ -78,6 +83,26 @@ public class ClipboardMonitorService
                 try
                 {
                     Clipboard.SetContent(dataPackage);
+
+                    if (triggeredHotkeyId.HasValue)
+                    {
+                        if (_notificationService.GetEnableNotification())
+                        {
+                            // Try to get Hotkey details
+                            HotkeyPageStructure? hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(triggeredHotkeyId.Value);
+                            string notificationTitle = "Text Modified";
+                            string notificationMessage = "Hotkey action completed successfully.";
+
+                            if (hotkeyStructure != null)
+                            {
+                                string displayHotkey = HotkeyDisplayHelper.GetDisplayText(hotkeyStructure);
+                                notificationTitle = string.IsNullOrWhiteSpace(hotkeyStructure.HotkeyName) ? "Hotkey Activated" : hotkeyStructure.HotkeyName;
+                                notificationMessage = $"Action for '{displayHotkey}' completed.";
+                            }
+
+                            _notificationService.ShowNotification(notificationTitle, notificationMessage, force: false, tag: true);
+                        }
+                    }
                 }
                 catch (Exception exSetContent)
                 {
@@ -87,8 +112,8 @@ public class ClipboardMonitorService
             }
         }
         catch (Exception ex)
-            {
-                // Catching exceptions from GetTextAsync() or _regexService processing.
+        {
+            // Catching exceptions from GetTextAsync() or _regexService processing.
             Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content. Raw text snippet was '{rawText.Substring(0, Math.Min(rawText.Length,50))}...': {ex.Message}");
         }
     }

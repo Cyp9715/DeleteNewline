@@ -191,7 +191,7 @@ public sealed class HotkeyCollectSaveService
         }
     }
 
-    public RegexChainStructure? GetRegexChainByHotkeyId(int hotkeyId)
+    public HotkeyPageStructure? GetHotkeyStructureById(int hotkeyId)
     {
         foreach (var config in HotkeyConfigs)
         {
@@ -203,7 +203,7 @@ public sealed class HotkeyCollectSaveService
                 int currentConfigHotkeyId = _HotkeyRegisterService.HotkeyToHash((config.Hotkey.Modifiers, config.Hotkey.Key));
                 if (currentConfigHotkeyId == hotkeyId)
                 {
-                    return config.RegexChain;
+                    return config;
                 }
             }
         }

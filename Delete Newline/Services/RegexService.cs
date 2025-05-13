@@ -13,65 +13,45 @@ public class RegexService
         _hotkeyCollectSaveService = hotkeyCollectSaveService ?? throw new ArgumentNullException(nameof(hotkeyCollectSaveService));
     }
 
-    // 일반 클립보드 변경 시 (기본 Windows 동작 사용)
-    public string ProcessText(string inputText)
-    {
-        return inputText;  // 기본 Windows 클립보드 동작 사용
-    }
 
     // 단축키로 특정 규칙 적용 시
-    public string ProcessText(string inputText, int hotkeyId)
+    public string ApplyHotkeyRules(string inputText, int hotkeyId)
     {
         Debug.WriteLine($"[RegexService] Attempting to apply rules for Hotkey ID: {hotkeyId}");
-        RegexChainStructure? regexChain = _hotkeyCollectSaveService.GetRegexChainByHotkeyId(hotkeyId);
+        HotkeyPageStructure? hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(hotkeyId);
+        RegexChainStructure? regexChain = hotkeyStructure?.RegexChain;
 
         if (regexChain != null && regexChain.ChainItems != null && regexChain.ChainItems.Any())
         {
-            var rulesToApply = new List<(string Pattern, string Replacement)>();
-            foreach (var chainItem in regexChain.ChainItems)
+            string processedText = inputText;
+            bool rulesApplied = false;
+
+            try
             {
-                if (!string.IsNullOrEmpty(chainItem.RegexExpression))
+                foreach (var chainItem in regexChain.ChainItems)
                 {
-                    rulesToApply.Add((chainItem.RegexExpression, chainItem.Replace ?? string.Empty));
+                    if (!string.IsNullOrEmpty(chainItem.RegexExpression))
+                    {
+                        Debug.WriteLine($"[RegexService] Applying rule: '{chainItem.RegexExpression}' -> '{chainItem.Replace ?? string.Empty}' for Hotkey ID: {hotkeyId}");
+                        processedText = Regex.Replace(processedText, chainItem.RegexExpression, Regex.Unescape(chainItem.Replace ?? string.Empty));
+                        rulesApplied = true;
+                    }
+                }
+
+                if (rulesApplied)
+                {
+                    Debug.WriteLine($"[RegexService] Successfully applied rules for Hotkey ID: {hotkeyId}.");
+                    return processedText;
                 }
             }
-
-            if (rulesToApply.Count != 0)
+            catch (ArgumentException ex)
             {
-                Debug.WriteLine($"[RegexService] Found {rulesToApply.Count} rules for Hotkey ID: {hotkeyId}. Applying sequentially...");
-                return ApplyRulesSequentially(inputText, rulesToApply);
+                Debug.WriteLine($"[RegexService] Regex processing error for Hotkey ID: {hotkeyId}: {ex.Message}. Input text: {inputText.Substring(0, Math.Min(inputText.Length, 50))}...");
+                return $"{inputText} [Regex Error: Invalid Pattern in Chain]";
             }
         }
         
-        Debug.WriteLine($"[RegexService] No valid rules found for Hotkey ID: {hotkeyId}. Using original text.");
+        Debug.WriteLine($"[RegexService] No valid rules found or applied for Hotkey ID: {hotkeyId}. Using original text.");
         return inputText;
-    }
-
-    private string ApplyRulesSequentially(string text, List<(string Pattern, string Replacement)> rules)
-    {
-        if (string.IsNullOrEmpty(text) || rules == null || rules.Any() == false)
-        {
-            return text;
-        }
-
-        string processedText = text;
-
-        try
-        {
-            foreach (var rule in rules)
-            {
-                if (!string.IsNullOrEmpty(rule.Pattern))
-                {
-                    processedText = Regex.Replace(processedText, rule.Pattern, Regex.Unescape(rule.Replacement ?? string.Empty));
-                }
-            }
-        }
-        catch (ArgumentException ex) 
-        {
-            Debug.WriteLine($"[RegexService] Regex processing error: {ex.Message}. Input text: {text.Substring(0, Math.Min(text.Length, 50))}...");
-            return $"{text} [Regex Error: Invalid Pattern in Chain]";
-        }
-        
-        return processedText;
     }
 }
