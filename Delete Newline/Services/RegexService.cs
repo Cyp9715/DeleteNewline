@@ -26,28 +26,20 @@ public class RegexService
             string processedText = inputText;
             bool rulesApplied = false;
 
-            try
+            foreach (var chainItem in regexChain.ChainItems)
             {
-                foreach (var chainItem in regexChain.ChainItems)
+                if (string.IsNullOrEmpty(chainItem.RegexExpression) == false)
                 {
-                    if (!string.IsNullOrEmpty(chainItem.RegexExpression))
-                    {
-                        Debug.WriteLine($"[RegexService] Applying rule: '{chainItem.RegexExpression}' -> '{chainItem.Replace ?? string.Empty}' for Hotkey ID: {hotkeyId}");
-                        processedText = Regex.Replace(processedText, chainItem.RegexExpression, Regex.Unescape(chainItem.Replace ?? string.Empty));
-                        rulesApplied = true;
-                    }
-                }
-
-                if (rulesApplied)
-                {
-                    Debug.WriteLine($"[RegexService] Successfully applied rules for Hotkey ID: {hotkeyId}.");
-                    return processedText;
+                    Debug.WriteLine($"[RegexService] Applying rule: '{chainItem.RegexExpression}' → '{chainItem.Replace ?? string.Empty}' for Hotkey ID: {hotkeyId}");
+                    processedText = Regex.Replace(processedText, chainItem.RegexExpression, Regex.Unescape(chainItem.Replace ?? string.Empty));
+                    rulesApplied = true;
                 }
             }
-            catch (ArgumentException ex)
+
+            if (rulesApplied)
             {
-                Debug.WriteLine($"[RegexService] Regex processing error for Hotkey ID: {hotkeyId}: {ex.Message}. Input text: {inputText.Substring(0, Math.Min(inputText.Length, 50))}...");
-                return $"{inputText} [Regex Error: Invalid Pattern in Chain]";
+                Debug.WriteLine($"[RegexService] Successfully applied rules for Hotkey ID: {hotkeyId}.");
+                return processedText;
             }
         }
         
