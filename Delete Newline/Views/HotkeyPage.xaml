@@ -11,12 +11,18 @@
     <ScrollViewer Padding="20,10,20,20">
         <Grid>
             <StackPanel MaxWidth="800">
+                <!-- Hotkey Settings Label -->
+                <TextBlock Text="Hotkey Settings"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           FontSize="18"
+                           HorizontalAlignment="Left"
+                           Margin="3,0,0,0"/>
                 <!-- Hotkey Name, Comment, Input -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
                         CornerRadius="4"
-                        Margin="00,10,0,5"
+                        Margin="0,5,0,5"
                         Padding="10">
                     <StackPanel>
                         <!-- Hotkey Name -->
@@ -61,6 +67,12 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Regex Chain Label -->
+                <TextBlock Text="Regex Chain"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           FontSize="18"
+                           HorizontalAlignment="Left"
+                           Margin="3,10,0,0"/>
                 <!-- Additional Regex Items -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -141,43 +153,53 @@
                     <Button Content="Add Regex Item"
                             Command="{Binding AddRegexItemCommand}"
                             Height="50"
-                            Margin="0, 15, 0, 0"
+                            Margin="1,0,1,0"
                             HorizontalAlignment="Stretch" />
                 </Grid>
 
-            <!-- Regex Example Group -->
-                <Grid x:Name="Grid_RegexExample"
-                    Margin="0,20,0,0">
+            <!-- Test Regex Chain Label -->
+            <TextBlock Text="Test Regex Chain"
+                       Style="{StaticResource SubtitleTextBlockStyle}"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       Margin="3,20,0,2"/>
+
+            <!-- Regex Example Group within a Border -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Margin="0,5,0,5"
+                    Padding="10">
+                <Grid x:Name="Grid_RegexExample">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBlock x:Name="Label_regexInput"
-                               Grid.Row="0"
-                               Text="Input Text"
-                               HorizontalAlignment="Right"
-                               Margin="0,0,0,5"
-                               FontSize="12" />
+                    <!-- Input TextBox -->
                     <TextBox x:Name="TextBox_regexInput"
-                             Grid.Row="1"
-                             Margin="0,0,0,10"
+                             Grid.Row="0"
+                             Margin="0,0,0,5"
                              Height="300"
                              AcceptsReturn="True"
                              Text="{Binding CurrentHotkeyConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Grid.Row="2"
-                               Text="Output Text"
-                               HorizontalAlignment="Right"
-                               Margin="0,0,0,5"
-                               FontSize="12" />
+
+                    <!-- Downward Arrow Icon -->
+                    <FontIcon Grid.Row="1"
+                              Glyph="&#xE0E5;" 
+                              HorizontalAlignment="Center"
+                              Margin="0,5,0,5"
+                              FontSize="16"/>
+
+                    <!-- Output TextBox -->
                     <TextBox x:Name="TextBox_regexOutput"
-                             Grid.Row="3"
-                             Margin="0,0,0,0"
+                             Grid.Row="2"
+                             Margin="0,2,0,0"
                              Height="300"
                              IsReadOnly="True" />
                 </Grid>
+            </Border>
 
             </StackPanel>
 
