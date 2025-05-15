@@ -8,110 +8,133 @@
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
       PointerPressed="HotkeyPage_PointerPressed">
 
-    <ScrollViewer>
+    <ScrollViewer Padding="20,10,20,20">
         <Grid>
-            <StackPanel MaxWidth="550">
-                <!-- Hotkey Name -->
-                <Grid Margin="0,25,0,0">
-                    <TextBlock Text="Hotkey Name"></TextBlock>
-                    <TextBox x:Name="TextBox_HotkeyName"
-                             Width="285"
-                             TextAlignment="Center"
-                             HorizontalAlignment="Right"
-                             Text="{Binding CurrentHotkeyConfig.HotkeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                </Grid>
+            <StackPanel MaxWidth="800">
+                <!-- Hotkey Name, Comment, Input -->
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="00,10,0,5"
+                        Padding="10">
+                    <StackPanel>
+                        <!-- Hotkey Name -->
+                        <Grid Margin="5,0,0,0">
+                            <TextBlock Text="Hotkey Name" VerticalAlignment="Center"/>
+                            <TextBox x:Name="TextBox_HotkeyName"
+                                     Width="300"
+                                     TextAlignment="Center"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Center"
+                                     Text="{Binding CurrentHotkeyConfig.HotkeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
 
-                <!-- Hotkey Comment -->
-                <Grid Margin="0,5,0,0">
-                    <TextBlock Text="Hotkey Comment"></TextBlock>
-                    <TextBox x:Name="TextBox_HotkeyComment"
-                             Width="285"
-                             TextAlignment="Center"
-                             HorizontalAlignment="Right"
-                             Text="{Binding CurrentHotkeyConfig.HotkeyComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                </Grid>
+                        <!-- Hotkey Comment -->
+                        <Grid Margin="5,5,0,0">
+                            <TextBlock Text="Hotkey Comment" VerticalAlignment="Center"/>
+                            <TextBox x:Name="TextBox_HotkeyComment"
+                                     Width="300"
+                                     TextAlignment="Center"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Center"
+                                     Text="{Binding CurrentHotkeyConfig.HotkeyComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
 
-                <!-- Hotkey Input -->
-                <Grid Margin="0,5,0,10">
-                    <TextBlock Text="Hotkey"></TextBlock>
-                    <TextBox x:Name="TextBox_Hotkey"
-                             Width="285"
-                             TextAlignment="Center"
-                             HorizontalAlignment="Right"
-                             IsReadOnly="True"
-                             Text="{Binding DisplayHotkey, Mode=OneWay}"
-                             GotFocus="TextBox_Hotkey_GotFocus"
-                             LostFocus="TextBox_Hotkey_LostFocus">
-                        <interactivity:Interaction.Behaviors>
-                            <behaviors:KeyboardAcceleratorBehavior CommandName="HandleKeyboardAcceleratorCommand" />
-                        </interactivity:Interaction.Behaviors>
-                    </TextBox>
-                </Grid>
+                        <!-- Hotkey Input -->
+                        <Grid Margin="5,5,0,0">
+                            <TextBlock Text="Hotkey" VerticalAlignment="Center"/>
+                            <TextBox x:Name="TextBox_Hotkey"
+                                     Width="300"
+                                     TextAlignment="Center"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Center"
+                                     IsReadOnly="True"
+                                     Text="{Binding DisplayHotkey, Mode=OneWay}"
+                                     GotFocus="TextBox_Hotkey_GotFocus"
+                                     LostFocus="TextBox_Hotkey_LostFocus">
+                                <interactivity:Interaction.Behaviors>
+                                    <behaviors:KeyboardAcceleratorBehavior CommandName="HandleKeyboardAcceleratorCommand" />
+                                </interactivity:Interaction.Behaviors>
+                            </TextBox>
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
                 <!-- Additional Regex Items -->
-                <ItemsRepeater ItemsSource="{Binding CurrentHotkeyConfig.RegexChain.ChainItems}">
-                    <ItemsRepeater.ItemTemplate>
-                        <DataTemplate x:DataType="structures:ChainItem">
-                            <Grid Margin="0,5,0,0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="0,5,0,5"
+                        Padding="10">
+                    <StackPanel>
+                        <ItemsRepeater ItemsSource="{Binding CurrentHotkeyConfig.RegexChain.ChainItems}">
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="structures:ChainItem">
+                                    <Grid Margin="5,0,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                                <!-- Regex Expression -->
-                                <Grid Grid.Row="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Regex Expression"
-                                               VerticalAlignment="Center"
-                                               Grid.Column="0" />
-                                    <TextBox Grid.Column="1"
-                                             Width="250"
-                                             TextAlignment="Center"
-                                             HorizontalAlignment="Right"
-                                             Text="{Binding RegexExpression, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </Grid>
+                                        <!-- Regex Expression -->
+                                        <Grid Grid.Row="0"
+                                              Margin="0,5,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Regex Expression"
+                                                       VerticalAlignment="Center"
+                                                       Grid.Column="0" />
+                                            <TextBox Grid.Column="1"
+                                                     Width="265"
+                                                     TextAlignment="Center"
+                                                     HorizontalAlignment="Right"
+                                                     Text="{Binding RegexExpression, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </Grid>
 
-                                <!-- Replace -->
-                                <Grid Grid.Row="1"
-                                      Margin="0,5,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="└ Replace"
-                                               VerticalAlignment="Center"
-                                               Grid.Column="0" />
-                                    <TextBox Grid.Column="1"
-                                             Width="250"
-                                             HorizontalAlignment="Right"
-                                             TextAlignment="Center"
-                                             Foreground="Red"
-                                             Text="{Binding Replace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </Grid>
+                                        <!-- Replace -->
+                                        <Grid Grid.Row="1"
+                                              Margin="0,5,0,5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="└ Replace"
+                                                       VerticalAlignment="Center"
+                                                       Grid.Column="0" />
+                                            <TextBox Grid.Column="1"
+                                                     Width="265"
+                                                     HorizontalAlignment="Right"
+                                                     TextAlignment="Center"
+                                                     Foreground="Red"
+                                                     Text="{Binding Replace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </Grid>
 
-                                <!-- Remove Button -->
-                                <Button Width="30"
-                                        Height="30"
-                                        Padding="0"
-                                        Grid.RowSpan="2"
-                                        Grid.Column="1"
-                                        Margin="5,0,0,0"
-                                        Command="{Binding DataContext.RemoveRegexItemCommand, ElementName=RootPage}"
-                                        CommandParameter="{Binding}">
-                                    <FontIcon Glyph="&#xE738;"
-                                              FontSize="12" />
-                                </Button>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
+                                        <!-- Remove Button -->
+                                        <Button Width="30"
+                                                Height="30"
+                                                Padding="0"
+                                                Grid.RowSpan="2"
+                                                Grid.Column="1"
+                                                Margin="5,0,0,0"
+                                                Command="{Binding DataContext.RemoveRegexItemCommand, ElementName=RootPage}"
+                                                CommandParameter="{Binding}">
+                                            <FontIcon Glyph="&#xE738;"
+                                                      FontSize="12" />
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </StackPanel>
+                </Border>
 
                 <Grid>
                     <!-- Add Button -->
@@ -121,39 +144,43 @@
                             Margin="0, 15, 0, 0"
                             HorizontalAlignment="Stretch" />
                 </Grid>
-                
-                <!-- Regex Example Group -->
+
+            <!-- Regex Example Group -->
                 <Grid x:Name="Grid_RegexExample"
-                      Margin="0,20,0,0">
+                    Margin="0,20,0,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <TextBlock x:Name="Label_regexInput"
                                Grid.Row="0"
                                Text="Input Text"
                                HorizontalAlignment="Right"
+                               Margin="0,0,0,5"
                                FontSize="12" />
                     <TextBox x:Name="TextBox_regexInput"
                              Grid.Row="1"
-                             Margin="0,5,0,0"
-                             Height="150"
+                             Margin="0,0,0,10"
+                             Height="300"
                              AcceptsReturn="True"
                              Text="{Binding CurrentHotkeyConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="2"
                                Text="Output Text"
-                               Margin="0,5,0,0"
-                               FontSize="12"
-                               HorizontalAlignment="Right" />
+                               HorizontalAlignment="Right"
+                               Margin="0,0,0,5"
+                               FontSize="12" />
                     <TextBox x:Name="TextBox_regexOutput"
                              Grid.Row="3"
-                             Height="150"
+                             Margin="0,0,0,0"
+                             Height="300"
                              IsReadOnly="True" />
                 </Grid>
+
             </StackPanel>
+
             <!-- Dummy button for focus removal -->
             <Button x:Name="DummyFocusButton"
                     Opacity="0"

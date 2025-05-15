@@ -69,6 +69,17 @@ public partial class SettingsViewModel : ObservableRecipient
         _notificationService.EnableNotificationChanged += OnNotificationEnabledChanged!;
     }
 
+    protected override void OnActivated()
+    {
+        base.OnActivated();
+        UpdateSelectedTheme();
+    }
+
+    public void UpdateSelectedTheme()
+    {
+        SelectedTheme = _themeSelectorService.Theme.ToString();
+    }
+
     private void OnNotificationEnabledChanged(object sender, bool isEnabled)
     {
         EnableNotification = isEnabled;
