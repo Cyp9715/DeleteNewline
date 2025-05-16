@@ -5,8 +5,9 @@ using Delete_Newline.Helpers;
 using Delete_Newline.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Windows.System;
+using System.Text.RegularExpressions;
+using System.Collections.Specialized;
 
 namespace Delete_Newline.ViewModels;
 public partial class HotkeyViewModel : ObservableRecipient
@@ -22,6 +23,9 @@ public partial class HotkeyViewModel : ObservableRecipient
 
     [ObservableProperty]
     private string? _displayHotkey;
+
+    [ObservableProperty]
+    private string? _regexOutputText;
 
     public HotkeyViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService)
     {
@@ -50,16 +54,76 @@ public partial class HotkeyViewModel : ObservableRecipient
 
     partial void OnCurrentHotkeyConfigChanged(HotkeyPageStructure? oldValue, HotkeyPageStructure? newValue)
     {
-        if (oldValue?.Hotkey != null)
+        if (oldValue != null)
         {
-            oldValue.Hotkey.PropertyChanged -= OnHotkeyPropertyChanged;
+            oldValue.PropertyChanged -= CurrentHotkeyConfig_PropertyChanged;
+            if (oldValue.Hotkey != null)
+            {
+                oldValue.Hotkey.PropertyChanged -= OnHotkeyPropertyChanged;
+            }
+            if (oldValue.RegexChain != null)
+            {
+                oldValue.RegexChain.ChainItems.CollectionChanged -= RegexChain_CollectionChanged;
+                foreach (var item in oldValue.RegexChain.ChainItems)
+                {
+                    item.PropertyChanged -= ChainItem_PropertyChanged;
+                }
+            }
         }
 
-        if (newValue?.Hotkey != null)
+        if (newValue != null)
         {
-            newValue.Hotkey.PropertyChanged += OnHotkeyPropertyChanged;
+            newValue.PropertyChanged += CurrentHotkeyConfig_PropertyChanged;
+            if (newValue.Hotkey != null)
+            {
+                newValue.Hotkey.PropertyChanged += OnHotkeyPropertyChanged;
+            }
+            if (newValue.RegexChain != null)
+            {
+                foreach (var item in newValue.RegexChain.ChainItems)
+                {
+                    item.PropertyChanged += ChainItem_PropertyChanged;
+                }
+                newValue.RegexChain.ChainItems.CollectionChanged += RegexChain_CollectionChanged;
+            }
         }
         UpdateDisplayHotkey();
+        UpdateRegexOutput();
+    }
+
+    private void CurrentHotkeyConfig_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(HotkeyPageStructure.InputText))
+        {
+            UpdateRegexOutput();
+        }
+    }
+
+    private void RegexChain_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (ChainItem item in e.OldItems)
+            {
+                item.PropertyChanged -= ChainItem_PropertyChanged;
+            }
+        }
+        if (e.NewItems != null)
+        {
+            foreach (ChainItem item in e.NewItems)
+            {
+                item.PropertyChanged += ChainItem_PropertyChanged;
+            }
+        }
+        UpdateRegexOutput();
+    }
+
+    private void ChainItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ChainItem.RegexExpression) || e.PropertyName == nameof(ChainItem.Replace))
+        {
+            UpdateRegexOutput();
+        }
     }
 
     private void OnHotkeyPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -76,6 +140,27 @@ public partial class HotkeyViewModel : ObservableRecipient
         }
 
         DisplayHotkey = HotkeyDisplayHelper.GetDisplayText(CurrentHotkeyConfig);
+    }
+
+    private void UpdateRegexOutput()
+    {
+        if (CurrentHotkeyConfig == null || CurrentHotkeyConfig.RegexChain == null)
+        {
+            RegexOutputText = string.Empty;
+            return;
+        }
+
+        string currentText = CurrentHotkeyConfig.InputText ?? string.Empty;
+
+        foreach (var chainItem in CurrentHotkeyConfig.RegexChain.ChainItems)
+        {
+            if (string.IsNullOrEmpty(chainItem.RegexExpression) == false)
+            {
+                string replacement = chainItem.Replace ?? string.Empty;
+                currentText = Regex.Replace(currentText, chainItem.RegexExpression, replacement);
+            }
+        }
+        RegexOutputText = currentText;
     }
 
     [RelayCommand]

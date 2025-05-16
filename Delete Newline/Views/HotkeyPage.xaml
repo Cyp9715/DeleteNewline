@@ -197,6 +197,7 @@
                              Grid.Row="2"
                              Margin="0,2,0,0"
                              Height="300"
+                             Text="{Binding RegexOutputText, Mode=OneWay}"
                              IsReadOnly="True" />
                 </Grid>
             </Border>
