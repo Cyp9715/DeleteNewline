@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Delete_Newline.Contracts.Structures;
 
@@ -19,4 +19,12 @@ public partial class HotkeyPageStructure : ObservableObject
 
     [ObservableProperty]
     public string _inputText = "";
+
+    [ObservableProperty]
+    private bool _isRegistrationFailed = false;
+
+    public bool ShouldSerializeIsRegistrationFailed()
+    {
+        return false;
+    }
 }

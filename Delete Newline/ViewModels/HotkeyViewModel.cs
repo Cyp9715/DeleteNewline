@@ -243,6 +243,7 @@ public partial class HotkeyViewModel : ObservableRecipient
 
             CurrentHotkeyConfig.Hotkey.Modifiers = tempModifiers;
             CurrentHotkeyConfig.Hotkey.Key = args.Key;
+            CurrentHotkeyConfig.IsRegistrationFailed = false;
             
             // Move focus to dummy button to remove focus from TextBox
             if (_dummyFocusButton != null && _dispatcherQueue != null)
@@ -273,6 +274,7 @@ public partial class HotkeyViewModel : ObservableRecipient
             // Reset hotkey to None when registration fails
             CurrentHotkeyConfig.Hotkey.Modifiers = VirtualKeyModifiers.None;
             CurrentHotkeyConfig.Hotkey.Key = VirtualKey.None;
+            CurrentHotkeyConfig.IsRegistrationFailed = true;
             
             _notificationService.ShowNotification(
                 "Hotkey Registration Failed",

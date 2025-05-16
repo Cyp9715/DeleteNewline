@@ -72,7 +72,7 @@
                      Severity="Informational"
                      HorizontalAlignment="Center"
                      VerticalAlignment="Bottom"
-                     Margin="0,0,0,75"
+                     Margin="0,0,0,25"
                      Width="500"/>
         </Grid>
     </Grid>

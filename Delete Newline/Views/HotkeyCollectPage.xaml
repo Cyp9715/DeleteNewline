@@ -4,7 +4,12 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:structures="using:Delete_Newline.Contracts.Structures"
       xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
-      xmlns:core="using:Microsoft.Xaml.Interactions.Core">
+      xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+      xmlns:converters="using:Delete_Newline.Converters">
+
+    <Page.Resources>
+        <converters:BooleanToFailedBrushConverter x:Key="BooleanToFailedBrushConverter" />
+    </Page.Resources>
 
     <Grid>
         <GridView ItemsSource="{x:Bind ViewModel.HotkeyConfigs, Mode=OneWay}"
@@ -43,7 +48,7 @@
                                            FontWeight="SemiBold"
                                            FontSize="12"
                                            HorizontalAlignment="Right"
-                                           Foreground="{ThemeResource SystemChromeGrayColor}" />
+                                           Foreground="{Binding IsRegistrationFailed, Converter={StaticResource BooleanToFailedBrushConverter}, Mode=OneWay}" />
                                 <TextBlock Text="{Binding HotkeyName}"
                                            FontWeight="SemiBold"
                                            FontSize="16" />

@@ -4,6 +4,10 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using Windows.System;
+using Microsoft.UI.Xaml.Controls;
+using System.Collections.Generic;
+using System.Text;
+using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
@@ -13,54 +17,91 @@ public sealed class HotkeyCollectSaveService
 
     private readonly SettingsService _localSettingsService;
     private readonly HotkeyRegisterService _HotkeyRegisterService;
+    private readonly InAppNotificationService _inAppNotificationService;
 
     private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
-    public HotkeyCollectSaveService(SettingsService localSettingsService, HotkeyRegisterService HotkeyRegisterService)
+    public HotkeyCollectSaveService(SettingsService localSettingsService, HotkeyRegisterService HotkeyRegisterService, InAppNotificationService inAppNotificationService)
     {
         _localSettingsService = localSettingsService;
         _HotkeyRegisterService = HotkeyRegisterService;
-
+        _inAppNotificationService = inAppNotificationService;
         HotkeyConfigs = new ObservableCollection<HotkeyPageStructure>();
     }
 
     public void Initialize()
     {
-        var savedHotkeyConfigs = _localSettingsService.ReadSetting<List<HotkeyPageStructure>>(HotkeyCollectionSettingsKey);
-        if (savedHotkeyConfigs != null)
+        var savedHotkeyConfigs = LoadSavedHotkeyConfigurations();
+
+        if (savedHotkeyConfigs != null && savedHotkeyConfigs.Count > 0) // Ensure there are configs to process
         {
-            // First, unregister all existing Hotkeys
-            foreach (var config in savedHotkeyConfigs)
+            this.HotkeyConfigs.Clear(); // Clear before re-populating
+            ShowFailedRegistrationNotification(RegisterHotkeysAndCollectFailures(savedHotkeyConfigs));
+        }
+        
+        this.HotkeyConfigs.CollectionChanged += OnHotkeyConfigsChanged;
+    }
+
+    private List<HotkeyPageStructure>? LoadSavedHotkeyConfigurations()
+    {
+        return _localSettingsService.ReadSetting<List<HotkeyPageStructure>>(HotkeyCollectionSettingsKey);
+    }
+
+    private List<string> RegisterHotkeysAndCollectFailures(IEnumerable<HotkeyPageStructure> savedConfigs)
+    {
+        List<string> failedHotkeyStrings = new List<string>();
+
+        foreach (var config in savedConfigs)
+        {
+            config.IsRegistrationFailed = false; // Reset status
+            this.HotkeyConfigs.Add(config); // Add to the main collection
+            Subscribe(config);
+
+            if (config.Hotkey.Modifiers == VirtualKeyModifiers.None &&
+                config.Hotkey.Key == VirtualKey.None)
             {
-                if (config.Hotkey != null && 
-                    config.Hotkey.Modifiers != VirtualKeyModifiers.None && 
-                    config.Hotkey.Key != VirtualKey.None)
-                {
-                    _HotkeyRegisterService.UnRegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
-                }
+                continue; // Skip empty/invalid hotkeys
             }
 
-            HotkeyConfigs.Clear();
-            foreach (var config in savedHotkeyConfigs)
+            bool registrationSuccess = _HotkeyRegisterService.RegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
+
+            if (!registrationSuccess)
             {
-                HotkeyConfigs.Add(config);
-                Subscribe(config);
-
-                if(config.Hotkey.Modifiers == VirtualKeyModifiers.None && 
-                    config.Hotkey.Key == VirtualKey.None)
-                    continue;
-
-                _HotkeyRegisterService.RegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
+                config.IsRegistrationFailed = true;
+                string hotkeyString = config.Hotkey.ToString(); // Or use a helper for formatted string if available
+                failedHotkeyStrings.Add(hotkeyString);
             }
         }
-        HotkeyConfigs.CollectionChanged += OnHotkeyConfigsChanged;
+        return failedHotkeyStrings;
+    }
+
+    private void ShowFailedRegistrationNotification(List<string> failedHotkeyStrings)
+    {
+        if (failedHotkeyStrings.Count > 0)
+        {
+            StringBuilder messageBuilder = new StringBuilder();
+            messageBuilder.AppendLine("The following hotkeys might already be in use by another application:");
+
+            foreach (var hotkeyStr in failedHotkeyStrings)
+            {
+                messageBuilder.AppendLine($"- {hotkeyStr}");
+            }
+            messageBuilder.Append("Problematic hotkeys are highlighted in red in the list.");
+
+            _inAppNotificationService.ShowNotification(
+                title: "Some Hotkey Registrations Failed",
+                message: messageBuilder.ToString(),
+                severity: InfoBarSeverity.Warning
+            );
+        }
     }
 
     public void AddHotkeyConfig(HotkeyPageStructure? config = null)
     {
         var newConfig = config ?? new HotkeyPageStructure();
         HotkeyConfigs.Add(newConfig);
+        // Subscribe logic is handled by OnHotkeyConfigsChanged if newConfig is added to HotkeyConfigs
     }
 
     public void RemoveHotkeyConfig(HotkeyPageStructure config)
@@ -69,7 +110,6 @@ public sealed class HotkeyCollectSaveService
         {
             Unsubscribe(config);
 
-            // Unregister Hotkey
             if (config!.Hotkey!.Modifiers != VirtualKeyModifiers.None && config.Hotkey.Key != VirtualKey.None)
             {
                 _HotkeyRegisterService.UnRegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
@@ -79,42 +119,47 @@ public sealed class HotkeyCollectSaveService
 
     private async void OnHotkeyConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.NewItems != null)
+        if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
         {
             foreach (HotkeyPageStructure config in e.NewItems)
             {
                 Subscribe(config);
+                // Note: Initial registration for newly added hotkeys might need to be handled here
+                // or rely on user navigating to edit the hotkey.
+                // For now, it's consistent with how it was before refactoring:
+                // new hotkeys are added, saved, and registered upon next app start or when edited.
             }
         }
 
-        if (e.OldItems != null)
+        if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
         {
             foreach (HotkeyPageStructure config in e.OldItems)
             {
                 Unsubscribe(config);
+                // Unregistration is handled in RemoveHotkeyConfig
             }
         }
+        
+        // If items are moved (reordered), subscriptions remain.
+        // If items are replaced, old ones should be unsubscribed, new ones subscribed.
+        // The current Subscribe/Unsubscribe in Add/Remove and Initialize should cover most cases.
 
         await SaveSettingsAsync();
     }
 
     private void Subscribe(HotkeyPageStructure config)
     {
-        // Name, Comment
         config.PropertyChanged += OnConfigPropertyChanged;
 
-        // Hotkey
         if (config.Hotkey != null)
         {
             config.Hotkey.PropertyChanged += OnConfigPropertyChanged;
         }
 
-        //RegexChain
         if (config.RegexChain != null)
         {
             config.RegexChain.ChainItems.CollectionChanged += OnChainItemsChanged;
 
-            // each items.
             foreach (var item in config.RegexChain.ChainItems)
             {
                 item.PropertyChanged += OnConfigPropertyChanged;
@@ -126,18 +171,15 @@ public sealed class HotkeyCollectSaveService
     {
         config.PropertyChanged -= OnConfigPropertyChanged;
 
-        // Hotkey
         if (config.Hotkey != null)
         {
             config.Hotkey.PropertyChanged -= OnConfigPropertyChanged;
         }
 
-        // RegexChain
         if (config.RegexChain != null)
         {
             config.RegexChain.ChainItems.CollectionChanged -= OnChainItemsChanged;
 
-            // each items.
             foreach (var item in config.RegexChain.ChainItems)
             {
                 item.PropertyChanged -= OnConfigPropertyChanged;
@@ -176,13 +218,11 @@ public sealed class HotkeyCollectSaveService
         await _saveLock.WaitAsync();
         try
         {
-            // Convert ObservableCollection to List for serialization
             var configsList = HotkeyConfigs.ToList();
             await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, configsList);
         }
         catch (Exception ex)
         {
-            // Todo : Error logic.
             System.Diagnostics.Debug.WriteLine($"Error saving Hotkeys: {ex.Message}");
         }
         finally
@@ -195,11 +235,10 @@ public sealed class HotkeyCollectSaveService
     {
         foreach (var config in HotkeyConfigs)
         {
-            if (config.Hotkey != null && 
-                config.Hotkey.Modifiers != VirtualKeyModifiers.None && 
+            if (config.Hotkey != null &&
+                config.Hotkey.Modifiers != VirtualKeyModifiers.None &&
                 config.Hotkey.Key != VirtualKey.None)
             {
-                // _HotkeyRegisterService is an injected instance of HotkeyRegisterService
                 int currentConfigHotkeyId = _HotkeyRegisterService.HotkeyToHash((config.Hotkey.Modifiers, config.Hotkey.Key));
                 if (currentConfigHotkeyId == hotkeyId)
                 {
