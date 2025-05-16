@@ -5,9 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using Windows.System;
 using Microsoft.UI.Xaml.Controls;
-using System.Collections.Generic;
 using System.Text;
-using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
@@ -101,7 +99,6 @@ public sealed class HotkeyCollectSaveService
     {
         var newConfig = config ?? new HotkeyPageStructure();
         HotkeyConfigs.Add(newConfig);
-        // Subscribe logic is handled by OnHotkeyConfigsChanged if newConfig is added to HotkeyConfigs
     }
 
     public void RemoveHotkeyConfig(HotkeyPageStructure config)
@@ -124,10 +121,6 @@ public sealed class HotkeyCollectSaveService
             foreach (HotkeyPageStructure config in e.NewItems)
             {
                 Subscribe(config);
-                // Note: Initial registration for newly added hotkeys might need to be handled here
-                // or rely on user navigating to edit the hotkey.
-                // For now, it's consistent with how it was before refactoring:
-                // new hotkeys are added, saved, and registered upon next app start or when edited.
             }
         }
 
@@ -136,13 +129,9 @@ public sealed class HotkeyCollectSaveService
             foreach (HotkeyPageStructure config in e.OldItems)
             {
                 Unsubscribe(config);
-                // Unregistration is handled in RemoveHotkeyConfig
             }
         }
         
-        // If items are moved (reordered), subscriptions remain.
-        // If items are replaced, old ones should be unsubscribed, new ones subscribed.
-        // The current Subscribe/Unsubscribe in Add/Remove and Initialize should cover most cases.
 
         await SaveSettingsAsync();
     }
