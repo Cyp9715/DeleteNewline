@@ -13,21 +13,14 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0"
-                        MaxWidth="1000">
+                        MaxWidth="800">
 
-                <Line X1="0"
-                      Y1="0"
-                      X2="1000"
-                      Y2="0"
-                      Stroke="{ThemeResource DividerStrokeColorDefaultBrush}"
-                      StrokeThickness="1"
-                      Margin="0,10,0,10" />
 
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
                         CornerRadius="4"
-                        Margin="0,0,0,5"
+                        Margin="0,20,0,5"
                         Padding="10">
                     <Grid Height="40">
                         <TextBlock x:Uid="Settings_StartOnTray"
@@ -153,26 +146,40 @@
                 </Border>
             </StackPanel>
 
-            <Grid Grid.Row="1">
-                <Button x:Uid="Settings_ImportSettings"
-                        Command="{x:Bind ViewModel.ImportSettingsCommand}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom"
-                        Content="Import"
-                        Margin="-500,0,0,20" />
+            <!-- 하단 동적 레이아웃 영역 -->
+            <Grid x:Name="BottomPanel"
+                  Grid.Row="1"
+                  MaxWidth="800"
+                  Margin="0,0,0,20"
+                  HorizontalAlignment="Center">
 
-                <Button x:Uid="Settings_ExportSettings"
-                        Command="{x:Bind ViewModel.ExportSettingsCommand}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom"
-                        Content="Export"
-                        Margin="-350,0,0,20" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}"
+                <!-- 버튼 컨테이너 -->
+                <StackPanel x:Name="ButtonContainer"
+                            Grid.Column="0"
+                            Width="800"
+                            Orientation="Horizontal"
+                            Spacing="10"
+                            HorizontalAlignment="Left">
+                    <Button x:Uid="Settings_ImportSettings"
+                            Command="{x:Bind ViewModel.ImportSettingsCommand}"
+                            Content="Import" />
+                    <Button x:Uid="Settings_ExportSettings"
+                            Command="{x:Bind ViewModel.ExportSettingsCommand}"
+                            Content="Export" />
+                </StackPanel>
+
+                <!-- 버전 정보 -->
+                <TextBlock x:Name="VersionText"
+                           Grid.Column="1"
+                           Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}"
                            Style="{ThemeResource BodyTextBlockStyle}"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Bottom"
-                           Margin="400,0,0,20" />
+                           HorizontalAlignment="Right"
+                           Margin="0,0,10,0" />
             </Grid>
         </Grid>
     </ScrollViewer>

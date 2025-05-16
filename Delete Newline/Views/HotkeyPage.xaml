@@ -8,15 +8,15 @@
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
       PointerPressed="HotkeyPage_PointerPressed">
 
-    <ScrollViewer Padding="20,10,20,20">
-        <Grid>
+    <ScrollViewer Margin="0">
+        <Grid Padding="20,0,20,0">
             <StackPanel MaxWidth="800">
                 <!-- Hotkey Settings Label -->
                 <TextBlock Text="Hotkey Settings"
                            Style="{StaticResource SubtitleTextBlockStyle}"
-                           FontSize="18"
+                           FontSize="16"
                            HorizontalAlignment="Left"
-                           Margin="3,0,0,0"/>
+                           Margin="3,20,0,0"/>
                 <!-- Hotkey Name, Comment, Input -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -70,9 +70,9 @@
                 <!-- Regex Chain Label -->
                 <TextBlock Text="Regex Chain"
                            Style="{StaticResource SubtitleTextBlockStyle}"
-                           FontSize="18"
+                           FontSize="16"
                            HorizontalAlignment="Left"
-                           Margin="3,10,0,0"/>
+                           Margin="3,15,0,0"/>
                 <!-- Additional Regex Items -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -160,9 +160,9 @@
             <!-- Test Regex Chain Label -->
             <TextBlock Text="Test Regex Chain"
                        Style="{StaticResource SubtitleTextBlockStyle}"
-                       FontSize="18"
+                       FontSize="16"
                        HorizontalAlignment="Left"
-                       Margin="3,20,0,2"/>
+                       Margin="3,15,0,2"/>
 
             <!-- Regex Example Group within a Border -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
