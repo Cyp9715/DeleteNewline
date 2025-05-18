@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -158,5 +158,29 @@
   </data>
   <data name="Shell_HotkeyDefault.Content" xml:space="preserve">
     <value>Hotkey</value>
+  </data>
+  <data name="Shell_OCR.Content" xml:space="preserve">
+    <value>OCR</value>
+  </data>
+  <data name="Settings_StartOnTray_Description.Text" xml:space="preserve">
+    <value>Starts the application minimized in the system tray.</value>
+  </data>
+  <data name="Settings_Theme_Description.Text" xml:space="preserve">
+    <value>Changes the application theme. Default follows system settings.</value>
+  </data>
+  <data name="Settings_Language_Description.Text" xml:space="preserve">
+    <value>Changes the application display language.</value>
+  </data>
+  <data name="Settings_Notification_Description.Text" xml:space="preserve">
+    <value>Sends Windows notifications. No notification will be sent if there is no matching pattern.</value>
+  </data>
+  <data name="Settings_TopMost_Description.Text" xml:space="preserve">
+    <value>Keeps the application window on top of other windows.</value>
+  </data>
+  <data name="Settings_ImportSettings.Content" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="Settings_ExportSettings.Content" xml:space="preserve">
+    <value>Export</value>
   </data>
 </root>
