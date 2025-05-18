@@ -13,8 +13,15 @@ public class RegexService
         _hotkeyCollectSaveService = hotkeyCollectSaveService ?? throw new ArgumentNullException(nameof(hotkeyCollectSaveService));
     }
 
+    public static string ProcessRegex(string inputText, string? regexPattern, string? replacement)
+    {
+        if (string.IsNullOrEmpty(regexPattern))
+        {
+            return inputText;
+        }
+        return Regex.Replace(inputText, regexPattern, Regex.Unescape(replacement ?? string.Empty), RegexOptions.Multiline);
+    }
 
-    // 단축키로 특정 규칙 적용 시
     public string ApplyHotkeyRules(string inputText, int hotkeyId)
     {
         Debug.WriteLine($"[RegexService] Attempting to apply rules for Hotkey ID: {hotkeyId}");
@@ -28,11 +35,18 @@ public class RegexService
 
             foreach (var chainItem in regexChain.ChainItems)
             {
-                if (string.IsNullOrEmpty(chainItem.RegexExpression) == false)
+                processedText = ProcessRegex(processedText, chainItem.RegexExpression, chainItem.Replace);
+
+                if (processedText != inputText || (chainItem.RegexExpression != null && chainItem.RegexExpression != string.Empty) )
                 {
-                    Debug.WriteLine($"[RegexService] Applying rule: '{chainItem.RegexExpression}' → '{chainItem.Replace ?? string.Empty}' for Hotkey ID: {hotkeyId}");
-                    processedText = Regex.Replace(processedText, chainItem.RegexExpression, Regex.Unescape(chainItem.Replace ?? string.Empty));
-                    rulesApplied = true;
+                    if(!rulesApplied && chainItem.RegexExpression != null && chainItem.RegexExpression != string.Empty)
+                    {
+                        Debug.WriteLine($"[RegexService] Applying rule: '{chainItem.RegexExpression}' → '{chainItem.Replace ?? string.Empty}' for Hotkey ID: {hotkeyId}");
+                        rulesApplied = true;
+                    } else if (rulesApplied && chainItem.RegexExpression != null && chainItem.RegexExpression != string.Empty)
+                    {
+                         Debug.WriteLine($"[RegexService] Applying next rule: '{chainItem.RegexExpression}' → '{chainItem.Replace ?? string.Empty}' for Hotkey ID: {hotkeyId}");
+                    }
                 }
             }
 

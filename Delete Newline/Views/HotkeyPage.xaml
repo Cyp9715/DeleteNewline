@@ -183,6 +183,9 @@
                              Margin="0,0,0,5"
                              Height="300"
                              AcceptsReturn="True"
+                             TextWrapping="NoWrap"
+                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                             PointerWheelChanged="TextBox_PointerWheelChanged"
                              Text="{Binding CurrentHotkeyConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                     <!-- Downward Arrow Icon -->
@@ -198,7 +201,11 @@
                              Margin="0,2,0,0"
                              Height="300"
                              Text="{Binding RegexOutputText, Mode=OneWay}"
-                             IsReadOnly="True" />
+                             IsReadOnly="True"
+                             AcceptsReturn="True"
+                             TextWrapping="NoWrap"
+                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                             PointerWheelChanged="TextBox_PointerWheelChanged" />
                 </Grid>
             </Border>
 

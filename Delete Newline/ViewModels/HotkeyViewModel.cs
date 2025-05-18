@@ -6,15 +6,13 @@ using Delete_Newline.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.System;
-using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 
 namespace Delete_Newline.ViewModels;
 public partial class HotkeyViewModel : ObservableRecipient
 {
     private readonly HotkeyRegisterService _hotkeyManager;
-    private readonly InAppNotificationService _notificationService;
-    private TextBox? _hotkeyTextBox;
+    private readonly InAppNotificationService _inAppNotificationService;
     private Button? _dummyFocusButton;
     private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
 
@@ -30,7 +28,7 @@ public partial class HotkeyViewModel : ObservableRecipient
     public HotkeyViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService)
     {
         _hotkeyManager = hotkeyManager;
-        _notificationService = notificationService;
+        _inAppNotificationService = notificationService;
         try
         {
             _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
@@ -40,11 +38,6 @@ public partial class HotkeyViewModel : ObservableRecipient
             // If not on UI thread, set to null
             _dispatcherQueue = null;
         }
-    }
-
-    public void SetHotkeyTextBox(TextBox textBox)
-    {
-        _hotkeyTextBox = textBox;
     }
 
     public void SetDummyFocusButton(Button btn)
@@ -154,11 +147,7 @@ public partial class HotkeyViewModel : ObservableRecipient
 
         foreach (var chainItem in CurrentHotkeyConfig.RegexChain.ChainItems)
         {
-            if (string.IsNullOrEmpty(chainItem.RegexExpression) == false)
-            {
-                string replacement = chainItem.Replace ?? string.Empty;
-                currentText = Regex.Replace(currentText, chainItem.RegexExpression, replacement);
-            }
+            currentText = RegexService.ProcessRegex(currentText, chainItem.RegexExpression, chainItem.Replace);
         }
         RegexOutputText = currentText;
     }
@@ -208,7 +197,7 @@ public partial class HotkeyViewModel : ObservableRecipient
         // Check for system hotkey
         if (_hotkeyManager.IsSystemHotkey((args.Modifiers, args.Key)))
         {
-            _notificationService.ShowNotification(
+            _inAppNotificationService.ShowNotification(
                 "Invalid Hotkey",
                 "System hotkeys (Ctrl+C, Ctrl+V, etc.) cannot be registered.",
                 InfoBarSeverity.Error
@@ -219,7 +208,7 @@ public partial class HotkeyViewModel : ObservableRecipient
         // Check if hotkey is already registered
         if (_hotkeyManager.IsHotkeyRegistered((args.Modifiers, args.Key)))
         {
-            _notificationService.ShowNotification(
+            _inAppNotificationService.ShowNotification(
                 "Invalid Hotkey",
                 "This hotkey combination is already registered.",
                 InfoBarSeverity.Error
@@ -276,7 +265,7 @@ public partial class HotkeyViewModel : ObservableRecipient
             CurrentHotkeyConfig.Hotkey.Key = VirtualKey.None;
             CurrentHotkeyConfig.IsRegistrationFailed = true;
             
-            _notificationService.ShowNotification(
+            _inAppNotificationService.ShowNotification(
                 "Hotkey Registration Failed",
                 "This hotkey combination is already in use by another application.",
                 InfoBarSeverity.Error

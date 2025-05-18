@@ -22,21 +22,66 @@
                         CornerRadius="4"
                         Margin="0,20,0,5"
                         Padding="10">
-                    <Grid Height="40">
-                        <TextBlock x:Uid="Settings_StartOnTray"
-                                   VerticalAlignment="Center" />
-                        <ToggleSwitch x:Name="StartOnTrayToggleSwitch"
+                    <StackPanel>
+                        <Grid Height="40">
+                            <TextBlock x:Uid="Settings_StartOnTray"
+                                       VerticalAlignment="Top"
+                                       Margin="0,10,0,0" />
+                            <ToggleSwitch x:Name="StartOnTrayToggleSwitch"
+                                          HorizontalAlignment="Right"
+                                          IsOn="{x:Bind ViewModel.EnableStartOnTray}"
+                                          Style="{StaticResource CompactToggleSwitch}">
+                                <behaviors:Interaction.Behaviors>
+                                    <core:EventTriggerBehavior EventName="Toggled">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleStartOnTrayCommand}"
+                                                                  CommandParameter="{Binding IsOn, ElementName=StartOnTrayToggleSwitch}" />
+                                    </core:EventTriggerBehavior>
+                                </behaviors:Interaction.Behaviors>
+                            </ToggleSwitch>
+                        </Grid>
+                        <TextBlock Text="Starts the application minimized in the system tray."
+                                   Opacity="0.6"
+                                   FontSize="12"
+                                   Margin="0,-5,0,2" />
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="0,0,0,5"
+                        Padding="10">
+                    <StackPanel>
+                        <Grid Height="40">
+                            <TextBlock x:Uid="Settings_Theme"
+                                       VerticalAlignment="Top"
+                                       Margin="0,10,0,0" />
+
+                            <ComboBox Width="125"
+                                      x:Name="ThemeComboBox"
                                       HorizontalAlignment="Right"
-                                      IsOn="{x:Bind ViewModel.EnableStartOnTray}"
-                                      Style="{StaticResource CompactToggleSwitch}">
-                            <behaviors:Interaction.Behaviors>
-                                <core:EventTriggerBehavior EventName="Toggled">
-                                    <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleStartOnTrayCommand}"
-                                                              CommandParameter="{Binding IsOn, ElementName=StartOnTrayToggleSwitch}" />
-                                </core:EventTriggerBehavior>
-                            </behaviors:Interaction.Behaviors>
-                        </ToggleSwitch>
-                    </Grid>
+                                      SelectedValue="{x:Bind ViewModel.SelectedTheme}"
+                                      SelectedValuePath="Tag">
+                                <behaviors:Interaction.Behaviors>
+                                    <core:EventTriggerBehavior EventName="SelectionChanged">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.SwitchThemeCommand}"
+                                                                  CommandParameter="{Binding SelectedValue, ElementName=ThemeComboBox}" />
+                                    </core:EventTriggerBehavior>
+                                </behaviors:Interaction.Behaviors>
+                                <ComboBoxItem x:Uid="Settings_Theme_Default"
+                                              Tag="Default" />
+                                <ComboBoxItem x:Uid="Settings_Theme_Light"
+                                              Tag="Light" />
+                                <ComboBoxItem x:Uid="Settings_Theme_Dark"
+                                              Tag="Dark" />
+                            </ComboBox>
+                        </Grid>
+                        <TextBlock Text="Changes the application theme. Default follows system settings."
+                                   Opacity="0.6"
+                                   FontSize="12"
+                                   Margin="0,-5,0,2" />
+                    </StackPanel>
                 </Border>
 
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -45,80 +90,31 @@
                         CornerRadius="4"
                         Margin="0,0,0,5"
                         Padding="10">
-                    <Grid Height="40">
-                        <TextBlock x:Uid="Settings_Theme"
-                                   VerticalAlignment="Center" />
+                    <StackPanel>
+                        <Grid Height="40">
+                            <TextBlock x:Uid="Settings_Language"
+                                       VerticalAlignment="Top"
+                                       Margin="0,10,0,0" />
 
-                        <ComboBox Width="125"
-                                  x:Name="ThemeComboBox"
-                                  HorizontalAlignment="Right"
-                                  SelectedValue="{x:Bind ViewModel.SelectedTheme}"
-                                  SelectedValuePath="Tag">
-                            <behaviors:Interaction.Behaviors>
-                                <core:EventTriggerBehavior EventName="SelectionChanged">
-                                    <core:InvokeCommandAction Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                                                              CommandParameter="{Binding SelectedValue, ElementName=ThemeComboBox}" />
-                                </core:EventTriggerBehavior>
-                            </behaviors:Interaction.Behaviors>
-                            <ComboBoxItem x:Uid="Settings_Theme_Default"
-                                          Tag="Default" />
-                            <ComboBoxItem x:Uid="Settings_Theme_Light"
-                                          Tag="Light" />
-                            <ComboBoxItem x:Uid="Settings_Theme_Dark"
-                                          Tag="Dark" />
-                        </ComboBox>
-                    </Grid>
-                </Border>
-
-                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="10">
-                    <Grid Height="40">
-                        <TextBlock x:Uid="Settings_Language"
-                                   VerticalAlignment="Center" />
-
-                        <ComboBox Width="125"
-                                  x:Name="LanguageComboBox"
-                                  HorizontalAlignment="Right"
-                                  ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
-                                  SelectedItem="{x:Bind ViewModel.SelectedLanguage}"
-                                  DisplayMemberPath="DisplayName">
-                            <behaviors:Interaction.Behaviors>
-                                <core:EventTriggerBehavior EventName="SelectionChanged">
-                                    <core:InvokeCommandAction Command="{x:Bind ViewModel.SwitchLanguageCommand}"
-                                                              CommandParameter="{Binding SelectedItem, ElementName=LanguageComboBox}" />
-                                </core:EventTriggerBehavior>
-                            </behaviors:Interaction.Behaviors>
-                        </ComboBox>
-                    </Grid>
-                </Border>
-
-                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="10">
-                    <Grid Height="40">
-                        <TextBlock x:Uid="Settings_Notification"
-                                   VerticalAlignment="Center" />
-                        <ToggleSwitch x:Name="NotificationToggleSwitch"
-                                      IsOn="{x:Bind ViewModel.EnableNotification, Mode=TwoWay}"
+                            <ComboBox Width="125"
+                                      x:Name="LanguageComboBox"
                                       HorizontalAlignment="Right"
-                                      Style="{StaticResource CompactToggleSwitch}">
-
-                            <behaviors:Interaction.Behaviors>
-                                <core:EventTriggerBehavior EventName="Toggled">
-                                    <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleNotificationCommand}"
-                                                              CommandParameter="{Binding IsOn, ElementName=NotificationToggleSwitch}" />
-                                </core:EventTriggerBehavior>
-                            </behaviors:Interaction.Behaviors>
-
-                        </ToggleSwitch>
-                    </Grid>
+                                      ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedLanguage}"
+                                      DisplayMemberPath="DisplayName">
+                                <behaviors:Interaction.Behaviors>
+                                    <core:EventTriggerBehavior EventName="SelectionChanged">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.SwitchLanguageCommand}"
+                                                                  CommandParameter="{Binding SelectedItem, ElementName=LanguageComboBox}" />
+                                    </core:EventTriggerBehavior>
+                                </behaviors:Interaction.Behaviors>
+                            </ComboBox>
+                        </Grid>
+                        <TextBlock Text="Changes the application display language."
+                                   Opacity="0.6"
+                                   FontSize="12"
+                                   Margin="0,-5,0,2" />
+                    </StackPanel>
                 </Border>
 
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -127,22 +123,61 @@
                         CornerRadius="4"
                         Margin="0,0,0,5"
                         Padding="10">
-                    <Grid Height="40">
-                        <TextBlock x:Uid="Settings_TopMost"
-                                   VerticalAlignment="Center" />
-                        <ToggleSwitch x:Name="TopMostToggleSwitch"
-                                      IsOn="{x:Bind ViewModel.EnableTopMost}"
-                                      HorizontalAlignment="Right"
-                                      Style="{StaticResource CompactToggleSwitch}">
+                    <StackPanel>
+                        <Grid Height="40">
+                            <TextBlock x:Uid="Settings_Notification"
+                                       VerticalAlignment="Top"
+                                       Margin="0,10,0,0" />
+                            <ToggleSwitch x:Name="NotificationToggleSwitch"
+                                          IsOn="{x:Bind ViewModel.EnableNotification, Mode=TwoWay}"
+                                          HorizontalAlignment="Right"
+                                          Style="{StaticResource CompactToggleSwitch}">
 
-                            <behaviors:Interaction.Behaviors>
-                                <core:EventTriggerBehavior EventName="Toggled">
-                                    <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleTopMostCommand}"
-                                                              CommandParameter="{Binding IsOn, ElementName=TopMostToggleSwitch}" />
-                                </core:EventTriggerBehavior>
-                            </behaviors:Interaction.Behaviors>
-                        </ToggleSwitch>
-                    </Grid>
+                                <behaviors:Interaction.Behaviors>
+                                    <core:EventTriggerBehavior EventName="Toggled">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleNotificationCommand}"
+                                                                  CommandParameter="{Binding IsOn, ElementName=NotificationToggleSwitch}" />
+                                    </core:EventTriggerBehavior>
+                                </behaviors:Interaction.Behaviors>
+
+                            </ToggleSwitch>
+                        </Grid>
+                        <TextBlock Text="Sends Windows notifications. No notification will be sent if there is no matching pattern."
+                                   Opacity="0.6"
+                                   FontSize="12"
+                                   Margin="0,-5,0,2" />
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="0,0,0,5"
+                        Padding="10">
+                    <StackPanel>
+                        <Grid Height="40">
+                            <TextBlock x:Uid="Settings_TopMost"
+                                       VerticalAlignment="Top"
+                                       Margin="0,10,0,0" />
+                            <ToggleSwitch x:Name="TopMostToggleSwitch"
+                                          IsOn="{x:Bind ViewModel.EnableTopMost}"
+                                          HorizontalAlignment="Right"
+                                          Style="{StaticResource CompactToggleSwitch}">
+
+                                <behaviors:Interaction.Behaviors>
+                                    <core:EventTriggerBehavior EventName="Toggled">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleTopMostCommand}"
+                                                                  CommandParameter="{Binding IsOn, ElementName=TopMostToggleSwitch}" />
+                                    </core:EventTriggerBehavior>
+                                </behaviors:Interaction.Behaviors>
+                            </ToggleSwitch>
+                        </Grid>
+                        <TextBlock Text="Keeps the application window on top of other windows."
+                                   Opacity="0.6"
+                                   FontSize="12"
+                                   Margin="0,-5,0,2" />
+                    </StackPanel>
                 </Border>
             </StackPanel>
 
@@ -150,7 +185,7 @@
             <Grid x:Name="BottomPanel"
                   Grid.Row="1"
                   MaxWidth="800"
-                  Margin="0,0,0,20"
+                  Margin="0,50,0,20"
                   HorizontalAlignment="Center">
 
                 <Grid.ColumnDefinitions>

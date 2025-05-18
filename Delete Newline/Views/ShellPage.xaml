@@ -38,6 +38,7 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
+                <!--
                 <NavigationViewItem x:Uid="Shell_OCR"
                                     helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.OCRViewModel"
                                     x:Name="OCRPageItem">
@@ -46,6 +47,7 @@
                                   Glyph="&#xE8A5;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                -->
             </NavigationView.MenuItems>
 
             <NavigationView.FooterMenuItems>
