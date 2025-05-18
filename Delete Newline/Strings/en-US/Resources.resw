@@ -172,7 +172,7 @@
     <value>Changes the application display language.</value>
   </data>
   <data name="Settings_Notification_Description.Text" xml:space="preserve">
-    <value>Sends Windows notifications. No notification will be sent if there is no matching pattern.</value>
+    <value>Windows notifications are sent when hotkeys modify text, if a regex pattern is matched.</value>
   </data>
   <data name="Settings_TopMost_Description.Text" xml:space="preserve">
     <value>Keeps the application window on top of other windows.</value>
@@ -232,13 +232,13 @@
     <value>Language Changed</value>
   </data>
   <data name="Notification_LanguageChanged_Message_RestartRequired" xml:space="preserve">
-    <value>Please restart the application for the language changes to take full effect.</value>
+    <value>Please restart the application immediately for the language changes to take full effect.</value>
   </data>
   <data name="Notification_SettingsImported_Success_Title" xml:space="preserve">
     <value>Settings Imported</value>
   </data>
   <data name="Notification_SettingsImported_Success_Message_RestartRequired" xml:space="preserve">
-    <value>Settings have been successfully imported. Please restart the application to apply all changes.</value>
+    <value>Settings have been successfully imported. Please restart the application immediately to apply all changes.</value>
   </data>
   <data name="Notification_SettingsImport_Error_Title" xml:space="preserve">
     <value>Import Failed</value>
@@ -260,5 +260,34 @@
   </data>
   <data name="Notification_SettingsExport_Error_General_Message" xml:space="preserve">
     <value>An unexpected error occurred while exporting settings.</value>
+  </data>
+
+  <!-- HotkeyPage -->
+  <data name="HotkeyPage_Title_HotkeySettings.Text" xml:space="preserve">
+    <value>Hotkey Settings</value>
+  </data>
+  <data name="HotkeyPage_Label_HotkeyName.Text" xml:space="preserve">
+    <value>Hotkey Name</value>
+  </data>
+  <data name="HotkeyPage_Label_HotkeyComment.Text" xml:space="preserve">
+    <value>Hotkey Comment</value>
+  </data>
+  <data name="HotkeyPage_Label_HotkeyInput.Text" xml:space="preserve">
+    <value>Hotkey</value>
+  </data>
+  <data name="HotkeyPage_Title_RegexChain.Text" xml:space="preserve">
+    <value>Regex Chain</value>
+  </data>
+  <data name="HotkeyPage_Label_RegexExpression.Text" xml:space="preserve">
+    <value>Regex Expression</value>
+  </data>
+  <data name="HotkeyPage_Label_Replace.Text" xml:space="preserve">
+    <value>└ Replace</value>
+  </data>
+  <data name="HotkeyPage_Button_AddRegexItem.Content" xml:space="preserve">
+    <value>Add Regex Item</value>
+  </data>
+  <data name="HotkeyPage_Title_TestRegexChain.Text" xml:space="preserve">
+    <value>Test Regex Chain</value>
   </data>
 </root>

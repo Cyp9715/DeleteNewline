@@ -137,7 +137,7 @@ public partial class SettingsViewModel : ObservableRecipient
             var success = await _localSettingsService.ImportSettingsAsync(importFilePath);
             if (success)
             {
-                _inAppNotificationService.ShowInAppNotification("Notification_SettingsImported_Success_Title", "Notification_SettingsImported_Success_Message", InfoBarSeverity.Success);
+                _inAppNotificationService.ShowInAppNotification("Notification_SettingsImported_Success_Title", "Notification_SettingsImported_Success_Message_RestartRequired", InfoBarSeverity.Success);
             }
             else
             {

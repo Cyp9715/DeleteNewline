@@ -245,7 +245,7 @@
                             Content="Export" />
                 </StackPanel>
 
-                <!-- 버전 정보 -->
+                <!-- Version Information -->
                 <TextBlock x:Name="VersionText"
                            Grid.Column="1"
                            Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}"
