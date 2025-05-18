@@ -197,10 +197,10 @@ public partial class HotkeyViewModel : ObservableRecipient
         // Check for system hotkey
         if (_hotkeyManager.IsSystemHotkey((args.Modifiers, args.Key)))
         {
-            _inAppNotificationService.ShowNotification(
-                "Invalid Hotkey",
-                "System hotkeys (Ctrl+C, Ctrl+V, etc.) cannot be registered.",
-                InfoBarSeverity.Error
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_InvalidHotkey_Title",
+                messageKey: "Notification_InvalidHotkey_SystemKey_Message",
+                severity: InfoBarSeverity.Error
             );
             return;
         }
@@ -208,10 +208,10 @@ public partial class HotkeyViewModel : ObservableRecipient
         // Check if hotkey is already registered
         if (_hotkeyManager.IsHotkeyRegistered((args.Modifiers, args.Key)))
         {
-            _inAppNotificationService.ShowNotification(
-                "Invalid Hotkey",
-                "This hotkey combination is already registered.",
-                InfoBarSeverity.Error
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_InvalidHotkey_Title",
+                messageKey: "Notification_InvalidHotkey_AlreadyRegistered_Message",
+                severity: InfoBarSeverity.Error
             );
             return;
         }
@@ -233,6 +233,13 @@ public partial class HotkeyViewModel : ObservableRecipient
             CurrentHotkeyConfig.Hotkey.Modifiers = tempModifiers;
             CurrentHotkeyConfig.Hotkey.Key = args.Key;
             CurrentHotkeyConfig.IsRegistrationFailed = false;
+
+            // Show success notification
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_HotkeySaved_Title",
+                messageKey: "Notification_HotkeySaved_Message",
+                severity: InfoBarSeverity.Success
+            );
             
             // Move focus to dummy button to remove focus from TextBox
             if (_dummyFocusButton != null && _dispatcherQueue != null)
@@ -265,10 +272,10 @@ public partial class HotkeyViewModel : ObservableRecipient
             CurrentHotkeyConfig.Hotkey.Key = VirtualKey.None;
             CurrentHotkeyConfig.IsRegistrationFailed = true;
             
-            _inAppNotificationService.ShowNotification(
-                "Hotkey Registration Failed",
-                "This hotkey combination is already in use by another application.",
-                InfoBarSeverity.Error
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_HotkeyRegistrationFailed_Title",
+                messageKey: "Notification_HotkeyRegistrationFailed_InUse_Message",
+                severity: InfoBarSeverity.Error
             );
         }
     }

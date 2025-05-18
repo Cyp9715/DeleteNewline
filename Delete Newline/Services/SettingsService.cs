@@ -86,43 +86,61 @@ public sealed class SettingsService
         await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json).ConfigureAwait(false);
     }
 
-    public async Task ExportSettingsAsync(string exportFilePath)
+    public async Task<bool> ExportSettingsAsync(string exportFilePath)
     {
-        // Read the contents of the currently saved settings file.
-        string jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName).ConfigureAwait(false);
-
-        // Separate the directory and file name from exportFilePath.
-        var exportDirectory = Path.GetDirectoryName(exportFilePath)!;
-        var exportFileName = Path.GetFileName(exportFilePath);
-
-        // Save the read JSON to the user-specified path.
-        await _fileService.SaveAsync(exportDirectory, exportFileName, jsonContent).ConfigureAwait(false);
+        try
+        {
+            string jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName).ConfigureAwait(false);
+            var exportDirectory = Path.GetDirectoryName(exportFilePath)!;
+            var exportFileName = Path.GetFileName(exportFilePath);
+            await _fileService.SaveAsync(exportDirectory, exportFileName, jsonContent).ConfigureAwait(false);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error exporting settings: {ex.Message}");
+            return false;
+        }
     }
 
-    public async Task ImportSettingsAsync(string importFilePath)
+    public async Task<bool> ImportSettingsAsync(string importFilePath)
     {
         var importDirectory = Path.GetDirectoryName(importFilePath)!;
         var importFileName = Path.GetFileName(importFilePath);
 
-        string jsonContent = await _fileService.ReadAsStringAsync(importDirectory, importFileName).ConfigureAwait(false);
+        string jsonContent;
+        try
+        {
+            jsonContent = await _fileService.ReadAsStringAsync(importDirectory, importFileName).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error reading import file: {ex.Message}");
+            return false; // Failed to read the file
+        }
 
-        var backupSettings = new Dictionary<string, JToken>(_settings); // copy original settings.
+        var backupSettings = new Dictionary<string, JToken>(_settings);
 
         try
         {
             var tempSettings = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent);
-            // if success
             _settings = tempSettings ?? new Dictionary<string, JToken>();
             await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent).ConfigureAwait(false);
-            
-            // Show both Windows notification and in-app notification
-            App.GetService<InAppNotificationService>().ShowNotification("Settings Imported", "The app needs to restart to apply the new settings.", InfoBarSeverity.Warning);
+            // App.GetService<InAppNotificationService>().ShowNotification("Settings Imported", "The app needs to restart to apply the new settings.", InfoBarSeverity.Warning);
+            return true;
         }
-        catch (Newtonsoft.Json.JsonReaderException)
+        catch (Newtonsoft.Json.JsonReaderException ex)
         {
-            // recover settings
             _settings = backupSettings;
-            App.GetService<InAppNotificationService>().ShowNotification("Import Failed", "Failed to import settings. The file format is invalid.", InfoBarSeverity.Error);
+            Debug.WriteLine($"Error deserializing settings on import: {ex.Message}");
+            // App.GetService<InAppNotificationService>().ShowNotification("Import Failed", "Failed to import settings. The file format is invalid.", InfoBarSeverity.Error);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _settings = backupSettings;
+            Debug.WriteLine($"Generic error during import process: {ex.Message}");
+            return false;
         }
     }
 }

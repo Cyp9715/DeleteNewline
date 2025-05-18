@@ -3,6 +3,7 @@ using Windows.ApplicationModel;
 using Microsoft.UI.Xaml;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Controls; // For InfoBarSeverity
 
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
@@ -18,7 +19,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private readonly ILocalizationService _localizationService;
     private readonly IFilePickerService _filePickerService;
     private readonly SettingsService _localSettingsService;
-    private readonly NotificationService _notificationService;
+    private readonly InAppNotificationService _inAppNotificationService;
     private readonly TopMostService _topMostService;
 
     [ObservableProperty]
@@ -46,27 +47,26 @@ public partial class SettingsViewModel : ObservableRecipient
         IThemeSelectorService themeSelectorService,
         IFilePickerService filePickerService,
         NotificationService notificationService,
+        InAppNotificationService inAppNotificationService,
         SettingsService localSettingsService,
         TopMostService topMostService)
     {
         _localizationService = localizationService;
         _themeSelectorService = themeSelectorService;
-        _notificationService = notificationService;
+        _inAppNotificationService = inAppNotificationService;
         _localSettingsService = localSettingsService;
         _filePickerService = filePickerService;
         _topMostService = topMostService;
 
-        // get initial settings
         AvailableLanguages = _localizationService.Languages;
         SelectedLanguage = _localizationService.GetCurrentLanguageItem();
         SelectedTheme = _themeSelectorService.Theme.ToString();
         VersionDescription = GetVersionDescription();
-        EnableNotification = _notificationService.GetEnableNotification();
+        EnableNotification = App.GetService<NotificationService>().GetEnableNotification();
         EnableTopMost = _topMostService.EnableTopMost;
         EnableStartOnTray = _localSettingsService.ReadSetting<bool>(DefaultStartOnTray);
 
-        // Tray option.
-        _notificationService.EnableNotificationChanged += OnNotificationEnabledChanged!;
+        App.GetService<NotificationService>().EnableNotificationChanged += OnNotificationEnabledChanged!;
     }
 
     protected override void OnActivated()
@@ -94,13 +94,15 @@ public partial class SettingsViewModel : ObservableRecipient
         }
     }
 
-    [RelayCommand] // need restart
+    [RelayCommand]
     private async Task SwitchLanguageAsync(LanguageItem param)
     {
-        // Problems running immediately after installing the app.
         if (param is not null)
         {
-            _notificationService.ShowNotification("Language Change", "The app needs to restart to apply the new language. Restart now?", force: true);
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_LanguageChanged_Title", 
+                "Notification_LanguageChanged_Message_RestartRequired",
+                InfoBarSeverity.Warning);
             await _localizationService.SetLanguage(param);
         }
     }
@@ -108,7 +110,7 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand]
     private async Task ToggleNotificationAsync(bool isChecked)
     {
-        await _notificationService.SetEnableNotificationAsync(isChecked);
+        await App.GetService<NotificationService>().SetEnableNotificationAsync(isChecked);
     }
 
     [RelayCommand]
@@ -132,7 +134,15 @@ public partial class SettingsViewModel : ObservableRecipient
         string? importFilePath = await _filePickerService.PickOpenFileAsync();
         if (!string.IsNullOrEmpty(importFilePath))
         {
-            await _localSettingsService.ImportSettingsAsync(importFilePath);
+            var success = await _localSettingsService.ImportSettingsAsync(importFilePath);
+            if (success)
+            {
+                _inAppNotificationService.ShowInAppNotification("Notification_SettingsImported_Success_Title", "Notification_SettingsImported_Success_Message", InfoBarSeverity.Success);
+            }
+            else
+            {
+                _inAppNotificationService.ShowInAppNotification("Notification_SettingsImported_Error_Title", "Notification_SettingsImported_Error_Message", InfoBarSeverity.Error);
+            }
         }
     }
 
@@ -142,7 +152,15 @@ public partial class SettingsViewModel : ObservableRecipient
         string? exportFilePath = await _filePickerService.PickSaveFileAsync();
         if (!string.IsNullOrEmpty(exportFilePath))
         {
-            await _localSettingsService.ExportSettingsAsync(exportFilePath);
+            var success = await _localSettingsService.ExportSettingsAsync(exportFilePath);
+            if (success)
+            {
+                _inAppNotificationService.ShowInAppNotification("Notification_SettingsExported_Success_Title", "Notification_SettingsExported_Success_Message", InfoBarSeverity.Success);
+            }
+            else
+            {
+                _inAppNotificationService.ShowInAppNotification("Notification_SettingsExported_Error_Title", "Notification_SettingsExported_Error_Message", InfoBarSeverity.Error);
+            }
         }
     }
 
@@ -153,7 +171,6 @@ public partial class SettingsViewModel : ObservableRecipient
         if (RuntimeHelper.IsMSIX)
         {
             var packageVersion = Package.Current.Id.Version;
-
             version = new(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
         }
         else
@@ -161,6 +178,6 @@ public partial class SettingsViewModel : ObservableRecipient
             version = Assembly.GetExecutingAssembly().GetName().Version!;
         }
 
-        return $"{"AppDisplayName".GetLocalized()} {version.Major}.{version.Minor}.{version.Build}";
+        return $"{LocalizationHelper.GetLocalizedString("AppDisplayName")} {version.Major}.{version.Minor}.{version.Build}";
     }
 }

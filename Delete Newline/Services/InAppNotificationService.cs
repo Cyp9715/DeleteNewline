@@ -1,37 +1,41 @@
 using Microsoft.UI.Xaml.Controls;
 using Delete_Newline.Views;
 using Microsoft.UI.Dispatching;
+using Delete_Newline.Helpers; // For LocalizationHelper
 
 namespace Delete_Newline.Services;
 
 public class InAppNotificationService
 {
-    private ShellPage? _shellPage;
+    private InfoBar? _infoBar; // Store direct reference to InfoBar
     private DispatcherQueue? _dispatcherQueue;
 
-    public void Initialize(ShellPage shellPage)
+    public void Initialize(InfoBar infoBar)
     {
-        _shellPage = shellPage;
-        _dispatcherQueue = shellPage.DispatcherQueue;
+        _infoBar = infoBar;
+        _dispatcherQueue = infoBar.DispatcherQueue;
     }
 
-    public void ShowNotification(string title, string message, InfoBarSeverity severity = InfoBarSeverity.Informational)
+    public void ShowInAppNotification(string titleKey, string messageKey, InfoBarSeverity severity = InfoBarSeverity.Informational, params object[]? messageArgs)
     {
-        if (_dispatcherQueue == null || _shellPage == null) return;
+        if (_dispatcherQueue == null || _infoBar == null) return;
 
         _dispatcherQueue.TryEnqueue(() =>
         {
-            _shellPage.ShowNotification(title, message, severity);
+            _infoBar.Title = LocalizationHelper.GetLocalizedString(titleKey);
+            _infoBar.Message = LocalizationHelper.GetLocalizedString(messageKey, messageArgs ?? System.Array.Empty<object>());
+            _infoBar.Severity = severity;
+            _infoBar.IsOpen = true;
         });
     }
 
-    public void HideNotification()
+    public void HideInAppNotification()
     {
-        if (_dispatcherQueue == null || _shellPage == null) return;
+        if (_dispatcherQueue == null || _infoBar == null) return;
 
         _dispatcherQueue.TryEnqueue(() =>
         {
-            _shellPage.HideNotification();
+            if (_infoBar != null) _infoBar.IsOpen = false;
         });
     }
 } 

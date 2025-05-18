@@ -183,4 +183,82 @@
   <data name="Settings_ExportSettings.Content" xml:space="preserve">
     <value>Export</value>
   </data>
+
+  <!-- HotkeyViewModel & HotkeyCollectSaveService Notifications -->
+  <data name="Notification_InvalidHotkey_Title" xml:space="preserve">
+    <value>Invalid Hotkey</value>
+  </data>
+  <data name="Notification_InvalidHotkey_SystemKey_Message" xml:space="preserve">
+    <value>This hotkey is reserved by the system and cannot be registered.</value>
+  </data>
+  <data name="Notification_InvalidHotkey_AlreadyRegistered_Message" xml:space="preserve">
+    <value>This hotkey is already registered within the application.</value>
+  </data>
+  <data name="Notification_HotkeySaved_Title" xml:space="preserve">
+    <value>Hotkey Saved</value>
+  </data>
+  <data name="Notification_HotkeySaved_Message" xml:space="preserve">
+    <value>The hotkey has been successfully registered.</value>
+  </data>
+  <data name="Notification_HotkeyRegistrationFailed_Title" xml:space="preserve">
+    <value>Hotkey Registration Failed</value>
+  </data>
+  <data name="Notification_HotkeyRegistrationFailed_InUse_Message" xml:space="preserve">
+    <value>Failed to register the hotkey. It might be in use by another application or a system error occurred.</value>
+  </data>
+  <data name="Notification_HotkeyRegistrationFailed_Message_Prefix" xml:space="preserve">
+    <value>The following hotkeys could not be registered:</value>
+  </data>
+  <data name="Notification_HotkeyRegistrationFailed_Message_Suffix" xml:space="preserve">
+    <value>Please check if they are used by other applications or try different combinations.</value>
+  </data>
+  <data name="Notification_HotkeyRegistrationFailed_Message_Body" xml:space="preserve">
+    <value>{0}</value> <!-- Placeholder for the detailed list -->
+  </data>
+
+  <!-- ClipboardMonitorService Notifications -->
+  <data name="Notification_TextModified_Title" xml:space="preserve">
+    <value>Text Modified</value>
+  </data>
+  <data name="Notification_HotkeyActivated_Title" xml:space="preserve">
+    <value>Hotkey Activated</value>
+  </data>
+  <data name="Notification_ActionForHotkeyCompleted_Message" xml:space="preserve">
+    <value>Action for hotkey '{0}' completed.</value> <!-- {0} is the display hotkey string -->
+  </data>
+
+  <!-- SettingsViewModel Notifications -->
+  <data name="Notification_LanguageChanged_Title" xml:space="preserve">
+    <value>Language Changed</value>
+  </data>
+  <data name="Notification_LanguageChanged_Message_RestartRequired" xml:space="preserve">
+    <value>Please restart the application for the language changes to take full effect.</value>
+  </data>
+  <data name="Notification_SettingsImported_Success_Title" xml:space="preserve">
+    <value>Settings Imported</value>
+  </data>
+  <data name="Notification_SettingsImported_Success_Message_RestartRequired" xml:space="preserve">
+    <value>Settings have been successfully imported. Please restart the application to apply all changes.</value>
+  </data>
+  <data name="Notification_SettingsImport_Error_Title" xml:space="preserve">
+    <value>Import Failed</value>
+  </data>
+  <data name="Notification_SettingsImport_Error_InvalidFile_Message" xml:space="preserve">
+    <value>Failed to import settings. The file format is invalid or the file is corrupted.</value>
+  </data>
+  <data name="Notification_SettingsImport_Error_General_Message" xml:space="preserve">
+    <value>An unexpected error occurred while importing settings.</value>
+  </data>
+  <data name="Notification_SettingsExported_Success_Title" xml:space="preserve">
+    <value>Settings Exported</value>
+  </data>
+  <data name="Notification_SettingsExported_Success_Message" xml:space="preserve">
+    <value>Settings have been successfully exported to the selected file.</value>
+  </data>
+  <data name="Notification_SettingsExport_Error_Title" xml:space="preserve">
+    <value>Export Failed</value>
+  </data>
+  <data name="Notification_SettingsExport_Error_General_Message" xml:space="preserve">
+    <value>An unexpected error occurred while exporting settings.</value>
+  </data>
 </root>

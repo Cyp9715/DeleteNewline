@@ -233,12 +233,15 @@
                             Width="800"
                             Orientation="Horizontal"
                             Spacing="10"
-                            HorizontalAlignment="Left">
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center">
                     <Button x:Uid="Settings_ImportSettings"
                             Command="{x:Bind ViewModel.ImportSettingsCommand}"
+                            Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
                             Content="Import" />
                     <Button x:Uid="Settings_ExportSettings"
                             Command="{x:Bind ViewModel.ExportSettingsCommand}"
+                            Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
                             Content="Export" />
                 </StackPanel>
 
@@ -248,6 +251,7 @@
                            Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}"
                            Style="{ThemeResource BodyTextBlockStyle}"
                            HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
                            Margin="0,0,10,0" />
             </Grid>
         </Grid>

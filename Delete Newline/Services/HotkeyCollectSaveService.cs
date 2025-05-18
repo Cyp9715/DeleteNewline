@@ -6,6 +6,7 @@ using System.ComponentModel;
 using Windows.System;
 using Microsoft.UI.Xaml.Controls;
 using System.Text;
+using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
@@ -79,18 +80,19 @@ public sealed class HotkeyCollectSaveService
         if (failedHotkeyStrings.Count > 0)
         {
             StringBuilder messageBuilder = new StringBuilder();
-            messageBuilder.AppendLine("The following hotkeys might already be in use by another application:");
+            messageBuilder.AppendLine(LocalizationHelper.GetLocalizedString("Notification_HotkeyRegistrationFailed_Message_Prefix"));
 
             foreach (var hotkeyStr in failedHotkeyStrings)
             {
                 messageBuilder.AppendLine($"- {hotkeyStr}");
             }
-            messageBuilder.Append("Problematic hotkeys are highlighted in red in the list.");
+            messageBuilder.Append(LocalizationHelper.GetLocalizedString("Notification_HotkeyRegistrationFailed_Message_Suffix"));
 
-            _inAppNotificationService.ShowNotification(
-                title: "Some Hotkey Registrations Failed",
-                message: messageBuilder.ToString(),
-                severity: InfoBarSeverity.Warning
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_HotkeyRegistrationFailed_Title",
+                messageKey: "Notification_HotkeyRegistrationFailed_Message_Body",
+                severity: InfoBarSeverity.Warning,
+                messageArgs: new object[] { messageBuilder.ToString() }
             );
         }
     }

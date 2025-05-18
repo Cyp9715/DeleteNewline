@@ -1,6 +1,7 @@
 using Delete_Newline.Contracts.Services;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
+using Delete_Newline.Helpers; // For LocalizationHelper
 
 namespace Delete_Newline.Services;
 
@@ -47,16 +48,19 @@ public sealed class NotificationService
 
     public bool GetEnableNotification() => _enableNotification;
 
-    public void ShowNotification(string title, string message, bool force = false, bool tag = true)
+    public void ShowSystemNotification(string titleKey, string messageKey, bool force = false, bool addTag = true, params object[]? messageArgs)
     {
         if (_enableNotification == false && force == false) 
             return;
+
+        string title = LocalizationHelper.GetLocalizedString(titleKey);
+        string message = LocalizationHelper.GetLocalizedString(messageKey, messageArgs ?? System.Array.Empty<object>());
 
         AppNotificationBuilder builder = new AppNotificationBuilder()
             .AddText(title)
             .AddText(message);
 
-        builder = tag ? builder.SetTag("Delete Newline") : builder;
+        builder = addTag ? builder.SetTag(LocalizationHelper.GetLocalizedString("AppDisplayName")) : builder;
 
         notificationManager!.Show(builder.BuildNotification());
     }

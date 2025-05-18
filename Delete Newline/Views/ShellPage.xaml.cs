@@ -10,6 +10,7 @@ namespace Delete_Newline.Views;
 public sealed partial class ShellPage : Page
 {
     public ShellViewModel ViewModel { get; }
+    private InAppNotificationService _inAppNotificationService;
 
     public ShellPage()
     {
@@ -21,10 +22,11 @@ public sealed partial class ShellPage : Page
 
         App.MainWindow.ExtendsContentIntoTitleBar = true;
         App.MainWindow.SetTitleBar(AppTitleBar);
-        AppTitleBarText.Text = "AppDisplayName".GetLocalized();
+        AppTitleBarText.Text = LocalizationHelper.GetLocalizedString("AppDisplayName");
 
         // Initialize InAppNotificationService
-        App.GetService<InAppNotificationService>().Initialize(this);
+        _inAppNotificationService = App.GetService<InAppNotificationService>();
+        _inAppNotificationService.Initialize(GlobalInfoBar);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -44,16 +46,17 @@ public sealed partial class ShellPage : Page
         };
     }
 
-    public void ShowNotification(string title, string message, InfoBarSeverity severity = InfoBarSeverity.Informational)
-    {
-        GlobalInfoBar.Title = title;
-        GlobalInfoBar.Message = message;
-        GlobalInfoBar.Severity = severity;
-        GlobalInfoBar.IsOpen = true;
-    }
+    // These methods are now effectively handled by InAppNotificationService directly
+    // public void ShowInAppNotification(string titleKey, string messageKey, InfoBarSeverity severity = InfoBarSeverity.Informational, params object[]? messageArgs)
+    // {
+    // GlobalInfoBar.Title = LocalizationHelper.GetLocalizedString(titleKey);
+    // GlobalInfoBar.Message = LocalizationHelper.GetLocalizedString(messageKey, messageArgs ?? System.Array.Empty<object>());
+    // GlobalInfoBar.Severity = severity;
+    // GlobalInfoBar.IsOpen = true;
+    // }
 
-    public void HideNotification()
-    {
-        GlobalInfoBar.IsOpen = false;
-    }
+    // public void HideInAppNotification()
+    // {
+    // GlobalInfoBar.IsOpen = false;
+    // }
 }
