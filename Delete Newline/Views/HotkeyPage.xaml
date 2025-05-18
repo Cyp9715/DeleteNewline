@@ -22,7 +22,7 @@
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
                         CornerRadius="4"
-                        Margin="0,5,0,5"
+                        Margin="0,5,0,0"
                         Padding="10">
                     <StackPanel>
                         <!-- Hotkey Name -->
@@ -72,14 +72,15 @@
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            FontSize="16"
                            HorizontalAlignment="Left"
-                           Margin="3,15,0,0"/>
+                           Margin="3,20,0,0"/>
                 <!-- Additional Regex Items -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
                         CornerRadius="4"
                         Margin="0,5,0,5"
-                        Padding="10">
+                        Padding="10"
+                        MinHeight="25">
                     <StackPanel>
                         <ItemsRepeater ItemsSource="{Binding CurrentHotkeyConfig.RegexChain.ChainItems}">
                             <ItemsRepeater.ItemTemplate>
@@ -162,7 +163,7 @@
                        Style="{StaticResource SubtitleTextBlockStyle}"
                        FontSize="16"
                        HorizontalAlignment="Left"
-                       Margin="3,15,0,2"/>
+                       Margin="3,20,0,2"/>
 
             <!-- Regex Example Group within a Border -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
