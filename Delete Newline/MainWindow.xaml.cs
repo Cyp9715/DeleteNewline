@@ -6,6 +6,10 @@ using Windows.UI.ViewManagement;
 using WinRT.Interop;
 using WinUIEx;
 using WinUIEx.Messaging;
+using Microsoft.UI.Input;
+using Delete_Newline.Contracts.Services;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
 
 namespace Delete_Newline;
 
@@ -16,6 +20,8 @@ public sealed partial class MainWindow : WindowEx
 
     public static IntPtr hwnd;
     private WindowMessageMonitor _messageMonitor;
+    private UIElement? _currentContentForPointerHandler;
+    private bool _pointerPressedHandlerAttached = false;
 
     private const int WM_LBUTTONDBLCLK = 0x0203;
     private const int WM_RBUTTONDOWN = 0x0204;
@@ -30,6 +36,9 @@ public sealed partial class MainWindow : WindowEx
         _settings = new UISettings();
         _settings.ColorValuesChanged += Settings_ColorValuesChanged;
 
+        // Subscribe to Activated event
+        this.Activated += MainWindow_Activated;
+
         hwnd = WindowNative.GetWindowHandle(this);
         
         // Set the window title
@@ -37,6 +46,28 @@ public sealed partial class MainWindow : WindowEx
 
         _messageMonitor = new WindowMessageMonitor(this);
         _messageMonitor.WindowMessageReceived += MessageMonitor_WindowMessageReceived!;
+    }
+
+    private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
+    {
+        // Ignore if handler is already attached or if the window is being deactivated
+        if (_pointerPressedHandlerAttached || args.WindowActivationState == WindowActivationState.Deactivated)
+        {
+            return;
+        }
+
+        if (this.Content is UIElement rootElement)
+        {
+            // If a handler was previously attached, remove it (for safety)
+            if (_currentContentForPointerHandler != null)
+            {
+                _currentContentForPointerHandler.RemoveHandler(UIElement.PointerPressedEvent, new PointerEventHandler(MainWindow_PointerPressed));
+            }
+            
+            rootElement.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(MainWindow_PointerPressed), true); // handledEventsToo = true
+            _currentContentForPointerHandler = rootElement;
+            _pointerPressedHandlerAttached = true;
+        }
     }
 
     private void Settings_ColorValuesChanged(UISettings sender, object args)
@@ -101,6 +132,33 @@ public sealed partial class MainWindow : WindowEx
                         break;
                 }
                 break;
+        }
+    }
+
+    private void MainWindow_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        var pointerPoint = e.GetCurrentPoint(sender as UIElement);
+        if (pointerPoint == null) return;
+
+        var properties = pointerPoint.Properties;
+        var navigationService = App.GetService<INavigationService>();
+
+        if (properties.IsXButton1Pressed)
+        {
+            if (navigationService.CanGoBack)
+            {
+                navigationService.GoBack();
+                e.Handled = true;
+            }
+        }
+        else if (properties.IsXButton2Pressed)
+        {
+            var frame = navigationService.Frame;
+            if (frame != null && frame.CanGoForward)
+            {
+                frame.GoForward();
+                e.Handled = true;
+            }
         }
     }
 }

@@ -5,8 +5,7 @@
       xmlns:structures="using:Delete_Newline.Contracts.Structures"
       xmlns:behaviors="using:Delete_Newline.Behaviors"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-      xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-      PointerPressed="HotkeyPage_PointerPressed">
+      xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
     <ScrollViewer Margin="0">
         <Grid Padding="20,0,20,0">
