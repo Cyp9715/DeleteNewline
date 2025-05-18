@@ -282,4 +282,55 @@
   <data name="AppDisplayName" xml:space="preserve">
     <value>Delete Newline</value>
   </data>
+  <!-- Settings Page - Startup Task -->
+  <data name="Settings_StartupTask.Text" xml:space="preserve">
+    <value>Windows 시작 시 실행</value>
+    <comment>시작 프로그램 토글 스위치 레이블</comment>
+  </data>
+  <data name="Settings_StartupTask_Description.Text" xml:space="preserve">
+    <value>Windows에 로그인할 때 자동으로 애플리케이션을 시작합니다.</value>
+    <comment>시작 프로그램 토글 스위치 설명</comment>
+  </data>
+
+  <!-- Startup Task Notifications -->
+  <data name="Notification_StartupTask_DisabledByUser_Title.Content" xml:space="preserve">
+    <value>사용자가 시작 프로그램 비활성화함</value>
+    <comment>사용자에 의해 시작 작업이 비활성화되었을 때 알림 제목</comment>
+  </data>
+  <data name="Notification_StartupTask_DisabledByUser_Message.Content" xml:space="preserve">
+    <value>이 애플리케이션의 시작 작업은 사용자가 시스템 설정을 통해 비활성화했습니다. 사용자가 직접 수동으로만 다시 활성화할 수 있습니다.</value>
+    <comment>사용자에 의해 시작 작업이 비활성화되었을 때 알림 메시지</comment>
+  </data>
+  <data name="Notification_StartupTask_DisabledByPolicy_Title.Content" xml:space="preserve">
+    <value>정책에 의해 시작 프로그램 비활성화됨</value>
+    <comment>정책에 의해 시작 작업이 비활성화되었을 때 알림 제목</comment>
+  </data>
+  <data name="Notification_StartupTask_DisabledByPolicy_Message.Content" xml:space="preserve">
+    <value>이 애플리케이션의 시작 작업은 관리자 또는 그룹 정책에 의해 비활성화되었습니다. 관리자에게 문의하십시오.</value>
+    <comment>정책에 의해 시작 작업이 비활성화되었을 때 알림 메시지</comment>
+  </data>
+  <data name="Notification_StartupTask_NotSupported_Title.Content" xml:space="preserve">
+    <value>시작 프로그램 설정 지원 안 함</value>
+    <comment>시작 프로그램 관리가 지원되지 않을 때 알림 제목 (예: 패키지되지 않은 앱)</comment>
+  </data>
+  <data name="Notification_StartupTask_NotSupported_Message.Content" xml:space="preserve">
+    <value>시작 프로그램 관리는 패키지된 버전의 애플리케이션에서만 지원됩니다.</value>
+    <comment>시작 프로그램 관리가 지원되지 않을 때 알림 메시지</comment>
+  </data>
+  <data name="Notification_StartupTask_EnableFailed_Title.Content" xml:space="preserve">
+    <value>시작 프로그램 활성화 실패</value>
+    <comment>시작 프로그램 활성화 실패 시 알림 제목</comment>
+  </data>
+  <data name="Notification_StartupTask_EnableFailed_Message.Content" xml:space="preserve">
+    <value>애플리케이션을 시작 프로그램으로 사용하도록 설정할 수 없습니다. 시스템 설정을 확인하거나 다시 시도하십시오.</value>
+    <comment>시작 프로그램 활성화 실패 시 알림 메시지</comment>
+  </data>
+  <data name="Notification_StartupTask_Error_Title.Content" xml:space="preserve">
+    <value>시작 프로그램 오류</value>
+    <comment>시작 프로그램 관리 중 오류 발생 시 알림 제목</comment>
+  </data>
+  <data name="Notification_StartupTask_Error_Message.Content" xml:space="preserve">
+    <value>시작 프로그램을 관리하는 동안 오류가 발생했습니다.</value>
+    <comment>시작 프로그램 관리 중 오류 발생 시 알림 메시지</comment>
+  </data>
 </root>

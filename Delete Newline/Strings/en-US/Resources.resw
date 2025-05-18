@@ -290,4 +290,56 @@
   <data name="HotkeyPage_Title_TestRegexChain.Text" xml:space="preserve">
     <value>Test Regex Chain</value>
   </data>
+
+  <!-- Settings Page - Startup Task -->
+  <data name="Settings_StartupTask.Text" xml:space="preserve">
+    <value>Run on Windows startup</value>
+    <comment>Label for the startup task toggle switch</comment>
+  </data>
+  <data name="Settings_StartupTask_Description.Text" xml:space="preserve">
+    <value>Automatically start the application when you sign into Windows.</value>
+    <comment>Description for the startup task toggle switch</comment>
+  </data>
+
+  <!-- Startup Task Notifications -->
+  <data name="Notification_StartupTask_DisabledByUser_Title.Content" xml:space="preserve">
+    <value>Startup Disabled by User</value>
+    <comment>Notification title when startup task is disabled by user</comment>
+  </data>
+  <data name="Notification_StartupTask_DisabledByUser_Message.Content" xml:space="preserve">
+    <value>This application's startup task has been disabled by the user through system settings. It can only be re-enabled manually by the user.</value>
+    <comment>Notification message when startup task is disabled by user</comment>
+  </data>
+  <data name="Notification_StartupTask_DisabledByPolicy_Title.Content" xml:space="preserve">
+    <value>Startup Disabled by Policy</value>
+    <comment>Notification title when startup task is disabled by policy</comment>
+  </data>
+  <data name="Notification_StartupTask_DisabledByPolicy_Message.Content" xml:space="preserve">
+    <value>This application's startup task has been disabled by an administrator or group policy. Please contact your administrator.</value>
+    <comment>Notification message when startup task is disabled by policy</comment>
+  </data>
+  <data name="Notification_StartupTask_NotSupported_Title.Content" xml:space="preserve">
+    <value>Startup Task Not Supported</value>
+    <comment>Notification title when startup task management is not supported (e.g., unpackaged app)</comment>
+  </data>
+  <data name="Notification_StartupTask_NotSupported_Message.Content" xml:space="preserve">
+    <value>Managing startup task is only supported for packaged versions of the application.</value>
+    <comment>Notification message when startup task management is not supported</comment>
+  </data>
+  <data name="Notification_StartupTask_EnableFailed_Title.Content" xml:space="preserve">
+    <value>Failed to Enable Startup Task</value>
+    <comment>Notification title when enabling startup task fails</comment>
+  </data>
+  <data name="Notification_StartupTask_EnableFailed_Message.Content" xml:space="preserve">
+    <value>The application could not be enabled to run on startup. Please check system settings or try again.</value>
+    <comment>Notification message when enabling startup task fails</comment>
+  </data>
+  <data name="Notification_StartupTask_Error_Title.Content" xml:space="preserve">
+    <value>Startup Task Error</value>
+    <comment>Notification title when an error occurs managing startup task</comment>
+  </data>
+  <data name="Notification_StartupTask_Error_Message.Content" xml:space="preserve">
+    <value>An error occurred while managing the startup task.</value>
+    <comment>Notification message when an error occurs managing startup task</comment>
+  </data>
 </root>

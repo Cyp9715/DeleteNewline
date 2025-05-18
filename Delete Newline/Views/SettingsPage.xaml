@@ -13,11 +13,50 @@
 
             <StackPanel Grid.Row="0" MaxWidth="800">
 
-                <!-- StartOnTray Setting -->
+                <!-- Startup Task Setting -->
                 <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
                         BorderThickness="1"
                         CornerRadius="4"
                         Margin="0,20,0,5"
+                        Padding="15">
+                    <Grid VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
+                            <TextBlock x:Uid="Settings_StartupTask"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap" />
+                            <TextBlock x:Uid="Settings_StartupTask_Description"
+                                       Opacity="0.6"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <ToggleSwitch Grid.Column="1"
+                                      x:Name="StartupTaskToggleSwitch"
+                                      IsOn="{x:Bind ViewModel.EnableStartupTask, Mode=TwoWay}"
+                                      Style="{StaticResource CompactToggleSwitch}"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Right">
+                            <behaviors:Interaction.Behaviors>
+                                <core:EventTriggerBehavior EventName="Toggled">
+                                    <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleStartupTaskCommand}"
+                                                              CommandParameter="{Binding IsOn, ElementName=StartupTaskToggleSwitch}" />
+                                </core:EventTriggerBehavior>
+                            </behaviors:Interaction.Behaviors>
+                        </ToggleSwitch>
+                    </Grid>
+                </Border>
+
+                <!-- StartOnTray Setting -->
+                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="0,0,0,5"
                         Padding="15">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>

@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls; // For InfoBarSeverity
+using System; // Required for StartupTask
+using System.Threading.Tasks; // Required for Task
 
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
@@ -43,6 +45,9 @@ public partial class SettingsViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _enableTopMost;
 
+    [ObservableProperty]
+    private bool _enableStartupTask;
+
     public SettingsViewModel(ILocalizationService localizationService, 
         IThemeSelectorService themeSelectorService,
         IFilePickerService filePickerService,
@@ -65,6 +70,9 @@ public partial class SettingsViewModel : ObservableRecipient
         EnableNotification = App.GetService<NotificationService>().GetEnableNotification();
         EnableTopMost = _topMostService.EnableTopMost;
         EnableStartOnTray = _localSettingsService.ReadSetting<bool>(DefaultStartOnTray);
+
+        // Load initial startup task state
+        InitializeStartupTaskStateAsync();
 
         App.GetService<NotificationService>().EnableNotificationChanged += OnNotificationEnabledChanged!;
     }
@@ -126,6 +134,104 @@ public partial class SettingsViewModel : ObservableRecipient
     private async Task ToggleStartOnTray(bool isChecked)
     {
         await _localSettingsService.SaveSettingAsync(DefaultStartOnTray, isChecked);
+    }
+
+    private async void InitializeStartupTaskStateAsync()
+    {
+        if (RuntimeHelper.IsMSIX)
+        {
+            try
+            {
+                StartupTask startupTask = await StartupTask.GetAsync("DeleteNewlineStartupTask");
+                EnableStartupTask = startupTask.State == StartupTaskState.Enabled || startupTask.State == StartupTaskState.EnabledByPolicy;
+                System.Diagnostics.Debug.WriteLine($"Initial startup task state: {startupTask.State}, IsEnabled: {EnableStartupTask}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting startup task: {ex.Message}");
+                EnableStartupTask = false; 
+            }
+        }
+        else
+        {
+            EnableStartupTask = false; 
+            System.Diagnostics.Debug.WriteLine("Startup task API not available (not an MSIX package).");
+        }
+    }
+
+    [RelayCommand]
+    private async Task ToggleStartupTaskAsync(bool isEnabled)
+    {
+        if (!RuntimeHelper.IsMSIX)
+        {
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_StartupTask_NotSupported_Title", 
+                "Notification_StartupTask_NotSupported_Message",
+                InfoBarSeverity.Warning);
+            if (EnableStartupTask) EnableStartupTask = false;
+            return;
+        }
+
+        try
+        {
+            StartupTask startupTask = await StartupTask.GetAsync("DeleteNewlineStartupTask");
+
+            if (isEnabled)
+            {
+                StartupTaskState newState = await startupTask.RequestEnableAsync();
+                bool actualStateIsNowEnabled = newState == StartupTaskState.Enabled || newState == StartupTaskState.EnabledByPolicy;
+
+                if (EnableStartupTask != actualStateIsNowEnabled)
+                {
+                    EnableStartupTask = actualStateIsNowEnabled;
+                }
+
+                if (actualStateIsNowEnabled)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Startup task enabled successfully. State: {newState}");
+                }
+                else
+                {
+                    // Provide more specific feedback based on the newState ONLY on failure
+                    switch (newState)
+                    {
+                        case StartupTaskState.DisabledByUser:
+                            _inAppNotificationService.ShowInAppNotification(
+                                "Notification_StartupTask_DisabledByUser_Title",
+                                "Notification_StartupTask_DisabledByUser_Message",
+                                InfoBarSeverity.Warning);
+                            break;
+                        case StartupTaskState.DisabledByPolicy:
+                            _inAppNotificationService.ShowInAppNotification(
+                                "Notification_StartupTask_DisabledByPolicy_Title",
+                                "Notification_StartupTask_DisabledByPolicy_Message",
+                                InfoBarSeverity.Warning);
+                            break;
+                        default: // General failure (includes StartupTaskState.Disabled)
+                            _inAppNotificationService.ShowInAppNotification(
+                                "Notification_StartupTask_EnableFailed_Title",
+                                "Notification_StartupTask_EnableFailed_Message",
+                                InfoBarSeverity.Warning);
+                            break;
+                    }
+                }
+            }
+            else // isEnabled is false (attempting to disable)
+            {
+                startupTask.Disable();
+                if(EnableStartupTask) EnableStartupTask = false; 
+                System.Diagnostics.Debug.WriteLine("Startup task disabled successfully via ToggleStartupTaskAsync.");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error toggling startup task: {ex.Message}");
+             _inAppNotificationService.ShowInAppNotification(
+                "Notification_StartupTask_Error_Title", 
+                "Notification_StartupTask_Error_Message", 
+                InfoBarSeverity.Error);
+            InitializeStartupTaskStateAsync(); // Re-sync UI on error
+        }
     }
 
     [RelayCommand]

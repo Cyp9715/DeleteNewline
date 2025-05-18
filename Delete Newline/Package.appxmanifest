@@ -5,6 +5,8 @@
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+
   IgnorableNamespaces="uap rescap">
 
   <Identity
@@ -27,7 +29,7 @@
 		<Resource Language="ko-KR"/>
 	</Resources>
 
-  <Applications>
+  <Applications>  
     <Application Id="App"
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
@@ -40,6 +42,18 @@
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"  Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+	
+        <Extensions>
+          <desktop:Extension Category="windows.startupTask"
+                             Executable="$targetnametoken$.exe"
+                             EntryPoint="Windows.FullTrustApplication">
+            <desktop:StartupTask
+                TaskId="DeleteNewlineStartupTask"
+                Enabled="true"
+                DisplayName="Delete Newline" />
+          </desktop:Extension>
+        </Extensions>
+  
     </Application>
   </Applications>
 
