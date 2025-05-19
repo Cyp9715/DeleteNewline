@@ -3,10 +3,7 @@ using Windows.ApplicationModel;
 using Microsoft.UI.Xaml;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Xaml.Controls; // For InfoBarSeverity
-using System; // Required for StartupTask
-using System.Threading.Tasks; // Required for Task
-
+using Microsoft.UI.Xaml.Controls;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
 using Delete_Newline.Models;

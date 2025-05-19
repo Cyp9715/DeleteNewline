@@ -1,7 +1,6 @@
-using Delete_Newline.Contracts.Services;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
-using Delete_Newline.Helpers; // For LocalizationHelper
+using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 

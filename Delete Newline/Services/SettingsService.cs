@@ -1,6 +1,5 @@
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Core.Helpers;
-using Microsoft.UI.Xaml.Controls;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

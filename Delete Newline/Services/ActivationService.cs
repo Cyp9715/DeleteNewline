@@ -3,10 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Delete_Newline.Activation;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
-using Delete_Newline.Helpers;
 using Delete_Newline.Core.Contracts.Services;
-using Delete_Newline.ViewModels;
-using WinUIEx;
 
 namespace Delete_Newline.Services;
 

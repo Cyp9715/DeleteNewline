@@ -1,6 +1,4 @@
 using Delete_Newline.Contracts.Structures;
-using System;
-using System.Linq;
 using Windows.System;
 
 namespace Delete_Newline.Services;
