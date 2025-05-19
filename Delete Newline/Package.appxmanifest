@@ -44,9 +44,7 @@
       </uap:VisualElements>
 	
         <Extensions>
-          <desktop:Extension Category="windows.startupTask"
-                             Executable="$targetnametoken$.exe"
-                             EntryPoint="Windows.FullTrustApplication">
+          <desktop:Extension Category="windows.startupTask">
             <desktop:StartupTask
                 TaskId="DeleteNewlineStartupTask"
                 Enabled="true"
