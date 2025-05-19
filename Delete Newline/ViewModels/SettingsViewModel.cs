@@ -247,7 +247,7 @@ public partial class SettingsViewModel : ObservableRecipient
             }
             else
             {
-                _inAppNotificationService.ShowInAppNotification("Notification_SettingsImported_Error_Title", "Notification_SettingsImported_Error_Message", InfoBarSeverity.Error);
+                _inAppNotificationService.ShowInAppNotification("Notification_SettingsImport_Error_Title", "Notification_SettingsImport_Error_General_Message", InfoBarSeverity.Error);
             }
         }
     }
@@ -265,7 +265,7 @@ public partial class SettingsViewModel : ObservableRecipient
             }
             else
             {
-                _inAppNotificationService.ShowInAppNotification("Notification_SettingsExported_Error_Title", "Notification_SettingsExported_Error_Message", InfoBarSeverity.Error);
+                _inAppNotificationService.ShowInAppNotification("Notification_SettingsExport_Error_Title", "Notification_SettingsExport_Error_General_Message", InfoBarSeverity.Error);
             }
         }
     }

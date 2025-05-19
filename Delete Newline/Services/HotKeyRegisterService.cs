@@ -72,13 +72,15 @@ public sealed class HotkeyRegisterService
 
     public bool IsSystemHotkey((VirtualKeyModifiers, VirtualKey) hotkey)
     {
-        // Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+Y, Ctrl+A
+        // Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+Y, Ctrl+A, Ctrl+S, Ctrl+O, Ctrl+P, Ctrl+N, Ctrl+F, Ctrl+H
         if (hotkey.Item1.HasFlag(VirtualKeyModifiers.Control))
         {
             return hotkey.Item2 switch
             {
                 VirtualKey.C or VirtualKey.V or VirtualKey.X or 
-                VirtualKey.Z or VirtualKey.Y or VirtualKey.A => true,
+                VirtualKey.Z or VirtualKey.Y or VirtualKey.A or
+                VirtualKey.S or VirtualKey.O or VirtualKey.P or
+                VirtualKey.N or VirtualKey.F or VirtualKey.H => true,
                 _ => false
             };
         }
