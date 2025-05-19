@@ -72,8 +72,8 @@ public sealed class HotkeyRegisterService
 
     public bool IsSystemHotkey((VirtualKeyModifiers, VirtualKey) hotkey)
     {
-        // Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+Y, Ctrl+A, Ctrl+S, Ctrl+O, Ctrl+P, Ctrl+N, Ctrl+F, Ctrl+H
-        if (hotkey.Item1.HasFlag(VirtualKeyModifiers.Control))
+        // Only block if Control is the only modifier
+        if (hotkey.Item1 == VirtualKeyModifiers.Control)
         {
             return hotkey.Item2 switch
             {
