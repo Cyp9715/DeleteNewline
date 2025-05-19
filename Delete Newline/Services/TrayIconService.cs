@@ -1,4 +1,4 @@
-using Delete_Newline.Contracts.Services;
+using Delete_Newline.Helpers;
 using System.Runtime.InteropServices;
 namespace Delete_Newline.Services;
 
@@ -87,7 +87,7 @@ public sealed class TrayIconService
             uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE,
             uCallbackMessage = WM_TRAYICON,
             hIcon = LoadIcon(),
-            szTip = "Delete Newline"
+            szTip = LocalizationHelper.GetLocalizedString("TrayIcon_Title")
         };
 
         bool success = Shell_NotifyIcon(NIM_ADD, nid);
@@ -152,9 +152,9 @@ public sealed class TrayIconService
 
         // Add Notification Menu
         uint notificationFlags = MF_STRING | (_notificationService.GetEnableNotification() ? MF_CHECKED : 0);
-        AppendMenu(hMenu, notificationFlags, (IntPtr)ID_NOTIFICATION, "Notification");
+        AppendMenu(hMenu, notificationFlags, (IntPtr)ID_NOTIFICATION, LocalizationHelper.GetLocalizedString("TrayIcon_Menu_Notification"));
 
-        AppendMenu(hMenu, 0, (IntPtr)ID_EXIT, "Exit Delete Newline");
+        AppendMenu(hMenu, 0, (IntPtr)ID_EXIT, LocalizationHelper.GetLocalizedString("TrayIcon_Menu_Exit"));
 
         GetCursorPos(out POINT pt);
         SetForegroundWindow(_hwnd);

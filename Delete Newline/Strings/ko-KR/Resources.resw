@@ -282,6 +282,15 @@
   <data name="AppDisplayName" xml:space="preserve">
     <value>Delete Newline</value>
   </data>
+  <data name="TrayIcon_Title" xml:space="preserve">
+    <value>Delete Newline</value>
+  </data>
+  <data name="TrayIcon_Menu_Notification" xml:space="preserve">
+    <value>알림</value>
+  </data>
+  <data name="TrayIcon_Menu_Exit" xml:space="preserve">
+    <value>Delete Newline 종료</value>
+  </data>
   <!-- Settings Page - Startup Task -->
   <data name="Settings_StartupTask.Text" xml:space="preserve">
     <value>Windows 시작 시 실행</value>
