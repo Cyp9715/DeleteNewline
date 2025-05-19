@@ -220,11 +220,11 @@
   <data name="Notification_TextModified_Title" xml:space="preserve">
     <value>Text Modified</value>
   </data>
-  <data name="Notification_HotkeyActivated_Title" xml:space="preserve">
-    <value>Hotkey Activated</value>
-  </data>
   <data name="Notification_ActionForHotkeyCompleted_Message" xml:space="preserve">
-    <value>Action for hotkey '{0}' completed.</value> <!-- {0} is the display hotkey string -->
+    <value>Hotkey '{0}' has been activated.</value>
+  </data>
+  <data name="Notification_ActionForHotkeyWithNameCompleted_Message" xml:space="preserve">
+    <value>Hotkey '{0}' ({1}) has been activated.</value>
   </data>
 
   <!-- SettingsViewModel Notifications -->

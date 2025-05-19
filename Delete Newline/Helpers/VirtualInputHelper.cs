@@ -112,7 +112,7 @@ namespace Delete_Newline.Helpers
 
         private static void ResetStuckKeys()
         {
-            System.Diagnostics.Debug.WriteLine("Resetting potentially stuck modifier keys...");
+            System.Diagnostics.Debug.WriteLine("Reset modifier keys...");
             SendKeyInput(VK_LCONTROL, false, false);
             SendKeyInput(VK_LSHIFT,   false, false);
             SendKeyInput(VK_LMENU,    false, false);

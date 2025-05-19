@@ -213,11 +213,11 @@
   <data name="Notification_TextModified_Title" xml:space="preserve">
     <value>텍스트 수정됨</value>
   </data>
-  <data name="Notification_HotkeyActivated_Title" xml:space="preserve">
-    <value>단축키 활성화됨</value>
-  </data>
   <data name="Notification_ActionForHotkeyCompleted_Message" xml:space="preserve">
-    <value>단축키 '{0}'에 대한 작업이 완료되었습니다.</value>
+    <value>단축키 '{0}'가 활성화되었습니다.</value>
+  </data>
+  <data name="Notification_ActionForHotkeyWithNameCompleted_Message" xml:space="preserve">
+    <value>단축키 '{0}' ({1})가 활성화되었습니다.</value>
   </data>
   <data name="Notification_LanguageChanged_Title" xml:space="preserve">
     <value>언어 변경됨</value>
