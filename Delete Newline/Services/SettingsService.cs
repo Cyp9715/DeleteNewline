@@ -126,14 +126,12 @@ public sealed class SettingsService
             var tempSettings = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent);
             _settings = tempSettings ?? new Dictionary<string, JToken>();
             await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent).ConfigureAwait(false);
-            // App.GetService<InAppNotificationService>().ShowNotification("Settings Imported", "The app needs to restart to apply the new settings.", InfoBarSeverity.Warning);
             return true;
         }
         catch (Newtonsoft.Json.JsonReaderException ex)
         {
             _settings = backupSettings;
             Debug.WriteLine($"Error deserializing settings on import: {ex.Message}");
-            // App.GetService<InAppNotificationService>().ShowNotification("Import Failed", "Failed to import settings. The file format is invalid.", InfoBarSeverity.Error);
             return false;
         }
         catch (Exception ex)

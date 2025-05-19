@@ -42,6 +42,13 @@ namespace Delete_Newline.Behaviors
 
         private void OnKeyDown(object sender, KeyRoutedEventArgs e)
         {
+            // Ignore Windows key completely
+            if (e.Key == VirtualKey.LeftWindows || e.Key == VirtualKey.RightWindows)
+            {
+                e.Handled = true;
+                return;
+            }
+
             UpdateModifiers(e.Key, true);
 
             // ignore modifierKey
