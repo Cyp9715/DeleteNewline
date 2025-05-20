@@ -9,7 +9,7 @@ using Delete_Newline.Contracts.Structures;
 
 namespace Delete_Newline.Behaviors
 {
-    public class KeyboardAcceleratorBehavior : Behavior<UIElement>
+    public class KeyboardInputBehavior : Behavior<UIElement>
     {
         public string CommandName
         {
@@ -21,7 +21,7 @@ namespace Delete_Newline.Behaviors
             DependencyProperty.Register(
                 nameof(CommandName),
                 typeof(string),
-                typeof(KeyboardAcceleratorBehavior),
+                typeof(KeyboardInputBehavior),
                 new PropertyMetadata(null));
 
         private VirtualKeyModifiers _currentModifiers = VirtualKeyModifiers.None;
@@ -55,10 +55,8 @@ namespace Delete_Newline.Behaviors
             if (IsModifierKey(e.Key))
                 return;
 
-            // Execute command only if a modifier is pressed, but ignore Shift alone
-            // to avoid confusion when using Shift as a Hotkey.
-            if (_currentModifiers != VirtualKeyModifiers.None &&
-                _currentModifiers != VirtualKeyModifiers.Shift)
+            // Execute command if any modifier is pressed
+            if (_currentModifiers != VirtualKeyModifiers.None)
             {
                 ExecuteCommand(e);
                 e.Handled = true;
@@ -146,7 +144,7 @@ namespace Delete_Newline.Behaviors
                 return;
 
             // Create event arguments containing the current modifiers and the key pressed
-            var args = new KeyboardAcceleratorEventArgs
+            var args = new KeyboardInputEventArgs
             {
                 Modifiers = _currentModifiers,
                 Key = e.Key

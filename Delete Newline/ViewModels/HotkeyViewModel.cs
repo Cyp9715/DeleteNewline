@@ -179,11 +179,22 @@ public partial class HotkeyViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void HandleKeyboardAccelerator(KeyboardAcceleratorEventArgs args)
+    public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
         // Ignore if not in hotkey registration mode
         if (!_hotkeyManager.IsRegisteringHotkey())
         {
+            return;
+        }
+
+        // Prevent using Shift key alone as it conflicts with many system shortcuts
+        if (args.Modifiers == VirtualKeyModifiers.Shift)
+        {
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Title",
+                messageKey: "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message",
+                severity: InfoBarSeverity.Error
+            );
             return;
         }
 

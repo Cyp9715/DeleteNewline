@@ -4,8 +4,8 @@
       xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
-    <ScrollViewer Padding="12">
-        <Grid>
+    <ScrollViewer>
+        <Grid Padding="12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />

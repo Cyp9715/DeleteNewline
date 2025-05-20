@@ -198,7 +198,13 @@
     <value>Invalid Hotkey</value>
   </data>
   <data name="Notification_InvalidHotkey_SystemKey_Message" xml:space="preserve">
-    <value>This hotkey is reserved by the system and cannot be registered.</value>
+    <value>Cannot use system hotkey.</value>
+  </data>
+  <data name="Notification_InvalidHotkey_ShiftAlone_NotAllowed_Title" xml:space="preserve">
+    <value>Shift Key Alone</value>
+  </data>
+  <data name="Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message" xml:space="preserve">
+    <value>The Shift key cannot be used alone as a hotkey. Please combine it with another key.</value>
   </data>
   <data name="Notification_InvalidHotkey_AlreadyRegistered_Message" xml:space="preserve">
     <value>This hotkey is already registered within the application.</value>

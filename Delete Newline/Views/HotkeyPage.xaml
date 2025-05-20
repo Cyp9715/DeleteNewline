@@ -59,7 +59,7 @@
                                      GotFocus="TextBox_Hotkey_GotFocus"
                                      LostFocus="TextBox_Hotkey_LostFocus">
                                 <interactivity:Interaction.Behaviors>
-                                    <behaviors:KeyboardAcceleratorBehavior CommandName="HandleKeyboardAcceleratorCommand" />
+                                    <behaviors:KeyboardInputBehavior CommandName="ProcessKeyInputCommand" />
                                 </interactivity:Interaction.Behaviors>
                             </TextBox>
                         </Grid>

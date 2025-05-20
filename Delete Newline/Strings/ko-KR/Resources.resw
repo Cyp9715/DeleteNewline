@@ -184,7 +184,13 @@
     <value>잘못된 단축키</value>
   </data>
   <data name="Notification_InvalidHotkey_SystemKey_Message" xml:space="preserve">
-    <value>시스템에서 사용 중인 단축키는 등록할 수 없습니다.</value>
+    <value>시스템 단축키는 사용할 수 없습니다.</value>
+  </data>
+  <data name="Notification_InvalidHotkey_ShiftAlone_NotAllowed_Title" xml:space="preserve">
+    <value>Shift 키 단독 사용</value>
+  </data>
+  <data name="Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message" xml:space="preserve">
+    <value>Shift 키는 단독으로 단축키로 사용할 수 없습니다. 다른 키와 조합해주세요.</value>
   </data>
   <data name="Notification_InvalidHotkey_AlreadyRegistered_Message" xml:space="preserve">
     <value>이미 앱 내에서 사용 중인 단축키입니다.</value>
