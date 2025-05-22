@@ -253,11 +253,11 @@
                 </Border>
             </StackPanel>
 
-            <!-- 하단 동적 레이아웃 영역 -->
+            <!-- bottom dynamic layout -->
             <Grid x:Name="BottomPanel"
                   Grid.Row="1"
                   MaxWidth="800"
-                  Margin="0,20,0,20"
+                  Margin="0,20,0,0"
                   HorizontalAlignment="Center">
 
                 <Grid.ColumnDefinitions>
@@ -265,7 +265,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- 버튼 컨테이너 -->
+                <!-- button container -->
                 <StackPanel x:Name="ButtonContainer"
                             Grid.Column="0"
                             Width="800"
