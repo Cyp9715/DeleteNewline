@@ -33,6 +33,9 @@ public partial class OCRViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _autoApplyHotkey;
 
+    [ObservableProperty]
+    private string? _displayHotkey;
+
     // OCR dedicated hotkey settings (synchronized with OCRService)
     private VirtualKeyModifiers _ocrModifiers = VirtualKeyModifiers.None;
     private VirtualKey _ocrKey = VirtualKey.None;
@@ -69,11 +72,21 @@ public partial class OCRViewModel : ObservableRecipient
         _ocrKey = _ocrService.OcrKey;
         AutoApplyHotkey = _ocrService.AutoApplyHotkey;
         SelectedLanguage = _ocrService.SelectedLanguage;
+        
+        // Update display hotkey
+        UpdateDisplayHotkey();
+    }
+
+    private void UpdateDisplayHotkey()
+    {
+        DisplayHotkey = HotkeyHelper.GetDisplayText(_ocrModifiers, _ocrKey);
     }
 
     private async Task SaveOcrHotkeyAsync()
     {
         await _ocrService.UpdateHotkeyAsync(_ocrModifiers, _ocrKey);
+        // Update display after saving
+        UpdateDisplayHotkey();
     }
 
     private async Task SaveAutoApplyHotkeyAsync()

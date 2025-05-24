@@ -372,8 +372,7 @@
     <comment>OCR page hotkey input label</comment>
   </data>
   <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
-    <value>Click here and press your hotkey combination</value>
-    <comment>OCR page hotkey input placeholder text</comment>
+    <value></value>
   </data>
   <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
     <value>OCR Language Settings</value>
@@ -392,12 +391,21 @@
     <comment>OCR page options section title</comment>
   </data>
   <data name="OCRPage_RegexApply.Text" xml:space="preserve">
-    <value>Regex Apply</value>
-    <comment>OCR page regex apply toggle label</comment>
+    <value>Apply Regular Expressions</value>
+  </data>
+  <data name="OCRPage_Description_RegexApply.Text" xml:space="preserve">
+    <value>Apply regular expressions sequentially to OCR-extracted text.</value>
+  </data>
+  <data name="OCRPage_Description_RegexApply_Detail.Text" xml:space="preserve">
+    <value>When enabled, after converting images to text using the OCR hotkey, you can immediately apply regex hotkeys without any mouse clicks or keyboard actions. The processed text will be saved to the clipboard.</value>
   </data>
   <data name="OCRPage_Text_AddLanguagePrefix.Text" xml:space="preserve">
     <value>To add new languages, please check </value>
     <comment>OCR page add language instruction prefix</comment>
+  </data>
+  <data name="OCRPage_Hyperlink_AddLanguage.Content" xml:space="preserve">
+    <value>this link</value>
+    <comment>OCR page add language hyperlink text</comment>
   </data>
   <data name="OCRPage_Text_AddLanguageSuffix.Text" xml:space="preserve">
     <value>.</value>
