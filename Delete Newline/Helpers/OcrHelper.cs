@@ -33,6 +33,15 @@ public static class OcrHelper
         return GetTextFromOcrResult(ocrResult, language);
     }
 
+    public static async Task<string> GetTextFromBitmapAsync(Bitmap bitmap, Language language, bool singleLineMode)
+    {
+        double scale = await GetIdealScaleFactorForOcrAsync(bitmap, language);
+        using Bitmap scaledBitmap = ImageHelper.ScaleBitmapUniform(bitmap, scale);
+        
+        OcrResult ocrResult = await GetOcrResultFromBitmapAsync(scaledBitmap, language);
+        return GetTextFromOcrResult(ocrResult, language, singleLineMode);
+    }
+
     public static async Task<OcrResult> GetOcrResultFromBitmapAsync(Bitmap bitmap, Language language)
     {
         using var stream = new MemoryStream();
@@ -74,6 +83,45 @@ public static class OcrHelper
                     isFirstWord = false;
                 }
                 text.AppendLine();
+            }
+        }
+
+        return text.ToString();
+    }
+
+    private static string GetTextFromOcrResult(OcrResult ocrResult, Language language, bool singleLineMode)
+    {
+        StringBuilder text = new();
+        bool isSpaceJoiningLanguage = IsSpaceJoiningLanguage(language);
+
+        foreach (OcrLine ocrLine in ocrResult.Lines)
+        {
+            if (isSpaceJoiningLanguage)
+            {
+                if (singleLineMode && text.Length > 0)
+                {
+                    text.Append(' '); // Add space between lines in single line mode
+                }
+                text.Append(ocrLine.Text);
+                if (!singleLineMode)
+                {
+                    text.AppendLine();
+                }
+            }
+            else
+            {
+                bool isFirstWordInLine = true;
+                foreach (OcrWord ocrWord in ocrLine.Words)
+                {
+                    if (!isFirstWordInLine || (singleLineMode && text.Length > 0))
+                        text.Append(' ');
+                    text.Append(ocrWord.Text);
+                    isFirstWordInLine = false;
+                }
+                if (!singleLineMode)
+                {
+                    text.AppendLine();
+                }
             }
         }
 

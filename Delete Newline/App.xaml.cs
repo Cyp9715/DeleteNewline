@@ -134,6 +134,9 @@ public partial class App : Application
                 // Add ClipboardMonitorService
                 services.AddSingleton<ClipboardMonitorService>();
 
+                // Add OCRService
+                services.AddSingleton<OCRService>();
+
                 // Views and ViewModels
                 services.AddSingleton<ShellViewModel>();
                 services.AddTransient<ShellPage>();

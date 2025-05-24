@@ -1,54 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Page x:Class="Delete_Newline.Views.OCRPage"
+<Page x:Name="RootPage"
+      x:Class="Delete_Newline.Views.OCRPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="using:Delete_Newline"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:behaviors="using:Delete_Newline.Behaviors"
+      xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       mc:Ignorable="d">
 
-    <Grid>
-        <ScrollViewer>
-            <StackPanel Margin="24"
-                        Spacing="16">
-
+    <ScrollViewer Margin="0">
+        <Grid Padding="20,0,20,0">
+            <StackPanel MaxWidth="800">
+                <!-- OCR Hotkey Settings Label -->
+                <TextBlock x:Uid="OCRPage_Title_HotkeySettings"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           FontSize="16"
+                           HorizontalAlignment="Left"
+                           Margin="3,20,0,0"/>
+                
+                <!-- OCR Hotkey Configuration -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
-                        CornerRadius="8">
-                    <StackPanel Margin="16"
-                                Spacing="12">
-                        <TextBlock Text="Full Screen OCR Capture"
-                                   Style="{ThemeResource SubtitleTextBlockStyle}" />
-
-                        <TextBlock Text="Capture text from any part of your screen using OCR technology."
+                        CornerRadius="4"
+                        Margin="0,5,0,0"
+                        Padding="10">
+                    <StackPanel>
+                        <!-- Description -->
+                        <TextBlock x:Uid="OCRPage_Description_HotkeySettings"
                                    Style="{ThemeResource BodyTextBlockStyle}"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Margin="5,0,0,0" />
 
-                        <Button x:Name="StartFullScreenOcrButton"
-                                Content="Start Full Screen OCR Capture"
-                                Style="{ThemeResource AccentButtonStyle}"
-                                HorizontalAlignment="Left"
-                                Click="StartFullScreenOcrButton_Click" />
+                        <!-- Hotkey Input -->
+                        <Grid Margin="5,10,0,0">
+                            <TextBlock x:Uid="OCRPage_Label_Hotkey" 
+                                       VerticalAlignment="Center"/>
+                            <TextBox x:Name="TextBox_OcrHotkey"
+                                     Width="300"
+                                     TextAlignment="Center"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Center"
+                                     IsReadOnly="True"
+                                     x:Uid="OCRPage_Placeholder_Hotkey"
+                                     Text="{Binding DisplayHotkey, Mode=OneWay}"
+                                     GotFocus="TextBox_OcrHotkey_GotFocus"
+                                     LostFocus="TextBox_OcrHotkey_LostFocus">
+                                <interactivity:Interaction.Behaviors>
+                                    <behaviors:KeyboardInputBehavior CommandName="ProcessKeyInputCommand" />
+                                </interactivity:Interaction.Behaviors>
+                            </TextBox>
+                        </Grid>
                     </StackPanel>
                 </Border>
 
+                <!-- OCR Language Settings Label -->
+                <TextBlock x:Uid="OCRPage_Title_LanguageSettings"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           FontSize="16"
+                           HorizontalAlignment="Left"
+                           Margin="3,20,0,0"/>
+
+                <!-- OCR Language Settings -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
-                        CornerRadius="8">
-                    <StackPanel Margin="16"
-                                Spacing="12">
-                        <TextBlock Text="OCR Language Settings"
-                                   Style="{ThemeResource SubtitleTextBlockStyle}" />
-
-                        <TextBlock Text="Choose the language for text recognition."
+                        CornerRadius="4"
+                        Margin="0,5,0,0"
+                        Padding="10">
+                    <StackPanel>
+                        <!-- Description -->
+                        <TextBlock x:Uid="OCRPage_Description_LanguageSettings"
                                    Style="{ThemeResource BodyTextBlockStyle}"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Margin="5,0,0,0" />
 
+                        <!-- Language Selection -->
                         <ComboBox x:Name="LanguageComboBox"
-                                  Header="Recognition Language"
+                                  x:Uid="OCRPage_Header_RecognitionLanguage"
                                   HorizontalAlignment="Stretch"
+                                  Margin="5,10,0,0"
                                   SelectionChanged="LanguageComboBox_SelectionChanged">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -56,29 +89,63 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
+
+                        <!-- Language Installation Help -->
+                        <StackPanel Orientation="Horizontal" Margin="5,8,0,0">
+                            <TextBlock x:Uid="OCRPage_Text_AddLanguagePrefix"
+                                       Style="{ThemeResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       VerticalAlignment="Center" />
+                            <HyperlinkButton x:Uid="OCRPage_Hyperlink_AddLanguage"
+                                             NavigateUri="https://learn.microsoft.com/en-us/windows/powertoys/text-extractor#how-to-query-for-ocr-language-packs"
+                                             FontSize="12"
+                                             Padding="0,0,0,0"
+                                             VerticalAlignment="Center" />
+                            <TextBlock x:Uid="OCRPage_Text_AddLanguageSuffix"
+                                       Style="{ThemeResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
+                <!-- OCR Options Label -->
+                <TextBlock x:Uid="OCRPage_Title_Options"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           FontSize="16"
+                           HorizontalAlignment="Left"
+                           Margin="3,20,0,0"/>
+
+                <!-- OCR Options -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
-                        CornerRadius="8">
-                    <StackPanel Margin="16"
-                                Spacing="12">
-                        <TextBlock Text="OCR Options"
-                                   Style="{ThemeResource SubtitleTextBlockStyle}" />
-
+                        CornerRadius="4"
+                        Margin="0,5,0,5"
+                        Padding="10">
+                    <StackPanel>
+                        <!-- Single Line Mode Toggle -->
                         <ToggleSwitch x:Name="SingleLineToggle"
-                                      Header="Single Line Mode"
-                                      OnContent="Enabled"
-                                      OffContent="Disabled" />
+                                      x:Uid="OCRPage_SingleLineMode"
+                                      IsOn="{Binding IsSingleLineMode, Mode=TwoWay}"
+                                      Margin="5,0,0,0" />
 
-                        <TextBlock Text="When enabled, all recognized text will be joined into a single line."
+                        <!-- Description -->
+                        <TextBlock x:Uid="OCRPage_Description_SingleLineMode"
                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Margin="5,5,0,0" />
                     </StackPanel>
                 </Border>
             </StackPanel>
-        </ScrollViewer>
-    </Grid>
+            
+            <!-- Dummy button for focus removal during hotkey registration -->
+            <Button x:Name="DummyFocusButton"
+                    Opacity="0"
+                    IsHitTestVisible="False"
+                    IsTabStop="True"
+                    Width="1" 
+                    Height="1" />
+        </Grid>
+    </ScrollViewer>
 </Page>

@@ -19,20 +19,22 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private Windows.Foundation.Point startPoint = new();
     private Windows.Foundation.Point currentPoint = new();
     private bool isSelecting = false;
-    private Language currentLanguage = new Language("en"); // 기본값 설정
+    private Language currentLanguage = new Language("en"); // Default language setting
     private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
+    private bool singleLineMode = false; // OCR single line mode setting
 
     public OcrCaptureWindow()
     {
         InitializeComponent();
-        // 기본 언어는 SetupFullscreen에서 설정됨
+        // Default language is set in SetupFullscreen
     }
 
-    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null)
+    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool singleLineMode = false)
     {
         backgroundImage = preloadedBackground;
+        this.singleLineMode = singleLineMode;
         
-        // 전달받은 언어 설정 (없으면 영어 기본값)
+        // Passed language setting (if any)
         if (selectedLanguage != null)
         {
             currentLanguage = selectedLanguage;
@@ -40,13 +42,14 @@ public sealed partial class OcrCaptureWindow : WindowEx
         }
         else
         {
-            // 기본값으로 영어 설정
+            // Default to English if no language is selected
             var availableLanguages = OcrEngine.AvailableRecognizerLanguages;
             var englishLang = availableLanguages.FirstOrDefault(l => l.LanguageTag.StartsWith("en"));
             currentLanguage = englishLang ?? availableLanguages.FirstOrDefault() ?? new Language("en");
             System.Diagnostics.Debug.WriteLine($"Using default language: {currentLanguage.DisplayName} ({currentLanguage.LanguageTag})");
         }
         
+        System.Diagnostics.Debug.WriteLine($"Single Line Mode: {this.singleLineMode}");
         System.Diagnostics.Debug.WriteLine("Setting up fullscreen OCR capture window");
         
         // Remove title bar
@@ -370,7 +373,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
             
             // Perform OCR
             System.Diagnostics.Debug.WriteLine("Starting OCR process...");
-            string ocrText = await OcrHelper.GetTextFromBitmapAsync(regionBitmap, currentLanguage);
+            System.Diagnostics.Debug.WriteLine($"Using Single Line Mode: {singleLineMode}");
+            string ocrText = await OcrHelper.GetTextFromBitmapAsync(regionBitmap, currentLanguage, singleLineMode);
             
             System.Diagnostics.Debug.WriteLine($"OCR completed. Raw result: '{ocrText}'");
             System.Diagnostics.Debug.WriteLine($"OCR text length: {ocrText?.Length ?? 0}");

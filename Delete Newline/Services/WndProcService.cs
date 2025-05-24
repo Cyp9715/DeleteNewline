@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Delete_Newline.Helpers;
+using Delete_Newline.Views;
+using Delete_Newline.ViewModels;
 
 namespace Delete_Newline.Services;
 
@@ -19,6 +21,9 @@ public sealed class WndProcService
     private delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
     private static IntPtr _oldWndProc;
     private static WndProc? _newWndProc;
+    
+    // OCR hotkey ID (Fix value)
+    private const int OCR_HOTKEY_ID = 9999;
     
     public void Initialize(IntPtr _hwnd)
     {
@@ -42,7 +47,15 @@ public sealed class WndProcService
                 int hotkeyId = wParam.ToInt32();
                 Debug.WriteLine($"WM_Hotkey received! ID={hotkeyId}");
 
-                // Set the active hotkey ID expecting a copy
+                // Check if this is the OCR hotkey
+                if (hotkeyId == OCR_HOTKEY_ID)
+                {
+                    Debug.WriteLine("OCR Hotkey detected - launching OCR capture");
+                    LaunchOcrCapture();
+                    break;
+                }
+
+                // Set the active hotkey ID expecting a copy (기존 텍스트 처리 핫키)
                 App.ActiveHotkeyIdForCopy = hotkeyId;
 
                 // Simulate Ctrl+C
@@ -54,6 +67,25 @@ public sealed class WndProcService
                 break;
         }
         return CallWindowProc(_oldWndProc, hWnd, (int)msg, wParam, lParam);
+    }
+
+    private void LaunchOcrCapture()
+    {
+        try
+        {
+            Debug.WriteLine("Starting OCR capture from hotkey...");
+            
+            // Get OCRViewModel instance and call its launch method
+            var ocrViewModel = App.GetService<OCRViewModel>();
+            ocrViewModel.LaunchOcrCapture();
+            
+            Debug.WriteLine("OCR capture launched successfully");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error launching OCR capture: {ex.Message}");
+            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
     }
 
     private static int LowWord(int value)

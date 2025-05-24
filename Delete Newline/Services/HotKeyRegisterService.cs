@@ -36,10 +36,82 @@ public sealed class HotkeyRegisterService
     private bool _isRegisteringHotkey = false;
     private readonly HashSet<(VirtualKeyModifiers, VirtualKey)> _registeredHotkeys = new();
     private readonly HashSet<int> _registeredHotkeyIds = new();
+    
+
+    private const int OCR_HOTKEY_ID = 9999;
+    private (VirtualKeyModifiers, VirtualKey)? _ocrHotkey = null;
 
     public void Initialize(IntPtr hwnd)
     {
         _hwnd = hwnd;
+    }
+    
+    public bool RegisterOcrHotkey(VirtualKeyModifiers modifiers, VirtualKey key)
+    {
+        var hotkey = (modifiers, key);
+        
+        if (IsSystemHotkey(hotkey))
+        {
+            Debug.WriteLine($"Cannot register system hotkey for OCR: {modifiers} + {key}");
+            return false;
+        }
+
+        if (IsHotkeyRegistered(hotkey))
+        {
+            Debug.WriteLine($"Hotkey already registered for text processing: {modifiers} + {key}");
+            return false;
+        }
+
+        if (_ocrHotkey.HasValue)
+        {
+            UnregisterOcrHotkey();
+        }
+
+        Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(modifiers);
+        
+        bool result = RegisterHotKey(_hwnd, OCR_HOTKEY_ID, (uint)win32Modifiers, (uint)key);
+
+        if (!result)
+        {
+            int errorCode = Marshal.GetLastWin32Error();
+            Debug.WriteLine($"RegisterOcrHotkey failed with error code: {errorCode}");
+        }
+        else
+        {
+            Debug.WriteLine($"RegisterOcrHotkey succeeded: {modifiers} + {key}");
+            _ocrHotkey = hotkey;
+        }
+        
+        return result;
+    }
+    
+    public void UnregisterOcrHotkey()
+    {
+        if (_ocrHotkey.HasValue)
+        {
+            if (UnregisterHotKey(_hwnd, OCR_HOTKEY_ID))
+            {
+                Debug.WriteLine($"UnregisterOcrHotkey succeeded: {_ocrHotkey.Value.Item1} + {_ocrHotkey.Value.Item2}");
+            }
+            else
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+                Debug.WriteLine($"UnregisterOcrHotkey failed with error code: {errorCode}");
+            }
+            _ocrHotkey = null;
+        }
+    }
+    
+    // OCR 핫키 조회
+    public (VirtualKeyModifiers, VirtualKey)? GetOcrHotkey()
+    {
+        return _ocrHotkey;
+    }
+    
+    // OCR 핫키가 등록되어 있는지 확인
+    public bool IsOcrHotkeyRegistered()
+    {
+        return _ocrHotkey.HasValue;
     }
 
     public int HotkeyToHash((VirtualKeyModifiers, VirtualKey) Hotkey)
@@ -104,6 +176,12 @@ public sealed class HotkeyRegisterService
                 _registeredHotkeyIds.Add(hotkeyId);
             }
         }
+        
+        // OCR 핫키도 임시 해제
+        if (_ocrHotkey.HasValue)
+        {
+            UnregisterHotKey(_hwnd, OCR_HOTKEY_ID);
+        }
     }
 
     // register all hotkeys
@@ -119,6 +197,13 @@ public sealed class HotkeyRegisterService
                 RegisterHotKey(_hwnd, hotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
                 _registeredHotkeyIds.Remove(hotkeyId);
             }
+        }
+        
+        // OCR 핫키 다시 등록
+        if (_ocrHotkey.HasValue)
+        {
+            Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(_ocrHotkey.Value.Item1);
+            RegisterHotKey(_hwnd, OCR_HOTKEY_ID, (uint)win32Modifiers, (uint)_ocrHotkey.Value.Item2);
         }
     }
 
@@ -138,6 +223,13 @@ public sealed class HotkeyRegisterService
         if (IsHotkeyRegistered(Hotkey))
         {
             Debug.WriteLine($"Hotkey already registered: {Hotkey.Item1} + {Hotkey.Item2}");
+            return false;
+        }
+        
+        // OCR 핫키와 충돌하는지 확인
+        if (_ocrHotkey.HasValue && _ocrHotkey.Value.Equals(Hotkey))
+        {
+            Debug.WriteLine($"Hotkey conflicts with OCR hotkey: {Hotkey.Item1} + {Hotkey.Item2}");
             return false;
         }
 

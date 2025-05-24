@@ -348,4 +348,76 @@
     <value>시작 프로그램을 관리하는 동안 오류가 발생했습니다.</value>
     <comment>시작 프로그램 관리 중 오류 발생 시 알림 메시지</comment>
   </data>
+
+  <!-- OCR Page -->
+  <data name="OCRPage_Title_HotkeySettings.Text" xml:space="preserve">
+    <value>OCR 단축키 설정</value>
+    <comment>OCR 페이지 단축키 설정 섹션 제목</comment>
+  </data>
+  <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
+    <value>화면에서 텍스트를 즉시 캡처할 수 있는 전역 단축키를 설정하세요.</value>
+    <comment>OCR 페이지 단축키 설정 설명</comment>
+  </data>
+  <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
+    <value>단축키:</value>
+    <comment>OCR 페이지 단축키 입력 레이블</comment>
+  </data>
+  <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
+    <value>여기를 클릭하고 단축키 조합을 누르세요</value>
+    <comment>OCR 페이지 단축키 입력 placeholder 텍스트</comment>
+  </data>
+  <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
+    <value>OCR 언어 설정</value>
+    <comment>OCR 페이지 언어 설정 섹션 제목</comment>
+  </data>
+  <data name="OCRPage_Description_LanguageSettings.Text" xml:space="preserve">
+    <value>텍스트 인식에 사용할 언어를 선택하세요.</value>
+    <comment>OCR 페이지 언어 설정 설명</comment>
+  </data>
+  <data name="OCRPage_Header_RecognitionLanguage.Header" xml:space="preserve">
+    <value>인식 언어</value>
+    <comment>OCR 페이지 언어 콤보박스 헤더</comment>
+  </data>
+  <data name="OCRPage_Title_Options.Text" xml:space="preserve">
+    <value>OCR 옵션</value>
+    <comment>OCR 페이지 옵션 섹션 제목</comment>
+  </data>
+  <data name="OCRPage_SingleLineMode.Header" xml:space="preserve">
+    <value>한 줄 모드</value>
+    <comment>OCR 페이지 한 줄 모드 토글 헤더</comment>
+  </data>
+  <data name="OCRPage_SingleLineMode.OnContent" xml:space="preserve">
+    <value>활성화</value>
+    <comment>OCR 페이지 한 줄 모드 토글 활성화 텍스트</comment>
+  </data>
+  <data name="OCRPage_SingleLineMode.OffContent" xml:space="preserve">
+    <value>비활성화</value>
+    <comment>OCR 페이지 한 줄 모드 토글 비활성화 텍스트</comment>
+  </data>
+  <data name="OCRPage_Description_SingleLineMode.Text" xml:space="preserve">
+    <value>활성화하면 인식된 모든 텍스트가 한 줄로 합쳐집니다.</value>
+    <comment>OCR 페이지 한 줄 모드 설명</comment>
+  </data>
+  <data name="OCRPage_Text_AddLanguagePrefix.Text" xml:space="preserve">
+    <value>새로운 언어를 추가하려면 </value>
+    <comment>OCR 페이지 언어 추가 안내 접두사</comment>
+  </data>
+  <data name="OCRPage_Hyperlink_AddLanguage.Content" xml:space="preserve">
+    <value>해당 링크</value>
+    <comment>OCR 페이지 언어 추가 하이퍼링크 텍스트</comment>
+  </data>
+  <data name="OCRPage_Text_AddLanguageSuffix.Text" xml:space="preserve">
+    <value>를 확인하세요.</value>
+    <comment>OCR 페이지 언어 추가 안내 접미사</comment>
+  </data>
+
+  <!-- OCR Language Error Notifications -->
+  <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">
+    <value>OCR 언어를 찾을 수 없음</value>
+    <comment>저장된 OCR 언어를 사용할 수 없을 때 알림 제목</comment>
+  </data>
+  <data name="Notification_OcrLanguageNotFound_Message" xml:space="preserve">
+    <value>이전에 선택한 OCR 언어를 더 이상 사용할 수 없습니다. 영어로 기본 설정되었습니다.</value>
+    <comment>저장된 OCR 언어를 사용할 수 없을 때 알림 메시지</comment>
+  </data>
 </root>

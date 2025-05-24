@@ -357,4 +357,76 @@
     <value>An error occurred while managing the startup task.</value>
     <comment>Notification message when an error occurs managing startup task</comment>
   </data>
+
+  <!-- OCR Page -->
+  <data name="OCRPage_Title_HotkeySettings.Text" xml:space="preserve">
+    <value>OCR Hotkey Settings</value>
+    <comment>OCR page hotkey settings section title</comment>
+  </data>
+  <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
+    <value>Set a global hotkey to instantly capture text from your screen.</value>
+    <comment>OCR page hotkey settings description</comment>
+  </data>
+  <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
+    <value>Hotkey:</value>
+    <comment>OCR page hotkey input label</comment>
+  </data>
+  <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
+    <value>Click here and press your hotkey combination</value>
+    <comment>OCR page hotkey input placeholder text</comment>
+  </data>
+  <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
+    <value>OCR Language Settings</value>
+    <comment>OCR page language settings section title</comment>
+  </data>
+  <data name="OCRPage_Description_LanguageSettings.Text" xml:space="preserve">
+    <value>Choose the language for text recognition.</value>
+    <comment>OCR page language settings description</comment>
+  </data>
+  <data name="OCRPage_Header_RecognitionLanguage.Header" xml:space="preserve">
+    <value>Recognition Language</value>
+    <comment>OCR page language combobox header</comment>
+  </data>
+  <data name="OCRPage_Title_Options.Text" xml:space="preserve">
+    <value>OCR Options</value>
+    <comment>OCR page options section title</comment>
+  </data>
+  <data name="OCRPage_SingleLineMode.Header" xml:space="preserve">
+    <value>Single Line Mode</value>
+    <comment>OCR page single line mode toggle header</comment>
+  </data>
+  <data name="OCRPage_SingleLineMode.OnContent" xml:space="preserve">
+    <value>Enabled</value>
+    <comment>OCR page single line mode toggle on content</comment>
+  </data>
+  <data name="OCRPage_SingleLineMode.OffContent" xml:space="preserve">
+    <value>Disabled</value>
+    <comment>OCR page single line mode toggle off content</comment>
+  </data>
+  <data name="OCRPage_Description_SingleLineMode.Text" xml:space="preserve">
+    <value>When enabled, all recognized text will be joined into a single line.</value>
+    <comment>OCR page single line mode description</comment>
+  </data>
+  <data name="OCRPage_Text_AddLanguagePrefix.Text" xml:space="preserve">
+    <value>To add new languages, please check </value>
+    <comment>OCR page add language instruction prefix</comment>
+  </data>
+  <data name="OCRPage_Hyperlink_AddLanguage.Content" xml:space="preserve">
+    <value>this link</value>
+    <comment>OCR page add language hyperlink text</comment>
+  </data>
+  <data name="OCRPage_Text_AddLanguageSuffix.Text" xml:space="preserve">
+    <value>.</value>
+    <comment>OCR page add language instruction suffix</comment>
+  </data>
+
+  <!-- OCR Language Error Notifications -->
+  <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">
+    <value>OCR Language Not Found</value>
+    <comment>Notification title when saved OCR language is not available</comment>
+  </data>
+  <data name="Notification_OcrLanguageNotFound_Message" xml:space="preserve">
+    <value>The previously selected OCR language is no longer available. Defaulted to English.</value>
+    <comment>Notification message when saved OCR language is not available</comment>
+  </data>
 </root>
