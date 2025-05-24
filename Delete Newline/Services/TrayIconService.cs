@@ -145,10 +145,14 @@ public sealed class TrayIconService
 
     public const int ID_EXIT = 1;
     public const int ID_NOTIFICATION = 2;
+    public const int ID_FULLSCREEN_OCR = 3;
 
     public void ShowContextMenu()
     {
         IntPtr hMenu = CreatePopupMenu();
+
+        // Add FullScreen OCR Menu
+        AppendMenu(hMenu, MF_STRING, (IntPtr)ID_FULLSCREEN_OCR, "Start FullScreen OCR");
 
         // Add Notification Menu
         uint notificationFlags = MF_STRING | (_notificationService.GetEnableNotification() ? MF_CHECKED : 0);

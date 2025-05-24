@@ -1,12 +1,12 @@
 using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
+using Delete_Newline.Views;
 using Microsoft.UI.Dispatching;
 using System.Runtime.InteropServices;
 using Windows.UI.ViewManagement;
 using WinRT.Interop;
 using WinUIEx;
 using WinUIEx.Messaging;
-using Microsoft.UI.Input;
 using Delete_Newline.Contracts.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
@@ -87,6 +87,23 @@ public sealed partial class MainWindow : WindowEx
         }
     }
 
+    /// <summary>
+    /// Starts the FullScreen OCR capture functionality
+    /// </summary>
+    public static void StartFullScreenOcr()
+    {
+        try
+        {
+            var ocrWindow = new OcrCaptureWindow();
+            ocrWindow.Activate();
+        }
+        catch (Exception ex)
+        {
+            // Log error or show notification
+            System.Diagnostics.Debug.WriteLine($"Error starting FullScreen OCR: {ex.Message}");
+        }
+    }
+
     /* 
      * TrayIcon Sector.
      */
@@ -129,6 +146,10 @@ public sealed partial class MainWindow : WindowEx
                     case TrayIconService.ID_NOTIFICATION:
                         var notificationService = App.GetService<NotificationService>();
                         await notificationService.SetEnableNotificationAsync(!notificationService.GetEnableNotification());
+                        break;
+
+                    case TrayIconService.ID_FULLSCREEN_OCR: // 새로운 OCR 메뉴 항목
+                        StartFullScreenOcr();
                         break;
                 }
                 break;
