@@ -3,9 +3,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Globalization;
 using Windows.Media.Ocr;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Views;
 
@@ -13,8 +10,11 @@ public sealed partial class OCRPage : Page
 {
     public OCRViewModel ViewModel { get; }
     
-    // Track all active OCR capture windows
-    private static readonly List<OcrCaptureWindow> activeOcrWindows = new();
+    // Track the single OCR capture window
+    private OcrCaptureWindow? activeOcrWindow;
+    
+    // Currently selected language
+    private Language? selectedLanguage;
 
     public OCRPage()
     {
@@ -26,22 +26,36 @@ public sealed partial class OCRPage : Page
 
     private void LoadOcrLanguages()
     {
+        System.Diagnostics.Debug.WriteLine("=== Loading OCR Languages ===");
+        
         var availableLanguages = OcrEngine.AvailableRecognizerLanguages;
+        
+        System.Diagnostics.Debug.WriteLine($"Total available OCR languages: {availableLanguages.Count}");
         
         foreach (var language in availableLanguages)
         {
             LanguageComboBox.Items.Add(language);
+            System.Diagnostics.Debug.WriteLine($"  - {language.DisplayName} ({language.LanguageTag})");
         }
         
         // Set default to English or first available
+        Language? defaultLanguage = null;
         var englishLang = availableLanguages.FirstOrDefault(l => l.LanguageTag.StartsWith("en"));
         if (englishLang != null)
         {
-            LanguageComboBox.SelectedItem = englishLang;
+            defaultLanguage = englishLang;
+            System.Diagnostics.Debug.WriteLine($"Default language set to English: {englishLang.DisplayName}");
         }
         else if (availableLanguages.Any())
         {
-            LanguageComboBox.SelectedIndex = 0;
+            defaultLanguage = availableLanguages.First();
+            System.Diagnostics.Debug.WriteLine($"Default language set to first available: {defaultLanguage.DisplayName}");
+        }
+        
+        if (defaultLanguage != null)
+        {
+            LanguageComboBox.SelectedItem = defaultLanguage;
+            selectedLanguage = defaultLanguage;
         }
     }
 
@@ -60,136 +74,85 @@ public sealed partial class OCRPage : Page
 
     private void LaunchFullScreenOcrCapture()
     {
-        // Close any existing OCR windows first
-        CloseAllOcrCaptureWindows();
+        // Close any existing OCR window first
+        CloseOcrCaptureWindow();
         
-        // Get all available monitors
-        var allScreens = GetAllMonitors();
+        System.Diagnostics.Debug.WriteLine("=== Starting OCR Capture ===");
+        System.Diagnostics.Debug.WriteLine($"Selected language: {selectedLanguage?.DisplayName ?? "None"} ({selectedLanguage?.LanguageTag ?? "None"})");
         
-        System.Diagnostics.Debug.WriteLine($"Found {allScreens.Count} monitors:");
-        foreach (var screen in allScreens)
+        try
         {
-            System.Diagnostics.Debug.WriteLine($"  Monitor: {screen.Bounds} (W:{screen.Bounds.Width}, H:{screen.Bounds.Height})");
-        }
-        
-        // Pre-capture all monitor screens before showing any windows
-        var monitorScreenshots = new Dictionary<MonitorInfo, Microsoft.UI.Xaml.Media.Imaging.BitmapImage>();
-        
-        foreach (var screen in allScreens)
-        {
-            System.Diagnostics.Debug.WriteLine($"Capturing screen for monitor: {screen.Bounds}");
+            // Pre-capture desktop screenshot for background
+            System.Diagnostics.Debug.WriteLine("Capturing desktop screenshot...");
+            var backgroundImage = Delete_Newline.Helpers.ImageHelper.GetFullDesktopScreenshotAsImageSource();
+            System.Diagnostics.Debug.WriteLine("Desktop screenshot captured successfully");
             
-            // Capture screen BEFORE creating the window - ensure exact bounds
-            var screenBitmap = ImageHelper.GetRegionOfScreenAsBitmap(screen.Bounds);
-            var imageSource = ImageHelper.BitmapToImageSource(screenBitmap);
-            
-            System.Diagnostics.Debug.WriteLine($"  Captured bitmap: {screenBitmap.Width}x{screenBitmap.Height}");
-            System.Diagnostics.Debug.WriteLine($"  Image source: {imageSource.PixelWidth}x{imageSource.PixelHeight}");
-            
-            monitorScreenshots[screen] = imageSource;
-            
-            // Dispose the bitmap to free memory
-            screenBitmap.Dispose();
-        }
-        
-        // Now create and show windows with pre-captured backgrounds
-        foreach (var screen in allScreens)
-        {
-            System.Diagnostics.Debug.WriteLine($"Creating OCR window for monitor: {screen.Bounds}");
-            
+            // Create single OCR window
             var ocrWindow = new OcrCaptureWindow();
-            ocrWindow.SetupForMonitor(screen, monitorScreenshots[screen]);
             
-            // Handle window closed event to remove from tracking list
+            // Handle window closed event
             ocrWindow.Closed += (sender, args) =>
             {
-                if (sender is OcrCaptureWindow closedWindow)
-                {
-                    activeOcrWindows.Remove(closedWindow);
-                }
+                activeOcrWindow = null;
+                System.Diagnostics.Debug.WriteLine("OCR window closed");
             };
             
+            // Setup fullscreen capture with preloaded background and selected language
+            ocrWindow.SetupFullscreen(backgroundImage, selectedLanguage);
             ocrWindow.Activate();
             
-            // Track the window so we can close all of them later
-            activeOcrWindows.Add(ocrWindow);
+            // Track the window
+            activeOcrWindow = ocrWindow;
+            
+            System.Diagnostics.Debug.WriteLine("=== OCR Capture window created and activated ===");
         }
-        
-        System.Diagnostics.Debug.WriteLine($"Created {activeOcrWindows.Count} OCR windows");
-    }
-
-    private List<MonitorInfo> GetAllMonitors()
-    {
-        detectedMonitors.Clear(); // Clear previous results
-        
-        // Use Win32 API to enumerate all monitors
-        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, MonitorEnumCallback, IntPtr.Zero);
-        
-        return new List<MonitorInfo>(detectedMonitors); // Return a copy
-    }
-
-    private readonly List<MonitorInfo> detectedMonitors = new();
-
-    private bool MonitorEnumCallback(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData)
-    {
-        var monitor = new MonitorInfo
+        catch (Exception ex)
         {
-            Bounds = new System.Drawing.Rectangle(
-                lprcMonitor.Left,
-                lprcMonitor.Top,
-                lprcMonitor.Right - lprcMonitor.Left,
-                lprcMonitor.Bottom - lprcMonitor.Top),
-            Primary = detectedMonitors.Count == 0 // First monitor is typically primary
-        };
-        
-        detectedMonitors.Add(monitor);
-        return true;
-    }
-
-    // Win32 API declarations
-    [DllImport("user32.dll")]
-    private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
-
-    private delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct RECT
-    {
-        public int Left;
-        public int Top;
-        public int Right;
-        public int Bottom;
-    }
-
-    public class MonitorInfo
-    {
-        public System.Drawing.Rectangle Bounds { get; set; }
-        public bool Primary { get; set; }
+            System.Diagnostics.Debug.WriteLine($"Error creating OCR window: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
     }
 
     private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (sender is ComboBox comboBox && comboBox.SelectedItem is Language selectedLanguage)
+        if (sender is ComboBox comboBox && comboBox.SelectedItem is Language newSelectedLanguage)
         {
+            selectedLanguage = newSelectedLanguage;
+            System.Diagnostics.Debug.WriteLine($"=== Language Changed ===");
+            System.Diagnostics.Debug.WriteLine($"New language: {selectedLanguage.DisplayName} ({selectedLanguage.LanguageTag})");
+            
+            // Test OCR engine availability for selected language
+            var testEngine = OcrEngine.TryCreateFromLanguage(selectedLanguage);
+            if (testEngine != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"✅ OCR engine available for {selectedLanguage.DisplayName}");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ OCR engine NOT available for {selectedLanguage.DisplayName}");
+            }
+            
             // TODO: Save selected language to settings
-            System.Diagnostics.Debug.WriteLine($"Selected OCR language: {selectedLanguage.DisplayName}");
         }
     }
 
-    // Static method to close all OCR windows from any instance
-    public static void CloseAllOcrCaptureWindows()
+    // Method to close OCR window from any instance
+    public void CloseOcrCaptureWindow()
     {
-        foreach (var window in activeOcrWindows.ToList()) // ToList to avoid modification during iteration
+        if (activeOcrWindow != null)
         {
             try
             {
-                window.Close();
+                activeOcrWindow.Close();
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error closing OCR window: {ex.Message}");
             }
+            finally
+            {
+                activeOcrWindow = null;
+            }
         }
-        activeOcrWindows.Clear();
     }
 } 

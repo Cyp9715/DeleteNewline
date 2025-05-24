@@ -16,7 +16,7 @@
         mc:Ignorable="d">
 
     <Grid x:Name="MainGrid">
-        <!-- Desktop screenshot background -->
+        <!-- Desktop screenshot background - simple 1:1 match -->
         <Image x:Name="BackgroundImage" Stretch="Fill" />
         
         <!-- Semi-transparent overlay that covers the entire screen -->
