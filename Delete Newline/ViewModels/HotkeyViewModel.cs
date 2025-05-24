@@ -132,7 +132,7 @@ public partial class HotkeyViewModel : ObservableRecipient
             return;
         }
 
-        DisplayHotkey = HotkeyDisplayHelper.GetDisplayText(CurrentHotkeyConfig);
+        DisplayHotkey = HotkeyHelper.GetDisplayText(CurrentHotkeyConfig.Hotkey.Modifiers, CurrentHotkeyConfig.Hotkey.Key);
     }
 
     private void UpdateRegexOutput()
@@ -187,12 +187,13 @@ public partial class HotkeyViewModel : ObservableRecipient
             return;
         }
 
-        // Prevent using Shift key alone as it conflicts with many system shortcuts
-        if (args.Modifiers == VirtualKeyModifiers.Shift)
+        // Check for forbidden hotkey combinations using centralized validation
+        if (HotkeyHelper.IsShiftAlone(args.Modifiers))
         {
+            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
             _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Title",
-                messageKey: "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message",
+                titleKey: titleKey,
+                messageKey: messageKey,
                 severity: InfoBarSeverity.Error
             );
             return;
@@ -205,12 +206,13 @@ public partial class HotkeyViewModel : ObservableRecipient
             _hotkeyManager.UnRegisterHotkey((CurrentHotkeyConfig.Hotkey.Modifiers, CurrentHotkeyConfig.Hotkey.Key));
         }
 
-        // Check for system hotkey
-        if (_hotkeyManager.IsSystemHotkey((args.Modifiers, args.Key)))
+        // Check for system hotkey using centralized validation
+        if (HotkeyHelper.IsSystemHotkey(args.Modifiers, args.Key))
         {
+            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
             _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_InvalidHotkey_Title",
-                messageKey: "Notification_InvalidHotkey_SystemKey_Message",
+                titleKey: titleKey,
+                messageKey: messageKey,
                 severity: InfoBarSeverity.Error
             );
             return;
@@ -245,13 +247,6 @@ public partial class HotkeyViewModel : ObservableRecipient
             CurrentHotkeyConfig.Hotkey.Key = args.Key;
             CurrentHotkeyConfig.IsRegistrationFailed = false;
 
-            // Show success notification
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_HotkeySaved_Title",
-                messageKey: "Notification_HotkeySaved_Message",
-                severity: InfoBarSeverity.Success
-            );
-            
             // Move focus to dummy button to remove focus from TextBox
             if (_dummyFocusButton != null && _dispatcherQueue != null)
             {

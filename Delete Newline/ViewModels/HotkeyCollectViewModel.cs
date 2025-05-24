@@ -26,7 +26,7 @@ public partial class HotkeyCollectViewModel : ObservableRecipient
 
     public string GetHotkeyDisplayText(HotkeyPageStructure config)
     {
-        return HotkeyDisplayHelper.GetDisplayText(config);
+        return HotkeyHelper.GetDisplayText(config.Hotkey.Modifiers, config.Hotkey.Key);
     }
 
     [RelayCommand]

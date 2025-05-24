@@ -229,7 +229,7 @@ public sealed class HotkeyCollectSaveService
                 config.Hotkey.Modifiers != VirtualKeyModifiers.None &&
                 config.Hotkey.Key != VirtualKey.None)
             {
-                int currentConfigHotkeyId = _HotkeyRegisterService.HotkeyToHash((config.Hotkey.Modifiers, config.Hotkey.Key));
+                int currentConfigHotkeyId = HotkeyHelper.GenerateHotkeyHash(config.Hotkey.Modifiers, config.Hotkey.Key);
                 if (currentConfigHotkeyId == hotkeyId)
                 {
                     return config;

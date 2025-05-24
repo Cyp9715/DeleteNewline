@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.IO;
 using Delete_Newline.Helpers;
+using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -22,17 +23,29 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private Language currentLanguage = new Language("en"); // Default language setting
     private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
     private bool singleLineMode = false; // OCR single line mode setting
+    private bool autoApplyHotkeyEnabled = false; // Auto apply hotkey setting
+
+    // OCRService dependency for notifying completion
+    private readonly OCRService? _ocrService;
 
     public OcrCaptureWindow()
     {
         InitializeComponent();
-        // Default language is set in SetupFullscreen
+        // Try to get OCRService if available (for dependency injection)
+        try
+        {
+            _ocrService = App.GetService<OCRService>();
+        }
+        catch
+        {
+            _ocrService = null; // Fallback if service not available
+        }
     }
 
-    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool singleLineMode = false)
+    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool autoApplyHotkeyEnabled = false)
     {
         backgroundImage = preloadedBackground;
-        this.singleLineMode = singleLineMode;
+        this.autoApplyHotkeyEnabled = autoApplyHotkeyEnabled;
         
         // Passed language setting (if any)
         if (selectedLanguage != null)
@@ -391,6 +404,10 @@ public sealed partial class OcrCaptureWindow : WindowEx
                     
                     System.Diagnostics.Debug.WriteLine("✅ Text copied to clipboard successfully!");
                     System.Diagnostics.Debug.WriteLine($"Copied text: '{ocrText.Trim()}'");
+                    System.Diagnostics.Debug.WriteLine($"AutoApplyHotkey enabled: {autoApplyHotkeyEnabled}");
+
+                    // Always notify OCRService of OCR completion (let OCRService handle autoApplyHotkey logic)
+                    _ocrService?.NotifyOcrCompleted(ocrText);
                 }
                 catch (Exception clipboardEx)
                 {

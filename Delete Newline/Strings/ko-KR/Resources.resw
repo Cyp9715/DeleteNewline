@@ -359,7 +359,7 @@
     <comment>OCR 페이지 단축키 설정 설명</comment>
   </data>
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
-    <value>단축키:</value>
+    <value>단축키</value>
     <comment>OCR 페이지 단축키 입력 레이블</comment>
   </data>
   <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
@@ -382,21 +382,9 @@
     <value>OCR 옵션</value>
     <comment>OCR 페이지 옵션 섹션 제목</comment>
   </data>
-  <data name="OCRPage_SingleLineMode.Header" xml:space="preserve">
-    <value>한 줄 모드</value>
-    <comment>OCR 페이지 한 줄 모드 토글 헤더</comment>
-  </data>
-  <data name="OCRPage_SingleLineMode.OnContent" xml:space="preserve">
-    <value>활성화</value>
-    <comment>OCR 페이지 한 줄 모드 토글 활성화 텍스트</comment>
-  </data>
-  <data name="OCRPage_SingleLineMode.OffContent" xml:space="preserve">
-    <value>비활성화</value>
-    <comment>OCR 페이지 한 줄 모드 토글 비활성화 텍스트</comment>
-  </data>
-  <data name="OCRPage_Description_SingleLineMode.Text" xml:space="preserve">
-    <value>활성화하면 인식된 모든 텍스트가 한 줄로 합쳐집니다.</value>
-    <comment>OCR 페이지 한 줄 모드 설명</comment>
+  <data name="OCRPage_RegexApply.Text" xml:space="preserve">
+    <value>정규표현식 적용</value>
+    <comment>OCR 페이지 정규표현식 적용 토글 레이블</comment>
   </data>
   <data name="OCRPage_Text_AddLanguagePrefix.Text" xml:space="preserve">
     <value>새로운 언어를 추가하려면 </value>
@@ -418,6 +406,16 @@
   </data>
   <data name="Notification_OcrLanguageNotFound_Message" xml:space="preserve">
     <value>이전에 선택한 OCR 언어를 더 이상 사용할 수 없습니다. 영어로 기본 설정되었습니다.</value>
-    <comment>저장된 OCR 언어를 사용할 수 없을 때 알림 메시지</comment>
+    <comment>저장된 OCR 언어를 사용할 수 없을 때 표시되는 알림 메시지</comment>
+  </data>
+
+  <!-- OCR 자동 단축키 적용 알림 -->
+  <data name="Notification_OcrHotkeyApplied_Title" xml:space="preserve">
+    <value>OCR → 단축키 적용됨</value>
+    <comment>OCR 결과가 단축키에 의해 자동으로 처리될 때의 알림 제목</comment>
+  </data>
+  <data name="Notification_OcrHotkeyApplied_Message" xml:space="preserve">
+    <value>OCR 결과가 단축키의 정규식 체인을 통해 처리되어 클립보드에 업데이트되었습니다.</value>
+    <comment>OCR 결과가 단축키에 의해 자동으로 처리될 때의 알림 메시지</comment>
   </data>
 </root>

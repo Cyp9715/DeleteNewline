@@ -368,7 +368,7 @@
     <comment>OCR page hotkey settings description</comment>
   </data>
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
-    <value>Hotkey:</value>
+    <value>Hotkey</value>
     <comment>OCR page hotkey input label</comment>
   </data>
   <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
@@ -391,29 +391,13 @@
     <value>OCR Options</value>
     <comment>OCR page options section title</comment>
   </data>
-  <data name="OCRPage_SingleLineMode.Header" xml:space="preserve">
-    <value>Single Line Mode</value>
-    <comment>OCR page single line mode toggle header</comment>
-  </data>
-  <data name="OCRPage_SingleLineMode.OnContent" xml:space="preserve">
-    <value>Enabled</value>
-    <comment>OCR page single line mode toggle on content</comment>
-  </data>
-  <data name="OCRPage_SingleLineMode.OffContent" xml:space="preserve">
-    <value>Disabled</value>
-    <comment>OCR page single line mode toggle off content</comment>
-  </data>
-  <data name="OCRPage_Description_SingleLineMode.Text" xml:space="preserve">
-    <value>When enabled, all recognized text will be joined into a single line.</value>
-    <comment>OCR page single line mode description</comment>
+  <data name="OCRPage_RegexApply.Text" xml:space="preserve">
+    <value>Regex Apply</value>
+    <comment>OCR page regex apply toggle label</comment>
   </data>
   <data name="OCRPage_Text_AddLanguagePrefix.Text" xml:space="preserve">
     <value>To add new languages, please check </value>
     <comment>OCR page add language instruction prefix</comment>
-  </data>
-  <data name="OCRPage_Hyperlink_AddLanguage.Content" xml:space="preserve">
-    <value>this link</value>
-    <comment>OCR page add language hyperlink text</comment>
   </data>
   <data name="OCRPage_Text_AddLanguageSuffix.Text" xml:space="preserve">
     <value>.</value>
@@ -428,5 +412,15 @@
   <data name="Notification_OcrLanguageNotFound_Message" xml:space="preserve">
     <value>The previously selected OCR language is no longer available. Defaulted to English.</value>
     <comment>Notification message when saved OCR language is not available</comment>
+  </data>
+
+  <!-- OCR Auto Apply Hotkey Notifications -->
+  <data name="Notification_OcrHotkeyApplied_Title" xml:space="preserve">
+    <value>OCR → Hotkey Applied</value>
+    <comment>Notification title when OCR result is automatically processed by hotkey</comment>
+  </data>
+  <data name="Notification_OcrHotkeyApplied_Message" xml:space="preserve">
+    <value>OCR result has been processed through the hotkey regex chain and updated in clipboard.</value>
+    <comment>Notification message when OCR result is automatically processed by hotkey</comment>
   </data>
 </root>

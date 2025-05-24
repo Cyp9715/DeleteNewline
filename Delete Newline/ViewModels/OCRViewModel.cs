@@ -24,17 +24,14 @@ public partial class OCRViewModel : ObservableRecipient
     // Settings keys (kept for compatibility, but OCRService handles the actual persistence)
     private const string OcrHotkeyModifiersKey = "OCR_HotkeyModifiers";
     private const string OcrHotkeyKeyKey = "OCR_HotkeyKey";
-    private const string OcrSingleLineModeKey = "OCR_SingleLineMode";
+    private const string OcrAutoApplyHotkeyKey = "OCR_AutoApplyHotkey";
     private const string OcrLanguageTagKey = "OCR_LanguageTag";
 
-    [ObservableProperty]
-    private string? _displayHotkey;
-    
     [ObservableProperty]
     private Language? _selectedLanguage;
 
     [ObservableProperty]
-    private bool _isSingleLineMode;
+    private bool _autoApplyHotkey;
 
     // OCR dedicated hotkey settings (synchronized with OCRService)
     private VirtualKeyModifiers _ocrModifiers = VirtualKeyModifiers.None;
@@ -56,9 +53,6 @@ public partial class OCRViewModel : ObservableRecipient
             // If not on UI thread, set to null
             _dispatcherQueue = null;
         }
-        
-        // Initialize display with default values
-        DisplayHotkey = "Click to set hotkey";
     }
 
     public void Initialize()
@@ -73,10 +67,8 @@ public partial class OCRViewModel : ObservableRecipient
         // Get current settings from OCRService
         _ocrModifiers = _ocrService.OcrModifiers;
         _ocrKey = _ocrService.OcrKey;
-        IsSingleLineMode = _ocrService.IsSingleLineMode;
+        AutoApplyHotkey = _ocrService.AutoApplyHotkey;
         SelectedLanguage = _ocrService.SelectedLanguage;
-        
-        UpdateDisplayHotkey();
     }
 
     private async Task SaveOcrHotkeyAsync()
@@ -84,9 +76,9 @@ public partial class OCRViewModel : ObservableRecipient
         await _ocrService.UpdateHotkeyAsync(_ocrModifiers, _ocrKey);
     }
 
-    private async Task SaveSingleLineModeAsync()
+    private async Task SaveAutoApplyHotkeyAsync()
     {
-        await _ocrService.UpdateSingleLineModeAsync(IsSingleLineMode);
+        await _ocrService.UpdateAutoApplyHotkeyAsync(AutoApplyHotkey);
     }
 
     private async Task SaveOcrLanguageAsync()
@@ -97,10 +89,10 @@ public partial class OCRViewModel : ObservableRecipient
         }
     }
 
-    // Handle Single Line Mode changes
-    partial void OnIsSingleLineModeChanged(bool value)
+    // Handle Auto Apply Hotkey changes
+    partial void OnAutoApplyHotkeyChanged(bool value)
     {
-        _ = SaveSingleLineModeAsync();
+        _ = SaveAutoApplyHotkeyAsync();
     }
 
     // Handle OCR Language changes
@@ -117,24 +109,6 @@ public partial class OCRViewModel : ObservableRecipient
         _dummyFocusButton = btn;
     }
 
-    private void UpdateDisplayHotkey()
-    {
-        if (_ocrModifiers == VirtualKeyModifiers.None && _ocrKey == VirtualKey.None)
-        {
-            DisplayHotkey = "Click to set hotkey";
-            return;
-        }
-
-        // Create temporary HotkeyStructure to use existing FormatHotkey method
-        var tempHotkey = new HotkeyStructure
-        {
-            Modifiers = _ocrModifiers,
-            Key = _ocrKey
-        };
-        
-        DisplayHotkey = HotkeyDisplayHelper.FormatHotkey(tempHotkey);
-    }
-
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
@@ -144,12 +118,13 @@ public partial class OCRViewModel : ObservableRecipient
             return;
         }
 
-        // Prevent using Shift key alone as it conflicts with many system shortcuts
-        if (args.Modifiers == VirtualKeyModifiers.Shift)
+        // Check for forbidden hotkey combinations using centralized validation
+        if (HotkeyHelper.IsShiftAlone(args.Modifiers))
         {
+            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
             _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Title",
-                messageKey: "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message",
+                titleKey: titleKey,
+                messageKey: messageKey,
                 severity: InfoBarSeverity.Error
             );
             return;
@@ -161,12 +136,13 @@ public partial class OCRViewModel : ObservableRecipient
             _hotkeyManager.UnregisterOcrHotkey();
         }
 
-        // Check for system hotkey
-        if (_hotkeyManager.IsSystemHotkey((args.Modifiers, args.Key)))
+        // Check for system hotkey using centralized validation
+        if (HotkeyHelper.IsSystemHotkey(args.Modifiers, args.Key))
         {
+            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
             _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_InvalidHotkey_Title",
-                messageKey: "Notification_InvalidHotkey_SystemKey_Message",
+                titleKey: titleKey,
+                messageKey: messageKey,
                 severity: InfoBarSeverity.Error
             );
             return;
@@ -200,18 +176,9 @@ public partial class OCRViewModel : ObservableRecipient
             _ocrModifiers = tempModifiers;
             _ocrKey = args.Key;
 
-            UpdateDisplayHotkey();
-
             // Save the new hotkey settings
             _ = SaveOcrHotkeyAsync();
 
-            // Show success notification
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_HotkeySaved_Title",
-                messageKey: "Notification_HotkeySaved_Message",
-                severity: InfoBarSeverity.Success
-            );
-            
             // Move focus to dummy button to remove focus from TextBox
             if (_dummyFocusButton != null && _dispatcherQueue != null)
             {
@@ -241,7 +208,6 @@ public partial class OCRViewModel : ObservableRecipient
             // Reset hotkey to None when registration fails
             _ocrModifiers = VirtualKeyModifiers.None;
             _ocrKey = VirtualKey.None;
-            UpdateDisplayHotkey();
             
             // Save the reset hotkey settings
             _ = SaveOcrHotkeyAsync();

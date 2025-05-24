@@ -45,7 +45,6 @@
                                      VerticalAlignment="Center"
                                      IsReadOnly="True"
                                      x:Uid="OCRPage_Placeholder_Hotkey"
-                                     Text="{Binding DisplayHotkey, Mode=OneWay}"
                                      GotFocus="TextBox_OcrHotkey_GotFocus"
                                      LostFocus="TextBox_OcrHotkey_LostFocus">
                                 <interactivity:Interaction.Behaviors>
@@ -79,7 +78,6 @@
 
                         <!-- Language Selection -->
                         <ComboBox x:Name="LanguageComboBox"
-                                  x:Uid="OCRPage_Header_RecognitionLanguage"
                                   HorizontalAlignment="Stretch"
                                   Margin="5,10,0,0"
                                   SelectionChanged="LanguageComboBox_SelectionChanged">
@@ -123,19 +121,16 @@
                         CornerRadius="4"
                         Margin="0,5,0,5"
                         Padding="10">
-                    <StackPanel>
-                        <!-- Single Line Mode Toggle -->
-                        <ToggleSwitch x:Name="SingleLineToggle"
-                                      x:Uid="OCRPage_SingleLineMode"
-                                      IsOn="{Binding IsSingleLineMode, Mode=TwoWay}"
-                                      Margin="5,0,0,0" />
-
-                        <!-- Description -->
-                        <TextBlock x:Uid="OCRPage_Description_SingleLineMode"
-                                   Style="{ThemeResource CaptionTextBlockStyle}"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Margin="5,5,0,0" />
-                    </StackPanel>
+                    <Grid>
+                        <!-- Regex Apply Toggle -->
+                        <TextBlock x:Uid="OCRPage_RegexApply"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0,0,0" />
+                        <ToggleSwitch x:Name="RegexApplyToggle"
+                                      IsOn="{Binding AutoApplyHotkey, Mode=TwoWay}"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,0,5,0" />
+                    </Grid>
                 </Border>
             </StackPanel>
             

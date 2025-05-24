@@ -1,8 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
 using Windows.System;
+using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
@@ -32,13 +31,11 @@ public sealed class HotkeyRegisterService
         int id);
 
     private IntPtr _hwnd;
-    private readonly string _salt = "Delete Newline";
     private bool _isRegisteringHotkey = false;
     private readonly HashSet<(VirtualKeyModifiers, VirtualKey)> _registeredHotkeys = new();
     private readonly HashSet<int> _registeredHotkeyIds = new();
     
-
-    private const int OCR_HOTKEY_ID = 9999;
+    // OCR hotkey management - now using same hash system as regular hotkeys
     private (VirtualKeyModifiers, VirtualKey)? _ocrHotkey = null;
 
     public void Initialize(IntPtr hwnd)
@@ -50,7 +47,7 @@ public sealed class HotkeyRegisterService
     {
         var hotkey = (modifiers, key);
         
-        if (IsSystemHotkey(hotkey))
+        if (HotkeyHelper.IsSystemHotkey(modifiers, key))
         {
             Debug.WriteLine($"Cannot register system hotkey for OCR: {modifiers} + {key}");
             return false;
@@ -68,8 +65,9 @@ public sealed class HotkeyRegisterService
         }
 
         Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(modifiers);
+        int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(modifiers, key);
         
-        bool result = RegisterHotKey(_hwnd, OCR_HOTKEY_ID, (uint)win32Modifiers, (uint)key);
+        bool result = RegisterHotKey(_hwnd, ocrHotkeyId, (uint)win32Modifiers, (uint)key);
 
         if (!result)
         {
@@ -78,7 +76,7 @@ public sealed class HotkeyRegisterService
         }
         else
         {
-            Debug.WriteLine($"RegisterOcrHotkey succeeded: {modifiers} + {key}");
+            Debug.WriteLine($"RegisterOcrHotkey succeeded: {modifiers} + {key}, Hash ID: {ocrHotkeyId}");
             _ocrHotkey = hotkey;
         }
         
@@ -89,9 +87,10 @@ public sealed class HotkeyRegisterService
     {
         if (_ocrHotkey.HasValue)
         {
-            if (UnregisterHotKey(_hwnd, OCR_HOTKEY_ID))
+            int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value);
+            if (UnregisterHotKey(_hwnd, ocrHotkeyId))
             {
-                Debug.WriteLine($"UnregisterOcrHotkey succeeded: {_ocrHotkey.Value.Item1} + {_ocrHotkey.Value.Item2}");
+                Debug.WriteLine($"UnregisterOcrHotkey succeeded: {_ocrHotkey.Value.Item1} + {_ocrHotkey.Value.Item2}, Hash ID: {ocrHotkeyId}");
             }
             else
             {
@@ -114,16 +113,10 @@ public sealed class HotkeyRegisterService
         return _ocrHotkey.HasValue;
     }
 
-    public int HotkeyToHash((VirtualKeyModifiers, VirtualKey) Hotkey)
+    // Get OCR hotkey hash ID (for WndProcService to identify OCR hotkey)
+    public int? GetOcrHotkeyId()
     {
-        string HotkeyString = $"{_salt}:{Hotkey.Item1}:{Hotkey.Item2}";
-
-        using (SHA256 sha256 = SHA256.Create())
-        {
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(HotkeyString));
-            int hashInt = BitConverter.ToInt32(hashBytes, 0);
-            return Math.Abs(hashInt);
-        }
+        return _ocrHotkey.HasValue ? HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value) : null;
     }
 
     private Win32Modifiers MapVirtualModifiersToWin32(VirtualKeyModifiers virtualModifiers)
@@ -144,19 +137,7 @@ public sealed class HotkeyRegisterService
 
     public bool IsSystemHotkey((VirtualKeyModifiers, VirtualKey) hotkey)
     {
-        // Only block if Control is the only modifier
-        if (hotkey.Item1 == VirtualKeyModifiers.Control)
-        {
-            return hotkey.Item2 switch
-            {
-                VirtualKey.C or VirtualKey.V or VirtualKey.X or 
-                VirtualKey.Z or VirtualKey.Y or VirtualKey.A or
-                VirtualKey.S or VirtualKey.O or VirtualKey.P or
-                VirtualKey.N or VirtualKey.F or VirtualKey.H => true,
-                _ => false
-            };
-        }
-        return false;
+        return HotkeyHelper.IsSystemHotkey(hotkey.Item1, hotkey.Item2);
     }
 
     public bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey)
@@ -170,7 +151,7 @@ public sealed class HotkeyRegisterService
         _isRegisteringHotkey = true;
         foreach (var hotkey in _registeredHotkeys.ToList())
         {
-            int hotkeyId = HotkeyToHash(hotkey);
+            int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
             if (UnregisterHotKey(_hwnd, hotkeyId))
             {
                 _registeredHotkeyIds.Add(hotkeyId);
@@ -180,7 +161,8 @@ public sealed class HotkeyRegisterService
         // OCR 핫키도 임시 해제
         if (_ocrHotkey.HasValue)
         {
-            UnregisterHotKey(_hwnd, OCR_HOTKEY_ID);
+            int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value);
+            UnregisterHotKey(_hwnd, ocrHotkeyId);
         }
     }
 
@@ -190,7 +172,7 @@ public sealed class HotkeyRegisterService
         _isRegisteringHotkey = false;
         foreach (var hotkey in _registeredHotkeys.ToList())
         {
-            int hotkeyId = HotkeyToHash(hotkey);
+            int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
             if (_registeredHotkeyIds.Contains(hotkeyId))
             {
                 Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
@@ -202,8 +184,9 @@ public sealed class HotkeyRegisterService
         // OCR 핫키 다시 등록
         if (_ocrHotkey.HasValue)
         {
+            int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value);
             Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(_ocrHotkey.Value.Item1);
-            RegisterHotKey(_hwnd, OCR_HOTKEY_ID, (uint)win32Modifiers, (uint)_ocrHotkey.Value.Item2);
+            RegisterHotKey(_hwnd, ocrHotkeyId, (uint)win32Modifiers, (uint)_ocrHotkey.Value.Item2);
         }
     }
 
@@ -214,7 +197,7 @@ public sealed class HotkeyRegisterService
 
     public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
-        if (IsSystemHotkey(Hotkey))
+        if (HotkeyHelper.IsSystemHotkey(Hotkey.Item1, Hotkey.Item2))
         {
             Debug.WriteLine($"Cannot register system hotkey: {Hotkey.Item1} + {Hotkey.Item2}");
             return false;
@@ -233,7 +216,7 @@ public sealed class HotkeyRegisterService
             return false;
         }
 
-        int HotkeyId = HotkeyToHash(Hotkey);
+        int HotkeyId = HotkeyHelper.GenerateHotkeyHash(Hotkey);
         Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(Hotkey.Item1);
         
         // Try to unregister any existing Hotkey with this ID first
@@ -256,7 +239,7 @@ public sealed class HotkeyRegisterService
 
     public void UnRegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
-        int HotkeyId = HotkeyToHash(Hotkey);
+        int HotkeyId = HotkeyHelper.GenerateHotkeyHash(Hotkey);
         if (UnregisterHotKey(_hwnd, HotkeyId) == false)
         {
             int errorCode = Marshal.GetLastWin32Error();
