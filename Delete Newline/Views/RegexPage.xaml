@@ -11,7 +11,7 @@
         <Grid Padding="20,0,20,0">
             <StackPanel MaxWidth="800">
                 <!-- Hotkey Settings Label -->
-                <TextBlock x:Uid="HotkeyPage_Title_HotkeySettings"
+                <TextBlock x:Uid="RegexPage_Title_HotkeySettings"
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            FontSize="16"
                            HorizontalAlignment="Left"
@@ -26,7 +26,7 @@
                     <StackPanel>
                         <!-- Hotkey Name -->
                         <Grid Margin="5,0,0,0">
-                            <TextBlock x:Uid="HotkeyPage_Label_HotkeyName" VerticalAlignment="Center"/>
+                            <TextBlock x:Uid="RegexPage_Label_HotkeyName" VerticalAlignment="Center"/>
                             <TextBox x:Name="TextBox_HotkeyName"
                                      Width="300"
                                      TextAlignment="Center"
@@ -37,7 +37,7 @@
 
                         <!-- Hotkey Comment -->
                         <Grid Margin="5,5,0,0">
-                            <TextBlock x:Uid="HotkeyPage_Label_HotkeyComment" VerticalAlignment="Center"/>
+                            <TextBlock x:Uid="RegexPage_Label_HotkeyComment" VerticalAlignment="Center"/>
                             <TextBox x:Name="TextBox_HotkeyComment"
                                      Width="300"
                                      TextAlignment="Center"
@@ -48,7 +48,7 @@
 
                         <!-- Hotkey Input -->
                         <Grid Margin="5,5,0,0">
-                            <TextBlock x:Uid="HotkeyPage_Label_HotkeyInput" VerticalAlignment="Center"/>
+                            <TextBlock x:Uid="RegexPage_Label_HotkeyInput" VerticalAlignment="Center"/>
                             <TextBox x:Name="TextBox_Hotkey"
                                      Width="300"
                                      TextAlignment="Center"
@@ -67,7 +67,7 @@
                 </Border>
 
                 <!-- Regex Chain Label -->
-                <TextBlock x:Uid="HotkeyPage_Title_RegexChain"
+                <TextBlock x:Uid="RegexPage_Title_RegexChain"
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            FontSize="16"
                            HorizontalAlignment="Left"
@@ -101,7 +101,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Uid="HotkeyPage_Label_RegexExpression"
+                                            <TextBlock x:Uid="RegexPage_Label_RegexExpression"
                                                        VerticalAlignment="Center"
                                                        Grid.Column="0" />
                                             <TextBox Grid.Column="1"
@@ -118,7 +118,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock x:Uid="HotkeyPage_Label_Replace"
+                                            <TextBlock x:Uid="RegexPage_Label_Replace"
                                                        VerticalAlignment="Center"
                                                        Grid.Column="0" />
                                             <TextBox Grid.Column="1"
@@ -150,7 +150,7 @@
 
                 <Grid>
                     <!-- Add Button -->
-                    <Button x:Uid="HotkeyPage_Button_AddRegexItem"
+                    <Button x:Uid="RegexPage_Button_AddRegexItem"
                             Command="{Binding AddRegexItemCommand}"
                             Height="50"
                             Margin="1,0,1,0"
@@ -158,7 +158,7 @@
                 </Grid>
 
             <!-- Test Regex Chain Label -->
-            <TextBlock x:Uid="HotkeyPage_Title_TestRegexChain"
+            <TextBlock x:Uid="RegexPage_Title_TestRegexChain"
                        Style="{StaticResource SubtitleTextBlockStyle}"
                        FontSize="16"
                        HorizontalAlignment="Left"
