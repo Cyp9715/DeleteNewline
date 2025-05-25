@@ -20,16 +20,11 @@ public sealed class OCRService
     private const string OcrHotkeyModifiersKey = "OCR_HotkeyModifiers";
     private const string OcrHotkeyKeyKey = "OCR_HotkeyKey";
     private const string OcrLanguageTagKey = "OCR_LanguageTag";
-    private const string OcrApplyRegexKey = "OCR_ApplyRegex";
 
     // OCR settings
     private VirtualKeyModifiers _ocrModifiers = VirtualKeyModifiers.None;
     private VirtualKey _ocrKey = VirtualKey.None;
-    private bool _applyRegex;
     private Language? _selectedLanguage;
-
-    // OCR → Hotkey matching state
-    private string? _lastOcrResult = null;
 
     public OCRService(HotkeyRegisterService hotkeyManager, InAppNotificationService inAppNotificationService, SettingsService settingsService, RegexCollectSaveService hotkeyCollectSaveService, RegexService regexService, NotificationService notificationService)
     {
@@ -63,9 +58,6 @@ public sealed class OCRService
                 _hotkeyManager.RegisterOcrHotkey(_ocrModifiers, _ocrKey);
             }
         }
-        
-        // Load Auto Apply Hotkey setting
-        _applyRegex = _settingsService.ReadSetting<bool?>(OcrApplyRegexKey) ?? false;
         
         // Load OCR Language setting
         LoadSavedLanguage();
@@ -113,8 +105,8 @@ public sealed class OCRService
             // Create OCR window
             var ocrWindow = new OcrCaptureWindow();
             
-            // Setup fullscreen capture with preloaded background, selected language, and auto apply hotkey setting
-            ocrWindow.SetupFullscreen(backgroundImage, _selectedLanguage, _applyRegex);
+            // Setup fullscreen capture with preloaded background and selected language
+            ocrWindow.SetupFullscreen(backgroundImage, _selectedLanguage, false);
             ocrWindow.Activate();
         }
         catch (Exception ex)
@@ -126,7 +118,6 @@ public sealed class OCRService
     // Public getters for OCRViewModel to access current settings
     public VirtualKeyModifiers OcrModifiers => _ocrModifiers;
     public VirtualKey OcrKey => _ocrKey;
-    public bool ApplyRegex => _applyRegex;
     public Language? SelectedLanguage => _selectedLanguage;
 
     // Methods for OCRViewModel to update settings
@@ -146,20 +137,6 @@ public sealed class OCRService
         }
     }
 
-    public async Task UpdateApplyRegexAsync(bool applyRegex)
-    {
-        _applyRegex = applyRegex;
-        
-        try
-        {
-            await _settingsService.SaveSettingAsync(OcrApplyRegexKey, applyRegex);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Failed to save OCR Apply Regex: {ex.Message}");
-        }
-    }
-
     public async Task UpdateLanguageAsync(Language language)
     {
         _selectedLanguage = language;
@@ -172,87 +149,5 @@ public sealed class OCRService
         {
             System.Diagnostics.Debug.WriteLine($"Failed to save OCR Language: {ex.Message}");
         }
-    }
-
-    // Called when a hotkey is triggered - checks for OCR → Hotkey matching
-    public bool TryApplyOcrToHotkey(VirtualKeyModifiers modifiers, VirtualKey key)
-    {
-        if (!_applyRegex || string.IsNullOrWhiteSpace(_lastOcrResult))
-        {
-            System.Diagnostics.Debug.WriteLine("TryApplyOcrToHotkey: Conditions not met, returning false");
-            return false;
-        }
-
-        // Find the matching hotkey configuration
-        var matchingHotkey = _hotkeyCollectSaveService.RegexConfigs.FirstOrDefault(h => 
-            h.Hotkey?.Modifiers == modifiers && h.Hotkey?.Key == key);
-
-        if (matchingHotkey?.RegexChain == null)
-        {
-            System.Diagnostics.Debug.WriteLine("TryApplyOcrToHotkey: No matching hotkey configuration found");
-            return false;
-        }
-
-        try
-        {
-            System.Diagnostics.Debug.WriteLine($"Applying regex chain for hotkey: {matchingHotkey.HotkeyName}");
-            
-            // Apply the regex chain to the OCR result
-            string processedText = _lastOcrResult;
-            foreach (var chainItem in matchingHotkey.RegexChain.ChainItems)
-            {
-                processedText = RegexService.ProcessRegex(processedText, chainItem.RegexExpression, chainItem.Replace);
-            }
-
-            // Set the processed text to clipboard
-            var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
-            dataPackage.SetText(processedText);
-            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
-
-            _lastOcrResult = null;
-            System.Diagnostics.Debug.WriteLine("OCR → Hotkey processing completed successfully");
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Error in TryApplyOcrToHotkey: {ex.Message}");
-            _lastOcrResult = null;
-            return false;
-        }
-    }
-
-    // Show OCR → Hotkey success notification
-    public void ShowOcrRegexNotification()
-    {
-        _notificationService.ShowSystemNotification(
-            titleKey: "Notification_OcrHotkeyApplied_Title",
-            messageKey: "Notification_OcrHotkeyApplied_Message",
-            force: false,
-            addTag: true
-        );
-    }
-
-    // Called when OCR is completed - sets up the matching window
-    public void NotifyOcrCompleted(string ocrResult)
-    {
-        System.Diagnostics.Debug.WriteLine($"=== NotifyOcrCompleted called ===");
-        System.Diagnostics.Debug.WriteLine($"ApplyRegex: {_applyRegex}");
-        System.Diagnostics.Debug.WriteLine($"OCR Result: '{ocrResult}'");
-        
-        if (!_applyRegex)
-        {
-            System.Diagnostics.Debug.WriteLine("❌ OCR → Hotkey feature is DISABLED. Please enable 'Apply Regular Expressions' in OCR page settings!");
-            return;
-        }
-        
-        if (string.IsNullOrWhiteSpace(ocrResult))
-        {
-            System.Diagnostics.Debug.WriteLine("❌ OCR result is empty or whitespace");
-            return;
-        }
-
-        _lastOcrResult = ocrResult;
-        System.Diagnostics.Debug.WriteLine($"✅ OCR state set: _lastOcrResult='{_lastOcrResult}'");
     }
 } 

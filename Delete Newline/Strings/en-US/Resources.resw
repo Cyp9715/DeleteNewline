@@ -333,19 +333,6 @@
     <value>Recognition Language</value>
     <comment>OCR page language combobox header</comment>
   </data>
-  <data name="OCRPage_Title_Options.Text" xml:space="preserve">
-    <value>Options</value>
-    <comment>OCR page options section title</comment>
-  </data>
-  <data name="OCRPage_RegexApply.Text" xml:space="preserve">
-    <value>Apply Regular Expressions</value>
-  </data>
-  <data name="OCRPage_Description_RegexApply.Text" xml:space="preserve">
-    <value>Apply regular expressions sequentially to OCR-extracted text.</value>
-  </data>
-  <data name="OCRPage_Description_RegexApply_Detail.Text" xml:space="preserve">
-    <value>When enabled, after converting images to text using the OCR hotkey, you can immediately apply regex hotkeys without any keyboard actions. The processed text will be saved to the clipboard.</value>
-  </data>
   <data name="OCRPage_Text_AddLanguagePrefix.Text" xml:space="preserve">
     <value>To add new languages, please check </value>
     <comment>OCR page add language instruction prefix</comment>
@@ -365,14 +352,6 @@
   <data name="Notification_OcrLanguageNotFound_Message" xml:space="preserve">
     <value>The previously selected OCR language is no longer available. Defaulted to English.</value>
     <comment>Notification message when saved OCR language is not available</comment>
-  </data>
-  <data name="Notification_OcrHotkeyApplied_Title" xml:space="preserve">
-    <value>OCR → Hotkey Applied</value>
-    <comment>Notification title when OCR result is automatically processed by hotkey</comment>
-  </data>
-  <data name="Notification_OcrHotkeyApplied_Message" xml:space="preserve">
-    <value>OCR result has been processed through the hotkey regex chain and updated in clipboard.</value>
-    <comment>Notification message when OCR result is automatically processed by hotkey</comment>
   </data>
   <data name="LanguageList/en-US" xml:space="preserve">
     <value>English</value>
@@ -399,7 +378,7 @@
     <value>Regex Expression</value>
   </data>
   <data name="RegexPage_Label_Replace.Text" xml:space="preserve">
-    <value>└ Replace</value>
+    <value>??Replace</value>
   </data>
   <data name="RegexPage_Button_AddRegexItem.Content" xml:space="preserve">
     <value>Add Regex Item</value>

@@ -31,9 +31,6 @@ public partial class OCRViewModel : ObservableRecipient
     private Language? _selectedLanguage;
 
     [ObservableProperty]
-    public bool _applyRegex;
-
-    [ObservableProperty]
     private string? _displayHotkey;
 
     // OCR dedicated hotkey settings (synchronized with OCRService)
@@ -72,7 +69,6 @@ public partial class OCRViewModel : ObservableRecipient
         // Get current settings from OCRService
         _ocrModifiers = _ocrService.OcrModifiers;
         _ocrKey = _ocrService.OcrKey;
-        ApplyRegex = _ocrService.ApplyRegex;
         SelectedLanguage = _ocrService.SelectedLanguage;
         
         // Update display hotkey
@@ -91,23 +87,12 @@ public partial class OCRViewModel : ObservableRecipient
         UpdateDisplayHotkey();
     }
 
-    private async Task SaveApplyRegexAsync()
-    {
-        await _ocrService.UpdateApplyRegexAsync(ApplyRegex);
-    }
-
     private async Task SaveOcrLanguageAsync()
     {
         if (SelectedLanguage != null)
         {
             await _ocrService.UpdateLanguageAsync(SelectedLanguage);
         }
-    }
-
-    // Handle Apply Hotkey changes
-    partial void OnApplyRegexChanged(bool value)
-    {
-        _ = SaveApplyRegexAsync();
     }
 
     // Handle OCR Language changes

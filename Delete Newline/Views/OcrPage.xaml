@@ -107,50 +107,6 @@
                         </StackPanel>
                     </StackPanel>
                 </Border>
-
-                <!-- OCR Options Label -->
-                <TextBlock x:Uid="OCRPage_Title_Options"
-                           Style="{StaticResource SubtitleTextBlockStyle}"
-                           FontSize="16"
-                           HorizontalAlignment="Left"
-                           Margin="3,20,0,0"/>
-
-                <!-- OCR Options -->
-                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-
-                        Margin="0,5,0,5"
-                        Padding="10">
-                    <StackPanel>
-                        <!-- Description -->
-                        <TextBlock x:Uid="OCRPage_Description_RegexApply"
-                                   Style="{ThemeResource BodyTextBlockStyle}"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Margin="5,0,0,0" />
-
-                        <!-- Regex Apply Toggle -->
-                        <Grid Margin="5,10,0,0">
-                            <TextBlock x:Uid="OCRPage_RegexApply"
-                                       VerticalAlignment="Center" />
-                            <ToggleSwitch x:Name="RegexApplyToggle"
-                                          IsOn="{Binding ApplyRegex, Mode=TwoWay}"
-                                          Style="{StaticResource CompactToggleSwitch}"
-                                          HorizontalAlignment="Right"
-                                          VerticalAlignment="Center"
-                                          OnContent=""
-                                          OffContent="" />
-                        </Grid>
-                        
-                        <!-- Detailed Description -->
-                        <TextBlock x:Uid="OCRPage_Description_RegexApply_Detail"
-                                   Style="{ThemeResource CaptionTextBlockStyle}"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Margin="5,5,0,0"
-                                   TextWrapping="Wrap" />
-                    </StackPanel>
-                </Border>
             </StackPanel>
             
             <!-- Dummy button for focus removal during hotkey registration -->

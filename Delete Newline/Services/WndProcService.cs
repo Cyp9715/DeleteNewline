@@ -108,21 +108,6 @@ public sealed class WndProcService
 
                 Debug.WriteLine($"Found hotkey structure: {hotkeyStructure.HotkeyName}");
 
-                // 3. Check if OCR was just completed (OCR → Hotkey processing)
-                Debug.WriteLine($"ㄴㄴㄴㄴㄴㄴㄴㄴㄴ{App.GetService<OCRViewModel>().ApplyRegex}");
-
-                if (App.GetService<OCRViewModel>().ApplyRegex)
-                {
-                    Debug.WriteLine($"ㄴㄴㄴㄴㄴㄴㄴㄴㄴ{App.GetService<OCRViewModel>().ApplyRegex}");
-
-                    if (ocrWithRegex)
-                    {
-                        bool isOcrToHotkey = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
-                        Debug.WriteLine($"OCR → Regex result: {isOcrToHotkey}");
-                        _ocrService.ShowOcrRegexNotification();
-                        break;
-                    }
-                }
 
                 // 4. Process normal hotkey (Ctrl+C needed)
                 Debug.WriteLine("Processing normal hotkey with Ctrl+C");
