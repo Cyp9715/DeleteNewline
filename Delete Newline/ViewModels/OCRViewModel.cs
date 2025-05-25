@@ -24,14 +24,14 @@ public partial class OCRViewModel : ObservableRecipient
     // Settings keys (kept for compatibility, but OCRService handles the actual persistence)
     private const string OcrHotkeyModifiersKey = "OCR_HotkeyModifiers";
     private const string OcrHotkeyKeyKey = "OCR_HotkeyKey";
-    private const string OcrAutoApplyHotkeyKey = "OCR_AutoApplyHotkey";
+    private const string OcrApplyRegexKey = "OCR_ApplyRegex";
     private const string OcrLanguageTagKey = "OCR_LanguageTag";
 
     [ObservableProperty]
     private Language? _selectedLanguage;
 
     [ObservableProperty]
-    private bool _autoApplyHotkey;
+    private bool _applyRegex;
 
     [ObservableProperty]
     private string? _displayHotkey;
@@ -70,7 +70,7 @@ public partial class OCRViewModel : ObservableRecipient
         // Get current settings from OCRService
         _ocrModifiers = _ocrService.OcrModifiers;
         _ocrKey = _ocrService.OcrKey;
-        AutoApplyHotkey = _ocrService.AutoApplyHotkey;
+        ApplyRegex = _ocrService.ApplyRegex;
         SelectedLanguage = _ocrService.SelectedLanguage;
         
         // Update display hotkey
@@ -89,9 +89,9 @@ public partial class OCRViewModel : ObservableRecipient
         UpdateDisplayHotkey();
     }
 
-    private async Task SaveAutoApplyHotkeyAsync()
+    private async Task SaveApplyRegexAsync()
     {
-        await _ocrService.UpdateAutoApplyHotkeyAsync(AutoApplyHotkey);
+        await _ocrService.UpdateApplyRegexAsync(ApplyRegex);
     }
 
     private async Task SaveOcrLanguageAsync()
@@ -102,10 +102,10 @@ public partial class OCRViewModel : ObservableRecipient
         }
     }
 
-    // Handle Auto Apply Hotkey changes
-    partial void OnAutoApplyHotkeyChanged(bool value)
+    // Handle Apply Hotkey changes
+    partial void OnApplyRegexChanged(bool value)
     {
-        _ = SaveAutoApplyHotkeyAsync();
+        _ = SaveApplyRegexAsync();
     }
 
     // Handle OCR Language changes

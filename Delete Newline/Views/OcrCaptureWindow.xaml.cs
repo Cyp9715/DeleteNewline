@@ -23,7 +23,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private Language currentLanguage = new Language("en"); // Default language setting
     private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
     private bool singleLineMode = false; // OCR single line mode setting
-    private bool autoApplyHotkeyEnabled = false; // Auto apply hotkey setting
+    private bool applyRegexEnabled = false; // Apply regex setting
 
     // OCRService dependency for notifying completion
     private readonly OCRService? _ocrService;
@@ -42,10 +42,10 @@ public sealed partial class OcrCaptureWindow : WindowEx
         }
     }
 
-    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool autoApplyHotkeyEnabled = false)
+    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool applyRegexEnabled = false)
     {
         backgroundImage = preloadedBackground;
-        this.autoApplyHotkeyEnabled = autoApplyHotkeyEnabled;
+        this.applyRegexEnabled = applyRegexEnabled;
         
         // Passed language setting (if any)
         if (selectedLanguage != null)
@@ -404,9 +404,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
                     
                     System.Diagnostics.Debug.WriteLine("✅ Text copied to clipboard successfully!");
                     System.Diagnostics.Debug.WriteLine($"Copied text: '{ocrText.Trim()}'");
-                    System.Diagnostics.Debug.WriteLine($"AutoApplyHotkey enabled: {autoApplyHotkeyEnabled}");
+                    System.Diagnostics.Debug.WriteLine($"ApplyRegex enabled: {applyRegexEnabled}");
 
-                    // Always notify OCRService of OCR completion (let OCRService handle autoApplyHotkey logic)
+                    // Always notify OCRService of OCR completion (let OCRService handle applyRegex logic)
                     _ocrService?.NotifyOcrCompleted(ocrText);
                 }
                 catch (Exception clipboardEx)

@@ -135,7 +135,7 @@
                             <TextBlock x:Uid="OCRPage_RegexApply"
                                        VerticalAlignment="Center" />
                             <ToggleSwitch x:Name="RegexApplyToggle"
-                                          IsOn="{Binding AutoApplyHotkey, Mode=TwoWay}"
+                                          IsOn="{Binding ApplyRegex, Mode=TwoWay}"
                                           Style="{StaticResource CompactToggleSwitch}"
                                           HorizontalAlignment="Right"
                                           VerticalAlignment="Center"

@@ -141,38 +141,49 @@ public sealed class WndProcService
 
             case WM_HOTKEY:
                 int hotkeyId = wParam.ToInt32();
+                Debug.WriteLine($"=== WM_HOTKEY received: ID={hotkeyId} ===");
                 
                 // 1. OCR Hotkey 확인
                 int? ocrHotkeyId = _hotkeyRegisterService.GetOcrHotkeyId();
                 bool isOcrHotkey = ocrHotkeyId.HasValue && hotkeyId == ocrHotkeyId.Value;
+                Debug.WriteLine($"OCR Hotkey ID: {ocrHotkeyId}, Is OCR Hotkey: {isOcrHotkey}");
 
                 if (isOcrHotkey)
                 {
-                    // OCR Hotkey 처리
+                    // OCR Hotkey 처리 - OCR 단축키는 일반 단축키 처리를 하지 않음
+                    Debug.WriteLine("Processing OCR Hotkey - launching OCR capture");
                     LaunchOcrCapture();
                     break;
                 }
-                else
+
+                // 2. 일반 Hotkey 확인
+                var hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(hotkeyId);
+                if (hotkeyStructure?.Hotkey == null)
                 {
-                    // 2. 일반 Hotkey - OCR 직후인지 확인
-                    var hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(hotkeyId);
-                    if (hotkeyStructure?.Hotkey != null)
-                    {
-                        bool isOcrToHotkey = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
-
-                        if (isOcrToHotkey)
-                        {
-                            // OCR → Hotkey 처리 (Ctrl+C 불필요)
-                            _ocrService.ShowOcrHotkeyNotification();
-                            break;
-                        }
-                    }
-
-                    // 3. 일반 Hotkey 처리 (Ctrl+C 필요)
-                    App.ActiveHotkeyIdForCopy = hotkeyId;
-                    VirtualInputHelper.SendCtrlC();
+                    // Hotkey structure not found - log error and ignore
+                    Debug.WriteLine($"ERROR: Hotkey structure not found for ID: {hotkeyId}");
                     break;
                 }
+
+                Debug.WriteLine($"Found hotkey structure: {hotkeyStructure.HotkeyName}");
+
+                // 3. OCR 직후인지 확인 (OCR → Hotkey 처리)
+                bool isOcrToHotkey = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
+                Debug.WriteLine($"OCR → Hotkey result: {isOcrToHotkey}");
+
+                if (isOcrToHotkey)
+                {
+                    // OCR → Hotkey 처리 성공 (Ctrl+C 불필요)
+                    Debug.WriteLine("OCR → Hotkey processing successful - showing notification");
+                    _ocrService.ShowOcrHotkeyNotification();
+                    break;
+                }
+
+                // 4. 일반 Hotkey 처리 (Ctrl+C 필요)
+                Debug.WriteLine("Processing normal hotkey with Ctrl+C");
+                App.ActiveHotkeyIdForCopy = hotkeyId;
+                VirtualInputHelper.SendCtrlC();
+                break;
         }
         return CallWindowProc(_oldWndProc, hWnd, (int)msg, wParam, lParam);
     }
