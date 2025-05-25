@@ -405,9 +405,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
                     System.Diagnostics.Debug.WriteLine("✅ Text copied to clipboard successfully!");
                     System.Diagnostics.Debug.WriteLine($"Copied text: '{ocrText.Trim()}'");
                     System.Diagnostics.Debug.WriteLine($"ApplyRegex enabled: {applyRegexEnabled}");
-
-                    // Always notify OCRService of OCR completion (let OCRService handle applyRegex logic)
-                    _ocrService?.NotifyOcrCompleted(ocrText);
                 }
                 catch (Exception clipboardEx)
                 {

@@ -29,7 +29,6 @@ public sealed class OCRService
     private Language? _selectedLanguage;
 
     // OCR → Hotkey matching state
-    private bool _ocrJustCompleted = false;
     private string? _lastOcrResult = null;
 
     public OCRService(HotkeyRegisterService hotkeyManager, InAppNotificationService inAppNotificationService, SettingsService settingsService, RegexCollectSaveService hotkeyCollectSaveService, RegexService regexService, NotificationService notificationService)
@@ -175,51 +174,10 @@ public sealed class OCRService
         }
     }
 
-    // Called when OCR is completed - sets up the matching window
-    public void NotifyOcrCompleted(string ocrResult)
-    {
-        System.Diagnostics.Debug.WriteLine($"=== NotifyOcrCompleted called ===");
-        System.Diagnostics.Debug.WriteLine($"ApplyRegex: {_applyRegex}");
-        System.Diagnostics.Debug.WriteLine($"OCR Result: '{ocrResult}'");
-        
-        if (!_applyRegex)
-        {
-            System.Diagnostics.Debug.WriteLine("❌ OCR → Hotkey feature is DISABLED. Please enable 'Apply Regular Expressions' in OCR page settings!");
-            return;
-        }
-        
-        if (string.IsNullOrWhiteSpace(ocrResult))
-        {
-            System.Diagnostics.Debug.WriteLine("❌ OCR result is empty or whitespace");
-            return;
-        }
-
-        _ocrJustCompleted = true;
-        _lastOcrResult = ocrResult;
-        System.Diagnostics.Debug.WriteLine($"✅ OCR state set: _ocrJustCompleted={_ocrJustCompleted}");
-    }
-
-    // Called when user input is detected (typing, mouse clicks) - disables matching
-    public void NotifyUserInputDetected()
-    {
-        if (_ocrJustCompleted)
-        {
-            System.Diagnostics.Debug.WriteLine("=== NotifyUserInputDetected: Resetting OCR state ===");
-            _ocrJustCompleted = false;
-            _lastOcrResult = null;
-        }
-    }
-
     // Called when a hotkey is triggered - checks for OCR → Hotkey matching
     public bool TryApplyOcrToHotkey(VirtualKeyModifiers modifiers, VirtualKey key)
     {
-        System.Diagnostics.Debug.WriteLine($"=== TryApplyOcrToHotkey called ===");
-        System.Diagnostics.Debug.WriteLine($"Hotkey: {modifiers} + {key}");
-        System.Diagnostics.Debug.WriteLine($"ApplyRegex: {_applyRegex}");
-        System.Diagnostics.Debug.WriteLine($"OCR just completed: {_ocrJustCompleted}");
-        System.Diagnostics.Debug.WriteLine($"Last OCR result: '{_lastOcrResult ?? "null"}'");
-        
-        if (!_applyRegex || !_ocrJustCompleted || string.IsNullOrWhiteSpace(_lastOcrResult))
+        if (!_applyRegex || string.IsNullOrWhiteSpace(_lastOcrResult))
         {
             System.Diagnostics.Debug.WriteLine("TryApplyOcrToHotkey: Conditions not met, returning false");
             return false;
@@ -251,8 +209,6 @@ public sealed class OCRService
             dataPackage.SetText(processedText);
             Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
 
-            // Clear the matching state
-            _ocrJustCompleted = false;
             _lastOcrResult = null;
             System.Diagnostics.Debug.WriteLine("OCR → Hotkey processing completed successfully");
 
@@ -261,14 +217,13 @@ public sealed class OCRService
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error in TryApplyOcrToHotkey: {ex.Message}");
-            _ocrJustCompleted = false;
             _lastOcrResult = null;
             return false;
         }
     }
 
     // Show OCR → Hotkey success notification
-    public void ShowOcrHotkeyNotification()
+    public void ShowOcrRegexNotification()
     {
         _notificationService.ShowSystemNotification(
             titleKey: "Notification_OcrHotkeyApplied_Title",

@@ -32,6 +32,8 @@ public sealed class WndProcService
     private static WndProc? _newWndProc;
     private static WndProcService? _instance;
 
+    private bool ocrWithRegex = false;
+
     public WndProcService(OCRService ocrService, RegexCollectSaveService regexCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
     {
         _ocrService = ocrService;
@@ -71,30 +73,28 @@ public sealed class WndProcService
                 
                 // Skip ESC key (used for OCR window closure)
                 if (vKey == 27) break;
-                
-                // Any other keyboard input breaks the OCR → Hotkey chain
-                _ocrService.NotifyUserInputDetected();
-                Debug.WriteLine($"Keyboard input detected (VKey: {vKey}) - OCR → Hotkey chain reset");
+                Debug.WriteLine($"OCR screen keyboard input detected (VKey: {vKey}) windows close.");
                 break;
 
             case WM_HOTKEY:
                 int hotkeyId = wParam.ToInt32();
                 Debug.WriteLine($"=== WM_HOTKEY received: ID={hotkeyId} ===");
                 
-                // 1. OCR Hotkey 확인
+                // 1. Check OCR Hotkey
                 int? ocrHotkeyId = _hotkeyRegisterService.GetOcrHotkeyId();
                 bool isOcrHotkey = ocrHotkeyId.HasValue && hotkeyId == ocrHotkeyId.Value;
                 Debug.WriteLine($"OCR Hotkey ID: {ocrHotkeyId}, Is OCR Hotkey: {isOcrHotkey}");
 
                 if (isOcrHotkey)
                 {
-                    // OCR Hotkey 처리 - OCR 단축키는 일반 단축키 처리를 하지 않음
+                    // Process OCR Hotkey - OCR hotkey doesn't follow normal hotkey processing
                     Debug.WriteLine("Processing OCR Hotkey - launching OCR capture");
                     LaunchOcrCapture();
+                    ocrWithRegex = true;
                     break;
                 }
 
-                // 2. 일반 Hotkey 확인
+                // 2. Check normal hotkey
                 var hotkeyStructure = _regexCollectSaveService.GetRegexStructureByHotkeyId(hotkeyId);
                 if (hotkeyStructure?.Hotkey == null)
                 {
@@ -105,19 +105,16 @@ public sealed class WndProcService
 
                 Debug.WriteLine($"Found hotkey structure: {hotkeyStructure.HotkeyName}");
 
-                // 3. OCR 직후인지 확인 (OCR → Hotkey 처리)
-                bool isOcrToHotkey = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
-                Debug.WriteLine($"OCR → Hotkey result: {isOcrToHotkey}");
-
-                if (isOcrToHotkey)
+                // 3. Check if OCR was just completed (OCR → Hotkey processing)
+                if(ocrWithRegex)
                 {
-                    // OCR → Hotkey 처리 성공 (Ctrl+C 불필요)
-                    Debug.WriteLine("OCR → Hotkey processing successful - showing notification");
-                    _ocrService.ShowOcrHotkeyNotification();
+                    bool isOcrToHotkey = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
+                    Debug.WriteLine($"OCR → Regex result: {isOcrToHotkey}");
+                    _ocrService.ShowOcrRegexNotification();
                     break;
                 }
 
-                // 4. 일반 Hotkey 처리 (Ctrl+C 필요)
+                // 4. Process normal hotkey (Ctrl+C needed)
                 Debug.WriteLine("Processing normal hotkey with Ctrl+C");
                 App.ActiveHotkeyIdForCopy = hotkeyId;
                 VirtualInputHelper.SendCtrlC();
