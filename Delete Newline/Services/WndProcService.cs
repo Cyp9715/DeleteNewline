@@ -20,39 +20,16 @@ public sealed class WndProcService
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool UnhookWindowsHookEx(IntPtr hhk);
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr GetModuleHandle(string lpModuleName);
-
     private const int WM_HOTKEY = 0x0312;
     private const int WM_ACTIVATE = 0x0006;
     private const int WM_KEYDOWN = 0x0100;
     private const int WM_KEYUP = 0x0101;
-    private const int WM_LBUTTONDOWN = 0x0201;
-    private const int WM_RBUTTONDOWN = 0x0204;
-    private const int WM_MBUTTONDOWN = 0x0207;
     private const int GWL_WNDPROC = -4;
 
-    // Mouse hook constants
-    private const int WH_MOUSE_LL = 14;
-    private const int HC_ACTION = 0;
-
     private delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-    private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
     
     private static IntPtr _oldWndProc;
     private static WndProc? _newWndProc;
-    private static IntPtr _mouseHookID = IntPtr.Zero;
-    private static LowLevelMouseProc? _mouseProc;
     private static WndProcService? _instance;
 
     public WndProcService(OCRService ocrService, HotkeyCollectSaveService hotkeyCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
@@ -68,46 +45,13 @@ public sealed class WndProcService
         _newWndProc = NewWndProc;
         IntPtr newWndProcPtr = Marshal.GetFunctionPointerForDelegate(_newWndProc);
         _oldWndProc = SetWindowLongPtr(_hwnd, GWL_WNDPROC, newWndProcPtr);
-
-        // Set up global mouse hook
-        _mouseProc = MouseHookProc;
-        _mouseHookID = SetWindowsHookEx(WH_MOUSE_LL, _mouseProc, GetModuleHandle("user32.dll"), 0);
         
-        if (_mouseHookID == IntPtr.Zero)
-        {
-            Debug.WriteLine("Failed to install mouse hook");
-        }
-        else
-        {
-            Debug.WriteLine("Mouse hook installed successfully");
-        }
+        Debug.WriteLine("WndProcService initialized successfully");
     }
 
     public void Dispose()
     {
-        if (_mouseHookID != IntPtr.Zero)
-        {
-            UnhookWindowsHookEx(_mouseHookID);
-            _mouseHookID = IntPtr.Zero;
-            Debug.WriteLine("Mouse hook uninstalled");
-        }
-    }
-
-    private static IntPtr MouseHookProc(int nCode, IntPtr wParam, IntPtr lParam)
-    {
-        if (nCode >= HC_ACTION && _instance != null)
-        {
-            int message = wParam.ToInt32();
-            
-            // Detect mouse clicks
-            if (message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN || message == WM_MBUTTONDOWN)
-            {
-                _instance._ocrService.NotifyUserInputDetected();
-                Debug.WriteLine($"Global mouse click detected: {message}");
-            }
-        }
-        
-        return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
+        Debug.WriteLine("WndProcService disposed");
     }
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
@@ -128,15 +72,9 @@ public sealed class WndProcService
                 // Skip ESC key (used for OCR window closure)
                 if (vKey == 27) break;
                 
-                // Any other key press/release breaks the OCR -> Hotkey chain
+                // Any other keyboard input breaks the OCR → Hotkey chain
                 _ocrService.NotifyUserInputDetected();
-                break;
-
-            case WM_LBUTTONDOWN:
-            case WM_RBUTTONDOWN:
-            case WM_MBUTTONDOWN:
-                // Mouse clicks break the OCR → Hotkey chain
-                _ocrService.NotifyUserInputDetected();
+                Debug.WriteLine($"Keyboard input detected (VKey: {vKey}) - OCR → Hotkey chain reset");
                 break;
 
             case WM_HOTKEY:

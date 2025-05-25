@@ -34,7 +34,7 @@
                                     helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.HotkeyCollectViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                  Glyph="&#xF210;" />
+                                  Glyph="&#xf683;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
@@ -43,7 +43,7 @@
                                     x:Name="OCRPageItem">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                  Glyph="&#xE7C3;" />
+                                  Glyph="&#xE7c5;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
