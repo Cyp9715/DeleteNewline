@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Shell_Memo.Content" xml:space="preserve">
-    <value>Memo</value>
-  </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
     <value>Theme</value>
   </data>
@@ -149,12 +146,6 @@
   </data>
   <data name="Settings_TopMost.Text" xml:space="preserve">
     <value>Always on Top</value>
-  </data>
-  <data name="Shell_Hotkeys.Content" xml:space="preserve">
-    <value>Hotkeys</value>
-  </data>
-  <data name="Shell_HotkeyDefault.Content" xml:space="preserve">
-    <value>Hotkey</value>
   </data>
   <data name="Shell_OCR.Content" xml:space="preserve">
     <value>OCR</value>
@@ -353,7 +344,7 @@
     <value>Apply regular expressions sequentially to OCR-extracted text.</value>
   </data>
   <data name="OCRPage_Description_RegexApply_Detail.Text" xml:space="preserve">
-    <value>When enabled, after converting images to text using the OCR hotkey, you can immediately apply regex hotkeys without any  keyboard actions. The processed text will be saved to the clipboard.</value>
+    <value>When enabled, after converting images to text using the OCR hotkey, you can immediately apply regex hotkeys without any keyboard actions. The processed text will be saved to the clipboard.</value>
   </data>
   <data name="OCRPage_Text_AddLanguagePrefix.Text" xml:space="preserve">
     <value>To add new languages, please check </value>
@@ -415,5 +406,8 @@
   </data>
   <data name="RegexPage_Title_TestRegexChain.Text" xml:space="preserve">
     <value>Test Regex Chain</value>
+  </data>
+  <data name="Shell_RegexExpressions.Content" xml:space="preserve">
+    <value>Regex Expressions</value>
   </data>
 </root>

@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Shell_Memo.Content" xml:space="preserve">
-    <value>메모</value>
-  </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
     <value>테마</value>
   </data>
@@ -149,12 +146,6 @@
   </data>
   <data name="Settings_TopMost.Text" xml:space="preserve">
     <value>항상 위에 표시</value>
-  </data>
-  <data name="Shell_Hotkeys.Content" xml:space="preserve">
-    <value>단축키 목록</value>
-  </data>
-  <data name="Shell_HotkeyDefault.Content" xml:space="preserve">
-    <value>단축키</value>
   </data>
   <data name="Shell_OCR.Content" xml:space="preserve">
     <value>OCR</value>
@@ -415,5 +406,8 @@
   </data>
   <data name="RegexPage_Title_TestRegexChain.Text" xml:space="preserve">
     <value>정규식 체인 테스트</value>
+  </data>
+  <data name="Shell_RegexExpressions.Content" xml:space="preserve">
+    <value>정규표현식</value>
   </data>
 </root>

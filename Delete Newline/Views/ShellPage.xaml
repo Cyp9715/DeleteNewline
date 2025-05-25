@@ -29,7 +29,7 @@
                         DisplayModeChanged="NavigationViewControl_DisplayModeChanged">
             
             <NavigationView.MenuItems>
-                <NavigationViewItem x:Uid="Shell_Hotkeys"
+                <NavigationViewItem x:Uid="Shell_RegexExpressions"
                                     x:Name="HotkeysPageItem"
                                     helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.RegexCollectViewModel">
                     <NavigationViewItem.Icon>
