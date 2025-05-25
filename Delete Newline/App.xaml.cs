@@ -24,6 +24,9 @@ public partial class App : Application
     private const string MutexName = "Cyp:DeleteNewlineMutex";
     private const string WindowTitle = "Delete Newline";
 
+    // State for currently triggered hotkey expecting a copy action
+    public static int? ActiveHotkeyIdForCopy { get; set; }
+
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
 

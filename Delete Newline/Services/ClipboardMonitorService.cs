@@ -53,12 +53,28 @@ public class ClipboardMonitorService
             rawText = dataPackageView.GetTextAsync().GetAwaiter().GetResult();
             string cleanedText;
 
-            Debug.WriteLine("[ClipboardMonitorService] General clipboard change. Applying default rules.");
-            cleanedText = rawText;
+            // Check if a hotkey triggered this clipboard change
+            int? triggeredHotkeyId = App.ActiveHotkeyIdForCopy;
+            if (triggeredHotkeyId.HasValue)
+            {
+                App.ActiveHotkeyIdForCopy = null; // Reset immediately
+                Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId.Value}. Applying regex rules.");
+                cleanedText = _regexService.ApplyRegexRules(rawText, triggeredHotkeyId.Value);
+            }
+            else
+            {
+                Debug.WriteLine("[ClipboardMonitorService] General clipboard change. No regex processing.");
+                cleanedText = rawText;
+            }
 
             if (rawText != cleanedText && !string.IsNullOrEmpty(cleanedText))
             {
-                UpdateClipboardContent(cleanedText);
+                UpdateClipboardContent(cleanedText, triggeredHotkeyId);
+            }
+            else if (triggeredHotkeyId.HasValue)
+            {
+                // Hotkey was triggered but no text changes were made - don't show notification
+                Debug.WriteLine($"[ClipboardMonitorService] Hotkey ID: {triggeredHotkeyId.Value} triggered but no regex rules matched or changed the text.");
             }
         }
         catch (Exception ex)
@@ -67,7 +83,7 @@ public class ClipboardMonitorService
         }
     }
 
-    private void UpdateClipboardContent(string cleanedText)
+    private void UpdateClipboardContent(string cleanedText, int? triggeredHotkeyId)
     {
         var dataPackage = new DataPackage();
         dataPackage.SetText(cleanedText);
@@ -75,10 +91,47 @@ public class ClipboardMonitorService
         try
         {
             Clipboard.SetContent(dataPackage);
+
+            if (triggeredHotkeyId.HasValue && _notificationService.GetEnableNotification())
+            {
+                ShowHotkeyNotification(triggeredHotkeyId.Value);
+            }
         }
         catch (Exception exSetContent)
         {
             Debug.WriteLine($"[ClipboardMonitorService] Error setting clipboard content: {exSetContent.Message}. Text was: {cleanedText.Substring(0, Math.Min(cleanedText.Length,50))}...");
         }
+    }
+
+    private void ShowHotkeyNotification(int hotkeyId)
+    {
+        RegexPageStructure? hotkeyStructure = _regexCollectSaveService.GetRegexStructureByHotkeyId(hotkeyId);
+        if (hotkeyStructure == null)
+        {
+            return;
+        }
+
+        string displayHotkey = HotkeyHelper.GetDisplayText(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
+        string messageKey;
+        object[] messageArgs;
+
+        if (string.IsNullOrWhiteSpace(hotkeyStructure.HotkeyName))
+        {
+            messageKey = "Notification_ActionForHotkeyCompleted_Message";
+            messageArgs = new object[] { displayHotkey };
+        }
+        else
+        {
+            messageKey = "Notification_ActionForHotkeyWithNameCompleted_Message";
+            messageArgs = new object[] { hotkeyStructure.HotkeyName, displayHotkey };
+        }
+
+        _notificationService.ShowSystemNotification(
+            titleKey: "Notification_TextModified_Title",
+            messageKey: messageKey,
+            force: false,
+            addTag: true,
+            messageArgs: messageArgs
+        );
     }
 }

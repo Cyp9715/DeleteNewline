@@ -102,6 +102,7 @@ public sealed class WndProcService
 
                 // 4. Process normal hotkey (Ctrl+C needed)
                 Debug.WriteLine("Processing normal hotkey with Ctrl+C");
+                App.ActiveHotkeyIdForCopy = hotkeyId;
                 VirtualInputHelper.SendCtrlC();
                 break;
         }
