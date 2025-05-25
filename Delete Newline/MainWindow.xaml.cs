@@ -87,23 +87,6 @@ public sealed partial class MainWindow : WindowEx
         }
     }
 
-    /// <summary>
-    /// Starts the FullScreen OCR capture functionality
-    /// </summary>
-    public static void StartFullScreenOcr()
-    {
-        try
-        {
-            var ocrWindow = new OcrCaptureWindow();
-            ocrWindow.Activate();
-        }
-        catch (Exception ex)
-        {
-            // Log error or show notification
-            System.Diagnostics.Debug.WriteLine($"Error starting FullScreen OCR: {ex.Message}");
-        }
-    }
-
     /* 
      * TrayIcon Sector.
      */
@@ -146,10 +129,6 @@ public sealed partial class MainWindow : WindowEx
                     case TrayIconService.ID_NOTIFICATION:
                         var notificationService = App.GetService<NotificationService>();
                         await notificationService.SetEnableNotificationAsync(!notificationService.GetEnableNotification());
-                        break;
-
-                    case TrayIconService.ID_FULLSCREEN_OCR: // 새로운 OCR 메뉴 항목
-                        StartFullScreenOcr();
                         break;
                 }
                 break;

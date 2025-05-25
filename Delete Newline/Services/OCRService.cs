@@ -17,13 +17,11 @@ public sealed class OCRService
     private readonly NotificationService _notificationService;
 
     // Settings keys
-    private const string OcrHotkeyModifiersKey = "OCR_HotkeyModifiers";
-    private const string OcrHotkeyKeyKey = "OCR_HotkeyKey";
+    private const string OcrHotkeyKey = "OCR_Hotkey";
     private const string OcrLanguageTagKey = "OCR_LanguageTag";
 
     // OCR settings
-    private VirtualKeyModifiers _ocrModifiers = VirtualKeyModifiers.None;
-    private VirtualKey _ocrKey = VirtualKey.None;
+    private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
     private Language? _selectedLanguage;
 
     public OCRService(HotkeyRegisterService hotkeyManager, InAppNotificationService inAppNotificationService, SettingsService settingsService, RegexCollectSaveService hotkeyCollectSaveService, RegexService regexService, NotificationService notificationService)
@@ -44,18 +42,16 @@ public sealed class OCRService
     private void LoadSettings()
     {
         // Load OCR hotkey
-        var savedModifiers = _settingsService.ReadSetting<int?>(OcrHotkeyModifiersKey);
-        var savedKey = _settingsService.ReadSetting<int?>(OcrHotkeyKeyKey);
+        var savedHotkey = _settingsService.ReadSetting<HotkeyStructure>(OcrHotkeyKey);
         
-        if (savedModifiers.HasValue && savedKey.HasValue)
+        if (savedHotkey != null)
         {
-            _ocrModifiers = (VirtualKeyModifiers)savedModifiers.Value;
-            _ocrKey = (VirtualKey)savedKey.Value;
+            _ocrHotkey = savedHotkey;
             
             // Register the loaded hotkey
-            if (_ocrModifiers != VirtualKeyModifiers.None && _ocrKey != VirtualKey.None)
+            if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
             {
-                _hotkeyManager.RegisterOcrHotkey(_ocrModifiers, _ocrKey);
+                _hotkeyManager.RegisterOcrHotkey(_ocrHotkey.Modifiers, _ocrHotkey.Key);
             }
         }
         
@@ -116,20 +112,17 @@ public sealed class OCRService
     }
 
     // Public getters for OCRViewModel to access current settings
-    public VirtualKeyModifiers OcrModifiers => _ocrModifiers;
-    public VirtualKey OcrKey => _ocrKey;
+    public HotkeyStructure OcrHotkey => _ocrHotkey;
     public Language? SelectedLanguage => _selectedLanguage;
 
     // Methods for OCRViewModel to update settings
-    public async Task UpdateHotkeyAsync(VirtualKeyModifiers modifiers, VirtualKey key)
+    public async Task UpdateHotkeyAsync(HotkeyStructure hotkey)
     {
-        _ocrModifiers = modifiers;
-        _ocrKey = key;
+        _ocrHotkey = hotkey;
         
         try
         {
-            await _settingsService.SaveSettingAsync(OcrHotkeyModifiersKey, (int)modifiers);
-            await _settingsService.SaveSettingAsync(OcrHotkeyKeyKey, (int)key);
+            await _settingsService.SaveSettingAsync(OcrHotkeyKey, hotkey);
         }
         catch (Exception ex)
         {

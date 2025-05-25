@@ -22,9 +22,7 @@ public partial class OCRViewModel : ObservableRecipient
     private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
 
     // Settings keys (kept for compatibility, but OCRService handles the actual persistence)
-    private const string OcrHotkeyModifiersKey = "OCR_HotkeyModifiers";
-    private const string OcrHotkeyKeyKey = "OCR_HotkeyKey";
-    private const string OcrApplyRegexKey = "OCR_ApplyRegex";
+    private const string OcrHotkeyKey = "OCR_Hotkey";
     private const string OcrLanguageTagKey = "OCR_LanguageTag";
 
     [ObservableProperty]
@@ -34,8 +32,7 @@ public partial class OCRViewModel : ObservableRecipient
     private string? _displayHotkey;
 
     // OCR dedicated hotkey settings (synchronized with OCRService)
-    private VirtualKeyModifiers _ocrModifiers = VirtualKeyModifiers.None;
-    private VirtualKey _ocrKey = VirtualKey.None;
+    private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
 
     public OCRViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService, SettingsService settingsService, OCRService ocrService)
     {
@@ -67,8 +64,7 @@ public partial class OCRViewModel : ObservableRecipient
     private void SyncWithOCRService()
     {
         // Get current settings from OCRService
-        _ocrModifiers = _ocrService.OcrModifiers;
-        _ocrKey = _ocrService.OcrKey;
+        _ocrHotkey = _ocrService.OcrHotkey;
         SelectedLanguage = _ocrService.SelectedLanguage;
         
         // Update display hotkey
@@ -77,12 +73,12 @@ public partial class OCRViewModel : ObservableRecipient
 
     private void UpdateDisplayHotkey()
     {
-        DisplayHotkey = HotkeyHelper.GetDisplayText(_ocrModifiers, _ocrKey);
+        DisplayHotkey = HotkeyHelper.GetDisplayText(_ocrHotkey.Modifiers, _ocrHotkey.Key);
     }
 
     private async Task SaveOcrHotkeyAsync()
     {
-        await _ocrService.UpdateHotkeyAsync(_ocrModifiers, _ocrKey);
+        await _ocrService.UpdateHotkeyAsync(_ocrHotkey);
         // Update display after saving
         UpdateDisplayHotkey();
     }
@@ -131,7 +127,7 @@ public partial class OCRViewModel : ObservableRecipient
         }
 
         // Unregister previous OCR hotkey if exists
-        if (_ocrModifiers != VirtualKeyModifiers.None && _ocrKey != VirtualKey.None)
+        if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
         {
             _hotkeyManager.UnregisterOcrHotkey();
         }
@@ -162,19 +158,8 @@ public partial class OCRViewModel : ObservableRecipient
         // Register new OCR hotkey
         if (_hotkeyManager.RegisterOcrHotkey(args.Modifiers, args.Key))
         {
-            VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
-
-            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Control))
-                tempModifiers |= VirtualKeyModifiers.Control;
-            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Menu))
-                tempModifiers |= VirtualKeyModifiers.Menu;
-            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Shift))
-                tempModifiers |= VirtualKeyModifiers.Shift;
-            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Windows))
-                tempModifiers |= VirtualKeyModifiers.Windows;
-
-            _ocrModifiers = tempModifiers;
-            _ocrKey = args.Key;
+            _ocrHotkey.Modifiers = args.Modifiers;
+            _ocrHotkey.Key = args.Key;
 
             // Save the new hotkey settings
             _ = SaveOcrHotkeyAsync();
@@ -206,8 +191,8 @@ public partial class OCRViewModel : ObservableRecipient
         else
         {
             // Reset hotkey to None when registration fails
-            _ocrModifiers = VirtualKeyModifiers.None;
-            _ocrKey = VirtualKey.None;
+            _ocrHotkey.Modifiers = VirtualKeyModifiers.None;
+            _ocrHotkey.Key = VirtualKey.None;
             
             // Save the reset hotkey settings
             _ = SaveOcrHotkeyAsync();

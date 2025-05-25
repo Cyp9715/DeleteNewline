@@ -383,7 +383,7 @@
     <value>Regex Expression</value>
   </data>
   <data name="RegexPage_Label_Replace.Text" xml:space="preserve">
-    <value>??Replace</value>
+    <value>└ Replace</value>
   </data>
   <data name="RegexPage_Button_AddRegexItem.Content" xml:space="preserve">
     <value>Add Regex Item</value>
