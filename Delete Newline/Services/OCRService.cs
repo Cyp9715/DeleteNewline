@@ -31,8 +31,6 @@ public sealed class OCRService
     // OCR → Hotkey matching state
     private bool _ocrJustCompleted = false;
     private string? _lastOcrResult = null;
-    private DateTime _ocrCompletedTime = DateTime.MinValue;
-    private readonly TimeSpan _ocrHotkeyMatchingWindow = TimeSpan.FromSeconds(3); // 3초 내에 매칭
 
     public OCRService(HotkeyRegisterService hotkeyManager, InAppNotificationService inAppNotificationService, SettingsService settingsService, HotkeyCollectSaveService hotkeyCollectSaveService, RegexService regexService, NotificationService notificationService)
     {
@@ -47,7 +45,6 @@ public sealed class OCRService
     public void Initialize()
     {
         LoadSettings();
-        System.Diagnostics.Debug.WriteLine("OCRService initialized - global OCR hotkeys registered");
     }
 
     private void LoadSettings()
@@ -88,7 +85,6 @@ public sealed class OCRService
             if (savedLanguage != null)
             {
                 _selectedLanguage = savedLanguage;
-                System.Diagnostics.Debug.WriteLine($"Loaded saved OCR language: {savedLanguage.DisplayName} ({savedLanguage.LanguageTag})");
                 return;
             }
             else
@@ -99,18 +95,12 @@ public sealed class OCRService
                     messageKey: "Notification_OcrLanguageNotFound_Message",
                     severity: InfoBarSeverity.Warning
                 );
-                System.Diagnostics.Debug.WriteLine($"Saved OCR language '{savedLanguageTag}' is no longer available");
             }
         }
         
         // Fall back to default language (English or first available)
         var englishLang = availableLanguages.FirstOrDefault(l => l.LanguageTag.StartsWith("en"));
         _selectedLanguage = englishLang ?? availableLanguages.FirstOrDefault();
-        
-        if (_selectedLanguage != null)
-        {
-            System.Diagnostics.Debug.WriteLine($"Using default OCR language: {_selectedLanguage.DisplayName} ({_selectedLanguage.LanguageTag})");
-        }
     }
 
     // OCR capture execution method
@@ -118,13 +108,8 @@ public sealed class OCRService
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine("=== Starting OCR Capture from global hotkey ===");
-            System.Diagnostics.Debug.WriteLine($"Selected language: {_selectedLanguage?.DisplayName ?? "None"} ({_selectedLanguage?.LanguageTag ?? "None"})");
-            
             // Pre-capture desktop screenshot for background
-            System.Diagnostics.Debug.WriteLine("Capturing desktop screenshot...");
             var backgroundImage = Delete_Newline.Helpers.ImageHelper.GetFullDesktopScreenshotAsImageSource();
-            System.Diagnostics.Debug.WriteLine("Desktop screenshot captured successfully");
             
             // Create OCR window
             var ocrWindow = new OcrCaptureWindow();
@@ -132,13 +117,10 @@ public sealed class OCRService
             // Setup fullscreen capture with preloaded background, selected language, and auto apply hotkey setting
             ocrWindow.SetupFullscreen(backgroundImage, _selectedLanguage, _autoApplyHotkey);
             ocrWindow.Activate();
-            
-            System.Diagnostics.Debug.WriteLine("=== OCR Capture window created and activated ===");
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error creating OCR window: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -158,7 +140,6 @@ public sealed class OCRService
         {
             await _settingsService.SaveSettingAsync(OcrHotkeyModifiersKey, (int)modifiers);
             await _settingsService.SaveSettingAsync(OcrHotkeyKeyKey, (int)key);
-            System.Diagnostics.Debug.WriteLine($"OCR Hotkey saved: {modifiers} + {key}");
         }
         catch (Exception ex)
         {
@@ -173,7 +154,6 @@ public sealed class OCRService
         try
         {
             await _settingsService.SaveSettingAsync(OcrAutoApplyHotkeyKey, autoApplyHotkey);
-            System.Diagnostics.Debug.WriteLine($"OCR Auto Apply Hotkey saved: {autoApplyHotkey}");
         }
         catch (Exception ex)
         {
@@ -188,7 +168,6 @@ public sealed class OCRService
         try
         {
             await _settingsService.SaveSettingAsync(OcrLanguageTagKey, language.LanguageTag);
-            System.Diagnostics.Debug.WriteLine($"OCR Language saved: {language.DisplayName} ({language.LanguageTag})");
         }
         catch (Exception ex)
         {
@@ -199,33 +178,13 @@ public sealed class OCRService
     // Called when OCR is completed - sets up the matching window
     public void NotifyOcrCompleted(string ocrResult)
     {
-        System.Diagnostics.Debug.WriteLine($"=== NotifyOcrCompleted called ===");
-        System.Diagnostics.Debug.WriteLine($"AutoApplyHotkey setting: {_autoApplyHotkey}");
-        System.Diagnostics.Debug.WriteLine($"OCR Result: '{ocrResult}'");
-        System.Diagnostics.Debug.WriteLine($"OCR Result length: {ocrResult?.Length ?? 0}");
-        System.Diagnostics.Debug.WriteLine($"Is null or whitespace: {string.IsNullOrWhiteSpace(ocrResult)}");
-
-        if (!_autoApplyHotkey)
+        if (!_autoApplyHotkey || string.IsNullOrWhiteSpace(ocrResult))
         {
-            System.Diagnostics.Debug.WriteLine("=== AutoApplyHotkey disabled - skipping ===");
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(ocrResult))
-        {
-            System.Diagnostics.Debug.WriteLine("=== OCR result is empty - skipping ===");
             return;
         }
 
         _ocrJustCompleted = true;
         _lastOcrResult = ocrResult;
-        _ocrCompletedTime = DateTime.UtcNow;
-
-        System.Diagnostics.Debug.WriteLine($"=== OCR → Hotkey matching window activated ===");
-        System.Diagnostics.Debug.WriteLine($"Stored OCR Result: '{_lastOcrResult}'");
-        System.Diagnostics.Debug.WriteLine($"Completion time: {_ocrCompletedTime:HH:mm:ss.fff}");
-        System.Diagnostics.Debug.WriteLine($"Matching window: {_ocrHotkeyMatchingWindow.TotalSeconds} seconds");
-        System.Diagnostics.Debug.WriteLine($"Window expires at: {(_ocrCompletedTime + _ocrHotkeyMatchingWindow):HH:mm:ss.fff}");
     }
 
     // Called when user input is detected (typing, mouse clicks) - disables matching
@@ -233,7 +192,6 @@ public sealed class OCRService
     {
         if (_ocrJustCompleted)
         {
-            System.Diagnostics.Debug.WriteLine("=== User input detected - OCR → Hotkey matching disabled ===");
             _ocrJustCompleted = false;
             _lastOcrResult = null;
         }
@@ -242,42 +200,16 @@ public sealed class OCRService
     // Called when a hotkey is triggered - checks for OCR → Hotkey matching
     public bool TryApplyOcrToHotkey(VirtualKeyModifiers modifiers, VirtualKey key)
     {
-        System.Diagnostics.Debug.WriteLine($"=== TryApplyOcrToHotkey called ===");
-        System.Diagnostics.Debug.WriteLine($"Hotkey: {modifiers} + {key}");
-        System.Diagnostics.Debug.WriteLine($"Current time: {DateTime.UtcNow:HH:mm:ss.fff}");
-        System.Diagnostics.Debug.WriteLine($"AutoApplyHotkey: {_autoApplyHotkey}");
-        System.Diagnostics.Debug.WriteLine($"OCR just completed: {_ocrJustCompleted}");
-        System.Diagnostics.Debug.WriteLine($"Last OCR result: '{_lastOcrResult ?? "null"}'");
-        System.Diagnostics.Debug.WriteLine($"OCR completed time: {_ocrCompletedTime:HH:mm:ss.fff}");
-
-        if (!_autoApplyHotkey)
+        // Check if this is the OCR hotkey itself - should not be processed as regex hotkey
+        if (_ocrModifiers == modifiers && _ocrKey == key)
         {
-            System.Diagnostics.Debug.WriteLine("=== AutoApplyHotkey disabled - not matching ===");
-            return false;
-        }
-
-        if (!_ocrJustCompleted)
-        {
-            System.Diagnostics.Debug.WriteLine("=== OCR not recently completed - not matching ===");
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(_lastOcrResult))
-        {
-            System.Diagnostics.Debug.WriteLine("=== No OCR result stored - not matching ===");
-            return false;
-        }
-
-        // Check if we're still within the matching window
-        var timeSinceOcr = DateTime.UtcNow - _ocrCompletedTime;
-        System.Diagnostics.Debug.WriteLine($"Time since OCR: {timeSinceOcr.TotalSeconds:F3} seconds");
-        System.Diagnostics.Debug.WriteLine($"Matching window: {_ocrHotkeyMatchingWindow.TotalSeconds} seconds");
-        
-        if (timeSinceOcr > _ocrHotkeyMatchingWindow)
-        {
-            System.Diagnostics.Debug.WriteLine("=== OCR → Hotkey matching window expired ===");
             _ocrJustCompleted = false;
             _lastOcrResult = null;
+            return false;
+        }
+
+        if (!_autoApplyHotkey || !_ocrJustCompleted || string.IsNullOrWhiteSpace(_lastOcrResult))
+        {
             return false;
         }
 
@@ -287,24 +219,17 @@ public sealed class OCRService
 
         if (matchingHotkey?.RegexChain == null)
         {
-            System.Diagnostics.Debug.WriteLine("=== No matching hotkey configuration found ===");
             return false;
         }
 
         try
         {
-            System.Diagnostics.Debug.WriteLine($"=== Applying OCR → Hotkey matching ===");
-            System.Diagnostics.Debug.WriteLine($"Original OCR text: {_lastOcrResult}");
-            System.Diagnostics.Debug.WriteLine($"Hotkey: {matchingHotkey.HotkeyName ?? "Unnamed"} ({modifiers} + {key})");
-
             // Apply the regex chain to the OCR result
             string processedText = _lastOcrResult;
             foreach (var chainItem in matchingHotkey.RegexChain.ChainItems)
             {
                 processedText = RegexService.ProcessRegex(processedText, chainItem.RegexExpression, chainItem.Replace);
             }
-
-            System.Diagnostics.Debug.WriteLine($"Processed text: {processedText}");
 
             // Set the processed text to clipboard
             var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
@@ -315,23 +240,24 @@ public sealed class OCRService
             _ocrJustCompleted = false;
             _lastOcrResult = null;
 
-            // Show success notification (as Windows system notification, like regular hotkeys)
-            _notificationService.ShowSystemNotification(
-                titleKey: "Notification_OcrHotkeyApplied_Title",
-                messageKey: "Notification_OcrHotkeyApplied_Message",
-                force: false,
-                addTag: true
-            );
-
-            System.Diagnostics.Debug.WriteLine("=== OCR → Hotkey matching completed successfully ===");
             return true;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            System.Diagnostics.Debug.WriteLine($"Error applying OCR → Hotkey matching: {ex.Message}");
             _ocrJustCompleted = false;
             _lastOcrResult = null;
             return false;
         }
+    }
+
+    // Show OCR → Hotkey success notification
+    public void ShowOcrHotkeyNotification()
+    {
+        _notificationService.ShowSystemNotification(
+            titleKey: "Notification_OcrHotkeyApplied_Title",
+            messageKey: "Notification_OcrHotkeyApplied_Message",
+            force: false,
+            addTag: true
+        );
     }
 } 

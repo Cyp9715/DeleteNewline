@@ -4,6 +4,7 @@ using Delete_Newline.Helpers;
 using Delete_Newline.Views;
 using Delete_Newline.ViewModels;
 using Windows.System;
+using System.Linq;
 
 namespace Delete_Newline.Services;
 
@@ -122,65 +123,56 @@ public sealed class WndProcService
 
             case WM_KEYDOWN:
             case WM_KEYUP:
-                // Detect keyboard input that would disable OCR → Hotkey matching
                 int vKey = wParam.ToInt32();
-                if (vKey != 27) // Ignore ESC key (used for OCR window closure)
-                {
-                    _ocrService.NotifyUserInputDetected();
-                }
+                
+                // Skip ESC key (used for OCR window closure)
+                if (vKey == 27) break;
+                
+                // Any other key press/release breaks the OCR -> Hotkey chain
+                _ocrService.NotifyUserInputDetected();
                 break;
 
             case WM_LBUTTONDOWN:
             case WM_RBUTTONDOWN:
             case WM_MBUTTONDOWN:
-                // Detect mouse clicks that would disable OCR → Hotkey matching
+                // Mouse clicks break the OCR → Hotkey chain
                 _ocrService.NotifyUserInputDetected();
                 break;
 
             case WM_HOTKEY:
                 int hotkeyId = wParam.ToInt32();
-                Debug.WriteLine($"=== WM_Hotkey received ===");
-                Debug.WriteLine($"Hotkey ID: {hotkeyId}");
-
-                // Check if this is the OCR hotkey (dynamically determine OCR hotkey ID)
+                
+                // 1. OCR Hotkey 확인
                 int? ocrHotkeyId = _hotkeyRegisterService.GetOcrHotkeyId();
                 bool isOcrHotkey = ocrHotkeyId.HasValue && hotkeyId == ocrHotkeyId.Value;
-                
-                Debug.WriteLine($"OCR Hotkey ID: {ocrHotkeyId}");
-                Debug.WriteLine($"Is OCR Hotkey: {isOcrHotkey}");
 
                 if (isOcrHotkey)
                 {
-                    Debug.WriteLine("=== OCR Hotkey detected - launching OCR capture ===");
+                    // OCR Hotkey 처리
                     LaunchOcrCapture();
-                    Debug.WriteLine("=== OCR Hotkey processing completed - returning immediately ===");
-                    return CallWindowProc(_oldWndProc, hWnd, (int)msg, wParam, lParam); // Immediately return after OCR processing
+                    break;
                 }
-
-                Debug.WriteLine("=== Processing regular hotkey ===");
-
-                // Check for OCR → Hotkey matching for regular hotkeys
-                var hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(hotkeyId);
-                if (hotkeyStructure?.Hotkey != null)
+                else
                 {
-                    bool ocrApplied = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
-                    if (ocrApplied)
+                    // 2. 일반 Hotkey - OCR 직후인지 확인
+                    var hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(hotkeyId);
+                    if (hotkeyStructure?.Hotkey != null)
                     {
-                        Debug.WriteLine($"OCR → Hotkey matching applied for hotkey ID: {hotkeyId}");
-                        break; // Skip normal hotkey processing
+                        bool isOcrToHotkey = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
+
+                        if (isOcrToHotkey)
+                        {
+                            // OCR → Hotkey 처리 (Ctrl+C 불필요)
+                            _ocrService.ShowOcrHotkeyNotification();
+                            break;
+                        }
                     }
+
+                    // 3. 일반 Hotkey 처리 (Ctrl+C 필요)
+                    App.ActiveHotkeyIdForCopy = hotkeyId;
+                    VirtualInputHelper.SendCtrlC();
+                    break;
                 }
-
-                // Normal hotkey processing
-                App.ActiveHotkeyIdForCopy = hotkeyId;
-
-                // Simulate Ctrl+C
-                VirtualInputHelper.SendCtrlC();
-                Debug.WriteLine($"Simulated Ctrl+C for Hotkey ID: {hotkeyId}");
-
-                // We no longer process clipboard directly here.
-                // check ClipboardMonitorService.cs
-                break;
         }
         return CallWindowProc(_oldWndProc, hWnd, (int)msg, wParam, lParam);
     }
@@ -189,18 +181,12 @@ public sealed class WndProcService
     {
         try
         {
-            Debug.WriteLine("Starting OCR capture from hotkey...");
-            
-            // Get OCRViewModel instance and call its launch method
             var ocrViewModel = App.GetService<OCRViewModel>();
             ocrViewModel.LaunchOcrCapture();
-            
-            Debug.WriteLine("OCR capture launched successfully");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error launching OCR capture: {ex.Message}");
-            Debug.WriteLine($"Stack trace: {ex.StackTrace}");
         }
     }
 

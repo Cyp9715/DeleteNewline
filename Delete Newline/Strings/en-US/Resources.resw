@@ -117,18 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AppDisplayName" xml:space="preserve">
-    <value>Delete Newline</value>
-  </data>
-  <data name="TrayIcon_Title" xml:space="preserve">
-    <value>Delete Newline</value>
-  </data>
-  <data name="TrayIcon_Menu_Notification" xml:space="preserve">
-    <value>Notification</value>
-  </data>
-  <data name="TrayIcon_Menu_Exit" xml:space="preserve">
-    <value>Exit Delete Newline</value>
-  </data>
   <data name="Shell_Memo.Content" xml:space="preserve">
     <value>Memo</value>
   </data>
@@ -192,8 +180,6 @@
   <data name="Settings_ExportSettings.Content" xml:space="preserve">
     <value>Export</value>
   </data>
-
-  <!-- HotkeyViewModel & HotkeyCollectSaveService Notifications -->
   <data name="Notification_InvalidHotkey_Title" xml:space="preserve">
     <value>Invalid Hotkey</value>
   </data>
@@ -228,10 +214,8 @@
     <value>Please check if they are used by other applications or try different combinations.</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_Message_Body" xml:space="preserve">
-    <value>{0}</value> <!-- Placeholder for the detailed list -->
+    <value>Placeholder for the detailed list</value>
   </data>
-
-  <!-- ClipboardMonitorService Notifications -->
   <data name="Notification_TextModified_Title" xml:space="preserve">
     <value>Text Modified</value>
   </data>
@@ -241,8 +225,6 @@
   <data name="Notification_ActionForHotkeyWithNameCompleted_Message" xml:space="preserve">
     <value>Hotkey '{0}' ({1}) has been activated.</value>
   </data>
-
-  <!-- SettingsViewModel Notifications -->
   <data name="Notification_LanguageChanged_Title" xml:space="preserve">
     <value>Language Changed</value>
   </data>
@@ -276,8 +258,6 @@
   <data name="Notification_SettingsExport_Error_General_Message" xml:space="preserve">
     <value>An unexpected error occurred while exporting settings.</value>
   </data>
-
-  <!-- HotkeyPage -->
   <data name="HotkeyPage_Title_HotkeySettings.Text" xml:space="preserve">
     <value>Hotkey Settings</value>
   </data>
@@ -305,8 +285,18 @@
   <data name="HotkeyPage_Title_TestRegexChain.Text" xml:space="preserve">
     <value>Test Regex Chain</value>
   </data>
-
-  <!-- Settings Page - Startup Task -->
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Delete Newline</value>
+  </data>
+  <data name="TrayIcon_Title" xml:space="preserve">
+    <value>Delete Newline</value>
+  </data>
+  <data name="TrayIcon_Menu_Notification" xml:space="preserve">
+    <value>Notification</value>
+  </data>
+  <data name="TrayIcon_Menu_Exit" xml:space="preserve">
+    <value>Exit Delete Newline</value>
+  </data>
   <data name="Settings_StartupTask.Text" xml:space="preserve">
     <value>Run on Windows startup</value>
     <comment>Label for the startup task toggle switch</comment>
@@ -315,8 +305,6 @@
     <value>Automatically start the application when you sign into Windows.</value>
     <comment>Description for the startup task toggle switch</comment>
   </data>
-
-  <!-- Startup Task Notifications -->
   <data name="Notification_StartupTask_DisabledByUser_Title.Content" xml:space="preserve">
     <value>Startup Disabled by User</value>
     <comment>Notification title when startup task is disabled by user</comment>
@@ -357,8 +345,6 @@
     <value>An error occurred while managing the startup task.</value>
     <comment>Notification message when an error occurs managing startup task</comment>
   </data>
-
-  <!-- OCR Page -->
   <data name="OCRPage_Title_HotkeySettings.Text" xml:space="preserve">
     <value>OCR Hotkey Settings</value>
     <comment>OCR page hotkey settings section title</comment>
@@ -370,9 +356,6 @@
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
     <value>Hotkey</value>
     <comment>OCR page hotkey input label</comment>
-  </data>
-  <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
-    <value></value>
   </data>
   <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
     <value>OCR Language Settings</value>
@@ -411,8 +394,6 @@
     <value>.</value>
     <comment>OCR page add language instruction suffix</comment>
   </data>
-
-  <!-- OCR Language Error Notifications -->
   <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">
     <value>OCR Language Not Found</value>
     <comment>Notification title when saved OCR language is not available</comment>
@@ -421,8 +402,6 @@
     <value>The previously selected OCR language is no longer available. Defaulted to English.</value>
     <comment>Notification message when saved OCR language is not available</comment>
   </data>
-
-  <!-- OCR Auto Apply Hotkey Notifications -->
   <data name="Notification_OcrHotkeyApplied_Title" xml:space="preserve">
     <value>OCR → Hotkey Applied</value>
     <comment>Notification title when OCR result is automatically processed by hotkey</comment>
