@@ -32,8 +32,6 @@ public sealed class WndProcService
     private static WndProc? _newWndProc;
     private static WndProcService? _instance;
 
-    public bool ocrWithRegex = false;
-
     public WndProcService(OCRService ocrService, RegexCollectSaveService regexCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
     {
         _ocrService = ocrService;
@@ -54,12 +52,6 @@ public sealed class WndProcService
     public void Dispose()
     {
         Debug.WriteLine("WndProcService disposed");
-    }
-
-    public void ResetOcrRegexState()
-    {
-        ocrWithRegex = false;
-        Console.WriteLine("ㅁㅁㅁ");
     }
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
@@ -93,7 +85,6 @@ public sealed class WndProcService
                     // Process OCR Hotkey - OCR hotkey doesn't follow normal hotkey processing
                     Debug.WriteLine("Processing OCR Hotkey - launching OCR capture");
                     LaunchOcrCapture();
-                    ocrWithRegex = true;
                     break;
                 }
 
@@ -111,7 +102,6 @@ public sealed class WndProcService
 
                 // 4. Process normal hotkey (Ctrl+C needed)
                 Debug.WriteLine("Processing normal hotkey with Ctrl+C");
-                App.ActiveHotkeyIdForCopy = hotkeyId;
                 VirtualInputHelper.SendCtrlC();
                 break;
         }
