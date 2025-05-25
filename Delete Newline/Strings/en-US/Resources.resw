@@ -368,6 +368,14 @@
     <value>No text was found in the selected area.</value>
     <comment>OCR no text found notification message</comment>
   </data>
+  <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">
+    <value>OCR Language Not Found</value>
+    <comment>Notification title when saved OCR language is not available</comment>
+  </data>
+  <data name="Notification_OcrLanguageNotFound_Message" xml:space="preserve">
+    <value>The previously selected OCR language is no longer available. Defaulted to English.</value>
+    <comment>Notification message when saved OCR language is not available</comment>
+  </data>
   <data name="LanguageList/en-US" xml:space="preserve">
     <value>English</value>
   </data>
