@@ -62,7 +62,6 @@ public partial class OCRViewModel : ObservableRecipient
     {
         // Synchronize with OCRService settings
         SyncWithOCRService();
-        System.Diagnostics.Debug.WriteLine("OCRViewModel synchronized with OCRService");
     }
 
     private void SyncWithOCRService()

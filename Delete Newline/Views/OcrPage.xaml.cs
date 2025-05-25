@@ -30,16 +30,11 @@ public sealed partial class OCRPage : Page
 
     private void LoadOcrLanguages()
     {
-        System.Diagnostics.Debug.WriteLine("=== Loading OCR Languages ===");
-        
         var availableLanguages = OcrEngine.AvailableRecognizerLanguages;
-        
-        System.Diagnostics.Debug.WriteLine($"Total available OCR languages: {availableLanguages.Count}");
         
         foreach (var language in availableLanguages)
         {
             LanguageComboBox.Items.Add(language);
-            System.Diagnostics.Debug.WriteLine($"  - {language.DisplayName} ({language.LanguageTag})");
         }
         
         // Sync ComboBox selection with ViewModel's loaded language
@@ -52,11 +47,9 @@ public sealed partial class OCRPage : Page
                 LanguageComboBox.SelectedItem = matchingLanguage;
                 // Update ViewModel to use the same instance as ComboBox for consistency
                 ViewModel.SelectedLanguage = matchingLanguage;
-                System.Diagnostics.Debug.WriteLine($"Synced ComboBox with saved language: {matchingLanguage.DisplayName} ({matchingLanguage.LanguageTag})");
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine($"Saved language '{ViewModel.SelectedLanguage.LanguageTag}' not found in available languages");
                 // Fall back to default
                 SetDefaultLanguage(availableLanguages);
             }
@@ -77,7 +70,6 @@ public sealed partial class OCRPage : Page
         {
             LanguageComboBox.SelectedItem = defaultLanguage;
             ViewModel.SelectedLanguage = defaultLanguage;
-            System.Diagnostics.Debug.WriteLine($"Set default language: {defaultLanguage.DisplayName} ({defaultLanguage.LanguageTag})");
         }
     }
 
@@ -97,19 +89,9 @@ public sealed partial class OCRPage : Page
         if (sender is ComboBox comboBox && comboBox.SelectedItem is Language newSelectedLanguage)
         {
             ViewModel.SelectedLanguage = newSelectedLanguage;
-            System.Diagnostics.Debug.WriteLine($"=== Language Changed ===");
-            System.Diagnostics.Debug.WriteLine($"New language: {newSelectedLanguage.DisplayName} ({newSelectedLanguage.LanguageTag})");
             
             // Test OCR engine availability for selected language
             var testEngine = OcrEngine.TryCreateFromLanguage(newSelectedLanguage);
-            if (testEngine != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"✅ OCR engine available for {newSelectedLanguage.DisplayName}");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine($"❌ OCR engine NOT available for {newSelectedLanguage.DisplayName}");
-            }
             
             // Language is automatically saved via ViewModel's OnSelectedLanguageChanged
         }
@@ -124,9 +106,9 @@ public sealed partial class OCRPage : Page
             {
                 activeOcrWindow.Close();
             }
-            catch (Exception ex)
+            catch
             {
-                System.Diagnostics.Debug.WriteLine($"Error closing OCR window: {ex.Message}");
+                // Error closing OCR window - silently handle
             }
             finally
             {

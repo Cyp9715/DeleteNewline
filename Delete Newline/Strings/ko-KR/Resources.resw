@@ -346,7 +346,7 @@
     <comment>시작 프로그램 관리 중 오류 발생 시 알림 메시지</comment>
   </data>
   <data name="OCRPage_Title_HotkeySettings.Text" xml:space="preserve">
-    <value>OCR 단축키 설정</value>
+    <value>단축키 설정</value>
     <comment>OCR 페이지 단축키 설정 섹션 제목</comment>
   </data>
   <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
@@ -358,7 +358,7 @@
     <comment>OCR 페이지 단축키 입력 레이블</comment>
   </data>
   <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
-    <value>OCR 언어 설정</value>
+    <value>언어 설정</value>
     <comment>OCR 페이지 언어 설정 섹션 제목</comment>
   </data>
   <data name="OCRPage_Description_LanguageSettings.Text" xml:space="preserve">
@@ -370,7 +370,7 @@
     <comment>OCR 페이지 언어 콤보박스 헤더</comment>
   </data>
   <data name="OCRPage_Title_Options.Text" xml:space="preserve">
-    <value>OCR 옵션</value>
+    <value>옵션</value>
     <comment>OCR 페이지 옵션 섹션 제목</comment>
   </data>
   <data name="OCRPage_RegexApply.Text" xml:space="preserve">
@@ -409,5 +409,11 @@
   <data name="Notification_OcrHotkeyApplied_Message" xml:space="preserve">
     <value>OCR 결과가 단축키의 정규식 체인을 통해 처리되어 클립보드에 업데이트되었습니다.</value>
     <comment>OCR 결과가 단축키에 의해 자동으로 처리될 때의 알림 메시지</comment>
+  </data>
+  <data name="LanguageList/en-US" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageList/ko-KR" xml:space="preserve">
+    <value>한국어</value>
   </data>
 </root>

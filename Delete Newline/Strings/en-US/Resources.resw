@@ -346,7 +346,7 @@
     <comment>Notification message when an error occurs managing startup task</comment>
   </data>
   <data name="OCRPage_Title_HotkeySettings.Text" xml:space="preserve">
-    <value>OCR Hotkey Settings</value>
+    <value>Hotkey Settings</value>
     <comment>OCR page hotkey settings section title</comment>
   </data>
   <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
@@ -358,7 +358,7 @@
     <comment>OCR page hotkey input label</comment>
   </data>
   <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
-    <value>OCR Language Settings</value>
+    <value>Language Settings</value>
     <comment>OCR page language settings section title</comment>
   </data>
   <data name="OCRPage_Description_LanguageSettings.Text" xml:space="preserve">
@@ -370,7 +370,7 @@
     <comment>OCR page language combobox header</comment>
   </data>
   <data name="OCRPage_Title_Options.Text" xml:space="preserve">
-    <value>OCR Options</value>
+    <value>Options</value>
     <comment>OCR page options section title</comment>
   </data>
   <data name="OCRPage_RegexApply.Text" xml:space="preserve">
@@ -409,5 +409,11 @@
   <data name="Notification_OcrHotkeyApplied_Message" xml:space="preserve">
     <value>OCR result has been processed through the hotkey regex chain and updated in clipboard.</value>
     <comment>Notification message when OCR result is automatically processed by hotkey</comment>
+  </data>
+  <data name="LanguageList/en-US" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageList/ko-KR" xml:space="preserve">
+    <value>한국어</value>
   </data>
 </root>
