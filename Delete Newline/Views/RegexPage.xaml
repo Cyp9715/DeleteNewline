@@ -24,6 +24,13 @@
                         Margin="0,5,0,0"
                         Padding="10">
                     <StackPanel>
+                        <!-- Description -->
+                        <TextBlock x:Uid="RegexPage_Description_HotkeySettings"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   Margin="5,0,0,10"/>
+                        
                         <!-- Hotkey Name -->
                         <Grid Margin="5,0,0,0">
                             <TextBlock x:Uid="RegexPage_Label_HotkeyName" VerticalAlignment="Center"/>
@@ -81,6 +88,13 @@
                         Padding="10"
                         MinHeight="25">
                     <StackPanel>
+                        <!-- Description -->
+                        <TextBlock x:Uid="RegexPage_Description_RegexChain"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   Margin="5,0,0,10"/>
+                        
                         <ItemsRepeater ItemsSource="{Binding CurrentRegexConfig.RegexChain.ChainItems}">
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="structures:ChainItem">
@@ -171,6 +185,14 @@
                     CornerRadius="4"
                     Margin="0,5,0,5"
                     Padding="10">
+                <StackPanel>
+                    <!-- Description -->
+                    <TextBlock x:Uid="RegexPage_Description_TestRegexChain"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               Margin="5,0,0,10"/>
+                    
                 <Grid x:Name="Grid_RegexExample">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -207,6 +229,7 @@
                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
                              PointerWheelChanged="TextBox_PointerWheelChanged" />
                 </Grid>
+                </StackPanel>
             </Border>
 
             </StackPanel>

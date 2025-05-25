@@ -311,7 +311,6 @@
   </data>
   <data name="OCRPage_Title_HotkeySettings.Text" xml:space="preserve">
     <value>Hotkey Settings</value>
-    <comment>OCR page hotkey settings section title</comment>
   </data>
   <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
     <value>Set a global hotkey to instantly capture text from your screen.</value>
@@ -362,6 +361,9 @@
   <data name="RegexPage_Title_HotkeySettings.Text" xml:space="preserve">
     <value>Hotkey Settings</value>
   </data>
+  <data name="RegexPage_Description_HotkeySettings.Text" xml:space="preserve">
+    <value>Configure the hotkey name, description, and key combination for applying regular expressions. This allows you to quickly transform text by selecting it in browsers, text editors, IDEs, and other programs, then pressing the hotkey to place the modified text in the clipboard.</value>
+  </data>
   <data name="RegexPage_Label_HotkeyName.Text" xml:space="preserve">
     <value>Hotkey Name</value>
   </data>
@@ -374,6 +376,9 @@
   <data name="RegexPage_Title_RegexChain.Text" xml:space="preserve">
     <value>Regex Chain</value>
   </data>
+  <data name="RegexPage_Description_RegexChain.Text" xml:space="preserve">
+    <value>Through regex chains, you can specify how to transform specific characters into other characters and configure them to work sequentially.</value>
+  </data>
   <data name="RegexPage_Label_RegexExpression.Text" xml:space="preserve">
     <value>Regex Expression</value>
   </data>
@@ -385,6 +390,9 @@
   </data>
   <data name="RegexPage_Title_TestRegexChain.Text" xml:space="preserve">
     <value>Test Regex Chain</value>
+  </data>
+  <data name="RegexPage_Description_TestRegexChain.Text" xml:space="preserve">
+    <value>Testing regex chains by pressing hotkeys on actual text every time you make changes is very tedious. Here, the output changes in real-time whenever you modify the regex chain or test input, allowing you to immediately see what value will be placed in the clipboard when you press the hotkey.</value>
   </data>
   <data name="Shell_RegexExpressions.Content" xml:space="preserve">
     <value>Regex Expressions</value>
