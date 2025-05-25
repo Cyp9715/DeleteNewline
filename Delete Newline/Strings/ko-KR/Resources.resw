@@ -160,7 +160,7 @@
     <value>애플리케이션 표시 언어를 변경합니다.</value>
   </data>
   <data name="Settings_Notification_Description.Text" xml:space="preserve">
-    <value>단축키를 통해 정규표현식, OCR 작업이 완료되면 Windows 알림을 보냅니다.</value>
+    <value>단축키를 통해 시작된 정규표현식, OCR 작업이 완료되면 Windows 알림을 보냅니다.</value>
   </data>
   <data name="Settings_TopMost_Description.Text" xml:space="preserve">
     <value>애플리케이션 창을 다른 창들 위에 유지합니다.</value>

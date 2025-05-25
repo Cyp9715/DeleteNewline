@@ -160,7 +160,7 @@
     <value>Changes the application display language.</value>
   </data>
   <data name="Settings_Notification_Description.Text" xml:space="preserve">
-    <value>Sends Windows notifications when regex expressions and OCR tasks are completed through hotkey operations.</value>
+    <value>Shows Windows notifications when hotkey-triggered regex and OCR tasks complete.</value>
   </data>
   <data name="Settings_TopMost_Description.Text" xml:space="preserve">
     <value>Keeps the application window on top of other windows.</value>
