@@ -1,5 +1,5 @@
 <Page x:Name="RootPage"
-      x:Class="Delete_Newline.Views.HotkeyPage"
+      x:Class="Delete_Newline.Views.RegexPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:structures="using:Delete_Newline.Contracts.Structures"
@@ -32,7 +32,7 @@
                                      TextAlignment="Center"
                                      HorizontalAlignment="Right"
                                      VerticalAlignment="Center"
-                                     Text="{Binding CurrentHotkeyConfig.HotkeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                     Text="{Binding CurrentRegexConfig.HotkeyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
 
                         <!-- Hotkey Comment -->
@@ -43,7 +43,7 @@
                                      TextAlignment="Center"
                                      HorizontalAlignment="Right"
                                      VerticalAlignment="Center"
-                                     Text="{Binding CurrentHotkeyConfig.HotkeyComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                     Text="{Binding CurrentRegexConfig.HotkeyComment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
 
                         <!-- Hotkey Input -->
@@ -81,7 +81,7 @@
                         Padding="10"
                         MinHeight="25">
                     <StackPanel>
-                        <ItemsRepeater ItemsSource="{Binding CurrentHotkeyConfig.RegexChain.ChainItems}">
+                        <ItemsRepeater ItemsSource="{Binding CurrentRegexConfig.RegexChain.ChainItems}">
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="structures:ChainItem">
                                     <Grid Margin="5,0,0,0">
@@ -186,7 +186,7 @@
                              TextWrapping="NoWrap"
                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
                              PointerWheelChanged="TextBox_PointerWheelChanged"
-                             Text="{Binding CurrentHotkeyConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding CurrentRegexConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                     <!-- Downward Arrow Icon -->
                     <FontIcon Grid.Row="1"

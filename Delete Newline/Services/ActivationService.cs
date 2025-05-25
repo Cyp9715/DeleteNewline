@@ -17,8 +17,8 @@ public sealed class ActivationService : IActivationService
     private readonly IFilePickerService _filePickerService;
     private readonly SettingsService _settingsService;
     private readonly NotificationService _notificationService;
-    private readonly HotkeyCollectSaveService _HotkeyCollectManagerService;
-    private readonly HotkeyRegisterService _HotkeyRegisterService;
+    private readonly RegexCollectSaveService _regexCollectSaveService;
+    private readonly HotkeyRegisterService _hotkeyRegisterService;
     private readonly WndProcService _wndProcService;
     private readonly TopMostService _topMostService;
     private readonly TrayIconService _trayIconService;
@@ -33,8 +33,8 @@ public sealed class ActivationService : IActivationService
         IFilePickerService filePickerService,
         SettingsService settingsService,
         NotificationService notificationService,
-        HotkeyCollectSaveService HotkeyCollectManagerService,
-        HotkeyRegisterService HotkeyRegister,
+        RegexCollectSaveService regexCollectSaveService,
+        HotkeyRegisterService hotkeyRegisterService,
         WndProcService wndProcService,
         TopMostService topMostService,
         TrayIconService trayIconService,
@@ -47,8 +47,8 @@ public sealed class ActivationService : IActivationService
         _settingsService = settingsService;
         _notificationService = notificationService;
         _filePickerService = filePickerService;
-        _HotkeyCollectManagerService = HotkeyCollectManagerService;
-        _HotkeyRegisterService = HotkeyRegister;
+        _regexCollectSaveService = regexCollectSaveService;
+        _hotkeyRegisterService = hotkeyRegisterService;
         _wndProcService = wndProcService;
         _topMostService = topMostService;
         _trayIconService = trayIconService;
@@ -74,7 +74,7 @@ public sealed class ActivationService : IActivationService
 
         // Initialize services that depend on window handle
         var hwnd = MainWindow.hwnd;
-        _HotkeyRegisterService.Initialize(hwnd);
+        _hotkeyRegisterService.Initialize(hwnd);
         _wndProcService.Initialize(hwnd);
         _filePickerService.Initialize(hwnd);
         _trayIconService.Initialize(hwnd);
@@ -84,8 +84,8 @@ public sealed class ActivationService : IActivationService
         _themeSelectorService.Initialize();
         _topMostService.Initialize(App.MainWindow);
         
-        // Initialize HotkeyCollectSaveService after HotkeyRegisterService
-        _HotkeyCollectManagerService.Initialize();
+        // Initialize regexCollectSaveService after hotkeyRegisterService
+        _regexCollectSaveService.Initialize();
 
         // Initialize OCRService to register global OCR hotkeys immediately
         // This ensures OCR hotkeys work regardless of whether user visits OCR page

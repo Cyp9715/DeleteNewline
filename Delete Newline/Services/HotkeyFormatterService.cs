@@ -58,7 +58,7 @@ public static class HotkeyFormatterService
         };
     }
 
-    public static string GetDisplayText(HotkeyPageStructure config)
+    public static string GetDisplayText(RegexPageStructure config)
     {
         if (config.Hotkey == null)
         {

@@ -9,9 +9,9 @@ using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
-public sealed class HotkeyCollectSaveService
+public sealed class RegexCollectSaveService
 {
-    public ObservableCollection<HotkeyPageStructure> HotkeyConfigs { get; private set; }
+    public ObservableCollection<RegexPageStructure> RegexConfigs { get; private set; }
 
     private readonly SettingsService _localSettingsService;
     private readonly HotkeyRegisterService _HotkeyRegisterService;
@@ -20,40 +20,42 @@ public sealed class HotkeyCollectSaveService
     private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
-    public HotkeyCollectSaveService(SettingsService localSettingsService, HotkeyRegisterService HotkeyRegisterService, InAppNotificationService inAppNotificationService)
+    public RegexCollectSaveService(SettingsService localSettingsService, 
+        HotkeyRegisterService HotkeyRegisterService, 
+        InAppNotificationService inAppNotificationService)
     {
         _localSettingsService = localSettingsService;
         _HotkeyRegisterService = HotkeyRegisterService;
         _inAppNotificationService = inAppNotificationService;
-        HotkeyConfigs = new ObservableCollection<HotkeyPageStructure>();
+        RegexConfigs = new ObservableCollection<RegexPageStructure>();
     }
 
     public void Initialize()
     {
-        var savedHotkeyConfigs = LoadSavedHotkeyConfigurations();
+        var savedRegexConfigs = LoadSavedHotkeyConfigurations();
 
-        if (savedHotkeyConfigs != null && savedHotkeyConfigs.Count > 0) // Ensure there are configs to process
+        if (savedRegexConfigs != null && savedRegexConfigs.Count > 0) // Ensure there are configs to process
         {
-            this.HotkeyConfigs.Clear(); // Clear before re-populating
-            ShowFailedRegistrationNotification(RegisterHotkeysAndCollectFailures(savedHotkeyConfigs));
+            this.RegexConfigs.Clear(); // Clear before re-populating
+            ShowFailedRegistrationNotification(RegisterRegexConfigsAndCollectFailures(savedRegexConfigs));
         }
         
-        this.HotkeyConfigs.CollectionChanged += OnHotkeyConfigsChanged;
+        this.RegexConfigs.CollectionChanged += OnRegexConfigsChanged;
     }
 
-    private List<HotkeyPageStructure>? LoadSavedHotkeyConfigurations()
+    private List<RegexPageStructure>? LoadSavedHotkeyConfigurations()
     {
-        return _localSettingsService.ReadSetting<List<HotkeyPageStructure>>(HotkeyCollectionSettingsKey);
+        return _localSettingsService.ReadSetting<List<RegexPageStructure>>(HotkeyCollectionSettingsKey);
     }
 
-    private List<string> RegisterHotkeysAndCollectFailures(IEnumerable<HotkeyPageStructure> savedConfigs)
+    private List<string> RegisterRegexConfigsAndCollectFailures(IEnumerable<RegexPageStructure> savedConfigs)
     {
         List<string> failedHotkeyStrings = new List<string>();
 
         foreach (var config in savedConfigs)
         {
             config.IsRegistrationFailed = false; // Reset status
-            this.HotkeyConfigs.Add(config); // Add to the main collection
+            this.RegexConfigs.Add(config); // Add to the main collection
             Subscribe(config);
 
             if (config.Hotkey.Modifiers == VirtualKeyModifiers.None &&
@@ -96,15 +98,15 @@ public sealed class HotkeyCollectSaveService
         }
     }
 
-    public void AddHotkeyConfig(HotkeyPageStructure? config = null)
+    public void AddRegexConfig(RegexPageStructure? config = null)
     {
-        var newConfig = config ?? new HotkeyPageStructure();
-        HotkeyConfigs.Add(newConfig);
+        var newConfig = config ?? new RegexPageStructure();
+        RegexConfigs.Add(newConfig);
     }
 
-    public void RemoveHotkeyConfig(HotkeyPageStructure config)
+    public void RemoveRegexConfig(RegexPageStructure config)
     {
-        if (HotkeyConfigs.Remove(config))
+        if (RegexConfigs.Remove(config))
         {
             Unsubscribe(config);
 
@@ -115,11 +117,11 @@ public sealed class HotkeyCollectSaveService
         }
     }
 
-    private async void OnHotkeyConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private async void OnRegexConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
         {
-            foreach (HotkeyPageStructure config in e.NewItems)
+            foreach (RegexPageStructure config in e.NewItems)
             {
                 Subscribe(config);
             }
@@ -127,7 +129,7 @@ public sealed class HotkeyCollectSaveService
 
         if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
         {
-            foreach (HotkeyPageStructure config in e.OldItems)
+            foreach (RegexPageStructure config in e.OldItems)
             {
                 Unsubscribe(config);
             }
@@ -137,7 +139,7 @@ public sealed class HotkeyCollectSaveService
         await SaveSettingsAsync();
     }
 
-    private void Subscribe(HotkeyPageStructure config)
+    private void Subscribe(RegexPageStructure config)
     {
         config.PropertyChanged += OnConfigPropertyChanged;
 
@@ -157,7 +159,7 @@ public sealed class HotkeyCollectSaveService
         }
     }
 
-    private void Unsubscribe(HotkeyPageStructure config)
+    private void Unsubscribe(RegexPageStructure config)
     {
         config.PropertyChanged -= OnConfigPropertyChanged;
 
@@ -208,7 +210,7 @@ public sealed class HotkeyCollectSaveService
         await _saveLock.WaitAsync();
         try
         {
-            var configsList = HotkeyConfigs.ToList();
+            var configsList = RegexConfigs.ToList();
             await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, configsList);
         }
         catch (Exception ex)
@@ -221,9 +223,9 @@ public sealed class HotkeyCollectSaveService
         }
     }
 
-    public HotkeyPageStructure? GetHotkeyStructureById(int hotkeyId)
+    public RegexPageStructure? GetRegexStructureByHotkeyId(int hotkeyId)
     {
-        foreach (var config in HotkeyConfigs)
+        foreach (var config in RegexConfigs)
         {
             if (config.Hotkey != null &&
                 config.Hotkey.Modifiers != VirtualKeyModifiers.None &&

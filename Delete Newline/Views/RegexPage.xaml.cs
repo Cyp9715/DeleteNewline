@@ -1,26 +1,22 @@
-using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Windows.System;
 
 namespace Delete_Newline.Views;
 
-public sealed partial class HotkeyPage : Page
+public sealed partial class RegexPage : Page
 {
-    public HotkeyViewModel ViewModel
+    public RegexViewModel ViewModel
     {
         get;
     }
 
-    public HotkeyPage()
+    public RegexPage()
     {
         InitializeComponent();
-        ViewModel = App.GetService<HotkeyViewModel>();
+        ViewModel = App.GetService<RegexViewModel>();
         DataContext = ViewModel;
         ViewModel.SetDummyFocusButton(DummyFocusButton);
     }

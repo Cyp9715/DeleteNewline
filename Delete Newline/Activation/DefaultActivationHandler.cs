@@ -9,14 +9,14 @@ namespace Delete_Newline.Activation;
 public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventArgs>
 {
     private readonly INavigationService _navigationService;
-    private readonly HotkeyCollectSaveService _HotkeyCollectSaveService;
+    private readonly RegexCollectSaveService _regexCollectSaveService;
 
     public DefaultActivationHandler(
         INavigationService navigationService, 
-        HotkeyCollectSaveService HotkeyCollectSaveService)
+        RegexCollectSaveService regexCollectSaveService)
     {
         _navigationService = navigationService;
-        _HotkeyCollectSaveService = HotkeyCollectSaveService;
+        _regexCollectSaveService = regexCollectSaveService;
     }
 
     protected override bool CanHandleInternal(LaunchActivatedEventArgs args)
@@ -28,7 +28,7 @@ public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventAr
     protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
     {
         // Navigate to HotkeyCollectPage as the initial page
-        _navigationService.NavigateTo(typeof(HotkeyCollectViewModel).FullName!, args.Arguments);
+        _navigationService.NavigateTo(typeof(RegexCollectViewModel).FullName!, args.Arguments);
 
         await Task.CompletedTask;
     }

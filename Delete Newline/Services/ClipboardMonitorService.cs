@@ -9,13 +9,13 @@ public class ClipboardMonitorService
 {
     private readonly RegexService _regexService;
     private readonly NotificationService _notificationService;
-    private readonly HotkeyCollectSaveService _hotkeyCollectSaveService;
+    private readonly RegexCollectSaveService _regexCollectSaveService;
 
-    public ClipboardMonitorService(RegexService regexService, NotificationService notificationService, HotkeyCollectSaveService hotkeyCollectSaveService)
+    public ClipboardMonitorService(RegexService regexService, NotificationService notificationService, RegexCollectSaveService regexCollectSaveService)
     {
         _regexService = regexService ?? throw new ArgumentNullException(nameof(regexService));
         _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
-        _hotkeyCollectSaveService = hotkeyCollectSaveService ?? throw new ArgumentNullException(nameof(hotkeyCollectSaveService));
+        _regexCollectSaveService = regexCollectSaveService ?? throw new ArgumentNullException(nameof(regexCollectSaveService));
     }
 
     public void StartMonitoring()
@@ -65,7 +65,7 @@ public class ClipboardMonitorService
             if (triggeredHotkeyId.HasValue)
             {
                 Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId.Value}. Applying specific rules.");
-                cleanedText = _regexService.ApplyHotkeyRules(rawText, triggeredHotkeyId.Value);
+                cleanedText = _regexService.ApplyRegexRules(rawText, triggeredHotkeyId.Value);
             }
             else
             {
@@ -106,7 +106,7 @@ public class ClipboardMonitorService
 
     private void ShowHotkeyNotification(int hotkeyId)
     {
-        HotkeyPageStructure? hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(hotkeyId);
+        RegexPageStructure? hotkeyStructure = _regexCollectSaveService.GetRegexStructureByHotkeyId(hotkeyId);
         if (hotkeyStructure == null)
         {
             return;

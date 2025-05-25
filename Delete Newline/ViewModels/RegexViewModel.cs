@@ -9,7 +9,7 @@ using Windows.System;
 using System.Collections.Specialized;
 
 namespace Delete_Newline.ViewModels;
-public partial class HotkeyViewModel : ObservableRecipient
+public partial class RegexViewModel : ObservableRecipient
 {
     private readonly HotkeyRegisterService _hotkeyManager;
     private readonly InAppNotificationService _inAppNotificationService;
@@ -17,7 +17,7 @@ public partial class HotkeyViewModel : ObservableRecipient
     private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
 
     [ObservableProperty]
-    private HotkeyPageStructure? _currentHotkeyConfig;
+    private RegexPageStructure? _currentRegexConfig;
 
     [ObservableProperty]
     private string? _displayHotkey;
@@ -25,7 +25,7 @@ public partial class HotkeyViewModel : ObservableRecipient
     [ObservableProperty]
     private string? _regexOutputText;
 
-    public HotkeyViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService)
+    public RegexViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService)
     {
         _hotkeyManager = hotkeyManager;
         _inAppNotificationService = notificationService;
@@ -45,11 +45,11 @@ public partial class HotkeyViewModel : ObservableRecipient
         _dummyFocusButton = btn;
     }
 
-    partial void OnCurrentHotkeyConfigChanged(HotkeyPageStructure? oldValue, HotkeyPageStructure? newValue)
+    partial void OnCurrentRegexConfigChanged(RegexPageStructure? oldValue, RegexPageStructure? newValue)
     {
         if (oldValue != null)
         {
-            oldValue.PropertyChanged -= CurrentHotkeyConfig_PropertyChanged;
+            oldValue.PropertyChanged -= CurrentRegexConfig_PropertyChanged;
             if (oldValue.Hotkey != null)
             {
                 oldValue.Hotkey.PropertyChanged -= OnHotkeyPropertyChanged;
@@ -66,7 +66,7 @@ public partial class HotkeyViewModel : ObservableRecipient
 
         if (newValue != null)
         {
-            newValue.PropertyChanged += CurrentHotkeyConfig_PropertyChanged;
+            newValue.PropertyChanged += CurrentRegexConfig_PropertyChanged;
             if (newValue.Hotkey != null)
             {
                 newValue.Hotkey.PropertyChanged += OnHotkeyPropertyChanged;
@@ -84,9 +84,9 @@ public partial class HotkeyViewModel : ObservableRecipient
         UpdateRegexOutput();
     }
 
-    private void CurrentHotkeyConfig_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void CurrentRegexConfig_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(HotkeyPageStructure.InputText))
+        if (e.PropertyName == nameof(RegexPageStructure.InputText))
         {
             UpdateRegexOutput();
         }
@@ -126,26 +126,26 @@ public partial class HotkeyViewModel : ObservableRecipient
 
     private void UpdateDisplayHotkey()
     {
-        if (CurrentHotkeyConfig?.Hotkey == null)
+        if (CurrentRegexConfig?.Hotkey == null)
         {
             DisplayHotkey = string.Empty;
             return;
         }
 
-        DisplayHotkey = HotkeyHelper.GetDisplayText(CurrentHotkeyConfig.Hotkey.Modifiers, CurrentHotkeyConfig.Hotkey.Key);
+        DisplayHotkey = HotkeyHelper.GetDisplayText(CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key);
     }
 
     private void UpdateRegexOutput()
     {
-        if (CurrentHotkeyConfig == null || CurrentHotkeyConfig.RegexChain == null)
+        if (CurrentRegexConfig == null || CurrentRegexConfig.RegexChain == null)
         {
             RegexOutputText = string.Empty;
             return;
         }
 
-        string currentText = CurrentHotkeyConfig.InputText ?? string.Empty;
+        string currentText = CurrentRegexConfig.InputText ?? string.Empty;
 
-        foreach (var chainItem in CurrentHotkeyConfig.RegexChain.ChainItems)
+        foreach (var chainItem in CurrentRegexConfig.RegexChain.ChainItems)
         {
             currentText = RegexService.ProcessRegex(currentText, chainItem.RegexExpression, chainItem.Replace);
         }
@@ -155,27 +155,27 @@ public partial class HotkeyViewModel : ObservableRecipient
     [RelayCommand]
     private void AddRegexItem()
     {
-        if (CurrentHotkeyConfig is null || CurrentHotkeyConfig.RegexChain is null)
+        if (CurrentRegexConfig is null || CurrentRegexConfig.RegexChain is null)
         {
-            throw new InvalidOperationException("CurrentHotkeyConfig is null.");
+            throw new InvalidOperationException("CurrentRegexConfig is null.");
         }
 
-        CurrentHotkeyConfig.RegexChain.AddChainItem();
+        CurrentRegexConfig.RegexChain.AddChainItem();
     }
 
     [RelayCommand]
     private void RemoveRegexItem(ChainItem item)
     {
-        if (CurrentHotkeyConfig is null || CurrentHotkeyConfig.RegexChain is null)
+        if (CurrentRegexConfig is null || CurrentRegexConfig.RegexChain is null)
         {
-            throw new InvalidOperationException("CurrentHotkeyConfig is null.");
+            throw new InvalidOperationException("CurrentRegexConfig is null.");
         }
 
         // Clear the properties before removing to ensure proper UI update
         item.RegexExpression = null;
         item.Replace = null;
         
-        CurrentHotkeyConfig.RegexChain.RemoveChainItem(item);
+        CurrentRegexConfig.RegexChain.RemoveChainItem(item);
     }
 
     [RelayCommand]
@@ -200,10 +200,10 @@ public partial class HotkeyViewModel : ObservableRecipient
         }
 
         // Unregister previous hotkey if exists
-        if (CurrentHotkeyConfig!.Hotkey!.Modifiers != VirtualKeyModifiers.None &&
-            CurrentHotkeyConfig!.Hotkey!.Key != VirtualKey.None)
+        if (CurrentRegexConfig!.Hotkey!.Modifiers != VirtualKeyModifiers.None &&
+            CurrentRegexConfig!.Hotkey!.Key != VirtualKey.None)
         {
-            _hotkeyManager.UnRegisterHotkey((CurrentHotkeyConfig.Hotkey.Modifiers, CurrentHotkeyConfig.Hotkey.Key));
+            _hotkeyManager.UnRegisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
         }
 
         // Check for system hotkey using centralized validation
@@ -243,9 +243,9 @@ public partial class HotkeyViewModel : ObservableRecipient
             if (args.Modifiers.HasFlag(VirtualKeyModifiers.Windows))
                 tempModifiers |= VirtualKeyModifiers.Windows;
 
-            CurrentHotkeyConfig.Hotkey.Modifiers = tempModifiers;
-            CurrentHotkeyConfig.Hotkey.Key = args.Key;
-            CurrentHotkeyConfig.IsRegistrationFailed = false;
+            CurrentRegexConfig.Hotkey.Modifiers = tempModifiers;
+            CurrentRegexConfig.Hotkey.Key = args.Key;
+            CurrentRegexConfig.IsRegistrationFailed = false;
 
             // Move focus to dummy button to remove focus from TextBox
             if (_dummyFocusButton != null && _dispatcherQueue != null)
@@ -274,9 +274,9 @@ public partial class HotkeyViewModel : ObservableRecipient
         else
         {
             // Reset hotkey to None when registration fails
-            CurrentHotkeyConfig.Hotkey.Modifiers = VirtualKeyModifiers.None;
-            CurrentHotkeyConfig.Hotkey.Key = VirtualKey.None;
-            CurrentHotkeyConfig.IsRegistrationFailed = true;
+            CurrentRegexConfig.Hotkey.Modifiers = VirtualKeyModifiers.None;
+            CurrentRegexConfig.Hotkey.Key = VirtualKey.None;
+            CurrentRegexConfig.IsRegistrationFailed = true;
             
             _inAppNotificationService.ShowInAppNotification(
                 titleKey: "Notification_HotkeyRegistrationFailed_Title",

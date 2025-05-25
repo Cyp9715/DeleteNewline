@@ -3,17 +3,17 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Delete_Newline.Views;
 
-public sealed partial class HotkeyCollectPage : Page
+public sealed partial class RegexCollectPage : Page
 {
-    public HotkeyCollectViewModel ViewModel
+    public RegexCollectViewModel ViewModel
     {
         get;
     }
 
-    public HotkeyCollectPage()
+    public RegexCollectPage()
     {
         InitializeComponent();
-        ViewModel = App.GetService<HotkeyCollectViewModel>();
+        ViewModel = App.GetService<RegexCollectViewModel>();
         DataContext = ViewModel;
     }
 }

@@ -12,7 +12,7 @@ public sealed class OCRService
     private readonly HotkeyRegisterService _hotkeyManager;
     private readonly InAppNotificationService _inAppNotificationService;
     private readonly SettingsService _settingsService;
-    private readonly HotkeyCollectSaveService _hotkeyCollectSaveService;
+    private readonly RegexCollectSaveService _hotkeyCollectSaveService;
     private readonly RegexService _regexService;
     private readonly NotificationService _notificationService;
 
@@ -32,7 +32,7 @@ public sealed class OCRService
     private bool _ocrJustCompleted = false;
     private string? _lastOcrResult = null;
 
-    public OCRService(HotkeyRegisterService hotkeyManager, InAppNotificationService inAppNotificationService, SettingsService settingsService, HotkeyCollectSaveService hotkeyCollectSaveService, RegexService regexService, NotificationService notificationService)
+    public OCRService(HotkeyRegisterService hotkeyManager, InAppNotificationService inAppNotificationService, SettingsService settingsService, RegexCollectSaveService hotkeyCollectSaveService, RegexService regexService, NotificationService notificationService)
     {
         _hotkeyManager = hotkeyManager;
         _inAppNotificationService = inAppNotificationService;
@@ -226,7 +226,7 @@ public sealed class OCRService
         }
 
         // Find the matching hotkey configuration
-        var matchingHotkey = _hotkeyCollectSaveService.HotkeyConfigs.FirstOrDefault(h => 
+        var matchingHotkey = _hotkeyCollectSaveService.RegexConfigs.FirstOrDefault(h => 
             h.Hotkey?.Modifiers == modifiers && h.Hotkey?.Key == key);
 
         if (matchingHotkey?.RegexChain == null)

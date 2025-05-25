@@ -30,9 +30,9 @@ public partial class ShellViewModel : ObservableRecipient
     {
         Type typeForSelectedItemCalculation;
 
-        if (e.SourcePageType == typeof(HotkeyPage))
+        if (e.SourcePageType == typeof(RegexPage))
         {
-            typeForSelectedItemCalculation = typeof(HotkeyCollectPage);
+            typeForSelectedItemCalculation = typeof(RegexCollectPage);
         }
         else
         {

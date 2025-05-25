@@ -11,7 +11,7 @@ namespace Delete_Newline.Services;
 public sealed class WndProcService
 {
     private readonly OCRService _ocrService;
-    private readonly HotkeyCollectSaveService _hotkeyCollectSaveService;
+    private readonly RegexCollectSaveService _regexCollectSaveService;
     private readonly HotkeyRegisterService _hotkeyRegisterService;
 
     [DllImport("user32.dll", SetLastError = true)]
@@ -32,10 +32,10 @@ public sealed class WndProcService
     private static WndProc? _newWndProc;
     private static WndProcService? _instance;
 
-    public WndProcService(OCRService ocrService, HotkeyCollectSaveService hotkeyCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
+    public WndProcService(OCRService ocrService, RegexCollectSaveService regexCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
     {
         _ocrService = ocrService;
-        _hotkeyCollectSaveService = hotkeyCollectSaveService;
+        _regexCollectSaveService = regexCollectSaveService;
         _hotkeyRegisterService = hotkeyRegisterService;
         _instance = this;
     }
@@ -95,7 +95,7 @@ public sealed class WndProcService
                 }
 
                 // 2. 일반 Hotkey 확인
-                var hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(hotkeyId);
+                var hotkeyStructure = _regexCollectSaveService.GetRegexStructureByHotkeyId(hotkeyId);
                 if (hotkeyStructure?.Hotkey == null)
                 {
                     // Hotkey structure not found - log error and ignore

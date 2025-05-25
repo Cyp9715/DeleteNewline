@@ -6,11 +6,11 @@ namespace Delete_Newline.Services;
 
 public class RegexService
 {
-    private readonly HotkeyCollectSaveService _hotkeyCollectSaveService;
+    private readonly RegexCollectSaveService _regexCollectSaveService;
 
-    public RegexService(HotkeyCollectSaveService hotkeyCollectSaveService)
+    public RegexService(RegexCollectSaveService regexCollectSaveService)
     {
-        _hotkeyCollectSaveService = hotkeyCollectSaveService ?? throw new ArgumentNullException(nameof(hotkeyCollectSaveService));
+        _regexCollectSaveService = regexCollectSaveService ?? throw new ArgumentNullException(nameof(regexCollectSaveService));
     }
 
     public static string ProcessRegex(string inputText, string? regexPattern, string? replacement)
@@ -22,11 +22,11 @@ public class RegexService
         return Regex.Replace(inputText, regexPattern, Regex.Unescape(replacement ?? string.Empty), RegexOptions.Multiline);
     }
 
-    public string ApplyHotkeyRules(string inputText, int hotkeyId)
+    public string ApplyRegexRules(string inputText, int hotkeyId)
     {
         Debug.WriteLine($"[RegexService] Attempting to apply rules for Hotkey ID: {hotkeyId}");
-        HotkeyPageStructure? hotkeyStructure = _hotkeyCollectSaveService.GetHotkeyStructureById(hotkeyId);
-        RegexChainStructure? regexChain = hotkeyStructure?.RegexChain;
+        RegexPageStructure? regexStructure = _regexCollectSaveService.GetRegexStructureByHotkeyId(hotkeyId);
+        RegexChainStructure? regexChain = regexStructure?.RegexChain;
 
         if (regexChain != null && regexChain.ChainItems != null && regexChain.ChainItems.Any())
         {

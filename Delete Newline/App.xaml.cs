@@ -120,7 +120,7 @@ public partial class App : Application
 
                 // Services, not need Interface.
                 services.AddSingleton<SettingsService>();
-                services.AddSingleton<HotkeyCollectSaveService>();
+                services.AddSingleton<RegexCollectSaveService>();
                 services.AddSingleton<HotkeyRegisterService>();
                 services.AddSingleton<WndProcService>();
                 services.AddSingleton<NotificationService>();
@@ -144,10 +144,10 @@ public partial class App : Application
                 services.AddSingleton<SettingsViewModel>();
                 services.AddTransient<SettingsPage>();
 
-                services.AddSingleton<HotkeyCollectViewModel>();
-                services.AddTransient<HotkeyCollectPage>();
-                services.AddSingleton<HotkeyViewModel>();
-                services.AddTransient<HotkeyPage>();
+                services.AddSingleton<RegexCollectViewModel>();
+                services.AddTransient<RegexCollectPage>();
+                services.AddSingleton<RegexViewModel>();
+                services.AddTransient<RegexPage>();
 
                 services.AddSingleton<OCRViewModel>();
                 services.AddTransient<OCRPage>();

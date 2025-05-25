@@ -31,7 +31,7 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Uid="Shell_Hotkeys"
                                     x:Name="HotkeysPageItem"
-                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.HotkeyCollectViewModel">
+                                    helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.RegexCollectViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xf683;" />
