@@ -137,6 +137,9 @@ public partial class App : Application
                 // Add OCRService
                 services.AddSingleton<OCRService>();
 
+                // Add GlobalKeyboardHookService
+                services.AddSingleton<GlobalKeyboardHookService>();
+
                 // Views and ViewModels
                 services.AddSingleton<ShellViewModel>();
                 services.AddTransient<ShellPage>();

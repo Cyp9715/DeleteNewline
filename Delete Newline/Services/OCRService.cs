@@ -232,4 +232,27 @@ public sealed class OCRService
             addTag: true
         );
     }
+
+    // Called when OCR is completed - sets up the matching window
+    public void NotifyOcrCompleted(string ocrResult)
+    {
+        System.Diagnostics.Debug.WriteLine($"=== NotifyOcrCompleted called ===");
+        System.Diagnostics.Debug.WriteLine($"ApplyRegex: {_applyRegex}");
+        System.Diagnostics.Debug.WriteLine($"OCR Result: '{ocrResult}'");
+        
+        if (!_applyRegex)
+        {
+            System.Diagnostics.Debug.WriteLine("❌ OCR → Hotkey feature is DISABLED. Please enable 'Apply Regular Expressions' in OCR page settings!");
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(ocrResult))
+        {
+            System.Diagnostics.Debug.WriteLine("❌ OCR result is empty or whitespace");
+            return;
+        }
+
+        _lastOcrResult = ocrResult;
+        System.Diagnostics.Debug.WriteLine($"✅ OCR state set: _lastOcrResult='{_lastOcrResult}'");
+    }
 } 

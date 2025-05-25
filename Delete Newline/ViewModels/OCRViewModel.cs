@@ -31,7 +31,7 @@ public partial class OCRViewModel : ObservableRecipient
     private Language? _selectedLanguage;
 
     [ObservableProperty]
-    private bool _applyRegex;
+    public bool _applyRegex;
 
     [ObservableProperty]
     private string? _displayHotkey;
@@ -56,6 +56,9 @@ public partial class OCRViewModel : ObservableRecipient
             // If not on UI thread, set to null
             _dispatcherQueue = null;
         }
+        
+        // Initialize settings from OCRService
+        Initialize();
     }
 
     public void Initialize()

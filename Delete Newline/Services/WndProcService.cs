@@ -32,7 +32,7 @@ public sealed class WndProcService
     private static WndProc? _newWndProc;
     private static WndProcService? _instance;
 
-    private bool ocrWithRegex = false;
+    public bool ocrWithRegex = false;
 
     public WndProcService(OCRService ocrService, RegexCollectSaveService regexCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
     {
@@ -56,6 +56,12 @@ public sealed class WndProcService
         Debug.WriteLine("WndProcService disposed");
     }
 
+    public void ResetOcrRegexState()
+    {
+        ocrWithRegex = false;
+        Console.WriteLine("ㅁㅁㅁ");
+    }
+
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
         switch (msg)
@@ -68,12 +74,9 @@ public sealed class WndProcService
                 break;
 
             case WM_KEYDOWN:
+                break;
+
             case WM_KEYUP:
-                int vKey = wParam.ToInt32();
-                
-                // Skip ESC key (used for OCR window closure)
-                if (vKey == 27) break;
-                Debug.WriteLine($"OCR screen keyboard input detected (VKey: {vKey}) windows close.");
                 break;
 
             case WM_HOTKEY:
@@ -106,12 +109,19 @@ public sealed class WndProcService
                 Debug.WriteLine($"Found hotkey structure: {hotkeyStructure.HotkeyName}");
 
                 // 3. Check if OCR was just completed (OCR → Hotkey processing)
-                if(ocrWithRegex)
+                Debug.WriteLine($"ㄴㄴㄴㄴㄴㄴㄴㄴㄴ{App.GetService<OCRViewModel>().ApplyRegex}");
+
+                if (App.GetService<OCRViewModel>().ApplyRegex)
                 {
-                    bool isOcrToHotkey = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
-                    Debug.WriteLine($"OCR → Regex result: {isOcrToHotkey}");
-                    _ocrService.ShowOcrRegexNotification();
-                    break;
+                    Debug.WriteLine($"ㄴㄴㄴㄴㄴㄴㄴㄴㄴ{App.GetService<OCRViewModel>().ApplyRegex}");
+
+                    if (ocrWithRegex)
+                    {
+                        bool isOcrToHotkey = _ocrService.TryApplyOcrToHotkey(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
+                        Debug.WriteLine($"OCR → Regex result: {isOcrToHotkey}");
+                        _ocrService.ShowOcrRegexNotification();
+                        break;
+                    }
                 }
 
                 // 4. Process normal hotkey (Ctrl+C needed)

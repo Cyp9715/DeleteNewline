@@ -39,6 +39,14 @@ public class ClipboardMonitorService
 
     private void OnClipboardContentChangedInternal(object? sender, object e)
     {
+        // Skip if OCR operation is in progress
+        var wndProcService = App.GetService<WndProcService>();
+        if (wndProcService.ocrWithRegex)
+        {
+            Debug.WriteLine("[ClipboardMonitorService] OCR operation in progress - ignoring clipboard change");
+            return;
+        }
+
         // Check if there's content and if it's text.
         DataPackageView dataPackageView = Clipboard.GetContent();
         if (dataPackageView.Contains(StandardDataFormats.Text) == false)
@@ -73,7 +81,7 @@ public class ClipboardMonitorService
                 cleanedText = rawText;
             }
 
-            if (rawText != cleanedText)
+            if (rawText != cleanedText && !string.IsNullOrEmpty(cleanedText))
             {
                 UpdateClipboardContent(cleanedText, triggeredHotkeyId);
             }
