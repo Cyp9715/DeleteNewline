@@ -12,6 +12,7 @@ using Windows.Media.Ocr;
 using Windows.System;
 using WinUIEx;
 using WinRT.Interop;
+using System.Threading.Tasks;
 
 namespace Delete_Newline.Views;
 
@@ -22,11 +23,11 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private bool isSelecting = false;
     private Language currentLanguage = new Language("en"); // Default language setting
     private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
-    private bool singleLineMode = false; // OCR single line mode setting
     private bool applyRegexEnabled = false; // Apply regex setting
 
     // OCRService dependency for notifying completion
     private readonly OCRService? _ocrService;
+    private readonly NotificationService? _notificationService;
 
     public OcrCaptureWindow()
     {
@@ -35,10 +36,12 @@ public sealed partial class OcrCaptureWindow : WindowEx
         try
         {
             _ocrService = App.GetService<OCRService>();
+            _notificationService = App.GetService<NotificationService>();
         }
         catch
         {
             _ocrService = null; // Fallback if service not available
+            _notificationService = null;
         }
     }
 
@@ -62,7 +65,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
             System.Diagnostics.Debug.WriteLine($"Using default language: {currentLanguage.DisplayName} ({currentLanguage.LanguageTag})");
         }
         
-        System.Diagnostics.Debug.WriteLine($"Single Line Mode: {this.singleLineMode}");
         System.Diagnostics.Debug.WriteLine("Setting up fullscreen OCR capture window");
         
         // Remove title bar
@@ -326,6 +328,12 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
         try
         {
+            // Hide selection border before capturing to prevent it from appearing in OCR image
+            SelectionBorder.Visibility = Visibility.Collapsed;
+            
+            // Small delay to ensure UI update is applied
+            await Task.Delay(1);
+            
             // Get actual window size for accurate coordinate mapping
             var virtualScreen = ImageHelper.GetVirtualScreenBounds();
             double windowActualWidth = this.Bounds.Width;
@@ -356,93 +364,172 @@ public sealed partial class OcrCaptureWindow : WindowEx
             
             System.Diagnostics.Debug.WriteLine($"Captured bitmap: {regionBitmap.Width}x{regionBitmap.Height}");
             
-            // Save captured image for debugging
-            try
-            {
-                string tempPath = Path.Combine(Path.GetTempPath(), $"ocr_debug_{DateTime.Now:yyyyMMdd_HHmmss}.png");
-                regionBitmap.Save(tempPath, System.Drawing.Imaging.ImageFormat.Png);
-                System.Diagnostics.Debug.WriteLine($"DEBUG: Captured image saved to: {tempPath}");
-            }
-            catch (Exception saveEx)
-            {
-                System.Diagnostics.Debug.WriteLine($"Failed to save debug image: {saveEx.Message}");
-            }
+            // Close the OCR window immediately to free the screen
+            this.Close();
             
-            System.Diagnostics.Debug.WriteLine($"OCR Language: {currentLanguage.DisplayName} ({currentLanguage.LanguageTag})");
-            
-            // Check if OCR engine is available
-            var ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(currentLanguage);
-            if (ocrEngine == null)
-            {
-                System.Diagnostics.Debug.WriteLine($"WARNING: OCR engine not available for {currentLanguage.DisplayName}, trying English...");
-                ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(new Language("en"));
-                if (ocrEngine == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("ERROR: No OCR engine available!");
-                    return;
-                }
-            }
-            System.Diagnostics.Debug.WriteLine($"OCR Engine ready: {ocrEngine != null}");
-            
-            // Perform OCR
-            System.Diagnostics.Debug.WriteLine("Starting OCR process...");
-            System.Diagnostics.Debug.WriteLine($"Using Single Line Mode: {singleLineMode}");
-            string ocrText = await OcrHelper.GetTextFromBitmapAsync(regionBitmap, currentLanguage, singleLineMode);
-            
-            System.Diagnostics.Debug.WriteLine($"OCR completed. Raw result: '{ocrText}'");
-            System.Diagnostics.Debug.WriteLine($"OCR text length: {ocrText?.Length ?? 0}");
-            System.Diagnostics.Debug.WriteLine($"OCR text is null or whitespace: {string.IsNullOrWhiteSpace(ocrText)}");
-
-            // Copy to clipboard if text found
-            if (!string.IsNullOrWhiteSpace(ocrText))
+            // Process OCR in background without blocking UI
+            _ = Task.Run(async () =>
             {
                 try
                 {
-                    var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
-                    dataPackage.SetText(ocrText);
-                    Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
-                    
-                    System.Diagnostics.Debug.WriteLine("✅ Text copied to clipboard successfully!");
-                    System.Diagnostics.Debug.WriteLine($"Copied text: '{ocrText.Trim()}'");
+                    await ProcessOcrAsync(regionBitmap, screenRect);
                 }
-                catch (Exception clipboardEx)
+                catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"❌ Failed to copy to clipboard: {clipboardEx.Message}");
+                    System.Diagnostics.Debug.WriteLine($"Background OCR processing error: {ex.Message}");
                 }
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("❌ No text found in OCR result");
-                
-                // Try alternative OCR approach
-                System.Diagnostics.Debug.WriteLine("Trying direct OCR without scaling...");
-                try
+                finally
                 {
-                    var ocrResult = await OcrHelper.GetOcrResultFromBitmapAsync(regionBitmap, currentLanguage);
-                    System.Diagnostics.Debug.WriteLine($"Direct OCR lines found: {ocrResult.Lines.Count}");
-                    foreach (var line in ocrResult.Lines)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"  Line: '{line.Text}'");
-                    }
+                    regionBitmap?.Dispose();
                 }
-                catch (Exception directOcrEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Direct OCR failed: {directOcrEx.Message}");
-                }
-            }
-            
-            // Clean up bitmap
-            regionBitmap.Dispose();
+            });
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error during OCR: {ex.Message}");
             System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
         }
-        finally
+    }
+
+    private async Task ProcessOcrAsync(Bitmap regionBitmap, Rectangle screenRect)
+    {
+        // Save captured image for debugging (only in DEBUG builds)
+#if DEBUG
+        try
         {
-            // Always close OCR window after drag completion
-            this.Close();
+            string tempPath = Path.Combine(Path.GetTempPath(), $"ocr_debug_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+            regionBitmap.Save(tempPath, System.Drawing.Imaging.ImageFormat.Png);
+            System.Diagnostics.Debug.WriteLine($"DEBUG: Captured image saved to: {tempPath}");
+        }
+        catch (Exception saveEx)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to save debug image: {saveEx.Message}");
+        }
+#endif
+        
+        System.Diagnostics.Debug.WriteLine($"OCR Language: {currentLanguage.DisplayName} ({currentLanguage.LanguageTag})");
+        
+        // Check if OCR engine is available
+        var ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(currentLanguage);
+        if (ocrEngine == null)
+        {
+            System.Diagnostics.Debug.WriteLine($"WARNING: OCR engine not available for {currentLanguage.DisplayName}, trying English...");
+            ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(new Language("en"));
+            if (ocrEngine == null)
+            {
+                System.Diagnostics.Debug.WriteLine("ERROR: No OCR engine available!");
+                return;
+            }
+        }
+        System.Diagnostics.Debug.WriteLine($"OCR Engine ready: {ocrEngine != null}");
+        
+        // Perform OCR
+        System.Diagnostics.Debug.WriteLine("Starting OCR process...");
+        string ocrText = await OcrHelper.GetTextFromBitmapAsync(regionBitmap, currentLanguage);
+        
+        System.Diagnostics.Debug.WriteLine($"OCR completed. Raw result: '{ocrText}'");
+        System.Diagnostics.Debug.WriteLine($"OCR text length: {ocrText?.Length ?? 0}");
+        System.Diagnostics.Debug.WriteLine($"OCR text is null or whitespace: {string.IsNullOrWhiteSpace(ocrText)}");
+
+        // Copy to clipboard if text found
+        if (!string.IsNullOrWhiteSpace(ocrText))
+        {
+            try
+            {
+                // Switch back to UI thread for clipboard access
+                var dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+                if (dispatcherQueue == null)
+                {
+                    // Try to get the main window's dispatcher
+                    var mainWindow = App.MainWindow;
+                    if (mainWindow != null)
+                    {
+                        dispatcherQueue = mainWindow.DispatcherQueue;
+                    }
+                }
+                
+                if (dispatcherQueue != null)
+                {
+                    dispatcherQueue.TryEnqueue(() =>
+                    {
+                        try
+                        {
+                            var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+                            dataPackage.SetText(ocrText);
+                            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+                            
+                            System.Diagnostics.Debug.WriteLine("✅ Text copied to clipboard successfully!");
+                            System.Diagnostics.Debug.WriteLine($"Copied text: '{ocrText.Trim()}'");
+                            
+                            // Show success notification if notification service is available
+                            if (_notificationService != null)
+                            {
+                                _notificationService.ShowSystemNotification(
+                                    "Notification_OCR_Success_Title",
+                                    "Notification_OCR_Success_Message",
+                                    force: false,
+                                    addTag: true,
+                                    messageArgs: new object[] { ocrText.Trim().Length }
+                                );
+                            }
+                        }
+                        catch (Exception clipboardEx)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"❌ Failed to copy to clipboard: {clipboardEx.Message}");
+                            
+                            // Show error notification
+                            if (_notificationService != null)
+                            {
+                                _notificationService.ShowSystemNotification(
+                                    "Notification_OCR_Error_Title",
+                                    "Notification_OCR_Error_Clipboard_Message",
+                                    force: false,
+                                    addTag: true
+                                );
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("❌ Could not get dispatcher queue for clipboard access");
+                }
+            }
+            catch (Exception dispatcherEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Failed to dispatch to UI thread: {dispatcherEx.Message}");
+            }
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine("❌ No text found in OCR result");
+            
+            // Show no text found notification
+            if (_notificationService != null)
+            {
+                _notificationService.ShowSystemNotification(
+                    "Notification_OCR_NoText_Title",
+                    "Notification_OCR_NoText_Message",
+                    force: false,
+                    addTag: true
+                );
+            }
+            
+            // Try alternative OCR approach
+            System.Diagnostics.Debug.WriteLine("Trying direct OCR without scaling...");
+            try
+            {
+                var ocrResult = await OcrHelper.GetOcrResultFromBitmapAsync(regionBitmap, currentLanguage);
+                System.Diagnostics.Debug.WriteLine($"Direct OCR lines found: {ocrResult.Lines.Count}");
+                foreach (var line in ocrResult.Lines)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  Line: '{line.Text}'");
+                }
+            }
+            catch (Exception directOcrEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"Direct OCR failed: {directOcrEx.Message}");
+            }
         }
     }
 } 

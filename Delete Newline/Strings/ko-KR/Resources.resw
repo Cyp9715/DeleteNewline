@@ -160,7 +160,7 @@
     <value>애플리케이션 표시 언어를 변경합니다.</value>
   </data>
   <data name="Settings_Notification_Description.Text" xml:space="preserve">
-    <value>단축키가 텍스트를 수정할 때, 정규식 패턴이 일치하면 Windows 알림이 전송됩니다.</value>
+    <value>단축키를 통해 정규표현식, OCR 작업이 완료되면 Windows 알림을 보냅니다.</value>
   </data>
   <data name="Settings_TopMost_Description.Text" xml:space="preserve">
     <value>애플리케이션 창을 다른 창들 위에 유지합니다.</value>
@@ -342,8 +342,8 @@
     <comment>OCR 페이지 언어 추가 하이퍼링크 텍스트</comment>
   </data>
   <data name="OCRPage_Text_AddLanguageSuffix.Text" xml:space="preserve">
-    <value>를 확인하세요.</value>
-    <comment>OCR 페이지 언어 추가 안내 접미사</comment>
+    <value>.</value>
+    <comment>OCR page add language suffix text</comment>
   </data>
   <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">
     <value>OCR 언어를 찾을 수 없음</value>
@@ -397,5 +397,29 @@
   </data>
   <data name="Shell_RegexExpressions.Content" xml:space="preserve">
     <value>정규표현식</value>
+  </data>
+  <data name="Notification_OCR_Success_Title" xml:space="preserve">
+    <value>OCR 완료</value>
+    <comment>OCR success notification title</comment>
+  </data>
+  <data name="Notification_OCR_Success_Message" xml:space="preserve">
+    <value>텍스트가 클립보드에 복사되었습니다. 길이: {0}자</value>
+    <comment>OCR success notification message with character count</comment>
+  </data>
+  <data name="Notification_OCR_Error_Title" xml:space="preserve">
+    <value>OCR 오류</value>
+    <comment>OCR error notification title</comment>
+  </data>
+  <data name="Notification_OCR_Error_Clipboard_Message" xml:space="preserve">
+    <value>클립보드 복사에 실패했습니다.</value>
+    <comment>OCR clipboard error notification message</comment>
+  </data>
+  <data name="Notification_OCR_NoText_Title" xml:space="preserve">
+    <value>텍스트 없음</value>
+    <comment>OCR no text found notification title</comment>
+  </data>
+  <data name="Notification_OCR_NoText_Message" xml:space="preserve">
+    <value>선택한 영역에서 텍스트를 찾을 수 없습니다.</value>
+    <comment>OCR no text found notification message</comment>
   </data>
 </root>
