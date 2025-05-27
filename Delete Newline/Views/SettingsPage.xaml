@@ -77,7 +77,7 @@
 
                         <ToggleSwitch Grid.Column="1"
                                       x:Name="StartOnTrayToggleSwitch"
-                                      IsOn="{x:Bind ViewModel.EnableStartOnTray}"
+                                      IsOn="{x:Bind ViewModel.EnableStartOnTray, Mode=TwoWay}"
                                       Style="{StaticResource CompactToggleSwitch}"
                                       VerticalAlignment="Center"
                                       HorizontalAlignment="Right">
@@ -117,7 +117,7 @@
                         <ComboBox Grid.Column="1"
                                   x:Name="ThemeComboBox"
                                   Width="125"
-                                  SelectedValue="{x:Bind ViewModel.SelectedTheme}"
+                                  SelectedValue="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}"
                                   SelectedValuePath="Tag"
                                   VerticalAlignment="Center"
                                   HorizontalAlignment="Right">
@@ -161,7 +161,7 @@
                                   x:Name="LanguageComboBox"
                                   Width="125"
                                   ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
-                                  SelectedItem="{x:Bind ViewModel.SelectedLanguage}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
                                   DisplayMemberPath="DisplayName"
                                   VerticalAlignment="Center"
                                   HorizontalAlignment="Right">
@@ -239,7 +239,7 @@
 
                         <ToggleSwitch Grid.Column="1"
                                       x:Name="TopMostToggleSwitch"
-                                      IsOn="{x:Bind ViewModel.EnableTopMost}"
+                                      IsOn="{x:Bind ViewModel.EnableTopMost, Mode=TwoWay}"
                                       Style="{StaticResource CompactToggleSwitch}"
                                       VerticalAlignment="Center"
                                       HorizontalAlignment="Right">
