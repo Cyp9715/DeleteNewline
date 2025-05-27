@@ -10,7 +10,7 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Publisher="CN=Cyp soft"
+    Publisher="CN=Cyp Soft"
     Version="3.0.0.0"  Name="DeleteNewline"/>
 
   <Properties>

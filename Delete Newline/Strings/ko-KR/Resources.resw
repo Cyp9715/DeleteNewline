@@ -314,7 +314,7 @@
     <comment>OCR 페이지 단축키 설정 섹션 제목</comment>
   </data>
   <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
-    <value>화면에서 텍스트를 즉시 캡처할 수 있는 전역 단축키를 설정하세요.</value>
+    <value>이미지 속 텍스트를 즉시 텍스트로 변환할 수 있는 전역 단축키를 설정하세요.</value>
     <comment>OCR 페이지 단축키 설정 설명</comment>
   </data>
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
@@ -342,7 +342,7 @@
     <comment>OCR 페이지 언어 추가 하이퍼링크 텍스트</comment>
   </data>
   <data name="OCRPage_Text_AddLanguageSuffix.Text" xml:space="preserve">
-    <value>.</value>
+    <value>를 클릭하세요.</value>
     <comment>OCR page add language suffix text</comment>
   </data>
   <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">

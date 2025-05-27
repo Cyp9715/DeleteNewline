@@ -313,7 +313,7 @@
     <value>Hotkey Settings</value>
   </data>
   <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
-    <value>Set a global hotkey to instantly capture text from your screen.</value>
+    <value>Set a global hotkey to instantly convert text from images to text.</value>
     <comment>OCR page hotkey settings description</comment>
   </data>
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
