@@ -24,7 +24,12 @@ public sealed class OCRService
     private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
     private Language? _selectedLanguage;
 
-    public OCRService(HotkeyRegisterService hotkeyManager, InAppNotificationService inAppNotificationService, SettingsService settingsService, RegexCollectSaveService hotkeyCollectSaveService, RegexService regexService, NotificationService notificationService)
+    public OCRService(HotkeyRegisterService hotkeyManager, 
+        InAppNotificationService inAppNotificationService, 
+        SettingsService settingsService, 
+        RegexCollectSaveService hotkeyCollectSaveService, 
+        RegexService regexService, 
+        NotificationService notificationService)
     {
         _hotkeyManager = hotkeyManager;
         _inAppNotificationService = inAppNotificationService;

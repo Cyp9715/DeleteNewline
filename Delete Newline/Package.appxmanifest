@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -10,7 +10,7 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Publisher="CN=Cyphe"
+    Publisher="CN=Cyp soft"
     Version="3.0.0.0"  Name="DeleteNewline"/>
 
   <Properties>

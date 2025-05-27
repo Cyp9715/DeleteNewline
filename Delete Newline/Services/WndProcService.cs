@@ -103,6 +103,8 @@ public sealed class WndProcService
                 // 4. Process normal hotkey (Ctrl+C needed)
                 Debug.WriteLine("Processing normal hotkey with Ctrl+C");
                 App.ActiveHotkeyIdForCopy = hotkeyId;
+
+                // 5. Goto OnClipboardContentChanged()
                 VirtualInputHelper.SendCtrlC();
                 break;
         }
@@ -113,8 +115,7 @@ public sealed class WndProcService
     {
         try
         {
-            var ocrViewModel = App.GetService<OCRViewModel>();
-            ocrViewModel.LaunchOcrCapture();
+            App.GetService<OCRService>().LaunchOcrCapture();
         }
         catch (Exception ex)
         {

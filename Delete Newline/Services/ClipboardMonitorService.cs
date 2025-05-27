@@ -22,7 +22,7 @@ public class ClipboardMonitorService
     {
         try
         {
-            Clipboard.ContentChanged += OnClipboardContentChangedInternal;
+            Clipboard.ContentChanged += OnClipboardContentChanged;
             Debug.WriteLine("[ClipboardMonitorService] Clipboard monitoring started.");
         }
         catch (Exception ex)
@@ -33,11 +33,11 @@ public class ClipboardMonitorService
 
     public void StopMonitoring()
     {
-        Clipboard.ContentChanged -= OnClipboardContentChangedInternal;
+        Clipboard.ContentChanged -= OnClipboardContentChanged;
         Debug.WriteLine("[ClipboardMonitorService] Clipboard monitoring stopped.");
     }
 
-    private void OnClipboardContentChangedInternal(object? sender, object e)
+    private void OnClipboardContentChanged(object? sender, object e)
     {
         // Check if there's content and if it's text.
         DataPackageView dataPackageView = Clipboard.GetContent();
@@ -67,6 +67,7 @@ public class ClipboardMonitorService
                 cleanedText = rawText;
             }
 
+            // If it is updated
             if (rawText != cleanedText && !string.IsNullOrEmpty(cleanedText))
             {
                 UpdateClipboardContent(cleanedText, triggeredHotkeyId);

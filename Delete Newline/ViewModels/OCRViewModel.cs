@@ -3,9 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Helpers;
 using Delete_Newline.Services;
-using Delete_Newline.Views;
 using Windows.Globalization;
-using Windows.Media.Ocr;
 using Windows.System;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
@@ -213,11 +211,5 @@ public partial class OCRViewModel : ObservableRecipient
     public void EndHotkeyRegistration()
     {
         _hotkeyManager.EndHotkeyRegistration();
-    }
-    
-    // OCR capture execution method
-    public void LaunchOcrCapture()
-    {
-        _ocrService.LaunchOcrCapture();
     }
 } 

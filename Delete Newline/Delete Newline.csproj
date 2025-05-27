@@ -25,6 +25,15 @@
     <MultilingualFallbackLanguage>en-US</MultilingualFallbackLanguage>
     <TranslationReport Condition="'$(Configuration)' == 'Release'">true</TranslationReport>
     <SuppressPseudoWarning Condition="'$(Configuration)' == 'Debug'">true</SuppressPseudoWarning>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+    <PackageCertificateThumbprint>0BEE4CCDA6BDF271D43AD754B576A7C3B1B7B54E</PackageCertificateThumbprint>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <GenerateTestArtifacts>True</GenerateTestArtifacts>
+    <AppxBundle>Never</AppxBundle>
+    <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />

@@ -29,13 +29,15 @@ public sealed class LocalizationService : ILocalizationService
 
         string? languageTag = _localSettingsService.ReadSetting<string>(LocalizationTagSettingsKey);
 
-        if (languageTag is not null && GetLanguageItem(languageTag) is LanguageItem languageItem)
+        if (languageTag != null && GetLanguageItem(languageTag) is LanguageItem languageItem)
         {
             ApplyLanguage(languageItem);
         }
         else
         {
-            ApplyLanguage(_currentLanguageItem);
+            // Detect system default language when no saved language setting exists
+            var systemLanguage = DetectSystemLanguage();
+            ApplyLanguage(systemLanguage);
         }
     }
 
@@ -72,6 +74,36 @@ public sealed class LocalizationService : ILocalizationService
     {
         return Languages.FirstOrDefault(item => item.Tag == languageTag)
                 ?? Languages.First(item => item.Tag == "en-US");
+    }
+
+    private LanguageItem DetectSystemLanguage()
+    {
+        // Detect system default language
+        var systemLanguages = Windows.Globalization.ApplicationLanguages.Languages;
+        
+        foreach (var systemLang in systemLanguages)
+        {
+            // Find matching language among supported languages
+            var matchingLanguage = Languages.FirstOrDefault(lang => lang.Tag == systemLang);
+            if (matchingLanguage != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"System language detected: {matchingLanguage.Tag} ({matchingLanguage.DisplayName})");
+                return matchingLanguage;
+            }
+            
+            // Check for partial match with language code only (e.g., ko-KR and ko)
+            var languageCode = systemLang.Split('-')[0];
+            var partialMatch = Languages.FirstOrDefault(lang => lang.Tag.StartsWith(languageCode + "-"));
+            if (partialMatch != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"System language partially detected: {partialMatch.Tag} ({partialMatch.DisplayName})");
+                return partialMatch;
+            }
+        }
+        
+        // Return default value if system language is not found
+        System.Diagnostics.Debug.WriteLine("System language not found, using default: en-US");
+        return _currentLanguageItem;
     }
 
     private void RegisterLanguageFromResource()

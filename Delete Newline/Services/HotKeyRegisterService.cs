@@ -100,14 +100,14 @@ public sealed class HotkeyRegisterService
             _ocrHotkey = null;
         }
     }
-    
-    // OCR 핫키 조회
+
+    // Retrieves the OCR hotkey.
     public (VirtualKeyModifiers, VirtualKey)? GetOcrHotkey()
     {
         return _ocrHotkey;
     }
-    
-    // OCR 핫키가 등록되어 있는지 확인
+
+    // Checks if an OCR hotkey is registered.
     public bool IsOcrHotkeyRegistered()
     {
         return _ocrHotkey.HasValue;
@@ -157,8 +157,8 @@ public sealed class HotkeyRegisterService
                 _registeredHotkeyIds.Add(hotkeyId);
             }
         }
-        
-        // OCR 핫키도 임시 해제
+
+        // Temporarily unregisters the OCR hotkey as well.
         if (_ocrHotkey.HasValue)
         {
             int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value);
@@ -180,8 +180,8 @@ public sealed class HotkeyRegisterService
                 _registeredHotkeyIds.Remove(hotkeyId);
             }
         }
-        
-        // OCR 핫키 다시 등록
+
+        // Re-registers the OCR hotkey if it was previously set.
         if (_ocrHotkey.HasValue)
         {
             int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value);
@@ -208,8 +208,8 @@ public sealed class HotkeyRegisterService
             Debug.WriteLine($"Hotkey already registered: {Hotkey.Item1} + {Hotkey.Item2}");
             return false;
         }
-        
-        // OCR 핫키와 충돌하는지 확인
+
+        // Checks if the new hotkey conflicts with the OCR hotkey.
         if (_ocrHotkey.HasValue && _ocrHotkey.Value.Equals(Hotkey))
         {
             Debug.WriteLine($"Hotkey conflicts with OCR hotkey: {Hotkey.Item1} + {Hotkey.Item2}");
