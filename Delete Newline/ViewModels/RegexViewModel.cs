@@ -135,6 +135,7 @@ public partial class RegexViewModel : ObservableRecipient
         DisplayHotkey = HotkeyHelper.GetDisplayText(CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key);
     }
 
+    // https://github.com/microsoft/microsoft-ui-xaml/issues/1826
     private void UpdateRegexOutput()
     {
         if (CurrentRegexConfig == null || CurrentRegexConfig.RegexChain == null)

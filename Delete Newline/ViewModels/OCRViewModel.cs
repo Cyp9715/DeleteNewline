@@ -19,10 +19,6 @@ public partial class OCRViewModel : ObservableRecipient
     private Button? _dummyFocusButton;
     private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
 
-    // Settings keys (kept for compatibility, but OCRService handles the actual persistence)
-    private const string OcrHotkeyKey = "OCR_Hotkey";
-    private const string OcrLanguageTagKey = "OCR_LanguageTag";
-
     [ObservableProperty]
     private Language? _selectedLanguage;
 

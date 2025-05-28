@@ -47,11 +47,11 @@ public class ClipboardMonitorService
             return;
         }
 
-        string rawText = string.Empty;
+        string beforeText = string.Empty;
         try
         {
-            rawText = dataPackageView.GetTextAsync().GetAwaiter().GetResult();
-            string cleanedText;
+            beforeText = dataPackageView.GetTextAsync().GetAwaiter().GetResult();
+            string afterText;
 
             // Check if a hotkey triggered this clipboard change
             int? triggeredHotkeyId = App.ActiveHotkeyIdForCopy;
@@ -59,18 +59,18 @@ public class ClipboardMonitorService
             {
                 App.ActiveHotkeyIdForCopy = null; // Reset immediately
                 Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId.Value}. Applying regex rules.");
-                cleanedText = _regexService.ApplyRegexRules(rawText, triggeredHotkeyId.Value);
+                afterText = _regexService.ApplyRegexRules(beforeText, triggeredHotkeyId.Value);
             }
             else
             {
                 Debug.WriteLine("[ClipboardMonitorService] General clipboard change. No regex processing.");
-                cleanedText = rawText;
+                afterText = beforeText;
             }
 
             // If it is updated
-            if (rawText != cleanedText && !string.IsNullOrEmpty(cleanedText))
+            if (beforeText != afterText && !string.IsNullOrEmpty(afterText))
             {
-                UpdateClipboardContent(cleanedText, triggeredHotkeyId);
+                UpdateClipboardContent(afterText, triggeredHotkeyId);
             }
             else if (triggeredHotkeyId.HasValue)
             {
@@ -80,14 +80,14 @@ public class ClipboardMonitorService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content. Raw text snippet was '{rawText.Substring(0, Math.Min(rawText.Length,50))}...': {ex.Message}");
+            Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content. Raw text snippet was '{beforeText.Substring(0, Math.Min(beforeText.Length,50))}...': {ex.Message}");
         }
     }
 
-    private void UpdateClipboardContent(string cleanedText, int? triggeredHotkeyId)
+    private void UpdateClipboardContent(string text, int? triggeredHotkeyId)
     {
         var dataPackage = new DataPackage();
-        dataPackage.SetText(cleanedText);
+        dataPackage.SetText(text);
         
         try
         {
@@ -100,7 +100,7 @@ public class ClipboardMonitorService
         }
         catch (Exception exSetContent)
         {
-            Debug.WriteLine($"[ClipboardMonitorService] Error setting clipboard content: {exSetContent.Message}. Text was: {cleanedText.Substring(0, Math.Min(cleanedText.Length,50))}...");
+            Debug.WriteLine($"[ClipboardMonitorService] Error setting clipboard content: {exSetContent.Message}. Text was: {text.Substring(0, Math.Min(text.Length,50))}...");
         }
     }
 
