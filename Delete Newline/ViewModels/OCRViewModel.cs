@@ -102,12 +102,6 @@ public partial class OCRViewModel : ObservableRecipient
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
-        // Ignore if not in hotkey registration mode
-        if (!_hotkeyManager.IsRegisteringHotkey())
-        {
-            return;
-        }
-
         // Check for forbidden hotkey combinations using centralized validation
         if (HotkeyHelper.IsShiftAlone(args.Modifiers))
         {

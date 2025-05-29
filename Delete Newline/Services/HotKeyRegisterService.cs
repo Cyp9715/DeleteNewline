@@ -31,7 +31,6 @@ public sealed class HotkeyRegisterService
         int id);
 
     private IntPtr _hwnd;
-    private bool _isRegisteringHotkey = false;
     private readonly HashSet<(VirtualKeyModifiers, VirtualKey)> _registeredHotkeys = new();
     private readonly HashSet<int> _registeredHotkeyIds = new();
     
@@ -148,7 +147,6 @@ public sealed class HotkeyRegisterService
     // unregister all hotkeys
     public void StartHotkeyRegistration()
     {
-        _isRegisteringHotkey = true;
         foreach (var hotkey in _registeredHotkeys.ToList())
         {
             int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
@@ -169,7 +167,6 @@ public sealed class HotkeyRegisterService
     // register all hotkeys
     public void EndHotkeyRegistration()
     {
-        _isRegisteringHotkey = false;
         foreach (var hotkey in _registeredHotkeys.ToList())
         {
             int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
@@ -188,11 +185,6 @@ public sealed class HotkeyRegisterService
             Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(_ocrHotkey.Value.Item1);
             RegisterHotKey(_hwnd, ocrHotkeyId, (uint)win32Modifiers, (uint)_ocrHotkey.Value.Item2);
         }
-    }
-
-    public bool IsRegisteringHotkey()
-    {
-        return _isRegisteringHotkey;
     }
 
     public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
@@ -244,6 +236,12 @@ public sealed class HotkeyRegisterService
         {
             int errorCode = Marshal.GetLastWin32Error();
             Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {HotkeyId}, _hwnd: {_hwnd}");
+            // Even if OS unregistration fails (e.g., already unregistered or never registered),
+            // remove it from our internal tracking to allow re-registration.
+            if (errorCode == 1419) // ERROR_HOTKEY_NOT_REGISTERED
+            {
+                _registeredHotkeys.Remove(Hotkey);
+            }
         }
         else
         {

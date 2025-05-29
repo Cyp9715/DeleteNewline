@@ -182,11 +182,11 @@ public partial class RegexViewModel : ObservableRecipient
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
-        // Ignore if not in hotkey registration mode
-        if (!_hotkeyManager.IsRegisteringHotkey())
+        if (CurrentRegexConfig != null)
         {
-            return;
+            _hotkeyManager.UnRegisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
         }
+
 
         // Check for forbidden hotkey combinations using centralized validation
         if (HotkeyHelper.IsShiftAlone(args.Modifiers))
@@ -198,13 +198,6 @@ public partial class RegexViewModel : ObservableRecipient
                 severity: InfoBarSeverity.Error
             );
             return;
-        }
-
-        // Unregister previous hotkey if exists
-        if (CurrentRegexConfig!.Hotkey!.Modifiers != VirtualKeyModifiers.None &&
-            CurrentRegexConfig!.Hotkey!.Key != VirtualKey.None)
-        {
-            _hotkeyManager.UnRegisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
         }
 
         // Check for system hotkey using centralized validation
