@@ -189,9 +189,6 @@
   <data name="Notification_HotkeySaved_Title" xml:space="preserve">
     <value>단축키 저장됨</value>
   </data>
-  <data name="Notification_HotkeySaved_Message" xml:space="preserve">
-    <value>단축키가 성공적으로 등록되었습니다.</value>
-  </data>
   <data name="Notification_HotkeyRegistrationFailed_Title" xml:space="preserve">
     <value>단축키 등록 실패</value>
   </data>
@@ -421,5 +418,8 @@
   <data name="Notification_OCR_NoText_Message" xml:space="preserve">
     <value>선택한 영역에서 텍스트를 찾을 수 없습니다.</value>
     <comment>OCR no text found notification message</comment>
+  </data>
+  <data name="RegexService_InvalidRegex_Message" xml:space="preserve">
+    <value>유효하지 않은 정규표현식</value>
   </data>
 </root>

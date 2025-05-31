@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Helpers;
 
 namespace Delete_Newline.Services;
 
@@ -15,11 +16,23 @@ public class RegexService
 
     public static string ProcessRegex(string inputText, string? regexPattern, string? replacement)
     {
-        if (string.IsNullOrEmpty(regexPattern))
+        string result = LocalizationHelper.GetLocalizedString("RegexService_InvalidRegex_Message");
+        
+        try
         {
-            return inputText;
+            if (string.IsNullOrEmpty(regexPattern))
+            {
+                return inputText;
+            }
+
+            result = Regex.Replace(inputText, regexPattern, Regex.Unescape(replacement ?? string.Empty), RegexOptions.Multiline);
         }
-        return Regex.Replace(inputText, regexPattern, Regex.Unescape(replacement ?? string.Empty), RegexOptions.Multiline);
+        catch(RegexParseException)
+        {
+            Debug.WriteLine("If you didn't input an invalid Regex, this is an intended error.");
+        }
+
+        return result;
     }
 
     public string ApplyRegexRules(string inputText, int hotkeyId)

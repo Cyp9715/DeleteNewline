@@ -189,9 +189,6 @@
   <data name="Notification_HotkeySaved_Title" xml:space="preserve">
     <value>Hotkey Saved</value>
   </data>
-  <data name="Notification_HotkeySaved_Message" xml:space="preserve">
-    <value>The hotkey has been successfully registered.</value>
-  </data>
   <data name="Notification_HotkeyRegistrationFailed_Title" xml:space="preserve">
     <value>Hotkey Registration Failed</value>
   </data>
@@ -344,30 +341,6 @@
     <value>.</value>
     <comment>OCR page add language suffix text</comment>
   </data>
-  <data name="Notification_OCR_Success_Title" xml:space="preserve">
-    <value>OCR Completed</value>
-    <comment>OCR success notification title</comment>
-  </data>
-  <data name="Notification_OCR_Success_Message" xml:space="preserve">
-    <value>Text copied to clipboard. Length: {0} characters</value>
-    <comment>OCR success notification message with character count</comment>
-  </data>
-  <data name="Notification_OCR_Error_Title" xml:space="preserve">
-    <value>OCR Error</value>
-    <comment>OCR error notification title</comment>
-  </data>
-  <data name="Notification_OCR_Error_Clipboard_Message" xml:space="preserve">
-    <value>Failed to copy text to clipboard.</value>
-    <comment>OCR clipboard error notification message</comment>
-  </data>
-  <data name="Notification_OCR_NoText_Title" xml:space="preserve">
-    <value>No Text Found</value>
-    <comment>OCR no text found notification title</comment>
-  </data>
-  <data name="Notification_OCR_NoText_Message" xml:space="preserve">
-    <value>No text was found in the selected area.</value>
-    <comment>OCR no text found notification message</comment>
-  </data>
   <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">
     <value>OCR Language Not Found</value>
     <comment>Notification title when saved OCR language is not available</comment>
@@ -420,5 +393,32 @@
   </data>
   <data name="Shell_RegexExpressions.Content" xml:space="preserve">
     <value>Regex Expressions</value>
+  </data>
+  <data name="Notification_OCR_Success_Title" xml:space="preserve">
+    <value>OCR Completed</value>
+    <comment>OCR success notification title</comment>
+  </data>
+  <data name="Notification_OCR_Success_Message" xml:space="preserve">
+    <value>Text copied to clipboard. Length: {0} characters</value>
+    <comment>OCR success notification message with character count</comment>
+  </data>
+  <data name="Notification_OCR_Error_Title" xml:space="preserve">
+    <value>OCR Error</value>
+    <comment>OCR error notification title</comment>
+  </data>
+  <data name="Notification_OCR_Error_Clipboard_Message" xml:space="preserve">
+    <value>Failed to copy text to clipboard.</value>
+    <comment>OCR clipboard error notification message</comment>
+  </data>
+  <data name="Notification_OCR_NoText_Title" xml:space="preserve">
+    <value>No Text Found</value>
+    <comment>OCR no text found notification title</comment>
+  </data>
+  <data name="Notification_OCR_NoText_Message" xml:space="preserve">
+    <value>No text was found in the selected area.</value>
+    <comment>OCR no text found notification message</comment>
+  </data>
+  <data name="RegexService_InvalidRegex_Message" xml:space="preserve">
+    <value>INVALID REGEX</value>
   </data>
 </root>
