@@ -62,9 +62,7 @@
                                      HorizontalAlignment="Right"
                                      VerticalAlignment="Center"
                                      IsReadOnly="True"
-                                     Text="{Binding DisplayHotkey, Mode=OneWay}"
-                                     GotFocus="TextBox_Hotkey_GotFocus"
-                                     LostFocus="TextBox_Hotkey_LostFocus">
+                                     Text="{Binding DisplayHotkey, Mode=OneWay}">
                                 <interactivity:Interaction.Behaviors>
                                     <behaviors:KeyboardInputBehavior CommandName="ProcessKeyInputCommand" />
                                 </interactivity:Interaction.Behaviors>

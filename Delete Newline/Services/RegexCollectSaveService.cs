@@ -14,7 +14,7 @@ public sealed class RegexCollectSaveService
     public ObservableCollection<RegexPageStructure> RegexConfigs { get; private set; }
 
     private readonly SettingsService _localSettingsService;
-    private readonly HotkeyRegisterService _HotkeyRegisterService;
+    private readonly HotkeyRegisterService _hotkeyRegisterService;
     private readonly InAppNotificationService _inAppNotificationService;
 
     private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
@@ -25,7 +25,7 @@ public sealed class RegexCollectSaveService
         InAppNotificationService inAppNotificationService)
     {
         _localSettingsService = localSettingsService;
-        _HotkeyRegisterService = HotkeyRegisterService;
+        _hotkeyRegisterService = HotkeyRegisterService;
         _inAppNotificationService = inAppNotificationService;
         RegexConfigs = new ObservableCollection<RegexPageStructure>();
     }
@@ -64,7 +64,7 @@ public sealed class RegexCollectSaveService
                 continue; // Skip empty/invalid hotkeys
             }
 
-            bool registrationSuccess = _HotkeyRegisterService.RegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
+            bool registrationSuccess = _hotkeyRegisterService.RegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
 
             if (!registrationSuccess)
             {
@@ -112,7 +112,7 @@ public sealed class RegexCollectSaveService
 
             if (config!.Hotkey!.Modifiers != VirtualKeyModifiers.None && config.Hotkey.Key != VirtualKey.None)
             {
-                _HotkeyRegisterService.UnRegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
+                _hotkeyRegisterService.UnRegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
             }
         }
     }

@@ -94,7 +94,7 @@
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        VerticalAlignment="Center" />
                             <HyperlinkButton x:Uid="OCRPage_Hyperlink_AddLanguage"
-                                             NavigateUri="https://learn.microsoft.com/en-us/windows/powertoys/text-extractor#how-to-query-for-ocr-language-packs"
+                                             NavigateUri="https://learn.microsoft.com/en-us/windows/powertoys/text-extractor#how-to-install-an-ocr-language-pack"
                                              FontSize="12"
                                              Padding="0,0,0,0"
                                              VerticalAlignment="Center" />

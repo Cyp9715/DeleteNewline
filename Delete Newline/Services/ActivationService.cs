@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml.Controls;
 using Delete_Newline.Activation;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
-using Delete_Newline.ViewModels;
 using Delete_Newline.Core.Contracts.Services;
 
 namespace Delete_Newline.Services;
@@ -22,7 +21,6 @@ public sealed class ActivationService : IActivationService
     private readonly WndProcService _wndProcService;
     private readonly TopMostService _topMostService;
     private readonly TrayIconService _trayIconService;
-    private readonly OCRService _ocrService;
 
     private UIElement? _shell = null;
 
@@ -37,8 +35,7 @@ public sealed class ActivationService : IActivationService
         HotkeyRegisterService hotkeyRegisterService,
         WndProcService wndProcService,
         TopMostService topMostService,
-        TrayIconService trayIconService,
-        OCRService ocrService)
+        TrayIconService trayIconService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
@@ -52,7 +49,6 @@ public sealed class ActivationService : IActivationService
         _wndProcService = wndProcService;
         _topMostService = topMostService;
         _trayIconService = trayIconService;
-        _ocrService = ocrService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -86,11 +82,6 @@ public sealed class ActivationService : IActivationService
         
         // Initialize regexCollectSaveService after hotkeyRegisterService
         _regexCollectSaveService.Initialize();
-
-        // Initialize OCRService to register global OCR hotkeys immediately
-        // This ensures OCR hotkeys work regardless of whether user visits OCR page
-        _ocrService.Initialize();
-        System.Diagnostics.Debug.WriteLine("OCRService initialized - global OCR hotkeys registered");
 
         // Apply theme (executed last as it affects UI appearance)
         _themeSelectorService.SetRequestedTheme();

@@ -180,38 +180,9 @@ public partial class RegexViewModel : ObservableRecipient
             _hotkeyRegisterService.UnRegisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
         }
 
-        // Check for forbidden hotkey combinations using centralized validation
-        if (HotkeyHelper.IsShiftAlone(args.Modifiers))
+        if(Errorcheck(in args) == false)
         {
-            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: titleKey,
-                messageKey: messageKey,
-                severity: InfoBarSeverity.Warning
-            );
-        }
-
-        // Check for system hotkey using centralized validation
-        if (HotkeyHelper.IsSystemHotkey(args.Modifiers, args.Key))
-        {
-            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: titleKey,
-                messageKey: messageKey,
-                severity: InfoBarSeverity.Error
-            );
-            return;
-        }
-
-        // Check if hotkey is already registered
-        if (_hotkeyRegisterService.IsHotkeyRegistered((args.Modifiers, args.Key)))
-        {
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_InvalidHotkey_Title",
-                messageKey: "Notification_InvalidHotkey_AlreadyRegistered_Message",
-                severity: InfoBarSeverity.Error
-            );
-            return;
+            return; // Exit if error check fails
         }
 
         // Register new hotkey
@@ -256,13 +227,43 @@ public partial class RegexViewModel : ObservableRecipient
         }
     }
 
-    public void StartHotkeyRegistration()
+    public bool Errorcheck(in KeyboardInputEventArgs args)
     {
-    }
+        // Check for forbidden hotkey combinations using centralized validation
+        if (HotkeyHelper.IsShiftAlone(args.Modifiers))
+        {
+            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: titleKey,
+                messageKey: messageKey,
+                severity: InfoBarSeverity.Warning
+            );
+        }
 
-    public void EndHotkeyRegistration()
-    {
-        _hotkeyRegisterService.EndHotkeyRegistration();
+        // Check for system hotkey using centralized validation
+        if (HotkeyHelper.IsSystemHotkey(args.Modifiers, args.Key))
+        {
+            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: titleKey,
+                messageKey: messageKey,
+                severity: InfoBarSeverity.Error
+            );
+            return false;
+        }
+
+        // Check if hotkey is already registered
+        if (_hotkeyRegisterService.IsHotkeyRegistered((args.Modifiers, args.Key)))
+        {
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_InvalidHotkey_Title",
+                messageKey: "Notification_InvalidHotkey_AlreadyRegistered_Message",
+                severity: InfoBarSeverity.Error
+            );
+            return false;
+        }
+
+        return true;
     }
 }
 

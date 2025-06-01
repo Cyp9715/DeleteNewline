@@ -1,18 +1,14 @@
 using System.Drawing;
-using System.IO;
 using Delete_Newline.Helpers;
 using Delete_Newline.Services;
-using Delete_Newline.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Windows.Globalization;
 using Windows.Media.Ocr;
 using Windows.System;
 using WinUIEx;
 using WinRT.Interop;
-using System.Threading.Tasks;
 
 namespace Delete_Newline.Views;
 
@@ -26,23 +22,12 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private bool applyRegexEnabled = false; // Apply regex setting
 
     // OCRService dependency for notifying completion
-    private readonly OCRService? _ocrService;
     private readonly NotificationService? _notificationService;
 
     public OcrCaptureWindow()
     {
         InitializeComponent();
-        // Try to get OCRService if available (for dependency injection)
-        try
-        {
-            _ocrService = App.GetService<OCRService>();
-            _notificationService = App.GetService<NotificationService>();
-        }
-        catch
-        {
-            _ocrService = null; // Fallback if service not available
-            _notificationService = null;
-        }
+        _notificationService = App.GetService<NotificationService>();
     }
 
     public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool applyRegexEnabled = false)

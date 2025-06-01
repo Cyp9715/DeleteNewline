@@ -10,7 +10,6 @@ namespace Delete_Newline.Services;
 
 public sealed class WndProcService
 {
-    private readonly OCRService _ocrService;
     private readonly RegexCollectSaveService _regexCollectSaveService;
     private readonly HotkeyRegisterService _hotkeyRegisterService;
 
@@ -32,9 +31,8 @@ public sealed class WndProcService
     private static WndProc? _newWndProc;
     private static WndProcService? _instance;
 
-    public WndProcService(OCRService ocrService, RegexCollectSaveService regexCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
+    public WndProcService(RegexCollectSaveService regexCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
     {
-        _ocrService = ocrService;
         _regexCollectSaveService = regexCollectSaveService;
         _hotkeyRegisterService = hotkeyRegisterService;
         _instance = this;
@@ -84,7 +82,7 @@ public sealed class WndProcService
                 {
                     // Process OCR Hotkey - OCR hotkey doesn't follow normal hotkey processing
                     Debug.WriteLine("Processing OCR Hotkey - launching OCR capture");
-                    LaunchOcrCapture();
+                    App.GetService<OCRViewModel>().LaunchOcr();
                     break;
                 }
 
@@ -99,7 +97,6 @@ public sealed class WndProcService
 
                 Debug.WriteLine($"Found hotkey structure: {hotkeyStructure.HotkeyName}");
 
-
                 // 4. Process normal hotkey (Ctrl+C needed)
                 Debug.WriteLine("Processing normal hotkey with Ctrl+C");
                 App.ActiveHotkeyIdForCopy = hotkeyId;
@@ -109,18 +106,6 @@ public sealed class WndProcService
                 break;
         }
         return CallWindowProc(_oldWndProc, hWnd, (int)msg, wParam, lParam);
-    }
-
-    private void LaunchOcrCapture()
-    {
-        try
-        {
-            App.GetService<OCRService>().LaunchOcrCapture();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error launching OCR capture: {ex.Message}");
-        }
     }
 
     private static int LowWord(int value)

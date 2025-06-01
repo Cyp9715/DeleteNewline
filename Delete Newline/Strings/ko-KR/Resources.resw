@@ -339,7 +339,7 @@
     <comment>OCR 페이지 언어 추가 하이퍼링크 텍스트</comment>
   </data>
   <data name="OCRPage_Text_AddLanguageSuffix.Text" xml:space="preserve">
-    <value>를 클릭하세요.</value>
+    <value>를 참조하세요.</value>
     <comment>OCR page add language suffix text</comment>
   </data>
   <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">

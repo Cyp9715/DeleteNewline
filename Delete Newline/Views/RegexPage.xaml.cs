@@ -21,16 +21,6 @@ public sealed partial class RegexPage : Page
         ViewModel.SetDummyFocusButton(DummyFocusButton);
     }
 
-    private void TextBox_Hotkey_GotFocus(object sender, RoutedEventArgs e)
-    {
-        ViewModel.StartHotkeyRegistration();
-    }
-
-    private void TextBox_Hotkey_LostFocus(object sender, RoutedEventArgs e)
-    {
-        ViewModel.EndHotkeyRegistration();
-    }
-
     private void TextBox_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
         var pointer = e.GetCurrentPoint(this);

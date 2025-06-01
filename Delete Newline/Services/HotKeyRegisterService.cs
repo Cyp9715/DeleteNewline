@@ -100,18 +100,6 @@ public sealed class HotkeyRegisterService
         }
     }
 
-    // Retrieves the OCR hotkey.
-    public (VirtualKeyModifiers, VirtualKey)? GetOcrHotkey()
-    {
-        return _ocrHotkey;
-    }
-
-    // Checks if an OCR hotkey is registered.
-    public bool IsOcrHotkeyRegistered()
-    {
-        return _ocrHotkey.HasValue;
-    }
-
     // Get OCR hotkey hash ID (for WndProcService to identify OCR hotkey)
     public int? GetOcrHotkeyId()
     {
@@ -134,67 +122,39 @@ public sealed class HotkeyRegisterService
         return win32Modifiers;
     }
 
-    public bool IsSystemHotkey((VirtualKeyModifiers, VirtualKey) hotkey)
-    {
-        return HotkeyHelper.IsSystemHotkey(hotkey.Item1, hotkey.Item2);
-    }
-
     public bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey)
     {
         return _registeredHotkeys.Contains(hotkey);
     }
 
-    // register all hotkeys
-    public void EndHotkeyRegistration()
+    public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey)
     {
-        foreach (var hotkey in _registeredHotkeys.ToList())
+        if (HotkeyHelper.IsSystemHotkey(hotkey.Item1, hotkey.Item2))
         {
-            int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
-            if (_registeredHotkeyIds.Contains(hotkeyId))
-            {
-                Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
-                RegisterHotKey(_hwnd, hotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
-                _registeredHotkeyIds.Remove(hotkeyId);
-            }
-        }
-
-        // Re-registers the OCR hotkey if it was previously set.
-        if (_ocrHotkey.HasValue)
-        {
-            int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value);
-            Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(_ocrHotkey.Value.Item1);
-            RegisterHotKey(_hwnd, ocrHotkeyId, (uint)win32Modifiers, (uint)_ocrHotkey.Value.Item2);
-        }
-    }
-
-    public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
-    {
-        if (HotkeyHelper.IsSystemHotkey(Hotkey.Item1, Hotkey.Item2))
-        {
-            Debug.WriteLine($"Cannot register system hotkey: {Hotkey.Item1} + {Hotkey.Item2}");
+            Debug.WriteLine($"Cannot register system hotkey: {hotkey.Item1} + {hotkey.Item2}");
             return false;
         }
 
-        if (IsHotkeyRegistered(Hotkey))
+        if (IsHotkeyRegistered(hotkey))
         {
-            Debug.WriteLine($"Hotkey already registered: {Hotkey.Item1} + {Hotkey.Item2}");
+            Debug.WriteLine($"Hotkey already registered: {hotkey.Item1} + {hotkey.Item2}");
             return false;
         }
 
         // Checks if the new hotkey conflicts with the OCR hotkey.
-        if (_ocrHotkey.HasValue && _ocrHotkey.Value.Equals(Hotkey))
+        if (_ocrHotkey.HasValue && _ocrHotkey.Value.Equals(hotkey))
         {
-            Debug.WriteLine($"Hotkey conflicts with OCR hotkey: {Hotkey.Item1} + {Hotkey.Item2}");
+            Debug.WriteLine($"Hotkey conflicts with OCR hotkey: {hotkey.Item1} + {hotkey.Item2}");
             return false;
         }
 
-        int HotkeyId = HotkeyHelper.GenerateHotkeyHash(Hotkey);
-        Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(Hotkey.Item1);
+        int HotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
+        Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
         
         // Try to unregister any existing Hotkey with this ID first
         UnregisterHotKey(_hwnd, HotkeyId);
         
-        bool result = RegisterHotKey(_hwnd, HotkeyId, (uint)win32Modifiers, (uint)Hotkey.Item2);
+        bool result = RegisterHotKey(_hwnd, HotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
 
         if (!result)
         {
@@ -204,7 +164,7 @@ public sealed class HotkeyRegisterService
         else
         {
             Debug.WriteLine($"RegisterHotkey succeeded. ID={HotkeyId}");
-            _registeredHotkeys.Add(Hotkey);
+            _registeredHotkeys.Add(hotkey);
         }
         return result;
     }
