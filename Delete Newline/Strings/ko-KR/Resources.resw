@@ -181,7 +181,7 @@
     <value>Shift 키 단독 사용</value>
   </data>
   <data name="Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message" xml:space="preserve">
-    <value>Shift 키는 단축키로 단독 사용할 수 없습니다. 다른 키와 조합하여 사용하세요.</value>
+    <value>Shift 조합키를 단독으로 사용할 경우, 다른 프로그램에서 단축키를 사용하지 못할 가능성이 존재합니다.(대문자 입력, 특수문자 입력 등)</value>
   </data>
   <data name="Notification_InvalidHotkey_AlreadyRegistered_Message" xml:space="preserve">
     <value>이 단축키는 이미 애플리케이션 내에서 등록되어 있습니다.</value>

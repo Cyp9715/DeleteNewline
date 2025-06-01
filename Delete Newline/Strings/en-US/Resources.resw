@@ -181,7 +181,7 @@
     <value>Shift Key Alone</value>
   </data>
   <data name="Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message" xml:space="preserve">
-    <value>The Shift key cannot be used alone as a hotkey. Please combine it with another key.</value>
+    <value>Using the Shift key by itself as a modifier could potentially prevent shortcuts in other programs from working (e.g., for typing uppercase letters, special characters, etc.)</value>
   </data>
   <data name="Notification_InvalidHotkey_AlreadyRegistered_Message" xml:space="preserve">
     <value>This hotkey is already registered within the application.</value>

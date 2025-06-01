@@ -187,9 +187,8 @@ public partial class RegexViewModel : ObservableRecipient
             _inAppNotificationService.ShowInAppNotification(
                 titleKey: titleKey,
                 messageKey: messageKey,
-                severity: InfoBarSeverity.Error
+                severity: InfoBarSeverity.Warning
             );
-            return;
         }
 
         // Check for system hotkey using centralized validation

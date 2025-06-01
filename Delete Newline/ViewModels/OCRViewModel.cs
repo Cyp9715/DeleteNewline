@@ -100,9 +100,8 @@ public partial class OCRViewModel : ObservableRecipient
             _inAppNotificationService.ShowInAppNotification(
                 titleKey: titleKey,
                 messageKey: messageKey,
-                severity: InfoBarSeverity.Error
+                severity: InfoBarSeverity.Warning
             );
-            return;
         }
 
         // Unregister previous OCR hotkey if exists
