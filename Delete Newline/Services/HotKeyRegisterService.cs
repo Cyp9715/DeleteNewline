@@ -144,26 +144,6 @@ public sealed class HotkeyRegisterService
         return _registeredHotkeys.Contains(hotkey);
     }
 
-    // unregister all hotkeys
-    public void StartHotkeyRegistration()
-    {
-        foreach (var hotkey in _registeredHotkeys.ToList())
-        {
-            int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
-            if (UnregisterHotKey(_hwnd, hotkeyId))
-            {
-                _registeredHotkeyIds.Add(hotkeyId);
-            }
-        }
-
-        // Temporarily unregisters the OCR hotkey as well.
-        if (_ocrHotkey.HasValue)
-        {
-            int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value);
-            UnregisterHotKey(_hwnd, ocrHotkeyId);
-        }
-    }
-
     // register all hotkeys
     public void EndHotkeyRegistration()
     {
@@ -232,21 +212,23 @@ public sealed class HotkeyRegisterService
     public void UnRegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
     {
         int HotkeyId = HotkeyHelper.GenerateHotkeyHash(Hotkey);
-        if (UnregisterHotKey(_hwnd, HotkeyId) == false)
+
+        if (UnregisterHotKey(_hwnd, HotkeyId)) // Check for success first
+        {
+            Debug.WriteLine($"UnregisterHotkey succeeded. ID={HotkeyId}");
+            _registeredHotkeys.Remove(Hotkey);
+        }
+        else // Handle failure
         {
             int errorCode = Marshal.GetLastWin32Error();
             Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {HotkeyId}, _hwnd: {_hwnd}");
+
             // Even if OS unregistration fails (e.g., already unregistered or never registered),
             // remove it from our internal tracking to allow re-registration.
             if (errorCode == 1419) // ERROR_HOTKEY_NOT_REGISTERED
             {
                 _registeredHotkeys.Remove(Hotkey);
             }
-        }
-        else
-        {
-            Debug.WriteLine($"UnregisterHotkey succeeded. ID={HotkeyId}");
-            _registeredHotkeys.Remove(Hotkey);
         }
     }
 }

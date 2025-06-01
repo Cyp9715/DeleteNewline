@@ -7,14 +7,15 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.System;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace Delete_Newline.ViewModels;
 public partial class RegexViewModel : ObservableRecipient
 {
-    private readonly HotkeyRegisterService _hotkeyManager;
+    private readonly HotkeyRegisterService _hotkeyRegisterService;
     private readonly InAppNotificationService _inAppNotificationService;
     private Button? _dummyFocusButton;
-    private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
+    private readonly DispatcherQueue? _dispatcherQueue;
 
     [ObservableProperty]
     private RegexPageStructure? _currentRegexConfig;
@@ -27,17 +28,9 @@ public partial class RegexViewModel : ObservableRecipient
 
     public RegexViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService)
     {
-        _hotkeyManager = hotkeyManager;
+        _hotkeyRegisterService = hotkeyManager;
         _inAppNotificationService = notificationService;
-        try
-        {
-            _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
-        }
-        catch
-        {
-            // If not on UI thread, set to null
-            _dispatcherQueue = null;
-        }
+        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     }
 
     public void SetDummyFocusButton(Button btn)
@@ -184,9 +177,8 @@ public partial class RegexViewModel : ObservableRecipient
     {
         if (CurrentRegexConfig != null)
         {
-            _hotkeyManager.UnRegisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
+            _hotkeyRegisterService.UnRegisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
         }
-
 
         // Check for forbidden hotkey combinations using centralized validation
         if (HotkeyHelper.IsShiftAlone(args.Modifiers))
@@ -213,7 +205,7 @@ public partial class RegexViewModel : ObservableRecipient
         }
 
         // Check if hotkey is already registered
-        if (_hotkeyManager.IsHotkeyRegistered((args.Modifiers, args.Key)))
+        if (_hotkeyRegisterService.IsHotkeyRegistered((args.Modifiers, args.Key)))
         {
             _inAppNotificationService.ShowInAppNotification(
                 titleKey: "Notification_InvalidHotkey_Title",
@@ -224,7 +216,7 @@ public partial class RegexViewModel : ObservableRecipient
         }
 
         // Register new hotkey
-        if (_hotkeyManager.RegisterHotkey((args.Modifiers, args.Key)))
+        if (_hotkeyRegisterService.RegisterHotkey((args.Modifiers, args.Key)))
         {
             VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
 
@@ -237,38 +229,23 @@ public partial class RegexViewModel : ObservableRecipient
             if (args.Modifiers.HasFlag(VirtualKeyModifiers.Windows))
                 tempModifiers |= VirtualKeyModifiers.Windows;
 
-            CurrentRegexConfig.Hotkey.Modifiers = tempModifiers;
+            CurrentRegexConfig!.Hotkey.Modifiers = tempModifiers;
             CurrentRegexConfig.Hotkey.Key = args.Key;
             CurrentRegexConfig.IsRegistrationFailed = false;
 
-            // Move focus to dummy button to remove focus from TextBox
-            if (_dummyFocusButton != null && _dispatcherQueue != null)
-            {
-                _dispatcherQueue.TryEnqueue(() =>
-                {
-                    try
-                    {
-                        _dummyFocusButton.Focus(FocusState.Programmatic);
-                    }
-                    catch
-                    {
-                        // Ignore focus move failure
-                    }
-                    finally
-                    {
-                        _hotkeyManager.EndHotkeyRegistration();
-                    }
-                });
-            }
-            else
-            {
-                _hotkeyManager.EndHotkeyRegistration();
-            }
+            //// Move focus to dummy button to remove focus from TextBox
+            //if (_dummyFocusButton != null && _dispatcherQueue != null)
+            //{
+            //    _dispatcherQueue.TryEnqueue(() =>
+            //    {
+            //        _dummyFocusButton.Focus(FocusState.Programmatic);
+            //    });
+            //}
         }
         else
         {
             // Reset hotkey to None when registration fails
-            CurrentRegexConfig.Hotkey.Modifiers = VirtualKeyModifiers.None;
+            CurrentRegexConfig!.Hotkey.Modifiers = VirtualKeyModifiers.None;
             CurrentRegexConfig.Hotkey.Key = VirtualKey.None;
             CurrentRegexConfig.IsRegistrationFailed = true;
             
@@ -282,12 +259,11 @@ public partial class RegexViewModel : ObservableRecipient
 
     public void StartHotkeyRegistration()
     {
-        _hotkeyManager.StartHotkeyRegistration();
     }
 
     public void EndHotkeyRegistration()
     {
-        _hotkeyManager.EndHotkeyRegistration();
+        _hotkeyRegisterService.EndHotkeyRegistration();
     }
 }
 

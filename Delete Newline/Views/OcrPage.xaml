@@ -45,9 +45,7 @@
                                      HorizontalAlignment="Right"
                                      VerticalAlignment="Center"
                                      IsReadOnly="True"
-                                     x:Uid="OCRPage_Placeholder_Hotkey"
-                                     GotFocus="TextBox_OcrHotkey_GotFocus"
-                                     LostFocus="TextBox_OcrHotkey_LostFocus">
+                                     x:Uid="OCRPage_Placeholder_Hotkey">
                                 <interactivity:Interaction.Behaviors>
                                     <behaviors:KeyboardInputBehavior CommandName="ProcessKeyInputCommand" />
                                 </interactivity:Interaction.Behaviors>

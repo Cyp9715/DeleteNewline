@@ -73,17 +73,6 @@ public sealed partial class OCRPage : Page
         }
     }
 
-    // Hotkey TextBox focus events
-    private void TextBox_OcrHotkey_GotFocus(object sender, RoutedEventArgs e)
-    {
-        ViewModel.StartHotkeyRegistration();
-    }
-
-    private void TextBox_OcrHotkey_LostFocus(object sender, RoutedEventArgs e)
-    {
-        ViewModel.EndHotkeyRegistration();
-    }
-
     private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is ComboBox comboBox && comboBox.SelectedItem is Language newSelectedLanguage)

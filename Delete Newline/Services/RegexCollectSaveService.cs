@@ -58,7 +58,7 @@ public sealed class RegexCollectSaveService
             this.RegexConfigs.Add(config); // Add to the main collection
             Subscribe(config);
 
-            if (config.Hotkey.Modifiers == VirtualKeyModifiers.None &&
+            if (config.Hotkey.Modifiers == VirtualKeyModifiers.None ||
                 config.Hotkey.Key == VirtualKey.None)
             {
                 continue; // Skip empty/invalid hotkeys

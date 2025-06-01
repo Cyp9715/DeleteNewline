@@ -34,16 +34,7 @@ public partial class OCRViewModel : ObservableRecipient
         _inAppNotificationService = notificationService;
         _settingsService = settingsService;
         _ocrService = ocrService;
-        
-        try
-        {
-            _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
-        }
-        catch
-        {
-            // If not on UI thread, set to null
-            _dispatcherQueue = null;
-        }
+        _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         
         // Initialize settings from OCRService
         Initialize();
@@ -152,29 +143,14 @@ public partial class OCRViewModel : ObservableRecipient
             // Save the new hotkey settings
             _ = SaveOcrHotkeyAsync();
 
-            // Move focus to dummy button to remove focus from TextBox
-            if (_dummyFocusButton != null && _dispatcherQueue != null)
-            {
-                _dispatcherQueue.TryEnqueue(() =>
-                {
-                    try
-                    {
-                        _dummyFocusButton.Focus(FocusState.Programmatic);
-                    }
-                    catch
-                    {
-                        // Ignore focus move failure
-                    }
-                    finally
-                    {
-                        _hotkeyManager.EndHotkeyRegistration();
-                    }
-                });
-            }
-            else
-            {
-                _hotkeyManager.EndHotkeyRegistration();
-            }
+            //// Move focus to dummy button to remove focus from TextBox
+            //if (_dummyFocusButton != null && _dispatcherQueue != null)
+            //{
+            //    _dispatcherQueue.TryEnqueue(() =>
+            //    {
+            //        _dummyFocusButton.Focus(FocusState.Programmatic);
+            //    });
+            //}
         }
         else
         {
@@ -191,15 +167,5 @@ public partial class OCRViewModel : ObservableRecipient
                 severity: InfoBarSeverity.Error
             );
         }
-    }
-
-    public void StartHotkeyRegistration()
-    {
-        _hotkeyManager.StartHotkeyRegistration();
-    }
-
-    public void EndHotkeyRegistration()
-    {
-        _hotkeyManager.EndHotkeyRegistration();
     }
 } 
