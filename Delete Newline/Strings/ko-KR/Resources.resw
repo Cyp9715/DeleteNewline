@@ -127,7 +127,7 @@
     <value>어둡게</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>기본값</value>
+    <value>시스템</value>
   </data>
   <data name="MemoPage_AutoCopy.Text" xml:space="preserve">
     <value>클립보드에 자동 복사</value>
@@ -154,7 +154,7 @@
     <value>시스템 트레이에 최소화된 상태로 애플리케이션을 시작합니다.</value>
   </data>
   <data name="Settings_Theme_Description.Text" xml:space="preserve">
-    <value>애플리케이션 테마를 변경합니다. 기본값은 어둡게 모드입니다.</value>
+    <value>애플리케이션 테마를 변경합니다.</value>
   </data>
   <data name="Settings_Language_Description.Text" xml:space="preserve">
     <value>애플리케이션 표시 언어를 변경합니다.</value>
@@ -196,10 +196,10 @@
     <value>다른 프로그램에서 이미 사용 중이거나 시스템 오류로 인해 단축키를 등록할 수 없습니다.</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_Message_Prefix" xml:space="preserve">
-    <value>다음 단축키들을 등록할 수 못했습니다:</value>
+    <value>다음 단축키들을 등록할 수 없었습니다:</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_Message_Suffix" xml:space="preserve">
-    <value>다른 사용 프로그램에서 사용 중인지 확인하거나 다른 조합을 시도해 보십시오.</value>
+    <value>다른 프로그램에서 사용 중인지 확인하거나 다른 조합을 시도해 보십시오.</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_Message_Body" xml:space="preserve">
     <value>{0}</value>
@@ -311,7 +311,7 @@
     <comment>OCR 페이지 단축키 설정 섹션 제목</comment>
   </data>
   <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
-    <value>이미지 속 텍스트를 즉시 텍스트로 변환할 수 있는 전역 단축키를 설정하세요.</value>
+    <value>이미지에서 텍스트를 즉시 추출할 수 있는 전역 단축키를 설정하세요.</value>
     <comment>OCR 페이지 단축키 설정 설명</comment>
   </data>
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">

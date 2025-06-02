@@ -154,7 +154,7 @@
     <value>Starts the application minimized in the system tray.</value>
   </data>
   <data name="Settings_Theme_Description.Text" xml:space="preserve">
-    <value>Change the application theme. Default is dark mode.</value>
+    <value>Changes the application theme.</value>
   </data>
   <data name="Settings_Language_Description.Text" xml:space="preserve">
     <value>Changes the application display language.</value>
@@ -199,10 +199,10 @@
     <value>The following hotkeys could not be registered:</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_Message_Suffix" xml:space="preserve">
-    <value>Please check if they are used by other applications or try different combinations.</value>
+    <value>Please check if they are being used by other applications or try different key combinations.</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_Message_Body" xml:space="preserve">
-    <value>Placeholder for the detailed list</value>
+    <value>{0}</value>
   </data>
   <data name="Notification_TextModified_Title" xml:space="preserve">
     <value>Text Modified</value>
@@ -310,7 +310,7 @@
     <value>Hotkey Settings</value>
   </data>
   <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
-    <value>Set a global hotkey to instantly convert text from images to text.</value>
+    <value>Set a global hotkey to instantly extract text from images.</value>
     <comment>OCR page hotkey settings description</comment>
   </data>
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
