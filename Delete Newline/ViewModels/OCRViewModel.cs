@@ -7,7 +7,6 @@ using Windows.Globalization;
 using Windows.Media.Ocr;
 using Windows.System;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
 using System.Collections.ObjectModel;
 using Delete_Newline.Views;
 
@@ -66,7 +65,7 @@ public partial class OCRViewModel : ObservableRecipient
             // Register the loaded hotkey
             if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
             {
-                _hotkeyManager.RegisterOcrHotkey(_ocrHotkey.Modifiers, _ocrHotkey.Key);
+                _hotkeyManager.RegisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
             }
         }
         
@@ -198,7 +197,7 @@ public partial class OCRViewModel : ObservableRecipient
         // Unregister previous OCR hotkey if exists
         if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
         {
-            _hotkeyManager.UnregisterOcrHotkey();
+            _hotkeyManager.UnregisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
         }
 
         // Check for system hotkey using centralized validation
@@ -225,7 +224,7 @@ public partial class OCRViewModel : ObservableRecipient
         }
 
         // Register new OCR hotkey
-        if (_hotkeyManager.RegisterOcrHotkey(args.Modifiers, args.Key))
+        if (_hotkeyManager.RegisterHotkey((args.Modifiers, args.Key), HotkeyType.Ocr))
         {
             _ocrHotkey.Modifiers = args.Modifiers;
             _ocrHotkey.Key = args.Key;

@@ -1,11 +1,8 @@
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
 using WinUIEx;
 
 namespace Delete_Newline.Helpers;

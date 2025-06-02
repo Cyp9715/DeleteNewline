@@ -177,7 +177,7 @@ public partial class RegexViewModel : ObservableRecipient
     {
         if (CurrentRegexConfig != null)
         {
-            _hotkeyRegisterService.UnRegisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
+            _hotkeyRegisterService.UnregisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
         }
 
         if(Errorcheck(in args) == false)

@@ -4,7 +4,6 @@ using System.Text;
 using Windows.Globalization;
 using Windows.Graphics.Imaging;
 using Windows.Media.Ocr;
-using Windows.Storage.Streams;
 using WinUIEx;
 
 namespace Delete_Newline.Helpers;

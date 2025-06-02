@@ -16,6 +16,12 @@ public enum Win32Modifiers
     MOD_NOREPEAT = 0x4000,
 }
 
+public enum HotkeyType
+{
+    Regex,
+    Ocr
+}
+
 public sealed class HotkeyRegisterService
 {
     [DllImport("user32.dll", SetLastError = true, EntryPoint = "RegisterHotKey")]
@@ -31,79 +37,22 @@ public sealed class HotkeyRegisterService
         int id);
 
     private IntPtr _hwnd;
-    private readonly HashSet<(VirtualKeyModifiers, VirtualKey)> _registeredHotkeys = new();
-    private readonly HashSet<int> _registeredHotkeyIds = new();
-    
-    // OCR hotkey management - now using same hash system as regular hotkeys
-    private (VirtualKeyModifiers, VirtualKey)? _ocrHotkey = null;
+    private readonly Dictionary<HotkeyType, HashSet<(VirtualKeyModifiers, VirtualKey)>> _registeredHotkeys;
+
+    public HotkeyRegisterService()
+    {
+        _registeredHotkeys = new Dictionary<HotkeyType, HashSet<(VirtualKeyModifiers, VirtualKey)>>();
+        
+        // Initialize HashSets for all HotkeyType values
+        foreach (HotkeyType type in Enum.GetValues<HotkeyType>())
+        {
+            _registeredHotkeys[type] = new HashSet<(VirtualKeyModifiers, VirtualKey)>();
+        }
+    }
 
     public void Initialize(IntPtr hwnd)
     {
         _hwnd = hwnd;
-    }
-    
-    public bool RegisterOcrHotkey(VirtualKeyModifiers modifiers, VirtualKey key)
-    {
-        var hotkey = (modifiers, key);
-        
-        if (HotkeyHelper.IsSystemHotkey(modifiers, key))
-        {
-            Debug.WriteLine($"Cannot register system hotkey for OCR: {modifiers} + {key}");
-            return false;
-        }
-
-        if (IsHotkeyRegistered(hotkey))
-        {
-            Debug.WriteLine($"Hotkey already registered for text processing: {modifiers} + {key}");
-            return false;
-        }
-
-        if (_ocrHotkey.HasValue)
-        {
-            UnregisterOcrHotkey();
-        }
-
-        Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(modifiers);
-        int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(modifiers, key);
-        
-        bool result = RegisterHotKey(_hwnd, ocrHotkeyId, (uint)win32Modifiers, (uint)key);
-
-        if (!result)
-        {
-            int errorCode = Marshal.GetLastWin32Error();
-            Debug.WriteLine($"RegisterOcrHotkey failed with error code: {errorCode}");
-        }
-        else
-        {
-            Debug.WriteLine($"RegisterOcrHotkey succeeded: {modifiers} + {key}, Hash ID: {ocrHotkeyId}");
-            _ocrHotkey = hotkey;
-        }
-        
-        return result;
-    }
-    
-    public void UnregisterOcrHotkey()
-    {
-        if (_ocrHotkey.HasValue)
-        {
-            int ocrHotkeyId = HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value);
-            if (UnregisterHotKey(_hwnd, ocrHotkeyId))
-            {
-                Debug.WriteLine($"UnregisterOcrHotkey succeeded: {_ocrHotkey.Value.Item1} + {_ocrHotkey.Value.Item2}, Hash ID: {ocrHotkeyId}");
-            }
-            else
-            {
-                int errorCode = Marshal.GetLastWin32Error();
-                Debug.WriteLine($"UnregisterOcrHotkey failed with error code: {errorCode}");
-            }
-            _ocrHotkey = null;
-        }
-    }
-
-    // Get OCR hotkey hash ID (for WndProcService to identify OCR hotkey)
-    public int? GetOcrHotkeyId()
-    {
-        return _ocrHotkey.HasValue ? HotkeyHelper.GenerateHotkeyHash(_ocrHotkey.Value) : null;
     }
 
     private Win32Modifiers MapVirtualModifiersToWin32(VirtualKeyModifiers virtualModifiers)
@@ -124,71 +73,65 @@ public sealed class HotkeyRegisterService
 
     public bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey)
     {
-        return _registeredHotkeys.Contains(hotkey);
+        // Check if hotkey is registered in any type using LINQ
+        return _registeredHotkeys.Values.Any(hotkeySet => hotkeySet.Contains(hotkey));
     }
 
-    public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey)
+    public bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type = HotkeyType.Regex)
     {
-        if (HotkeyHelper.IsSystemHotkey(hotkey.Item1, hotkey.Item2))
-        {
-            Debug.WriteLine($"Cannot register system hotkey: {hotkey.Item1} + {hotkey.Item2}");
-            return false;
-        }
-
+        // Check if hotkey is registered in any type
         if (IsHotkeyRegistered(hotkey))
         {
             Debug.WriteLine($"Hotkey already registered: {hotkey.Item1} + {hotkey.Item2}");
             return false;
         }
 
-        // Checks if the new hotkey conflicts with the OCR hotkey.
-        if (_ocrHotkey.HasValue && _ocrHotkey.Value.Equals(hotkey))
-        {
-            Debug.WriteLine($"Hotkey conflicts with OCR hotkey: {hotkey.Item1} + {hotkey.Item2}");
-            return false;
-        }
-
-        int HotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
+        int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
         Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
         
-        // Try to unregister any existing Hotkey with this ID first
-        UnregisterHotKey(_hwnd, HotkeyId);
+        // Try to unregister any existing hotkey with this ID first
+        UnregisterHotKey(_hwnd, hotkeyId);
         
-        bool result = RegisterHotKey(_hwnd, HotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
+        bool result = RegisterHotKey(_hwnd, hotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
 
         if (!result)
         {
-            int errorCode = Marshal.GetLastWin32Error();
-            Debug.WriteLine($"RegisterHotkey failed with error code: {errorCode}, ID: {HotkeyId}, _hwnd: {_hwnd}");
+            Debug.WriteLine($"RegisterHotkey failed. Type={type}, ID={hotkeyId}");
         }
         else
         {
-            Debug.WriteLine($"RegisterHotkey succeeded. ID={HotkeyId}");
-            _registeredHotkeys.Add(hotkey);
+            Debug.WriteLine($"RegisterHotkey succeeded. Type={type}, ID={hotkeyId}");
+            _registeredHotkeys[type].Add(hotkey);
         }
+
         return result;
     }
 
-    public void UnRegisterHotkey((VirtualKeyModifiers, VirtualKey) Hotkey)
+    public void UnregisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type = HotkeyType.Regex)
     {
-        int HotkeyId = HotkeyHelper.GenerateHotkeyHash(Hotkey);
+        int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
 
-        if (UnregisterHotKey(_hwnd, HotkeyId)) // Check for success first
+        if (UnregisterHotKey(_hwnd, hotkeyId))
         {
-            Debug.WriteLine($"UnregisterHotkey succeeded. ID={HotkeyId}");
-            _registeredHotkeys.Remove(Hotkey);
+            Debug.WriteLine($"UnregisterHotkey succeeded. Type={type}, ID={hotkeyId}");
+            _registeredHotkeys[type].Remove(hotkey);
         }
-        else // Handle failure
+        else
         {
             int errorCode = Marshal.GetLastWin32Error();
-            Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {HotkeyId}, _hwnd: {_hwnd}");
+            Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {hotkeyId}, _hwnd: {_hwnd}");
 
-            // Even if OS unregistration fails (e.g., already unregistered or never registered),
-            // remove it from our internal tracking to allow re-registration.
+            // Even if OS unregistration fails, remove from our tracking
             if (errorCode == 1419) // ERROR_HOTKEY_NOT_REGISTERED
             {
-                _registeredHotkeys.Remove(Hotkey);
+                _registeredHotkeys[type].Remove(hotkey);
             }
         }
+    }
+
+    public int? GetOcrHotkeyId()
+    {
+        var ocrHotkey = _registeredHotkeys[HotkeyType.Ocr].FirstOrDefault();
+        return ocrHotkey != default ? HotkeyHelper.GenerateHotkeyHash(ocrHotkey) : null;
     }
 }

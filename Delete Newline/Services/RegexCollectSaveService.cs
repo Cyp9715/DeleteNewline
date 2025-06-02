@@ -32,7 +32,7 @@ public sealed class RegexCollectSaveService
 
     public void Initialize()
     {
-        var savedRegexConfigs = LoadSavedHotkeyConfigurations();
+        var savedRegexConfigs = _localSettingsService.ReadSetting<List<RegexPageStructure>>(HotkeyCollectionSettingsKey);
 
         if (savedRegexConfigs != null && savedRegexConfigs.Count > 0) // Ensure there are configs to process
         {
@@ -41,11 +41,6 @@ public sealed class RegexCollectSaveService
         }
         
         this.RegexConfigs.CollectionChanged += OnRegexConfigsChanged;
-    }
-
-    private List<RegexPageStructure>? LoadSavedHotkeyConfigurations()
-    {
-        return _localSettingsService.ReadSetting<List<RegexPageStructure>>(HotkeyCollectionSettingsKey);
     }
 
     private List<string> RegisterRegexConfigsAndCollectFailures(IEnumerable<RegexPageStructure> savedConfigs)
@@ -64,9 +59,7 @@ public sealed class RegexCollectSaveService
                 continue; // Skip empty/invalid hotkeys
             }
 
-            bool registrationSuccess = _hotkeyRegisterService.RegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
-
-            if (!registrationSuccess)
+            if (_hotkeyRegisterService.RegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key)) == false)
             {
                 config.IsRegistrationFailed = true;
                 string hotkeyString = config.Hotkey.ToString(); // Or use a helper for formatted string if available
@@ -112,7 +105,7 @@ public sealed class RegexCollectSaveService
 
             if (config!.Hotkey!.Modifiers != VirtualKeyModifiers.None && config.Hotkey.Key != VirtualKey.None)
             {
-                _hotkeyRegisterService.UnRegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
+                _hotkeyRegisterService.UnregisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
             }
         }
     }

@@ -11,9 +11,6 @@ using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
 using Delete_Newline.Views;
 
-using WinUIEx;
-using System.Threading;
-using Windows.ApplicationModel;
 using System.Runtime.InteropServices;
 
 namespace Delete_Newline;
