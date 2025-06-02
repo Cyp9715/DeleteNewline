@@ -154,7 +154,7 @@
     <value>Starts the application minimized in the system tray.</value>
   </data>
   <data name="Settings_Theme_Description.Text" xml:space="preserve">
-    <value>Changes the application theme. Default follows system settings.</value>
+    <value>Change the application theme. Default is dark mode.</value>
   </data>
   <data name="Settings_Language_Description.Text" xml:space="preserve">
     <value>Changes the application display language.</value>

@@ -154,7 +154,7 @@
     <value>시스템 트레이에 최소화된 상태로 애플리케이션을 시작합니다.</value>
   </data>
   <data name="Settings_Theme_Description.Text" xml:space="preserve">
-    <value>애플리케이션 테마를 변경합니다. 기본값은 시스템 설정을 따릅니다.</value>
+    <value>애플리케이션 테마를 변경합니다. 기본값은 어둡게 모드입니다.</value>
   </data>
   <data name="Settings_Language_Description.Text" xml:space="preserve">
     <value>애플리케이션 표시 언어를 변경합니다.</value>
