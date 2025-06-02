@@ -137,7 +137,7 @@
                                                      Width="265"
                                                      HorizontalAlignment="Right"
                                                      TextAlignment="Center"
-                                                     Foreground="Red"
+                                                     Foreground="Orange"
                                                      Text="{Binding Replace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         </Grid>
 
