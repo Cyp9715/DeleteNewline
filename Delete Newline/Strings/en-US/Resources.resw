@@ -421,4 +421,16 @@
   <data name="RegexService_InvalidRegex_Message" xml:space="preserve">
     <value>INVALID REGEX</value>
   </data>
+  <data name="RegexPage_Text_linebreak_Prefix.Text" xml:space="preserve">
+    <value>Currently, TextBox in UWP and WinUI3 has a</value>
+    <comment>Description prefix about newline character handling in regex chain testing</comment>
+  </data>
+  <data name="RegexPage_Hyperlink_linebreak.Text" xml:space="preserve">
+    <value>known bug</value>
+    <comment>Microsoft GitHub issue link text</comment>
+  </data>
+  <data name="RegexPage_Text_linebreak_Suffix.Text" xml:space="preserve">
+    <value> that processes newline characters as '\r'. This is incompatible with Windows' standard newline character '\n', which can cause issues. While actual Hotkey operations work correctly, the test display here may not show properly. Therefore, when matching newline characters in regular expressions, it is recommended to use '[\r\n]'.</value>
+    <comment>Description suffix about newline character handling in regex chain testing</comment>
+  </data>
 </root>

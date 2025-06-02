@@ -190,8 +190,19 @@
                                FontSize="12"
                                TextWrapping="Wrap"
                                Margin="5,0,0,10"/>
-                    
-                <Grid x:Name="Grid_RegexExample">
+
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               Margin="5,0,0,10">
+                        <Run x:Uid="RegexPage_Text_linebreak_Prefix" />
+                        <Hyperlink NavigateUri="https://github.com/microsoft/microsoft-ui-xaml/issues/1826">
+                            <Run x:Uid="RegexPage_Hyperlink_linebreak" />
+                        </Hyperlink>
+                        <Run x:Uid="RegexPage_Text_linebreak_Suffix" />
+                    </TextBlock>
+
+                        <Grid x:Name="Grid_RegexExample">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
