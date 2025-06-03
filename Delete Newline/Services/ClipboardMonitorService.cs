@@ -37,6 +37,7 @@ public class ClipboardMonitorService
         Debug.WriteLine("[ClipboardMonitorService] Clipboard monitoring stopped.");
     }
 
+    // This logic is only used in Regex logic.
     private void OnClipboardContentChanged(object? sender, object e)
     {
         // Check if there's content and if it's text.

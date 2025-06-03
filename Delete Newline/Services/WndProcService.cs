@@ -73,12 +73,10 @@ public sealed class WndProcService
                 int hotkeyId = wParam.ToInt32();
                 Debug.WriteLine($"=== WM_HOTKEY received: ID={hotkeyId} ===");
                 
-                // 1. Check OCR Hotkey
+                // Check OCR Hotkey
                 int? ocrHotkeyId = _hotkeyRegisterService.GetOcrHotkeyId();
-                bool isOcrHotkey = ocrHotkeyId.HasValue && hotkeyId == ocrHotkeyId.Value;
-                Debug.WriteLine($"OCR Hotkey ID: {ocrHotkeyId}, Is OCR Hotkey: {isOcrHotkey}");
 
-                if (isOcrHotkey)
+                if (ocrHotkeyId.HasValue && hotkeyId == ocrHotkeyId.Value)
                 {
                     // Process OCR Hotkey - OCR hotkey doesn't follow normal hotkey processing
                     Debug.WriteLine("Processing OCR Hotkey - launching OCR capture");
@@ -86,22 +84,13 @@ public sealed class WndProcService
                     break;
                 }
 
-                // 2. Check normal hotkey
-                var hotkeyStructure = _regexCollectSaveService.GetRegexStructureByHotkeyId(hotkeyId);
-                if (hotkeyStructure?.Hotkey == null)
-                {
-                    // Hotkey structure not found - log error and ignore
-                    Debug.WriteLine($"ERROR: Hotkey structure not found for ID: {hotkeyId}");
-                    break;
-                }
 
-                Debug.WriteLine($"Found hotkey structure: {hotkeyStructure.HotkeyName}");
 
-                // 4. Process normal hotkey (Ctrl+C needed)
+                // Process normal hotkey (Ctrl+C needed)
                 Debug.WriteLine("Processing normal hotkey with Ctrl+C");
                 App.ActiveHotkeyIdForCopy = hotkeyId;
 
-                // 5. Goto OnClipboardContentChanged()
+                // Goto OnClipboardContentChanged()
                 VirtualInputHelper.SendCtrlC();
                 break;
         }
