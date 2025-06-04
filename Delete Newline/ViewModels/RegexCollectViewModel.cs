@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Services;
@@ -26,7 +27,7 @@ public partial class RegexCollectViewModel : ObservableRecipient
 
     public string GetHotkeyDisplayText(RegexPageStructure config)
     {
-        return HotkeyHelper.GetDisplayText(config.Hotkey.Modifiers, config.Hotkey.Key);
+        return HotkeyFormatter.GetDisplayText(config.Hotkey.Modifiers, config.Hotkey.Key);
     }
 
     [RelayCommand]
@@ -49,19 +50,5 @@ public partial class RegexCollectViewModel : ObservableRecipient
     {
         App.GetService<RegexViewModel>().CurrentRegexConfig = regexConfig;
         NavigationService.NavigateTo(typeof(RegexViewModel).FullName!);
-    }
-
-    public static bool isDragEnded = true;
-
-    [RelayCommand]
-    private void DragItemsStarting()
-    {
-        isDragEnded = false;
-    }
-
-    [RelayCommand]
-    private void DragItemsCompleted()
-    {
-        isDragEnded = true;
     }
 }

@@ -18,15 +18,6 @@
                   CanDragItems="True"
                   AllowDrop="True">
 
-            <behaviors:Interaction.Behaviors>
-                <core:EventTriggerBehavior EventName="DragItemsStarting">
-                    <core:InvokeCommandAction Command="{x:Bind ViewModel.DragItemsStartingCommand}" />
-                </core:EventTriggerBehavior>
-                <core:EventTriggerBehavior EventName="DragItemsCompleted">
-                    <core:InvokeCommandAction Command="{x:Bind ViewModel.DragItemsCompletedCommand}" />
-                </core:EventTriggerBehavior>
-            </behaviors:Interaction.Behaviors>
-
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="structures:RegexPageStructure">
                     <Border CornerRadius="5"

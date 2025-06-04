@@ -3,15 +3,14 @@ using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Helpers;
 using Delete_Newline.Services;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.System;
 using System.Collections.Specialized;
-using System.Diagnostics;
 
 namespace Delete_Newline.ViewModels;
 public partial class RegexViewModel : ObservableRecipient
 {
+    private readonly RegexCollectSaveService _regexCollectSaveService;
     private readonly HotkeyRegisterService _hotkeyRegisterService;
     private readonly InAppNotificationService _inAppNotificationService;
     private Button? _dummyFocusButton;
@@ -26,10 +25,14 @@ public partial class RegexViewModel : ObservableRecipient
     [ObservableProperty]
     private string? _regexOutputText;
 
-    public RegexViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService)
+    public RegexViewModel(
+        RegexCollectSaveService regexCollectSaveService,
+        HotkeyRegisterService hotkeyRegisterService,
+        InAppNotificationService inAppNotificationService)
     {
-        _hotkeyRegisterService = hotkeyManager;
-        _inAppNotificationService = notificationService;
+        _regexCollectSaveService = regexCollectSaveService;
+        _hotkeyRegisterService = hotkeyRegisterService;
+        _inAppNotificationService = inAppNotificationService;
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     }
 
@@ -125,7 +128,7 @@ public partial class RegexViewModel : ObservableRecipient
             return;
         }
 
-        DisplayHotkey = HotkeyHelper.GetDisplayText(CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key);
+        DisplayHotkey = HotkeyFormatter.GetDisplayText(CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key);
     }
 
     // https://github.com/microsoft/microsoft-ui-xaml/issues/1826
@@ -180,9 +183,9 @@ public partial class RegexViewModel : ObservableRecipient
             _hotkeyRegisterService.UnregisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
         }
 
-        if(Errorcheck(in args) == false)
+        if(!HotkeyValidator.ValidateHotkey(args, _hotkeyRegisterService, _inAppNotificationService))
         {
-            return; // Exit if error check fails
+            return; // Exit if validation fails
         }
 
         // Register new hotkey
@@ -225,45 +228,6 @@ public partial class RegexViewModel : ObservableRecipient
                 severity: InfoBarSeverity.Error
             );
         }
-    }
-
-    public bool Errorcheck(in KeyboardInputEventArgs args)
-    {
-        // Check for forbidden hotkey combinations using centralized validation
-        if (HotkeyHelper.IsShiftAlone(args.Modifiers))
-        {
-            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: titleKey,
-                messageKey: messageKey,
-                severity: InfoBarSeverity.Warning
-            );
-        }
-
-        // Check for system hotkey using centralized validation
-        if (HotkeyHelper.IsSystemHotkey(args.Modifiers, args.Key))
-        {
-            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: titleKey,
-                messageKey: messageKey,
-                severity: InfoBarSeverity.Error
-            );
-            return false;
-        }
-
-        // Check if hotkey is already registered
-        if (_hotkeyRegisterService.IsHotkeyRegistered((args.Modifiers, args.Key)))
-        {
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_InvalidHotkey_Title",
-                messageKey: "Notification_InvalidHotkey_AlreadyRegistered_Message",
-                severity: InfoBarSeverity.Error
-            );
-            return false;
-        }
-
-        return true;
     }
 }
 

@@ -9,6 +9,7 @@ using Windows.System;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 using Delete_Newline.Views;
+using Microsoft.UI.Xaml;
 
 namespace Delete_Newline.ViewModels;
 
@@ -36,7 +37,10 @@ public partial class OCRViewModel : ObservableRecipient
     // OCR dedicated hotkey settings
     private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
 
-    public OCRViewModel(HotkeyRegisterService hotkeyManager, InAppNotificationService notificationService, SettingsService settingsService)
+    public OCRViewModel(
+        HotkeyRegisterService hotkeyManager, 
+        InAppNotificationService notificationService, 
+        SettingsService settingsService)
     {
         _hotkeyManager = hotkeyManager;
         _inAppNotificationService = notificationService;
@@ -108,7 +112,7 @@ public partial class OCRViewModel : ObservableRecipient
 
     private void UpdateDisplayHotkey()
     {
-        DisplayHotkey = HotkeyHelper.GetDisplayText(_ocrHotkey.Modifiers, _ocrHotkey.Key);
+        DisplayHotkey = HotkeyFormatter.GetDisplayText(_ocrHotkey.Modifiers, _ocrHotkey.Key);
     }
 
     private async Task SaveOcrHotkeyAsync()
@@ -183,44 +187,15 @@ public partial class OCRViewModel : ObservableRecipient
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
-        // Check for forbidden hotkey combinations using centralized validation
-        if (HotkeyHelper.IsShiftAlone(args.Modifiers))
-        {
-            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: titleKey,
-                messageKey: messageKey,
-                severity: InfoBarSeverity.Warning
-            );
-        }
-
         // Unregister previous OCR hotkey if exists
         if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
         {
             _hotkeyManager.UnregisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
         }
 
-        // Check for system hotkey using centralized validation
-        if (HotkeyHelper.IsSystemHotkey(args.Modifiers, args.Key))
+        if(!HotkeyValidator.ValidateHotkey(args, _hotkeyManager, _inAppNotificationService))
         {
-            var (titleKey, messageKey) = HotkeyHelper.GetForbiddenHotkeyError(args.Modifiers, args.Key);
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: titleKey,
-                messageKey: messageKey,
-                severity: InfoBarSeverity.Error
-            );
-            return;
-        }
-
-        // Check if hotkey is already registered for text processing
-        if (_hotkeyManager.IsHotkeyRegistered((args.Modifiers, args.Key)))
-        {
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_InvalidHotkey_Title",
-                messageKey: "Notification_InvalidHotkey_AlreadyRegistered_Message",
-                severity: InfoBarSeverity.Error
-            );
-            return;
+            return; // Exit if validation fails
         }
 
         // Register new OCR hotkey
@@ -231,21 +206,16 @@ public partial class OCRViewModel : ObservableRecipient
 
             // Save the new hotkey settings
             _ = SaveOcrHotkeyAsync();
+
         }
-        else
-        {
-            // Reset hotkey to None when registration fails
-            _ocrHotkey.Modifiers = VirtualKeyModifiers.None;
-            _ocrHotkey.Key = VirtualKey.None;
-            
-            // Save the reset hotkey settings
-            _ = SaveOcrHotkeyAsync();
-            
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_HotkeyRegistrationFailed_Title",
-                messageKey: "Notification_HotkeyRegistrationFailed_InUse_Message",
-                severity: InfoBarSeverity.Error
-            );
-        }
+
+        //// Move focus to dummy button to remove focus from TextBox
+        //if (_dummyFocusButton != null && _dispatcherQueue != null)
+        //{
+        //    _dispatcherQueue.TryEnqueue(() =>
+        //    {
+        //        _dummyFocusButton.Focus(FocusState.Programmatic);
+        //    });
+        //}
     }
 } 

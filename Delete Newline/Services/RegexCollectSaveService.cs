@@ -224,7 +224,7 @@ public sealed class RegexCollectSaveService
                 config.Hotkey.Modifiers != VirtualKeyModifiers.None &&
                 config.Hotkey.Key != VirtualKey.None)
             {
-                int currentConfigHotkeyId = HotkeyHelper.GenerateHotkeyHash(config.Hotkey.Modifiers, config.Hotkey.Key);
+                int currentConfigHotkeyId = HotkeyHasher.GenerateHotkeyHash((config.Hotkey.Modifiers, config.Hotkey.Key));
                 if (currentConfigHotkeyId == hotkeyId)
                 {
                     return config;

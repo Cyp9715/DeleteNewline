@@ -86,7 +86,7 @@ public sealed class HotkeyRegisterService
             return false;
         }
 
-        int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
+        int hotkeyId = HotkeyHasher.GenerateHotkeyHash(hotkey);
         Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
         
         // Try to unregister any existing hotkey with this ID first
@@ -109,7 +109,7 @@ public sealed class HotkeyRegisterService
 
     public void UnregisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type = HotkeyType.Regex)
     {
-        int hotkeyId = HotkeyHelper.GenerateHotkeyHash(hotkey);
+        int hotkeyId = HotkeyHasher.GenerateHotkeyHash(hotkey);
 
         if (UnregisterHotKey(_hwnd, hotkeyId))
         {
@@ -132,6 +132,6 @@ public sealed class HotkeyRegisterService
     public int? GetOcrHotkeyId()
     {
         var ocrHotkey = _registeredHotkeys[HotkeyType.Ocr].FirstOrDefault();
-        return ocrHotkey != default ? HotkeyHelper.GenerateHotkeyHash(ocrHotkey) : null;
+        return ocrHotkey != default ? HotkeyHasher.GenerateHotkeyHash(ocrHotkey) : null;
     }
 }

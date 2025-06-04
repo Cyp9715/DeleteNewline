@@ -1,10 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Delete_Newline.Helpers;
-using Delete_Newline.Views;
 using Delete_Newline.ViewModels;
-using Windows.System;
-using System.Linq;
 
 namespace Delete_Newline.Services;
 
@@ -84,13 +81,10 @@ public sealed class WndProcService
                     break;
                 }
 
-
-
-                // Process normal hotkey (Ctrl+C needed)
-                Debug.WriteLine("Processing normal hotkey with Ctrl+C");
                 App.ActiveHotkeyIdForCopy = hotkeyId;
 
                 // Goto OnClipboardContentChanged()
+                Debug.WriteLine("Processing normal hotkey with Ctrl+C");
                 VirtualInputHelper.SendCtrlC();
                 break;
         }

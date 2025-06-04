@@ -18,6 +18,6 @@ public partial class HotkeyStructure : ObservableObject
 
     public override string ToString()
     {
-        return HotkeyHelper.GetDisplayText(Modifiers, Key);
+        return HotkeyFormatter.GetDisplayText(Modifiers, Key);
     }
 }

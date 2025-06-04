@@ -1,24 +1,16 @@
+using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Services;
+using Microsoft.UI.Xaml.Controls;
 using System.Security.Cryptography;
 using System.Text;
 using Windows.System;
 
 namespace Delete_Newline.Helpers;
 
-/// <summary>
-/// Comprehensive helper class for all hotkey-related operations including validation, hashing, and display
-/// </summary>
-public static class HotkeyHelper
+public static class HotkeyHasher
 {
     private const string SALT = "Delete Newline";
 
-    #region Hotkey Hash Generation
-    
-    /// <summary>
-    /// Generate a unique hash ID for a hotkey combination
-    /// </summary>
-    /// <param name="modifiers">Virtual key modifiers</param>
-    /// <param name="key">Virtual key</param>
-    /// <returns>Unique integer hash for the hotkey combination</returns>
     public static int GenerateHotkeyHash(VirtualKeyModifiers modifiers, VirtualKey key)
     {
         string hotkeyString = $"{SALT}:{modifiers}:{key}";
@@ -31,110 +23,157 @@ public static class HotkeyHelper
         }
     }
 
-    /// <summary>
-    /// Generate a unique hash ID for a hotkey tuple
-    /// </summary>
-    /// <param name="hotkey">Hotkey tuple (modifiers, key)</param>
-    /// <returns>Unique integer hash for the hotkey combination</returns>
     public static int GenerateHotkeyHash((VirtualKeyModifiers, VirtualKey) hotkey)
     {
         return GenerateHotkeyHash(hotkey.Item1, hotkey.Item2);
     }
+}
 
-    #endregion
-
-    #region Hotkey Validation
-    
-    /// <summary>
-    /// Check if the given hotkey combination is a system hotkey that should not be overridden
-    /// </summary>
-    /// <param name="modifiers">Virtual key modifiers</param>
-    /// <param name="key">Virtual key</param>
-    /// <returns>True if this is a forbidden system hotkey</returns>
-    public static bool IsSystemHotkey(VirtualKeyModifiers modifiers, VirtualKey key)
+public static class HotkeyValidator
+{
+    public static bool ValidateHotkey(KeyboardInputEventArgs args,
+        HotkeyRegisterService hotkeyRegisterService,
+        InAppNotificationService inAppNotificationService)
     {
-        // Only block if Control is the only modifier
-        if (modifiers == VirtualKeyModifiers.Control)
+        // Check for forbidden hotkey combinations
+        if (IsShiftAlone(args.Modifiers))
         {
-            return key switch
-            {
-                VirtualKey.C or VirtualKey.V or VirtualKey.X or 
-                VirtualKey.Z or VirtualKey.Y or VirtualKey.A or
-                VirtualKey.S or VirtualKey.O or VirtualKey.P or
-                VirtualKey.N or VirtualKey.F or VirtualKey.H => true,
-                _ => false
-            };
+            inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Title",
+                messageKey: "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message",
+                severity: InfoBarSeverity.Warning
+            );
         }
-        
-        // Block common Windows system hotkeys
-        if (modifiers == VirtualKeyModifiers.Windows)
+
+        // Check for system hotkey
+        if (IsSystemHotkey(args.Modifiers, args.Key))
         {
-            return key switch
-            {
-                VirtualKey.L or VirtualKey.R or VirtualKey.D or
-                VirtualKey.E or VirtualKey.I or VirtualKey.X or
-                VirtualKey.Tab => true,
-                _ => false
-            };
+            inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_InvalidHotkey_Title",
+                messageKey: "Notification_InvalidHotkey_SystemKey_Message",
+                severity: InfoBarSeverity.Error
+            );
+            return false;
         }
-        
-        // Block Alt+Tab and Alt+F4
-        if (modifiers == VirtualKeyModifiers.Menu)
+
+        // Check if hotkey is already registered
+        if (hotkeyRegisterService.IsHotkeyRegistered((args.Modifiers, args.Key)))
         {
-            return key switch
-            {
-                VirtualKey.Tab or VirtualKey.F4 => true,
-                _ => false
-            };
+            inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_InvalidHotkey_Title",
+                messageKey: "Notification_InvalidHotkey_AlreadyRegistered_Message",
+                severity: InfoBarSeverity.Error
+            );
+            return false;
         }
-        
-        return false;
+
+        return true;
     }
 
-    /// <summary>
-    /// Check if Shift key is used alone (which should be forbidden)
-    /// </summary>
-    /// <param name="modifiers">Virtual key modifiers</param>
-    /// <returns>True if only Shift modifier is used</returns>
-    public static bool IsShiftAlone(VirtualKeyModifiers modifiers)
+    private static bool IsShiftAlone(VirtualKeyModifiers modifiers)
     {
         return modifiers == VirtualKeyModifiers.Shift;
     }
 
-    /// <summary>
-    /// Get a user-friendly error message for forbidden hotkey types
-    /// </summary>
-    /// <param name="modifiers">Virtual key modifiers</param>
-    /// <param name="key">Virtual key</param>
-    /// <returns>Error message key for localization</returns>
-    public static (string titleKey, string messageKey) GetForbiddenHotkeyError(VirtualKeyModifiers modifiers, VirtualKey key)
+    private static bool IsSystemHotkey(VirtualKeyModifiers modifiers, VirtualKey key)
     {
-        if (IsShiftAlone(modifiers))
+        switch (modifiers)
         {
-            return ("Notification_InvalidHotkey_ShiftAlone_NotAllowed_Title", 
-                    "Notification_InvalidHotkey_ShiftAlone_NotAllowed_Message");
+            case VirtualKeyModifiers.Control:
+                return key switch
+                {
+                    VirtualKey.C or VirtualKey.V or VirtualKey.X or
+                    VirtualKey.Z or VirtualKey.Y or VirtualKey.A or
+                    VirtualKey.S or VirtualKey.O or VirtualKey.P or
+                    VirtualKey.N or VirtualKey.F or VirtualKey.H => true,
+                    _ => false
+                };
+
+            case VirtualKeyModifiers.Windows:
+                return key switch
+                {
+                    VirtualKey.L or VirtualKey.R or VirtualKey.D or
+                    VirtualKey.E or VirtualKey.I or VirtualKey.X or
+                    VirtualKey.Tab => true,
+                    _ => false
+                };
+
+            case VirtualKeyModifiers.Menu:
+                return key switch
+                {
+                    VirtualKey.Tab or VirtualKey.F4 => true,
+                    _ => false
+                };
+
         }
-        
-        if (IsSystemHotkey(modifiers, key))
+
+        return false;
+    }
+}
+
+public static class HotkeyFormatter
+{
+    public static string FormatHotkey(HotkeyStructure hotkey)
+    {
+        if (hotkey == null || hotkey.Modifiers == VirtualKeyModifiers.None || hotkey.Key == VirtualKey.None)
         {
-            return ("Notification_InvalidHotkey_Title", 
-                    "Notification_InvalidHotkey_SystemKey_Message");
+            return string.Empty;
         }
-        
-        return ("Notification_InvalidHotkey_Title", 
-                "Notification_InvalidHotkey_AlreadyRegistered_Message");
+
+        var allModifiers = new[]
+        {
+            VirtualKeyModifiers.Control,
+            VirtualKeyModifiers.Menu,
+            VirtualKeyModifiers.Shift,
+            VirtualKeyModifiers.Windows
+        };
+
+        // Modifier to string
+        var modifierStrings = allModifiers
+            .Where(flag => hotkey.Modifiers.HasFlag(flag))
+            .Select(mod => GetModifierString(mod))
+            .Where(str => !string.IsNullOrEmpty(str));
+
+        // Key to string
+        var keyString = GetKeyString(hotkey.Key);
+
+        return string.Join(" + ", modifierStrings.Concat(new[] { keyString }));
     }
 
-    #endregion
+    private static string GetModifierString(VirtualKeyModifiers modifier)
+    {
+        return modifier switch
+        {
+            VirtualKeyModifiers.Control => "Ctrl",
+            VirtualKeyModifiers.Menu => "Alt",
+            VirtualKeyModifiers.Shift => "Shift",
+            VirtualKeyModifiers.Windows => "Win",
+            _ => string.Empty,
+        };
+    }
 
-    #region Hotkey Display
+    private static string GetKeyString(VirtualKey key)
+    {
+        return key switch
+        {
+            VirtualKey.Space => "Space",
+            VirtualKey.Escape => "Esc",
+            VirtualKey.Left => "Left Arrow",
+            VirtualKey.Right => "Right Arrow",
+            _ => key.ToString(),
+        };
+    }
 
-    /// <summary>
-    /// Get a user-friendly display string for a hotkey combination
-    /// </summary>
-    /// <param name="modifiers">Virtual key modifiers</param>
-    /// <param name="key">Virtual key</param>
-    /// <returns>Display string like "Ctrl + Shift + A"</returns>
+    public static string GetDisplayText(RegexPageStructure config)
+    {
+        if (config.Hotkey == null)
+        {
+            return string.Empty;
+        }
+
+        return FormatHotkey(config.Hotkey);
+    }
+
     public static string GetDisplayText(VirtualKeyModifiers modifiers, VirtualKey key)
     {
         if (modifiers == VirtualKeyModifiers.None && key == VirtualKey.None)
@@ -159,15 +198,8 @@ public static class HotkeyHelper
         return string.Join(" + ", parts);
     }
 
-    /// <summary>
-    /// Get a user-friendly display string for a hotkey tuple
-    /// </summary>
-    /// <param name="hotkey">Hotkey tuple (modifiers, key)</param>
-    /// <returns>Display string like "Ctrl + Shift + A"</returns>
     public static string GetDisplayText((VirtualKeyModifiers, VirtualKey) hotkey)
     {
         return GetDisplayText(hotkey.Item1, hotkey.Item2);
     }
-
-    #endregion
-} 
+}

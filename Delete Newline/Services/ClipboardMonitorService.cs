@@ -113,7 +113,7 @@ public class ClipboardMonitorService
             return;
         }
 
-        string displayHotkey = HotkeyHelper.GetDisplayText(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
+        string displayHotkey = HotkeyFormatter.GetDisplayText(hotkeyStructure.Hotkey.Modifiers, hotkeyStructure.Hotkey.Key);
         string messageKey;
         object[] messageArgs;
 
