@@ -17,7 +17,6 @@ public sealed class ActivationService : IActivationService
     private readonly SettingsService _settingsService;
     private readonly NotificationService _notificationService;
     private readonly RegexCollectSaveService _regexCollectSaveService;
-    private readonly HotkeyRegisterService _hotkeyRegisterService;
     private readonly WndProcService _wndProcService;
     private readonly TopMostService _topMostService;
     private readonly TrayIconService _trayIconService;
@@ -32,7 +31,6 @@ public sealed class ActivationService : IActivationService
         SettingsService settingsService,
         NotificationService notificationService,
         RegexCollectSaveService regexCollectSaveService,
-        HotkeyRegisterService hotkeyRegisterService,
         WndProcService wndProcService,
         TopMostService topMostService,
         TrayIconService trayIconService)
@@ -45,7 +43,6 @@ public sealed class ActivationService : IActivationService
         _notificationService = notificationService;
         _filePickerService = filePickerService;
         _regexCollectSaveService = regexCollectSaveService;
-        _hotkeyRegisterService = hotkeyRegisterService;
         _wndProcService = wndProcService;
         _topMostService = topMostService;
         _trayIconService = trayIconService;
@@ -70,7 +67,6 @@ public sealed class ActivationService : IActivationService
 
         // Initialize services that depend on window handle
         var hwnd = MainWindow.hwnd;
-        _hotkeyRegisterService.Initialize(hwnd);
         _wndProcService.Initialize(hwnd);
         _filePickerService.Initialize(hwnd);
         _trayIconService.Initialize(hwnd);

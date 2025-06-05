@@ -8,7 +8,6 @@ namespace Delete_Newline.Services;
 public sealed class WndProcService
 {
     private readonly RegexCollectSaveService _regexCollectSaveService;
-    private readonly HotkeyRegisterService _hotkeyRegisterService;
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
@@ -28,10 +27,9 @@ public sealed class WndProcService
     private static WndProc? _newWndProc;
     private static WndProcService? _instance;
 
-    public WndProcService(RegexCollectSaveService regexCollectSaveService, HotkeyRegisterService hotkeyRegisterService)
+    public WndProcService(RegexCollectSaveService regexCollectSaveService)
     {
         _regexCollectSaveService = regexCollectSaveService;
-        _hotkeyRegisterService = hotkeyRegisterService;
         _instance = this;
     }
 
@@ -71,7 +69,7 @@ public sealed class WndProcService
                 Debug.WriteLine($"=== WM_HOTKEY received: ID={hotkeyId} ===");
                 
                 // Check OCR Hotkey
-                int? ocrHotkeyId = _hotkeyRegisterService.GetOcrHotkeyId();
+                int? ocrHotkeyId = HotkeyRegister.GetOcrHotkeyId();
 
                 if (ocrHotkeyId.HasValue && hotkeyId == ocrHotkeyId.Value)
                 {

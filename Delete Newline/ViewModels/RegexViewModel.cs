@@ -11,7 +11,6 @@ namespace Delete_Newline.ViewModels;
 public partial class RegexViewModel : ObservableRecipient
 {
     private readonly RegexCollectSaveService _regexCollectSaveService;
-    private readonly HotkeyRegisterService _hotkeyRegisterService;
     private readonly InAppNotificationService _inAppNotificationService;
     private Button? _dummyFocusButton;
     private readonly DispatcherQueue? _dispatcherQueue;
@@ -27,11 +26,9 @@ public partial class RegexViewModel : ObservableRecipient
 
     public RegexViewModel(
         RegexCollectSaveService regexCollectSaveService,
-        HotkeyRegisterService hotkeyRegisterService,
         InAppNotificationService inAppNotificationService)
     {
         _regexCollectSaveService = regexCollectSaveService;
-        _hotkeyRegisterService = hotkeyRegisterService;
         _inAppNotificationService = inAppNotificationService;
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     }
@@ -180,16 +177,16 @@ public partial class RegexViewModel : ObservableRecipient
     {
         if (CurrentRegexConfig != null)
         {
-            _hotkeyRegisterService.UnregisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
+            HotkeyRegister.UnregisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
         }
 
-        if(!HotkeyValidator.ValidateHotkey(args, _hotkeyRegisterService, _inAppNotificationService))
+        if(!HotkeyValidator.ValidateHotkey(args, _inAppNotificationService))
         {
             return; // Exit if validation fails
         }
 
         // Register new hotkey
-        if (_hotkeyRegisterService.RegisterHotkey((args.Modifiers, args.Key)))
+        if (HotkeyRegister.RegisterHotkey((args.Modifiers, args.Key)))
         {
             VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
 

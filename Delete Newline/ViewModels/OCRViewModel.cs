@@ -15,7 +15,6 @@ namespace Delete_Newline.ViewModels;
 
 public partial class OCRViewModel : ObservableRecipient
 {
-    private readonly HotkeyRegisterService _hotkeyManager;
     private readonly InAppNotificationService _inAppNotificationService;
     private readonly SettingsService _settingsService;
     private Button? _dummyFocusButton;
@@ -38,11 +37,9 @@ public partial class OCRViewModel : ObservableRecipient
     private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
 
     public OCRViewModel(
-        HotkeyRegisterService hotkeyManager, 
         InAppNotificationService notificationService, 
         SettingsService settingsService)
     {
-        _hotkeyManager = hotkeyManager;
         _inAppNotificationService = notificationService;
         _settingsService = settingsService;
         _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
@@ -69,7 +66,7 @@ public partial class OCRViewModel : ObservableRecipient
             // Register the loaded hotkey
             if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
             {
-                _hotkeyManager.RegisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
+                HotkeyRegister.RegisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
             }
         }
         
@@ -190,16 +187,16 @@ public partial class OCRViewModel : ObservableRecipient
         // Unregister previous OCR hotkey if exists
         if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
         {
-            _hotkeyManager.UnregisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
+            HotkeyRegister.UnregisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
         }
 
-        if(!HotkeyValidator.ValidateHotkey(args, _hotkeyManager, _inAppNotificationService))
+        if(!HotkeyValidator.ValidateHotkey(args, _inAppNotificationService))
         {
             return; // Exit if validation fails
         }
 
         // Register new OCR hotkey
-        if (_hotkeyManager.RegisterHotkey((args.Modifiers, args.Key), HotkeyType.Ocr))
+        if (HotkeyRegister.RegisterHotkey((args.Modifiers, args.Key), HotkeyType.Ocr))
         {
             _ocrHotkey.Modifiers = args.Modifiers;
             _ocrHotkey.Key = args.Key;

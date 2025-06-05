@@ -118,7 +118,6 @@ public partial class App : Application
                 // Services, not need Interface.
                 services.AddSingleton<SettingsService>();
                 services.AddSingleton<RegexCollectSaveService>();
-                services.AddSingleton<HotkeyRegisterService>();
                 services.AddSingleton<WndProcService>();
                 services.AddSingleton<NotificationService>();
                 services.AddSingleton<TrayIconService>();
@@ -155,6 +154,7 @@ public partial class App : Application
         UnhandledException += App_UnhandledException;
     }
 
+    // lazy initialization of MainWindow
     private static MainWindow? _mainWindow;
     public static MainWindow MainWindow
     {
