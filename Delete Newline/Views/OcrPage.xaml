@@ -79,7 +79,8 @@
                         <ComboBox x:Name="LanguageComboBox"
                                   HorizontalAlignment="Stretch"
                                   Margin="5,10,0,0"
-                                  SelectionChanged="LanguageComboBox_SelectionChanged">
+                                  ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding DisplayName}" />

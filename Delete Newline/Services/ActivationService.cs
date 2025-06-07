@@ -18,10 +18,10 @@ public sealed class ActivationService : IActivationService
     private readonly SettingsService _settingsService;
     private readonly NotificationService _notificationService;
     private readonly RegexCollectSaveService _regexCollectSaveService;
-    private readonly OCRViewModel _ocrViewModel;
     private readonly WndProcService _wndProcService;
     private readonly TopMostService _topMostService;
     private readonly TrayIconService _trayIconService;
+    private readonly OCRViewModel _ocrViewModel;
 
     private UIElement? _shell = null;
 
@@ -33,10 +33,10 @@ public sealed class ActivationService : IActivationService
         SettingsService settingsService,
         NotificationService notificationService,
         RegexCollectSaveService regexCollectSaveService,
-        OCRViewModel ocrViewModel,
         WndProcService wndProcService,
         TopMostService topMostService,
-        TrayIconService trayIconService)
+        TrayIconService trayIconService,
+        OCRViewModel ocrViewModel)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
@@ -46,10 +46,10 @@ public sealed class ActivationService : IActivationService
         _notificationService = notificationService;
         _filePickerService = filePickerService;
         _regexCollectSaveService = regexCollectSaveService;
-        _ocrViewModel = ocrViewModel;
         _wndProcService = wndProcService;
         _topMostService = topMostService;
         _trayIconService = trayIconService;
+        _ocrViewModel = ocrViewModel;
     }
 
     public async Task ActivateAsync(object activationArgs)
