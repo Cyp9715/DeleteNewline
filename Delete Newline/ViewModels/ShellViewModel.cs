@@ -1,7 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Delete_Newline.Contracts.Services;
-using Delete_Newline.Views; // Required for HotkeyPage and HotkeyCollectPage types
-using Microsoft.UI.Xaml.Navigation; // For NavigationEventArgs
+using Delete_Newline.Views;
+using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Delete_Newline.ViewModels;
 
@@ -13,15 +14,11 @@ public partial class ShellViewModel : ObservableRecipient
     private object? _selectedItem;
 
     public INavigationService NavigationService { get; }
-    public INavigationViewService NavigationViewService { get; }
 
-    public ShellViewModel(INavigationService navigationService,
-        INavigationViewService navigationViewService,
-        IPageService pageService) // Add IPageService to constructor
+    public ShellViewModel(INavigationService navigationService, IPageService pageService)
     {
         NavigationService = navigationService;
-        NavigationViewService = navigationViewService;
-        _pageService = pageService; // Store IPageService
+        _pageService = pageService;
 
         NavigationService.Navigated += OnNavigated;
     }
@@ -39,7 +36,7 @@ public partial class ShellViewModel : ObservableRecipient
             typeForSelectedItemCalculation = e.SourcePageType;
         }
 
-        var currentSelectedItem = NavigationViewService.GetSelectedItem(typeForSelectedItemCalculation);
+        var currentSelectedItem = NavigationService.GetSelectedItem(typeForSelectedItemCalculation);
         if (currentSelectedItem != null)
         {
             SelectedItem = currentSelectedItem;

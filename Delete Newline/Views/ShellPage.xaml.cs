@@ -18,7 +18,7 @@ public sealed partial class ShellPage : Page
         InitializeComponent();
 
         ViewModel.NavigationService.Frame = NavigationFrame;
-        ViewModel.NavigationViewService.Initialize(NavigationViewControl);
+        ViewModel.NavigationService.InitializeNavigationView(NavigationViewControl);
 
         App.MainWindow.ExtendsContentIntoTitleBar = true;
         App.MainWindow.SetTitleBar(AppTitleBar);
@@ -32,7 +32,7 @@ public sealed partial class ShellPage : Page
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         // Set HotkeyCollectPage as the default selected item
-        ViewModel.SelectedItem = ViewModel.NavigationViewService.GetSelectedItem(typeof(RegexCollectPage));
+        ViewModel.SelectedItem = ViewModel.NavigationService.GetSelectedItem(typeof(RegexCollectPage));
     }
 
     private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)

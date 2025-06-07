@@ -104,7 +104,6 @@ public partial class App : Application
 
                 // Services
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
-                services.AddSingleton<INavigationViewService, NavigationViewService>();
                 services.AddSingleton<ILocalizationService, LocalizationService>();
 
                 services.AddSingleton<IActivationService, ActivationService>();
