@@ -433,4 +433,10 @@
     <value> that processes newline characters as '\r'. This is incompatible with Windows' standard newline character '\n', which can cause issues. While actual Hotkey operations work correctly, the test display here may not show properly. Therefore, when matching newline characters in regular expressions, it is recommended to use '[\r\n]'.</value>
     <comment>Description suffix about newline character handling in regex chain testing</comment>
   </data>
+  <data name="Notification_TextNotModified_Title" xml:space="preserve">
+    <value>Text Not Modified</value>
+  </data>
+  <data name="Notification_TextNotModified_Message" xml:space="preserve">
+    <value>No matching rules found for the copied text.</value>
+  </data>
 </root>

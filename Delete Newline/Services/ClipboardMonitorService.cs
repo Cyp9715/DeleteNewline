@@ -37,7 +37,6 @@ public class ClipboardMonitorService
         Debug.WriteLine("[ClipboardMonitorService] Clipboard monitoring stopped.");
     }
 
-    // This logic is only used in Regex logic.
     private void OnClipboardContentChanged(object? sender, object e)
     {
         // Check if there's content and if it's text.
@@ -61,22 +60,25 @@ public class ClipboardMonitorService
                 App.ActiveHotkeyIdForCopy = null; // Reset immediately
                 Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId.Value}. Applying regex rules.");
                 afterText = _regexService.ApplyRegexRules(beforeText, triggeredHotkeyId.Value);
+
+                if (!string.IsNullOrEmpty(afterText))
+                {
+                    if (beforeText != afterText)
+                    {
+                        // Text was modified
+                        UpdateClipboardContent(afterText, triggeredHotkeyId, true);
+                    }
+                    else
+                    {
+                        // Text was not modified - no matching rules
+                        UpdateClipboardContent(afterText, triggeredHotkeyId, false);
+                    }
+                }
             }
             else
             {
                 Debug.WriteLine("[ClipboardMonitorService] General clipboard change. No regex processing.");
                 afterText = beforeText;
-            }
-
-            // If it is updated
-            if (beforeText != afterText && !string.IsNullOrEmpty(afterText))
-            {
-                UpdateClipboardContent(afterText, triggeredHotkeyId);
-            }
-            else if (triggeredHotkeyId.HasValue)
-            {
-                // Hotkey was triggered but no text changes were made - don't show notification
-                Debug.WriteLine($"[ClipboardMonitorService] Hotkey ID: {triggeredHotkeyId.Value} triggered but no regex rules matched or changed the text.");
             }
         }
         catch (Exception ex)
@@ -85,7 +87,7 @@ public class ClipboardMonitorService
         }
     }
 
-    private void UpdateClipboardContent(string text, int? triggeredHotkeyId)
+    private void UpdateClipboardContent(string text, int? triggeredHotkeyId, bool wasModified)
     {
         var dataPackage = new DataPackage();
         dataPackage.SetText(text);
@@ -96,7 +98,19 @@ public class ClipboardMonitorService
 
             if (triggeredHotkeyId.HasValue && _notificationService.GetEnableNotification())
             {
-                ShowHotkeyNotification(triggeredHotkeyId.Value);
+                if (wasModified)
+                {
+                    ShowModifiedNotification(triggeredHotkeyId.Value);
+                }
+                else
+                {
+                    _notificationService.ShowSystemNotification(
+                        titleKey: "Notification_TextNotModified_Title",
+                        messageKey: "Notification_TextNotModified_Message",
+                        force: false,
+                        addTag: true
+                    );
+                }
             }
         }
         catch (Exception exSetContent)
@@ -105,7 +119,7 @@ public class ClipboardMonitorService
         }
     }
 
-    private void ShowHotkeyNotification(int hotkeyId)
+    private void ShowModifiedNotification(int hotkeyId)
     {
         RegexPageStructure? hotkeyStructure = _regexCollectSaveService.GetRegexStructureByHotkeyId(hotkeyId);
         if (hotkeyStructure == null)
@@ -134,6 +148,16 @@ public class ClipboardMonitorService
             force: false,
             addTag: true,
             messageArgs: messageArgs
+        );
+    }
+
+    private void ShowNotModifiedNotification()
+    {
+        _notificationService.ShowSystemNotification(
+            titleKey: "Notification_TextNotModified_Title",
+            messageKey: "Notification_TextNotModified_Message",
+            force: false,
+            addTag: true
         );
     }
 }
