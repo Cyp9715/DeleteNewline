@@ -128,7 +128,7 @@ public partial class App : Application
                 services.AddSingleton<RegexService>();
 
                 // Add ClipboardMonitorService
-                services.AddSingleton<ClipboardMonitorService>();;
+                services.AddSingleton<ClipboardMonitorService>();
 
                 // Views and ViewModels
                 services.AddSingleton<ShellViewModel>();

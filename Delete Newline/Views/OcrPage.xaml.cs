@@ -18,10 +18,7 @@ public sealed partial class OCRPage : Page
         ViewModel = App.GetService<OCRViewModel>();
         InitializeComponent();
         DataContext = ViewModel;
-        
-        // Initialize ViewModel to sync with OCRService
-        ViewModel.Initialize();
-        
+
         LoadOcrLanguages();
         
         // Set dummy focus button for hotkey registration
@@ -78,11 +75,6 @@ public sealed partial class OCRPage : Page
         if (sender is ComboBox comboBox && comboBox.SelectedItem is Language newSelectedLanguage)
         {
             ViewModel.SelectedLanguage = newSelectedLanguage;
-            
-            // Test OCR engine availability for selected language
-            var testEngine = OcrEngine.TryCreateFromLanguage(newSelectedLanguage);
-            
-            // Language is automatically saved via ViewModel's OnSelectedLanguageChanged
         }
     }
 
@@ -95,10 +87,7 @@ public sealed partial class OCRPage : Page
             {
                 activeOcrWindow.Close();
             }
-            catch
-            {
-                // Error closing OCR window - silently handle
-            }
+
             finally
             {
                 activeOcrWindow = null;

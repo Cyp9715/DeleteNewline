@@ -9,7 +9,6 @@ using Windows.System;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 using Delete_Newline.Views;
-using Microsoft.UI.Xaml;
 
 namespace Delete_Newline.ViewModels;
 
@@ -44,35 +43,27 @@ public partial class OCRViewModel : ObservableRecipient
         _settingsService = settingsService;
         _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         _availableLanguages = new ObservableCollection<Language>(OcrEngine.AvailableRecognizerLanguages);
-        
-        // Initialize settings
-        Initialize();
     }
 
     public void Initialize()
     {
-        LoadSettings();
-    }
-
-    private void LoadSettings()
-    {
         // Load OCR hotkey
         var savedHotkey = _settingsService.ReadSetting<HotkeyStructure>(OcrHotkeyKey);
-        
+
         if (savedHotkey != null)
         {
             _ocrHotkey = savedHotkey;
-            
+
             // Register the loaded hotkey
             if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
             {
                 HotkeyRegister.RegisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
             }
         }
-        
+
         // Load OCR Language setting
         LoadSavedLanguage();
-        
+
         // Update display hotkey
         UpdateDisplayHotkey();
     }

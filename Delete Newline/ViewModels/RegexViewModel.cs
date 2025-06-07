@@ -10,10 +10,8 @@ using System.Collections.Specialized;
 namespace Delete_Newline.ViewModels;
 public partial class RegexViewModel : ObservableRecipient
 {
-    private readonly RegexCollectSaveService _regexCollectSaveService;
     private readonly InAppNotificationService _inAppNotificationService;
     private Button? _dummyFocusButton;
-    private readonly DispatcherQueue? _dispatcherQueue;
 
     [ObservableProperty]
     private RegexPageStructure? _currentRegexConfig;
@@ -24,13 +22,9 @@ public partial class RegexViewModel : ObservableRecipient
     [ObservableProperty]
     private string? _regexOutputText;
 
-    public RegexViewModel(
-        RegexCollectSaveService regexCollectSaveService,
-        InAppNotificationService inAppNotificationService)
+    public RegexViewModel(InAppNotificationService inAppNotificationService)
     {
-        _regexCollectSaveService = regexCollectSaveService;
         _inAppNotificationService = inAppNotificationService;
-        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     }
 
     public void SetDummyFocusButton(Button btn)

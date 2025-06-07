@@ -8,7 +8,7 @@ public class TopMostService
     public const string DefaultTopMostKey = "TopMost";
     public bool EnableTopMost { get; private set; } = false;
 
-    public void Initialize(Window window)
+    public void Initialize()
     {
         _localSettingsService = App.GetService<SettingsService>();
         bool? storedSetting = _localSettingsService.ReadSetting<bool?>(DefaultTopMostKey);

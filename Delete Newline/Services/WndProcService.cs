@@ -7,8 +7,6 @@ namespace Delete_Newline.Services;
 
 public sealed class WndProcService
 {
-    private readonly RegexCollectSaveService _regexCollectSaveService;
-
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
@@ -27,9 +25,8 @@ public sealed class WndProcService
     private static WndProc? _newWndProc;
     private static WndProcService? _instance;
 
-    public WndProcService(RegexCollectSaveService regexCollectSaveService)
+    public WndProcService()
     {
-        _regexCollectSaveService = regexCollectSaveService;
         _instance = this;
     }
 
