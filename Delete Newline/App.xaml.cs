@@ -143,8 +143,6 @@ public partial class App : Application
 
                 services.AddSingleton<OCRViewModel>();
                 services.AddTransient<OCRPage>();
-
-                services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             }).Build();
 
         // Start clipboard monitoring after services are built and available

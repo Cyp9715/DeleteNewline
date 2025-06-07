@@ -10,12 +10,12 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Publisher="CN=Cyp Soft"
-    Version="3.0.0.0"  Name="DeleteNewline"/>
+    Publisher="CN=0EB9F685-7CC3-4B9F-8F3E-BA45BA39030A"
+    Version="3.0.0.0"  Name="62164CypSoft.DeleteNewline"/>
 
   <Properties>
     <DisplayName>Delete Newline</DisplayName>
-    <PublisherDisplayName>CypSoft</PublisherDisplayName>
+    <PublisherDisplayName>Cyp Soft</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
