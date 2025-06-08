@@ -36,6 +36,7 @@
     <GenerateAppxBundle>Always</GenerateAppxBundle>
     <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
     <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+    <AppxBundle>Never</AppxBundle>
 
   </PropertyGroup>
   <ItemGroup>
