@@ -9,7 +9,7 @@
 
     <ScrollViewer Margin="0">
         <Grid Padding="20,0,20,0">
-            <StackPanel MaxWidth="800">
+            <StackPanel MaxWidth="900">
                 <!-- Hotkey Settings Label -->
                 <TextBlock x:Uid="RegexPage_Title_HotkeySettings"
                            Style="{StaticResource SubtitleTextBlockStyle}"
@@ -35,7 +35,7 @@
                         <Grid Margin="5,0,0,0">
                             <TextBlock x:Uid="RegexPage_Label_HotkeyName" VerticalAlignment="Center"/>
                             <TextBox x:Name="TextBox_HotkeyName"
-                                     Width="300"
+                                     Width="335"
                                      TextAlignment="Center"
                                      HorizontalAlignment="Right"
                                      VerticalAlignment="Center"
@@ -46,7 +46,7 @@
                         <Grid Margin="5,5,0,0">
                             <TextBlock x:Uid="RegexPage_Label_HotkeyComment" VerticalAlignment="Center"/>
                             <TextBox x:Name="TextBox_HotkeyComment"
-                                     Width="300"
+                                     Width="335"
                                      TextAlignment="Center"
                                      HorizontalAlignment="Right"
                                      VerticalAlignment="Center"
@@ -57,7 +57,7 @@
                         <Grid Margin="5,5,0,0">
                             <TextBlock x:Uid="RegexPage_Label_HotkeyInput" VerticalAlignment="Center"/>
                             <TextBox x:Name="TextBox_Hotkey"
-                                     Width="300"
+                                     Width="335"
                                      TextAlignment="Center"
                                      HorizontalAlignment="Right"
                                      VerticalAlignment="Center"
@@ -106,42 +106,41 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <!-- Regex Expression -->
                                         <Grid Grid.Row="0"
+                                              Grid.Column="0"
                                               Margin="0,5,0,0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock x:Uid="RegexPage_Label_RegexExpression"
                                                        VerticalAlignment="Center"
                                                        Grid.Column="0" />
                                             <TextBox Grid.Column="1"
-                                                     Width="265"
+                                                     Width="300"
                                                      TextAlignment="Center"
                                                      HorizontalAlignment="Right"
                                                      Text="{Binding RegexExpression, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         </Grid>
 
-                                        <!-- Replace -->
                                         <Grid Grid.Row="1"
+                                              Grid.Column="0"
                                               Margin="0,5,0,5">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock x:Uid="RegexPage_Label_Replace"
                                                        VerticalAlignment="Center"
                                                        Grid.Column="0" />
                                             <TextBox Grid.Column="1"
-                                                     Width="265"
+                                                     Width="300"
                                                      HorizontalAlignment="Right"
                                                      TextAlignment="Center"
                                                      Foreground="Orange"
                                                      Text="{Binding Replace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         </Grid>
 
-                                        <!-- Remove Button -->
                                         <Button Width="30"
                                                 Height="30"
                                                 Padding="0"
