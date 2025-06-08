@@ -1,24 +1,26 @@
-# Delete Newline(WinUI3)
+# Delete Newline
 
-## Project Status
-- The current Master branch is built on WPF.
-- The Master branch will be maintained without updates.
-- Future versions of Delete Newline will be built based on WinUI3.
-- We plan to release version 3.0 based on WinUI 3.
+## The Ultimate Hotkey Tool for On-the-Fly Text Transformation.
 
-## Version 3.0 preview.
-- Based on WinUI3.
-- Supports both Light and Dark themes.
-- Korean language support has been added.
-- Supports multiple RegexChains, allowing for multi-keybind functionality.
-- Instead of using `SetWindowsHookEx` based hooking, it operates based on `RegisterHotkey`.
-- The settings now operate based on a `.json` file, and functionality for importing and exporting has been added.
-- We have significantly improved the stability of the hotkey feature (copy → apply regular expression → paste to clipboard).
-- will be able to convert images to text using OCR and immediately apply regular expressions to the extracted text.
-- ~~A small advertisement window will be added to the bottom.~~ 
+Delete Newline elevates your productivity by allowing you to instantly reformat, clean, and modify text from any application. Simply select text anywhere(in your browser, code editor, or document) and press a hotkey. Delete Newline automatically grabs the selected text, processes it through your custom rules, and places the result on your clipboard, ready to be pasted.
 
-![image](https://github.com/user-attachments/assets/79b8ff23-951e-497c-81b4-48cfd1fdcc93)
+It's a seamless workflow designed for developers, editors, and anyone who needs to transform text instantly without the tedious copy-paste-edit cycle.
 
+## How It Works
 
-## Recommended Build Tools
-1. [Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=dts-publisher.mat2022)
+### Prerequisites: One-Time Setup
+
+Before the magic happens, you first need to teach Delete Newline what you want to do. This setup is only required once per workflow.
+
+1. Create a Rule Chain: Inside the app, add one or more Regex rules to define your desired text transformation.
+2. Assign a Hotkey: Assign a unique keyboard shortcut to that specific rule chain.
+
+Once your hotkey is set, you're ready for the daily workflow.
+
+### Daily Workflow
+
+Your daily use is elegantly simple and free of extra steps:
+
+1. Select Text: Highlight any text in any application.
+2. Press Hotkey: Press the custom hotkey you configured.
+3. Paste Result: The transformed text is now on your clipboard, ready to be pasted anywhere.
