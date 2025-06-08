@@ -1,6 +1,5 @@
 using Microsoft.Windows.ApplicationModel.Resources;
 using Delete_Newline.Contracts.Services;
-using Delete_Newline.Models;
 
 namespace Delete_Newline.Services;
 

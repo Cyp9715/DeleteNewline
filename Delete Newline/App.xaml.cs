@@ -6,7 +6,6 @@ using Delete_Newline.Activation;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Core.Services;
-using Delete_Newline.Models;
 using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
 using Delete_Newline.Views;

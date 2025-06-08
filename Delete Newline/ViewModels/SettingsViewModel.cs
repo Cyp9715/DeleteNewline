@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
-using Delete_Newline.Models;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Services;
 
