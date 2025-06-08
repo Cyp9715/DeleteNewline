@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
 using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Controls;
 
 namespace Delete_Newline.ViewModels;
 
