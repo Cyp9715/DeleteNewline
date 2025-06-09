@@ -10,7 +10,7 @@ It's a seamless workflow designed for developers, editors, and anyone who needs 
 
 ### Prerequisites: One-Time Setup
 
-Before the magic happens, you first need to teach Delete Newline what you want to do. This setup is only required once per workflow.
+You first need to teach Delete Newline what you want to do. This setup is only required once per workflow.
 
 1. Create a Rule Chain: Inside the app, add one or more Regex rules to define your desired text transformation.
 2. Assign a Hotkey: Assign a unique keyboard shortcut to that specific rule chain.
