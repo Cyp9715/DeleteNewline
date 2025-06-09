@@ -4,13 +4,13 @@ namespace Delete_Newline.Services;
 
 public class TopMostService
 {
-    private static SettingsService? _localSettingsService;
+    private static SettingsFileService? _localSettingsService;
     public const string DefaultTopMostKey = "TopMost";
     public bool EnableTopMost { get; private set; } = false;
 
     public void Initialize()
     {
-        _localSettingsService = App.GetService<SettingsService>();
+        _localSettingsService = App.GetService<SettingsFileService>();
         bool? storedSetting = _localSettingsService.ReadSetting<bool?>(DefaultTopMostKey);
 
         if (storedSetting.HasValue)

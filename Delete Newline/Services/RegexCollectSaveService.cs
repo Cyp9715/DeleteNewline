@@ -6,6 +6,7 @@ using Windows.System;
 using Microsoft.UI.Xaml.Controls;
 using System.Text;
 using Delete_Newline.Helpers;
+using Delete_Newline.Helpers.Hotkeys;
 
 namespace Delete_Newline.Services;
 
@@ -13,13 +14,13 @@ public sealed class RegexCollectSaveService
 {
     public ObservableCollection<RegexPageStructure> RegexConfigs { get; private set; }
 
-    private readonly SettingsService _localSettingsService;
+    private readonly SettingsFileService _localSettingsService;
     private readonly InAppNotificationService _inAppNotificationService;
 
     private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
-    public RegexCollectSaveService(SettingsService localSettingsService, 
+    public RegexCollectSaveService(SettingsFileService localSettingsService, 
                                     InAppNotificationService inAppNotificationService)
     {
         _localSettingsService = localSettingsService;

@@ -16,7 +16,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
     private readonly IFilePickerService _filePickerService;
-    private readonly SettingsService _localSettingsService;
+    private readonly SettingsFileService _localSettingsService;
     private readonly InAppNotificationService _inAppNotificationService;
     private readonly TopMostService _topMostService;
 
@@ -49,7 +49,7 @@ public partial class SettingsViewModel : ObservableRecipient
         IFilePickerService filePickerService,
         NotificationService notificationService,
         InAppNotificationService inAppNotificationService,
-        SettingsService localSettingsService,
+        SettingsFileService localSettingsService,
         TopMostService topMostService)
     {
         _localizationService = localizationService;

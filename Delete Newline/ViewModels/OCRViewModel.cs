@@ -9,13 +9,14 @@ using Windows.System;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 using Delete_Newline.Views;
+using Delete_Newline.Helpers.Hotkeys;
 
 namespace Delete_Newline.ViewModels;
 
 public partial class OCRViewModel : ObservableRecipient
 {
     private readonly InAppNotificationService _inAppNotificationService;
-    private readonly SettingsService _settingsService;
+    private readonly SettingsFileService _settingsService;
     private Button? _dummyFocusButton;
     private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
 
@@ -37,7 +38,7 @@ public partial class OCRViewModel : ObservableRecipient
 
     public OCRViewModel(
         InAppNotificationService notificationService, 
-        SettingsService settingsService)
+        SettingsFileService settingsService)
     {
         _inAppNotificationService = notificationService;
         _settingsService = settingsService;

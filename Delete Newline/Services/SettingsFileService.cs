@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Delete_Newline.Services;
 
-public sealed class SettingsService
+public sealed class SettingsFileService
 {
     private readonly IFileService _fileService;
     private IDictionary<string, JToken> _settings;
@@ -15,7 +15,7 @@ public sealed class SettingsService
     private readonly string _applicationDataDirectory = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
     private const string _settingsFileName = "Settings.json";
 
-    public SettingsService(IFileService fileService)
+    public SettingsFileService(IFileService fileService)
     {
         _fileService = fileService;
         _settings = new Dictionary<string, JToken>();

@@ -1,11 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Structures;
-using Delete_Newline.Helpers;
 using Delete_Newline.Services;
 using Microsoft.UI.Xaml.Controls;
 using Windows.System;
 using System.Collections.Specialized;
+using Delete_Newline.Helpers.Hotkeys;
+using Delete_Newline.Helpers;
 
 namespace Delete_Newline.ViewModels;
 public partial class RegexViewModel : ObservableRecipient

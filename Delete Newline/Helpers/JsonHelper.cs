@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Delete_Newline.Core.Helpers;
 
-public static class Json
+public static class JsonHelper
 {
     public static Task<T> DeserializeAsync<T>(string value, JsonSerializerSettings? settings = null)
     {

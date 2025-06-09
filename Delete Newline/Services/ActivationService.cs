@@ -15,7 +15,7 @@ public sealed class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
     private readonly IFilePickerService _filePickerService;
-    private readonly SettingsService _settingsService;
+    private readonly SettingsFileService _settingsService;
     private readonly NotificationService _notificationService;
     private readonly RegexCollectSaveService _regexCollectSaveService;
     private readonly WndProcService _wndProcService;
@@ -30,7 +30,7 @@ public sealed class ActivationService : IActivationService
         IThemeSelectorService themeSelectorService,
         ILocalizationService localizationService,
         IFilePickerService filePickerService,
-        SettingsService settingsService,
+        SettingsFileService settingsService,
         NotificationService notificationService,
         RegexCollectSaveService regexCollectSaveService,
         WndProcService wndProcService,

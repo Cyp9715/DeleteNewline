@@ -80,7 +80,7 @@ public sealed partial class MainWindow : WindowEx
 
     public static void StartOnTray()
     {
-        if (App.GetService<SettingsService>().ReadSetting<bool>(SettingsViewModel.DefaultStartOnTray) == false)
+        if (App.GetService<SettingsFileService>().ReadSetting<bool>(SettingsViewModel.DefaultStartOnTray) == false)
         {
             App.MainWindow.Show();
             App.MainWindow.Activate();

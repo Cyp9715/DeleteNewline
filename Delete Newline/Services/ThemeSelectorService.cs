@@ -11,9 +11,9 @@ public sealed class ThemeSelectorService : IThemeSelectorService
 
     public ElementTheme Theme { get; set; } = ElementTheme.Default;
 
-    private readonly SettingsService _localSettingsService;
+    private readonly SettingsFileService _localSettingsService;
 
-    public ThemeSelectorService(SettingsService localSettingsService)
+    public ThemeSelectorService(SettingsFileService localSettingsService)
     {
         _localSettingsService = localSettingsService;
     }

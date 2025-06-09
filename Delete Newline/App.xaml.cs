@@ -114,7 +114,7 @@ public partial class App : Application
                 services.AddSingleton<IFilePickerService, FilePickerService>();
 
                 // Services, not need Interface.
-                services.AddSingleton<SettingsService>();
+                services.AddSingleton<SettingsFileService>();
                 services.AddSingleton<RegexCollectSaveService>();
                 services.AddSingleton<WndProcService>();
                 services.AddSingleton<NotificationService>();

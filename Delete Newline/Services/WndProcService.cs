@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Delete_Newline.Helpers;
+using Delete_Newline.Helpers.Hotkeys;
 using Delete_Newline.ViewModels;
 
 namespace Delete_Newline.Services;
