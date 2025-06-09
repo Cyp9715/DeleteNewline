@@ -6,6 +6,8 @@ Delete Newline elevates your productivity by allowing you to instantly reformat,
 
 It's a seamless workflow designed for developers, editors, and anyone who needs to transform text instantly without the tedious copy-paste-edit cycle.
 
+![Uploading 452765660-4e9354ad-0f77-46bf-a30b-135018f6390c.png…]()
+
 ## How It Works
 
 ### Prerequisites: One-Time Setup
