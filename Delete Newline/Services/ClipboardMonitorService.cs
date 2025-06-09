@@ -150,14 +150,4 @@ public class ClipboardMonitorService
             messageArgs: messageArgs
         );
     }
-
-    private void ShowNotModifiedNotification()
-    {
-        _notificationService.ShowSystemNotification(
-            titleKey: "Notification_TextNotModified_Title",
-            messageKey: "Notification_TextNotModified_Message",
-            force: false,
-            addTag: true
-        );
-    }
 }

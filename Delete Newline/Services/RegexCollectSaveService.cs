@@ -17,7 +17,7 @@ public sealed class RegexCollectSaveService
     private readonly SettingsFileService _localSettingsService;
     private readonly InAppNotificationService _inAppNotificationService;
 
-    private const string HotkeyCollectionSettingsKey = "HotkeyCollection";
+    private const string RegexCollectionSettingsKey = "RegexCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
 
     public RegexCollectSaveService(SettingsFileService localSettingsService, 
@@ -30,7 +30,7 @@ public sealed class RegexCollectSaveService
 
     public void Initialize()
     {
-        var savedRegexConfigs = _localSettingsService.ReadSetting<List<RegexPageStructure>>(HotkeyCollectionSettingsKey);
+        var savedRegexConfigs = _localSettingsService.ReadSetting<List<RegexPageStructure>>(RegexCollectionSettingsKey);
 
         if (savedRegexConfigs != null && savedRegexConfigs.Count > 0) // Ensure there are configs to process
         {
@@ -202,7 +202,7 @@ public sealed class RegexCollectSaveService
         try
         {
             var configsList = RegexConfigs.ToList();
-            await _localSettingsService.SaveSettingAsync(HotkeyCollectionSettingsKey, configsList);
+            await _localSettingsService.SaveSettingAsync(RegexCollectionSettingsKey, configsList);
         }
         catch (Exception ex)
         {
