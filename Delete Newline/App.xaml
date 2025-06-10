@@ -7,10 +7,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <ResourceDictionary Source="/Styles/FontSizes.xaml" />
                 <ResourceDictionary Source="/Styles/Thickness.xaml" />
-                <ResourceDictionary Source="/Styles/TextBlock.xaml" />
-                <ResourceDictionary Source="/Styles/CheckBox.xaml" />
                 <ResourceDictionary Source="/Styles/ToggleSwitch.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
@@ -25,6 +22,11 @@
                     <SolidColorBrush x:Key="RectBrush" Color="Red"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+
+            <!-- Global Checkbox Style -->
+            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                <Setter Property="IsSpellCheckEnabled" Value="False"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

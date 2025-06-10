@@ -80,9 +80,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Remove="Styles\CheckBox.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <XliffResource Include="MultilingualResources\Delete Newline.ko-KR.xlf" />
   </ItemGroup>
   <ItemGroup>
