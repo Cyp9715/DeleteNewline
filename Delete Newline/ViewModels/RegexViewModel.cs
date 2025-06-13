@@ -12,7 +12,6 @@ namespace Delete_Newline.ViewModels;
 public partial class RegexViewModel : ObservableRecipient
 {
     private readonly InAppNotificationService _inAppNotificationService;
-    private Button? _dummyFocusButton;
 
     [ObservableProperty]
     private RegexPageStructure? _currentRegexConfig;
@@ -26,11 +25,6 @@ public partial class RegexViewModel : ObservableRecipient
     public RegexViewModel(InAppNotificationService inAppNotificationService)
     {
         _inAppNotificationService = inAppNotificationService;
-    }
-
-    public void SetDummyFocusButton(Button btn)
-    {
-        _dummyFocusButton = btn;
     }
 
     partial void OnCurrentRegexConfigChanged(RegexPageStructure? oldValue, RegexPageStructure? newValue)
@@ -170,6 +164,8 @@ public partial class RegexViewModel : ObservableRecipient
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
+        HotkeyRegister
+
         if (CurrentRegexConfig != null)
         {
             HotkeyRegister.UnregisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
@@ -197,15 +193,6 @@ public partial class RegexViewModel : ObservableRecipient
             CurrentRegexConfig!.Hotkey.Modifiers = tempModifiers;
             CurrentRegexConfig.Hotkey.Key = args.Key;
             CurrentRegexConfig.IsRegistrationFailed = false;
-
-            //// Move focus to dummy button to remove focus from TextBox
-            //if (_dummyFocusButton != null && _dispatcherQueue != null)
-            //{
-            //    _dispatcherQueue.TryEnqueue(() =>
-            //    {
-            //        _dummyFocusButton.Focus(FocusState.Programmatic);
-            //    });
-            //}
         }
         else
         {

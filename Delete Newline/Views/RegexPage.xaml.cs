@@ -18,7 +18,6 @@ public sealed partial class RegexPage : Page
         InitializeComponent();
         ViewModel = App.GetService<RegexViewModel>();
         DataContext = ViewModel;
-        ViewModel.SetDummyFocusButton(DummyFocusButton);
     }
 
     private void TextBox_PointerWheelChanged(object sender, PointerRoutedEventArgs e)

@@ -17,7 +17,6 @@ public partial class OCRViewModel : ObservableRecipient
 {
     private readonly InAppNotificationService _inAppNotificationService;
     private readonly SettingsFileService _settingsService;
-    private Button? _dummyFocusButton;
     private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
 
     // Settings keys
@@ -141,12 +140,6 @@ public partial class OCRViewModel : ObservableRecipient
             _ = SaveOcrLanguageAsync();
         }
     }
-
-    public void SetDummyFocusButton(Button btn)
-    {
-        _dummyFocusButton = btn;
-    }
-
     [RelayCommand]
     public void LaunchOcr()
     {
@@ -198,13 +191,5 @@ public partial class OCRViewModel : ObservableRecipient
 
         }
 
-        //// Move focus to dummy button to remove focus from TextBox
-        //if (_dummyFocusButton != null && _dispatcherQueue != null)
-        //{
-        //    _dispatcherQueue.TryEnqueue(() =>
-        //    {
-        //        _dummyFocusButton.Focus(FocusState.Programmatic);
-        //    });
-        //}
     }
 } 
