@@ -104,9 +104,47 @@
                                    FontSize="12"
                                    TextWrapping="Wrap"
                                    Margin="5,0,0,10"/>
-                        
-                        <ItemsRepeater ItemsSource="{Binding CurrentRegexConfig.RegexChain.ChainItems}">
-                            <ItemsRepeater.ItemTemplate>
+
+                        <ListView x:Name="RegexItemsListView"
+                                 ItemsSource="{Binding CurrentRegexConfig.RegexChain.ChainItems}"
+                                 CanDragItems="True"
+                                 CanReorderItems="True"
+                                 AllowDrop="True"
+                                 SelectionMode="Single">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="0,2,0,2" />
+                                    <Setter Property="IsTabStop" Value="False" />
+                                    <Setter Property="FocusVisualPrimaryBrush" Value="Transparent" />
+                                    <Setter Property="FocusVisualSecondaryBrush" Value="Transparent" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListViewItem">
+                                                <ListViewItemPresenter
+                                                    ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                    Control.IsTemplateFocusTarget="True"
+                                                    FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
+                                                    FocusVisualPrimaryBrush="Transparent"
+                                                    FocusVisualPrimaryThickness="0"
+                                                    FocusVisualSecondaryBrush="Transparent"
+                                                    FocusVisualSecondaryThickness="0"
+                                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    Padding="{TemplateBinding Padding}"
+                                                    PointerOverBackground="Transparent"
+                                                    SelectedBackground="Transparent"
+                                                    SelectedForeground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    SelectionCheckMarkVisualEnabled="False"
+                                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                                                </ListViewItemPresenter>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="structures:ChainItem">
                                     <Grid Margin="5,0,0,0">
                                         <Grid.RowDefinitions>
@@ -166,8 +204,8 @@
                                         </Button>
                                     </Grid>
                                 </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </StackPanel>
                 </Border>
 
