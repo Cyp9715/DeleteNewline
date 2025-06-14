@@ -157,27 +157,28 @@ public partial class RegexViewModel : ObservableRecipient
         // Clear the properties before removing to ensure proper UI update
         item.RegexExpression = null;
         item.Replace = null;
-        
+
         CurrentRegexConfig.RegexChain.RemoveChainItem(item);
     }
 
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
-        HotkeyRegister
-
-        if (CurrentRegexConfig != null)
+        // Unregister previous hotkey if exists
+        if (CurrentRegexConfig != null && CurrentRegexConfig.Hotkey != null &&
+            CurrentRegexConfig.Hotkey.Modifiers != VirtualKeyModifiers.None &&
+            CurrentRegexConfig.Hotkey.Key != VirtualKey.None)
         {
-            HotkeyRegister.UnregisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key));
+            HotkeyRegister.UnregisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key), HotkeyType.Regex);
         }
 
-        if(!HotkeyValidator.ValidateHotkey(args, _inAppNotificationService))
+        if (!HotkeyValidator.ValidateHotkey(args, HotkeyType.Regex, _inAppNotificationService))
         {
-            return; // Exit if validation fails
+            return;
         }
 
         // Register new hotkey
-        if (HotkeyRegister.RegisterHotkey((args.Modifiers, args.Key)))
+        if (HotkeyRegister.RegisterHotkey((args.Modifiers, args.Key), HotkeyType.Regex))
         {
             VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
 
@@ -190,23 +191,35 @@ public partial class RegexViewModel : ObservableRecipient
             if (args.Modifiers.HasFlag(VirtualKeyModifiers.Windows))
                 tempModifiers |= VirtualKeyModifiers.Windows;
 
-            CurrentRegexConfig!.Hotkey.Modifiers = tempModifiers;
+            CurrentRegexConfig!.Hotkey!.Modifiers = tempModifiers;
             CurrentRegexConfig.Hotkey.Key = args.Key;
             CurrentRegexConfig.IsRegistrationFailed = false;
         }
         else
         {
             // Reset hotkey to None when registration fails
-            CurrentRegexConfig!.Hotkey.Modifiers = VirtualKeyModifiers.None;
+            CurrentRegexConfig!.Hotkey!.Modifiers = VirtualKeyModifiers.None;
             CurrentRegexConfig.Hotkey.Key = VirtualKey.None;
             CurrentRegexConfig.IsRegistrationFailed = true;
-            
+
             _inAppNotificationService.ShowInAppNotification(
                 titleKey: "Notification_HotkeyRegistrationFailed_Title",
                 messageKey: "Notification_HotkeyRegistrationFailed_InUse_Message",
                 severity: InfoBarSeverity.Error
             );
         }
+    }
+
+    [RelayCommand]
+    public void GotFocusHotkeyTextBox()
+    {
+        HotkeyRegister.DisableAllHotkeys();
+    }
+
+    [RelayCommand]
+    public void LostFocusHotkeyTextBox()
+    {
+        HotkeyRegister.EnableAllHotkeys();
     }
 }
 

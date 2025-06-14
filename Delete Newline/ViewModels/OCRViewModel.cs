@@ -36,7 +36,7 @@ public partial class OCRViewModel : ObservableRecipient
     private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
 
     public OCRViewModel(
-        InAppNotificationService notificationService, 
+        InAppNotificationService notificationService,
         SettingsFileService settingsService)
     {
         _inAppNotificationService = notificationService;
@@ -71,12 +71,12 @@ public partial class OCRViewModel : ObservableRecipient
     private void LoadSavedLanguage()
     {
         var savedLanguageTag = _settingsService.ReadSetting<string>(OcrLanguageTagKey);
-        
+
         if (!string.IsNullOrEmpty(savedLanguageTag))
         {
             // Try to find the saved language in available languages
             var savedLanguage = AvailableLanguages.FirstOrDefault(l => l.LanguageTag == savedLanguageTag);
-            
+
             if (savedLanguage != null)
             {
                 SelectedLanguage = savedLanguage;
@@ -92,7 +92,7 @@ public partial class OCRViewModel : ObservableRecipient
                 );
             }
         }
-        
+
         // Fall back to default language (English or first available)
         var englishLang = AvailableLanguages.FirstOrDefault(l => l.LanguageTag.StartsWith("en"));
         SelectedLanguage = englishLang ?? AvailableLanguages.FirstOrDefault();
@@ -147,10 +147,10 @@ public partial class OCRViewModel : ObservableRecipient
         {
             // Pre-capture desktop screenshot for background
             var backgroundImage = ImageHelper.GetFullDesktopScreenshotAsImageSource();
-            
+
             // Create OCR window
             var ocrWindow = new OcrCaptureWindow();
-            
+
             // Setup fullscreen capture with preloaded background and selected language
             ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage, false);
             ocrWindow.Activate();
@@ -175,7 +175,7 @@ public partial class OCRViewModel : ObservableRecipient
             HotkeyRegister.UnregisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
         }
 
-        if(!HotkeyValidator.ValidateHotkey(args, _inAppNotificationService))
+        if(!HotkeyValidator.ValidateHotkey(args, HotkeyType.Ocr, _inAppNotificationService))
         {
             return; // Exit if validation fails
         }
@@ -188,8 +188,18 @@ public partial class OCRViewModel : ObservableRecipient
 
             // Save the new hotkey settings
             _ = SaveOcrHotkeyAsync();
-
         }
-
     }
-} 
+
+    [RelayCommand]
+    public void GotFocusHotkeyTextBox()
+    {
+        HotkeyRegister.DisableAllHotkeys();
+    }
+
+    [RelayCommand]
+    public void LostFocusHotkeyTextBox()
+    {
+        HotkeyRegister.EnableAllHotkeys();
+    }
+}

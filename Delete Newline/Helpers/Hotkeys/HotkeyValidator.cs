@@ -8,7 +8,8 @@ namespace Delete_Newline.Helpers;
 
 public static class HotkeyValidator
 {
-    public static bool ValidateHotkey(KeyboardInputEventArgs args,
+    public static bool ValidateHotkey(KeyboardInputEventArgs args, 
+        HotkeyType hotkeyType,
         InAppNotificationService inAppNotificationService)
     {
         // Check for forbidden hotkey combinations
@@ -33,7 +34,7 @@ public static class HotkeyValidator
         }
 
         // Check if hotkey is already registered
-        if (HotkeyRegister.IsHotkeyRegistered((args.Modifiers, args.Key)))
+        if (HotkeyRegister.IsHotkeyRegistered((args.Modifiers, args.Key), hotkeyType))
         {
             inAppNotificationService.ShowInAppNotification(
                 titleKey: "Notification_InvalidHotkey_Title",

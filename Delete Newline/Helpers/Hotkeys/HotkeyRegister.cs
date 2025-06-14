@@ -72,36 +72,29 @@ public static class HotkeyRegister
         return win32Modifiers;
     }
 
-    public static bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey)
+    public static bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type)
     {
-        return _registeredHotkeys.Values.Any(hotkeySet => hotkeySet.Contains(hotkey));
+        return _registeredHotkeys[type].Contains(hotkey);
     }
 
     public static bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type = HotkeyType.Regex)
     {
-        // Check if hotkey is registered in any type
-        if (IsHotkeyRegistered(hotkey))
-        {
-            Debug.WriteLine($"Hotkey already registered: {hotkey.Item1} + {hotkey.Item2}");
+        if (IsHotkeyRegistered(hotkey, type))
             return false;
-        }
 
         int hotkeyId = HotkeyHasher.GenerateHotkeyHash(hotkey);
         Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
 
-        // Try to unregister any existing hotkey with this ID first
-        UnregisterHotKey(_hwnd, hotkeyId);
-
         bool result = RegisterHotKey(_hwnd, hotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
 
-        if (!result)
+        if (result)
         {
-            Debug.WriteLine($"RegisterHotkey failed. Type={type}, ID={hotkeyId}");
+            _registeredHotkeys[type].Add(hotkey);
+            Debug.WriteLine($"RegisterHotkey succeeded. Type={type}, ID={hotkeyId}");
         }
         else
         {
-            Debug.WriteLine($"RegisterHotkey succeeded. Type={type}, ID={hotkeyId}");
-            _registeredHotkeys[type].Add(hotkey);
+            Debug.WriteLine($"RegisterHotkey failed. Type={type}, ID={hotkeyId}");
         }
 
         return result;
@@ -109,8 +102,12 @@ public static class HotkeyRegister
 
     public static void UnregisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type = HotkeyType.Regex)
     {
+        if (!_registeredHotkeys[type].Contains(hotkey))
+            return;
+
         int hotkeyId = HotkeyHasher.GenerateHotkeyHash(hotkey);
 
+        // Always try to unregister from OS
         if (UnregisterHotKey(_hwnd, hotkeyId))
         {
             Debug.WriteLine($"UnregisterHotkey succeeded. Type={type}, ID={hotkeyId}");
@@ -120,12 +117,6 @@ public static class HotkeyRegister
         {
             int errorCode = Marshal.GetLastWin32Error();
             Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {hotkeyId}, _hwnd: {_hwnd}");
-
-            // Even if OS unregistration fails, remove from our tracking
-            if (errorCode == 1419) // ERROR_HOTKEY_NOT_REGISTERED
-            {
-                _registeredHotkeys[type].Remove(hotkey);
-            }
         }
     }
 
@@ -133,5 +124,32 @@ public static class HotkeyRegister
     {
         var ocrHotkey = _registeredHotkeys[HotkeyType.Ocr].FirstOrDefault();
         return ocrHotkey != default ? HotkeyHasher.GenerateHotkeyHash(ocrHotkey) : null;
+    }
+
+    public static void DisableAllHotkeys()
+    {
+        foreach (var type in _registeredHotkeys.Keys)
+        {
+            foreach (var hotkey in _registeredHotkeys[type])
+            {
+                int hotkeyId = HotkeyHasher.GenerateHotkeyHash(hotkey);
+                UnregisterHotKey(_hwnd, hotkeyId);
+            }
+        }
+        Debug.WriteLine("All hotkeys disabled");
+    }
+
+    public static void EnableAllHotkeys()
+    {
+        foreach (var type in _registeredHotkeys.Keys)
+        {
+            foreach (var hotkey in _registeredHotkeys[type])
+            {
+                int hotkeyId = HotkeyHasher.GenerateHotkeyHash(hotkey);
+                Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
+                RegisterHotKey(_hwnd, hotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
+            }
+        }
+        Debug.WriteLine("All hotkeys re-enabled");
     }
 }

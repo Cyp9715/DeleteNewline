@@ -6,7 +6,7 @@ namespace Delete_Newline.Services;
 
 public class InAppNotificationService
 {
-    private InfoBar? _infoBar; // Store direct reference to InfoBar
+    private InfoBar? _infoBar;
     private DispatcherQueue? _dispatcherQueue;
 
     public void Initialize(InfoBar infoBar)
