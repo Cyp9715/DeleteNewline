@@ -193,7 +193,7 @@
     <value>Hotkey Registration Failed</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_InUse_Message" xml:space="preserve">
-    <value>Failed to register the hotkey. It might be in use by another application or a system error occurred.</value>
+    <value>The same shortcut key is already in use within Delete Newline</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_Message_Prefix" xml:space="preserve">
     <value>The following hotkeys could not be registered:</value>

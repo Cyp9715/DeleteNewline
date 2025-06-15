@@ -193,7 +193,7 @@
     <value>단축키 등록 실패</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_InUse_Message" xml:space="preserve">
-    <value>다른 프로그램에서 이미 사용 중이거나 시스템 오류로 인해 단축키를 등록할 수 없습니다.</value>
+    <value>Delete Newline 내부에서 이미 동일한 단축키를 사용중입니다.</value>
   </data>
   <data name="Notification_HotkeyRegistrationFailed_Message_Prefix" xml:space="preserve">
     <value>다음 단축키들을 등록할 수 없었습니다:</value>
