@@ -270,7 +270,7 @@
     <value>Startup Disabled by User</value>
     <comment>Notification title when startup task is disabled by user</comment>
   </data>
-  <data name="Notification_StartupTask_DisabledByUser_Message.Content" xml:space="preserve">
+  <data name="Notification_StartupTask_DisabledByUser_Message" xml:space="preserve">
     <value>This application's startup task has been disabled by the user through system settings. It can only be re-enabled manually by the user.</value>
     <comment>Notification message when startup task is disabled by user</comment>
   </data>
@@ -294,7 +294,7 @@
     <value>Failed to Enable Startup Task</value>
     <comment>Notification title when enabling startup task fails</comment>
   </data>
-  <data name="Notification_StartupTask_EnableFailed_Message.Content" xml:space="preserve">
+  <data name="Notification_StartupTask_EnableFailed_Message" xml:space="preserve">
     <value>The application could not be enabled to run on startup. Please check system settings or try again.</value>
     <comment>Notification message when enabling startup task fails</comment>
   </data>

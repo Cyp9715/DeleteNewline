@@ -270,7 +270,7 @@
     <value>사용자에 의해 시작 프로그램 비활성화됨</value>
     <comment>사용자에 의해 시작 작업이 비활성화되었을 때 알림 제목</comment>
   </data>
-  <data name="Notification_StartupTask_DisabledByUser_Message.Content" xml:space="preserve">
+  <data name="Notification_StartupTask_DisabledByUser_Message" xml:space="preserve">
     <value>이 애플리케이션의 시작 작업이 사용자의 시스템 설정에 의해 비활성화되었습니다. 사용자가 직접 수동으로만 다시 활성화할 수 있습니다.</value>
     <comment>사용자에 의해 시작 작업이 비활성화되었을 때 알림 메시지</comment>
   </data>
@@ -294,7 +294,7 @@
     <value>시작 프로그램 활성화 실패</value>
     <comment>시작 프로그램 활성화 실패 시 알림 제목</comment>
   </data>
-  <data name="Notification_StartupTask_EnableFailed_Message.Content" xml:space="preserve">
+  <data name="Notification_StartupTask_EnableFailed_Message" xml:space="preserve">
     <value>애플리케이션을 시작 프로그램으로 설정할 수 없었습니다. 시스템 설정을 확인하거나 다시 시도하십시오.</value>
     <comment>시작 프로그램 활성화 실패 시 알림 메시지</comment>
   </data>
