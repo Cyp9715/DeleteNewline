@@ -23,7 +23,7 @@ Once your hotkey is set, you're ready for the daily workflow.
 
 Your daily use is elegantly simple and free of extra steps:
 
-1. Select Text: Highlight any text in any application.
+1. Select Text: Highlight(mouse drag) any text in any application.
 2. Press Hotkey: Press the custom hotkey you configured.
 3. Paste Result: The transformed text is now on your clipboard, ready to be pasted anywhere.
 
