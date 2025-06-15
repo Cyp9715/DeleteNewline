@@ -10,7 +10,7 @@ It's a seamless workflow designed for developers, editors, and anyone who needs 
 
 ## How It Works
 
-### Prerequisites: One-Time Setup
+### ⚙️ One-Time Setup
 
 You first need to teach Delete Newline what you want to do. This setup is only required once per workflow.
 
@@ -19,7 +19,7 @@ You first need to teach Delete Newline what you want to do. This setup is only r
 
 Once your hotkey is set, you're ready for the daily workflow.
 
-### Daily Workflow
+### ⚡Daily Workflow
 
 Your daily use is elegantly simple and free of extra steps:
 
@@ -27,27 +27,10 @@ Your daily use is elegantly simple and free of extra steps:
 2. Press Hotkey: Press the custom hotkey you configured.
 3. Paste Result: The transformed text is now on your clipboard, ready to be pasted anywhere.
 
-## Update 3.0.0
-
-🚀 Major Updates in Delete Newline 3.0.0!
-
-1. Completely Revamped UI: Introducing WinUI3  
-    We've redesigned the app from WPF to the latest WinUI3, offering a more modern and intuitive user experience.
-
-2. Unlimited Hotkeys: Multi-Hotkey Support  
-    Break free from the one-regex limit. You can now assign multiple regular expression patterns to different hotkeys for quick and precise use whenever you need them.
-
-3. Text Extraction from Images (OCR)  
-    Stop manually typing text from documents, websites, or screenshots. Just press a hotkey, drag over the desired area, and let the OCR engine instantly extract the text to your clipboard.
-
-4. Settings Backup & Restore: Import/Export Feature  
-    No worries when you change PCs or reinstall your OS. With just a few clicks, you can restore all your saved settings and hotkeys to get right back to work.
-
-5. More Convenient: Official Korean Support  
-    Korean language support is now available.
-
-6. Major Stability and Convenience Improvements  
-    Based on valuable user feedback, we've enhanced the app's overall performance and meticulously polished rough edges from the previous version to deliver a more complete and reliable tool.
-
-
 ![image](https://github.com/user-attachments/assets/3e82b981-9132-4b5c-ad44-fc4c62de8891)
+
+## 📥 How to Download
+
+You can download `Delete Newline` directly from the Microsoft Store.
+
+[![Get it from the Microsoft Store](https://img.shields.io/badge/Get_it_from_the-Microsoft_Store-blue.svg)](https://apps.microsoft.com/detail/9nc17sl0vv5s?hl=en-US&gl=US)
