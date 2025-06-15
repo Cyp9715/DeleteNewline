@@ -169,27 +169,66 @@ public partial class OCRViewModel : ObservableRecipient
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
-        // Unregister previous OCR hotkey if exists
-        if (_ocrHotkey.Modifiers != VirtualKeyModifiers.None && _ocrHotkey.Key != VirtualKey.None)
+        var newHotkey = (args.Modifiers, args.Key);
+        var oldHotkey = (_ocrHotkey.Modifiers, _ocrHotkey.Key);
+
+        // 1. If the new hotkey is the same as the old one, do nothing.
+        if (newHotkey == oldHotkey)
         {
-            HotkeyRegister.UnregisterHotkey((_ocrHotkey.Modifiers, _ocrHotkey.Key), HotkeyType.Ocr);
+            return;
         }
 
-        if(!HotkeyValidator.ValidateHotkey(args, HotkeyType.Ocr, _inAppNotificationService))
+        // 2. First, unregister the old hotkey.
+        if (oldHotkey.Key != VirtualKey.None)
         {
-            return; // Exit if validation fails
+            HotkeyRegister.UnregisterHotkey(oldHotkey, HotkeyType.Ocr);
         }
 
-        // Register new OCR hotkey
-        if (HotkeyRegister.RegisterHotkey((args.Modifiers, args.Key), HotkeyType.Ocr))
+        // 3. Check if the new hotkey is already registered globally.
+        if (HotkeyRegister.IsHotkeyRegisteredGlobally(newHotkey))
         {
-            _ocrHotkey.Modifiers = args.Modifiers;
-            _ocrHotkey.Key = args.Key;
+            // 3-1. If it's a duplicate, show a notification and re-register the old hotkey (rollback).
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_HotkeyRegistrationFailed_Title",
+                messageKey: "Notification_HotkeyRegistrationFailed_InUse_Message",
+                severity: InfoBarSeverity.Error
+            );
 
-            // Save the new hotkey settings
-            _ = SaveOcrHotkeyAsync();
+            if (oldHotkey.Key != VirtualKey.None)
+            {
+                HotkeyRegister.RegisterHotkey(oldHotkey, HotkeyType.Ocr);
+            }
+
+            // Force a UI update to revert to the previous hotkey display.
+            UpdateDisplayHotkey();
+            return;
+        }
+
+        // 4. If the hotkey is available, register the new hotkey.
+        bool registrationSuccess = true;
+        if (newHotkey.Key != VirtualKey.None)
+        {
+            registrationSuccess = HotkeyRegister.RegisterHotkey(newHotkey, HotkeyType.Ocr);
+        }
+
+        if (registrationSuccess)
+        {
+            // 4-1. If registration succeeds, update the model and save.
+            _ocrHotkey.Modifiers = newHotkey.Item1;
+            _ocrHotkey.Key = newHotkey.Item2;
+            _ = SaveOcrHotkeyAsync(); // UpdateDisplayHotkey() is called inside this method.
+        }
+        else
+        {
+            // 4-2. If registration fails, roll back.
+            if (oldHotkey.Key != VirtualKey.None)
+            {
+                HotkeyRegister.RegisterHotkey(oldHotkey, HotkeyType.Ocr);
+            }
+            UpdateDisplayHotkey();
         }
     }
+
 
     [RelayCommand]
     public void GotFocusHotkeyTextBox()

@@ -164,50 +164,69 @@ public partial class RegexViewModel : ObservableRecipient
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
-        // Unregister previous hotkey if exists
-        if (CurrentRegexConfig != null && CurrentRegexConfig.Hotkey != null &&
-            CurrentRegexConfig.Hotkey.Modifiers != VirtualKeyModifiers.None &&
-            CurrentRegexConfig.Hotkey.Key != VirtualKey.None)
-        {
-            HotkeyRegister.UnregisterHotkey((CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key), HotkeyType.Regex);
-        }
+        if (CurrentRegexConfig?.Hotkey == null) return;
 
-        if (!HotkeyValidator.ValidateHotkey(args, HotkeyType.Regex, _inAppNotificationService))
+        var newHotkey = (args.Modifiers, args.Key);
+        var oldHotkey = (CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key);
+
+        // 1. If the new hotkey is the same as the old one, do nothing.
+        if (newHotkey == oldHotkey)
         {
             return;
         }
 
-        // Register new hotkey
-        if (HotkeyRegister.RegisterHotkey((args.Modifiers, args.Key), HotkeyType.Regex))
+        // 2. Check if the new hotkey is already registered by another item (not the current one).
+        //    To do this accurately, we must first temporarily unregister the current item's hotkey.
+        HotkeyRegister.UnregisterHotkey(oldHotkey, HotkeyType.Regex);
+
+        if (HotkeyRegister.IsHotkeyRegisteredGlobally(newHotkey))
         {
-            VirtualKeyModifiers tempModifiers = VirtualKeyModifiers.None;
-
-            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Control))
-                tempModifiers |= VirtualKeyModifiers.Control;
-            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Menu))
-                tempModifiers |= VirtualKeyModifiers.Menu;
-            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Shift))
-                tempModifiers |= VirtualKeyModifiers.Shift;
-            if (args.Modifiers.HasFlag(VirtualKeyModifiers.Windows))
-                tempModifiers |= VirtualKeyModifiers.Windows;
-
-            CurrentRegexConfig!.Hotkey!.Modifiers = tempModifiers;
-            CurrentRegexConfig.Hotkey.Key = args.Key;
-            CurrentRegexConfig.IsRegistrationFailed = false;
-        }
-        else
-        {
-            // Reset hotkey to None when registration fails
-            CurrentRegexConfig!.Hotkey!.Modifiers = VirtualKeyModifiers.None;
-            CurrentRegexConfig.Hotkey.Key = VirtualKey.None;
-            CurrentRegexConfig.IsRegistrationFailed = true;
-
+            // 3. If the hotkey is a duplicate:
+            //    - Display a notification to the user.
             _inAppNotificationService.ShowInAppNotification(
                 titleKey: "Notification_HotkeyRegistrationFailed_Title",
                 messageKey: "Notification_HotkeyRegistrationFailed_InUse_Message",
                 severity: InfoBarSeverity.Error
             );
+
+            //    - Crucially, re-register the old hotkey to restore the original state.
+            if (oldHotkey.Key != VirtualKey.None)
+            {
+                HotkeyRegister.RegisterHotkey(oldHotkey, HotkeyType.Regex);
+            }
+
+            //    - Exit without modifying the model to ensure the UI keeps displaying the old value.
+            //      (If the UI doesn't update immediately, you might need to raise a PropertyChanged event manually).
+            //      OnPropertyChanged(nameof(DisplayHotkey)); 
+            return;
         }
+
+        // 4. If the hotkey is not a duplicate and is available for use:
+        //    - Register the new hotkey (if it's not VirtualKey.None).
+        bool registrationSuccess = true;
+        if (newHotkey.Key != VirtualKey.None)
+        {
+            registrationSuccess = HotkeyRegister.RegisterHotkey(newHotkey, HotkeyType.Regex);
+        }
+
+        if (registrationSuccess)
+        {
+            //    - If registration is successful, update the model (CurrentRegexConfig) with the new hotkey.
+            CurrentRegexConfig.Hotkey.Modifiers = newHotkey.Item1;
+            CurrentRegexConfig.Hotkey.Key = newHotkey.Item2;
+            CurrentRegexConfig.IsRegistrationFailed = false;
+        }
+        else
+        {
+            //    - (Edge case) If registration fails here, roll back by re-registering the old hotkey.
+            CurrentRegexConfig.IsRegistrationFailed = true;
+
+            if (oldHotkey.Key != VirtualKey.None)
+            {
+                HotkeyRegister.RegisterHotkey(oldHotkey, HotkeyType.Regex);
+            }
+        }
+        // The UI updates automatically because changing the Hotkey properties will trigger a PropertyChanged notification.
     }
 
     [RelayCommand]

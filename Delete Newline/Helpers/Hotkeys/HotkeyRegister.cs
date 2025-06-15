@@ -72,11 +72,6 @@ public static class HotkeyRegister
         return win32Modifiers;
     }
 
-    public static bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type)
-    {
-        return _registeredHotkeys[type].Contains(hotkey);
-    }
-
     public static bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type = HotkeyType.Regex)
     {
         if (IsHotkeyRegistered(hotkey, type))
@@ -90,11 +85,11 @@ public static class HotkeyRegister
         if (result)
         {
             _registeredHotkeys[type].Add(hotkey);
-            Debug.WriteLine($"RegisterHotkey succeeded. Type={type}, ID={hotkeyId}");
+            Debug.WriteLine($"RegisterHotkey succeeded. Type={type}, ID={hotkeyId}, hwnd={_hwnd}");
         }
         else
         {
-            Debug.WriteLine($"RegisterHotkey failed. Type={type}, ID={hotkeyId}");
+            Debug.WriteLine($"RegisterHotkey failed. Type={type}, ID={hotkeyId}, hwnd={_hwnd}");
         }
 
         return result;
@@ -110,14 +105,16 @@ public static class HotkeyRegister
         // Always try to unregister from OS
         if (UnregisterHotKey(_hwnd, hotkeyId))
         {
-            Debug.WriteLine($"UnregisterHotkey succeeded. Type={type}, ID={hotkeyId}");
-            _registeredHotkeys[type].Remove(hotkey);
+            Debug.WriteLine($"UnregisterHotkey succeeded. Type={type}, ID={hotkeyId}, hwnd={_hwnd}");
         }
         else
         {
             int errorCode = Marshal.GetLastWin32Error();
+            Debug.WriteLine($"This may be an intended error.");
             Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {hotkeyId}, _hwnd: {_hwnd}");
         }
+
+        _registeredHotkeys[type].Remove(hotkey);
     }
 
     public static int? GetOcrHotkeyId()
@@ -151,5 +148,29 @@ public static class HotkeyRegister
             }
         }
         Debug.WriteLine("All hotkeys re-enabled");
+    }
+
+    public static bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type)
+    {
+        return _registeredHotkeys[type].Contains(hotkey);
+    }
+
+
+    public static bool IsHotkeyRegisteredGlobally((VirtualKeyModifiers, VirtualKey) hotkey)
+    {
+        if (hotkey.Item1 == VirtualKeyModifiers.None && hotkey.Item2 == VirtualKey.None)
+        {
+            return false;
+        }
+
+        foreach (var hotkeyHashSet in _registeredHotkeys.Values)
+        {
+            if (hotkeyHashSet.Contains(hotkey))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
