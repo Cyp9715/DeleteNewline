@@ -39,16 +39,3 @@ The .exe of Delete Newline is provided only up to version 1.2.7. However, since 
 	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
 </a>
 </p>
-
-## Upcoming Update: Delete Newline - Version 3.0
-I’m excited to share a sneak peek of the future for Delete Newline! Work is currently underway to bring you Version 3.0, rebuilt from the ground up using WinUI 3. This new version will introduce significant feature enhancements, aiming to make the app even more powerful and user-friendly.
-
-One important update to note: advertisements will be included in Version 3.0 to help support the ongoing development of the app.
-
-For those who prefer an ad-free experience, I recommend continuing to use Version 2.0, which is based on the WPF branch. However, Version 2.0 will no longer be supported through the Microsoft Store. Instead, the executable (.exe) version of Version 2.0 will be made available for download.
-
-This update is a big step forward for Delete Newline, and I am committed to making it a tool that continues to deliver value and convenience for users like you. Thank you for being part of this journey, and stay tuned for more updates on Version 3.0.
-
-If you have any feedback, questions, or suggestions, feel free to reach out through GitHub or the app store page. Your support and ideas drive the improvements and innovations behind Delete Newline.
-
-**Cyp**
