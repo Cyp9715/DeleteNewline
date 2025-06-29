@@ -140,6 +140,7 @@ public partial class OCRViewModel : ObservableRecipient
             _ = SaveOcrLanguageAsync();
         }
     }
+
     [RelayCommand]
     public void LaunchOcr()
     {
@@ -169,6 +170,9 @@ public partial class OCRViewModel : ObservableRecipient
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
+        if(HotkeyValidator.ValidateHotkey(args, HotkeyType.Ocr, _inAppNotificationService) == false)
+            return;
+
         var newHotkey = (args.Modifiers, args.Key);
         var oldHotkey = (_ocrHotkey.Modifiers, _ocrHotkey.Key);
 

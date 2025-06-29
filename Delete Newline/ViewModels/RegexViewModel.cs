@@ -164,7 +164,11 @@ public partial class RegexViewModel : ObservableRecipient
     [RelayCommand]
     public void ProcessKeyInput(KeyboardInputEventArgs args)
     {
-        if (CurrentRegexConfig?.Hotkey == null) return;
+        if (CurrentRegexConfig?.Hotkey == null) 
+            return;
+
+        if (HotkeyValidator.ValidateHotkey(args, HotkeyType.Regex, _inAppNotificationService) == false)
+            return;
 
         var newHotkey = (args.Modifiers, args.Key);
         var oldHotkey = (CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key);

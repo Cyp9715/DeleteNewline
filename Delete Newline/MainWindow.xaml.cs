@@ -1,6 +1,5 @@
 using Delete_Newline.Services;
 using Delete_Newline.ViewModels;
-using Delete_Newline.Views;
 using Microsoft.UI.Dispatching;
 using System.Runtime.InteropServices;
 using Windows.UI.ViewManagement;
@@ -93,6 +92,9 @@ public sealed partial class MainWindow : WindowEx
     [DllImport("user32.dll")]
     private static extern int GetMenuItemID(IntPtr hMenu, int nPos);
 
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
     private async void MessageMonitor_WindowMessageReceived(object sender, WindowMessageEventArgs e)
     {
         var trayIconService = App.GetService<TrayIconService>();
@@ -105,6 +107,7 @@ public sealed partial class MainWindow : WindowEx
                     case WM_LBUTTONDBLCLK:
                         this.Show();
                         this.Activate();
+                        SetForegroundWindow(hwnd);
                         break;
                     case WM_RBUTTONDOWN:
                         trayIconService.ShowContextMenu();
