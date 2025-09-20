@@ -9,6 +9,7 @@ using Windows.Media.Ocr;
 using Windows.System;
 using WinUIEx;
 using WinRT.Interop;
+using System.Runtime.InteropServices;
 
 namespace Delete_Newline.Views;
 
@@ -20,21 +21,57 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private Language currentLanguage = new Language("en"); // Default language setting
     private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
     private bool applyRegexEnabled = false; // Apply regex setting
-
     // OCRService dependency for notifying completion
     private readonly NotificationService? _notificationService;
+
+    private bool isFadeInStarted = false;
 
     public OcrCaptureWindow()
     {
         InitializeComponent();
         _notificationService = App.GetService<NotificationService>();
+        this.Activated += OnWindowActivated_FirstTime;
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+    private const uint LWA_ALPHA = 0x00000002;
+    private const int GWL_EXSTYLE = -20;
+    private const int WS_EX_LAYERED = 0x80000;
+    private void OnWindowActivated_FirstTime(object sender, WindowActivatedEventArgs args)
+    {
+        if (isFadeInStarted) return;  // Ignore if already started (prevent repetition)
+        isFadeInStarted = true;
+        var hwnd = WindowNative.GetWindowHandle(this);
+
+        // Set window to layered mode (start fully transparent)
+        SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+        SetLayeredWindowAttributes(hwnd, 0, 0, LWA_ALPHA);  // Initial alpha 0 (fully transparent)
+
+        // Fade-in animation: gradually increase alpha from 0 to 255 over 0.5 seconds
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(10) };  // Adjusted: smoother (reduce flickering)
+        byte alpha = 0;
+        timer.Tick += (s, e) =>
+        {
+            alpha = (byte)Math.Min(alpha + 20, 255);  // Adjusted: increase faster (minimize flickering)
+            SetLayeredWindowAttributes(hwnd, 0, alpha, LWA_ALPHA);
+            if (alpha >= 255)
+            {
+                timer.Stop();
+                // Additional: force window refresh to prevent flickering
+                SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+            }
+        };
+        timer.Start();
+        // Remove event handler (extra safety)
+        this.Activated -= OnWindowActivated_FirstTime;
     }
 
     public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool applyRegexEnabled = false)
     {
         backgroundImage = preloadedBackground;
         this.applyRegexEnabled = applyRegexEnabled;
-        
+
         // Passed language setting (if any)
         if (selectedLanguage != null)
         {
@@ -49,45 +86,43 @@ public sealed partial class OcrCaptureWindow : WindowEx
             currentLanguage = englishLang ?? availableLanguages.FirstOrDefault() ?? new Language("en");
             System.Diagnostics.Debug.WriteLine($"Using default language: {currentLanguage.DisplayName} ({currentLanguage.LanguageTag})");
         }
-        
+
         System.Diagnostics.Debug.WriteLine("Setting up fullscreen OCR capture window");
-        
+
         // Remove title bar
         this.SetTitleBar(null);
-        
+
         // Get window handle and remove decorations
         var hwnd = WindowNative.GetWindowHandle(this);
         RemoveWindowDecorations(hwnd);
-        
+
         // Get virtual screen bounds (all monitors)
         var virtualScreen = ImageHelper.GetVirtualScreenBounds();
-        
+
         // Position and size window to cover entire virtual screen
-        SetWindowPos(hwnd, 
+        SetWindowPos(hwnd,
             new IntPtr(-1), // HWND_TOPMOST
-            virtualScreen.X, 
-            virtualScreen.Y, 
-            virtualScreen.Width, 
-            virtualScreen.Height, 
+            virtualScreen.X,
+            virtualScreen.Y,
+            virtualScreen.Width,
+            virtualScreen.Height,
             SWP_NOZORDER | SWP_SHOWWINDOW);
-        
+
         System.Diagnostics.Debug.WriteLine($"Window positioned: {virtualScreen}");
         System.Diagnostics.Debug.WriteLine($"Background image size: {backgroundImage?.PixelWidth}x{backgroundImage?.PixelHeight}");
-        
+
         // Initialize
         Initialize();
     }
 
     [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, 
-        int X, int Y, int cx, int cy, uint uFlags);
-
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-    
+
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-    
+
     private const uint SWP_NOZORDER = 0x0004;
     private const uint SWP_SHOWWINDOW = 0x0040;
     private const int GWL_STYLE = -16;
@@ -96,6 +131,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private const int WS_MINIMIZE = 0x20000000;
     private const int WS_MAXIMIZE = 0x01000000;
     private const int WS_SYSMENU = 0x00080000;
+    private const uint SWP_FRAMECHANGED = 0x0020;
+    private const uint SWP_NOMOVE = 0x0002;
+    private const uint SWP_NOSIZE = 0x0001;
 
     private void RemoveWindowDecorations(IntPtr hwnd)
     {
