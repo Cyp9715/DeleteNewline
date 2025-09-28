@@ -70,7 +70,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
         NativeMethods.SetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE, NativeMethods.GetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE) | NativeMethods.WS_EX_LAYERED);
         NativeMethods.SetLayeredWindowAttributes(hwnd, 0, 0, NativeMethods.LWA_ALPHA);
 
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(3) };
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(2) };
         byte alpha = 0;
         const byte MAX_ALPHA = 255;   // <‑‑ 여기서 최종 투명도를 정의 (255보다 낮게)
 
@@ -103,8 +103,11 @@ public sealed partial class OcrCaptureWindow : WindowEx
             virtualScreen.Y,
             virtualScreen.Width,
             virtualScreen.Height,
-            NativeMethods.SWP_NOZORDER | NativeMethods.SWP_SHOWWINDOW);
+            NativeMethods.SWP_SHOWWINDOW);
 
+        // TopMost
+        NativeMethods.SetForegroundWindow(hwnd);
+        
         System.Diagnostics.Debug.WriteLine($"Window positioned: {virtualScreen}");
         System.Diagnostics.Debug.WriteLine($"Background image size: {backgroundImage?.PixelWidth}x{backgroundImage?.PixelHeight}");
         System.Diagnostics.Debug.WriteLine("Initializing OCR capture window");
