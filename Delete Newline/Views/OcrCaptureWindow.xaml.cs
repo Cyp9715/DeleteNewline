@@ -118,10 +118,15 @@ public sealed partial class OcrCaptureWindow : WindowEx
     [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
     private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
     [System.Runtime.InteropServices.DllImport("user32.dll")]
+
     private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
+
     private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
 
     private void RemoveWindowDecorations(IntPtr hwnd)
     {
@@ -161,13 +166,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private void OcrCaptureWindow_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         System.Diagnostics.Debug.WriteLine($"Key pressed: {e.Key}");
-        
-        if (e.Key == VirtualKey.Escape)
-        {
-            System.Diagnostics.Debug.WriteLine("ESC key detected - closing OCR window");
-            this.Close();
-            e.Handled = true;
-        }
+        System.Diagnostics.Debug.WriteLine("Any key detected - closing OCR window");
+        this.Close();
+        e.Handled = true;
     }
 
     private void SetupOverlayRectangles()
