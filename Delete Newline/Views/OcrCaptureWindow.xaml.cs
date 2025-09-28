@@ -70,16 +70,17 @@ public sealed partial class OcrCaptureWindow : WindowEx
         NativeMethods.SetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE, NativeMethods.GetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE) | NativeMethods.WS_EX_LAYERED);
         NativeMethods.SetLayeredWindowAttributes(hwnd, 0, 0, NativeMethods.LWA_ALPHA);
 
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(10) };
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(3) };
         byte alpha = 0;
+        const byte MAX_ALPHA = 255;   // <‑‑ 여기서 최종 투명도를 정의 (255보다 낮게)
+
         timer.Tick += (s, e) =>
         {
-            alpha = (byte)Math.Min(alpha + 20, 255);
+            alpha = (byte)Math.Min(alpha + 10, MAX_ALPHA);
             NativeMethods.SetLayeredWindowAttributes(hwnd, 0, alpha, NativeMethods.LWA_ALPHA);
-            if (alpha >= 255)
+            if (alpha >= MAX_ALPHA)
             {
                 timer.Stop();
-                NativeMethods.SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOZORDER | NativeMethods.SWP_FRAMECHANGED);
             }
         };
         timer.Start();
@@ -89,10 +90,10 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool applyRegexEnabled = false)
     {
-        backgroundImage = preloadedBackground;
-
         var hwnd = WindowNative.GetWindowHandle(this);
-        RemoveWindowDecorations(hwnd);
+        currentLanguage = selectedLanguage ?? new Language("en");
+        backgroundImage = preloadedBackground;
+        RemoveWindowFrames(hwnd);
 
         var virtualScreen = ImageHelper.GetVirtualScreenBounds();
 
@@ -114,7 +115,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
         SetupKeyHandling();
     }
 
-    private void RemoveWindowDecorations(IntPtr hwnd)
+    private void RemoveWindowFrames(IntPtr hwnd)
     {
         try
         {
@@ -306,21 +307,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private async Task ProcessOcrAsync(Bitmap regionBitmap, Rectangle screenRect)
     {
-        var ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(currentLanguage)
-                        ?? Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(new Language("en"));
+        var ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(currentLanguage);
 
-        if (ocrEngine == null)
-        {
-            _notificationService?.ShowSystemNotification(
-                "Notification_OCR_Error_Title",
-                "Notification_OCR_NoEngine_Message",
-                force: false,
-                addTag: true
-            );
-            return;
-        }
-
-        string ocrText = await OcrHelper.GetTextFromBitmapAsync(regionBitmap, ocrEngine.RecognizerLanguage);
+        string ocrText = await OcrHelper.GetTextFromBitmapAsync(regionBitmap, currentLanguage);
 
         if (!string.IsNullOrWhiteSpace(ocrText))
         {
