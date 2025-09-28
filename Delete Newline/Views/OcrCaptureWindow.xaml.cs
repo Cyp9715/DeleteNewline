@@ -14,16 +14,22 @@ namespace Delete_Newline.Views;
 
 public sealed partial class OcrCaptureWindow : WindowEx
 {
-    private Windows.Foundation.Point startPoint = new();
-    private Windows.Foundation.Point currentPoint = new();
-    private bool isSelecting = false;
-    private Language currentLanguage = new Language("en"); // Default language setting
-    private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
-    private bool applyRegexEnabled = false; // Apply regex setting
-    // OCRService dependency for notifying completion
     private readonly NotificationService? _notificationService;
 
     private bool isFadeInStarted = false;
+
+    private const uint SWP_NOZORDER = 0x0004;
+    private const uint SWP_SHOWWINDOW = 0x0040;
+    private const int GWL_STYLE = -16;
+    private const int WS_CAPTION = 0x00C00000;
+    private const int WS_THICKFRAME = 0x00040000;
+    private const int WS_MINIMIZE = 0x20000000;
+    private const int WS_MAXIMIZE = 0x01000000;
+    private const int WS_SYSMENU = 0x00080000;
+    private const uint SWP_FRAMECHANGED = 0x0020;
+    private const uint SWP_NOMOVE = 0x0002;
+    private const uint SWP_NOSIZE = 0x0001;
+
 
     public OcrCaptureWindow()
     {
@@ -67,13 +73,11 @@ public sealed partial class OcrCaptureWindow : WindowEx
         this.Activated -= OnWindowActivated_FirstTime;
     }
 
+    private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
+
     public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool applyRegexEnabled = false)
     {
         backgroundImage = preloadedBackground;
-        this.applyRegexEnabled = applyRegexEnabled;
-
-        // Remove title bar
-        this.SetTitleBar(null);
 
         // Get window handle and remove decorations
         var hwnd = WindowNative.GetWindowHandle(this);
@@ -94,8 +98,21 @@ public sealed partial class OcrCaptureWindow : WindowEx
         System.Diagnostics.Debug.WriteLine($"Window positioned: {virtualScreen}");
         System.Diagnostics.Debug.WriteLine($"Background image size: {backgroundImage?.PixelWidth}x{backgroundImage?.PixelHeight}");
 
-        // Initialize
-        Initialize();
+        System.Diagnostics.Debug.WriteLine("Initializing OCR capture window");
+        (new Action(() =>
+        {
+            // Set preloaded background image
+            BackgroundImage.Source = backgroundImage;
+
+            // Setup overlay rectangles
+            SetupOverlayRectangles();
+
+            // Setup canvas events
+            SetupCanvasEvents();
+
+            // Setup window‑level key handling for ESC
+            SetupKeyHandling();
+        }))();
     }
 
     [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
@@ -105,18 +122,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
-    private const uint SWP_NOZORDER = 0x0004;
-    private const uint SWP_SHOWWINDOW = 0x0040;
-    private const int GWL_STYLE = -16;
-    private const int WS_CAPTION = 0x00C00000;
-    private const int WS_THICKFRAME = 0x00040000;
-    private const int WS_MINIMIZE = 0x20000000;
-    private const int WS_MAXIMIZE = 0x01000000;
-    private const int WS_SYSMENU = 0x00080000;
-    private const uint SWP_FRAMECHANGED = 0x0020;
-    private const uint SWP_NOMOVE = 0x0002;
-    private const uint SWP_NOSIZE = 0x0001;
 
     private void RemoveWindowDecorations(IntPtr hwnd)
     {
@@ -132,22 +137,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
         }
     }
 
-    private void Initialize()
-    {
-        System.Diagnostics.Debug.WriteLine("Initializing OCR capture window");
-        
-        // Set preloaded background image
-        SetBackgroundImage();
-        
-        // Setup overlay rectangles
-        SetupOverlayRectangles();
-        
-        // Setup canvas events
-        SetupCanvasEvents();
-        
-        // Setup window-level key handling for ESC
-        SetupKeyHandling();
-    }
 
     private void SetupKeyHandling()
     {
@@ -181,26 +170,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
         }
     }
 
-    private void SetBackgroundImage()
-    {
-        try
-        {
-            if (backgroundImage != null)
-            {
-                BackgroundImage.Source = backgroundImage;
-                System.Diagnostics.Debug.WriteLine("Preloaded background image set successfully");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("Warning: No background image provided");
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Failed to set background image: {ex.Message}");
-        }
-    }
-
     private void SetupOverlayRectangles()
     {
         var virtualScreen = ImageHelper.GetVirtualScreenBounds();
@@ -215,11 +184,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
         LeftOverlay.Visibility = Visibility.Collapsed;
         RightOverlay.Visibility = Visibility.Collapsed;
         BottomOverlay.Visibility = Visibility.Collapsed;
-        
-        System.Diagnostics.Debug.WriteLine($"Overlay setup: {virtualScreen.Width}x{virtualScreen.Height}");
     }
 
-    private void UpdateOverlayRectangles(Windows.Foundation.Rect selectionRect)
+    private void HighlightSelectionOverlay(Windows.Foundation.Rect selectionRect)
     {
         var virtualScreen = ImageHelper.GetVirtualScreenBounds();
         double windowWidth = virtualScreen.Width;
@@ -267,6 +234,11 @@ public sealed partial class OcrCaptureWindow : WindowEx
         RegionClickCanvas.Focus(FocusState.Programmatic);
     }
 
+
+    private Windows.Foundation.Point startPoint = new();
+    private Windows.Foundation.Point currentPoint = new();
+    private bool isSelecting = false;
+
     private void Canvas_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
         isSelecting = true;
@@ -304,7 +276,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
         // Update overlay rectangles to highlight selection
         var selectionRect = new Windows.Foundation.Rect(left, top, width, height);
-        UpdateOverlayRectangles(selectionRect);
+        HighlightSelectionOverlay(selectionRect);
     }
 
     private async void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
@@ -322,15 +294,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
         double canvasHeight = Math.Abs(currentPoint.Y - startPoint.Y);
 
         System.Diagnostics.Debug.WriteLine($"Canvas selection: {canvasWidth}x{canvasHeight} at ({canvasLeft}, {canvasTop})");
-
-        // Check if selection is large enough
-        if (canvasWidth < 10 || canvasHeight < 10)
-        {
-            System.Diagnostics.Debug.WriteLine("Selection too small, ignoring");
-            SetupOverlayRectangles();
-            SelectionBorder.Visibility = Visibility.Collapsed;
-            return;
-        }
 
         try
         {
@@ -397,18 +360,16 @@ public sealed partial class OcrCaptureWindow : WindowEx
         }
     }
 
+    private Language currentLanguage = new Language("en"); // Default language setting
+
     private async Task ProcessOcrAsync(Bitmap regionBitmap, Rectangle screenRect)
     {        
         // Check if OCR engine is available
         var ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(currentLanguage);
+
         if (ocrEngine == null)
         {
             ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(new Language("en"));
-            if (ocrEngine == null)
-            {
-                System.Diagnostics.Debug.WriteLine("ERROR: No OCR engine available!");
-                return;
-            }
         }
         
         // Perform OCR
