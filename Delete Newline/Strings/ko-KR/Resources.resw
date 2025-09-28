@@ -438,6 +438,6 @@
     <value>텍스트 변경되지 않음</value>
   </data>
   <data name="Notification_TextNotModified_Message" xml:space="preserve">
-    <value>복사된 텍스트에 대해 일치하는 규칙을 찾지 못했습니다.</value>
+    <value>복사된 텍스트에 대해 일치하는 규칙을 찾지 못했습니다. 텍스트가 클립보드에 그대로 복사됩니다.</value>
   </data>
 </root>

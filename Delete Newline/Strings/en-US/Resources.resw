@@ -437,6 +437,6 @@
     <value>Text Not Modified</value>
   </data>
   <data name="Notification_TextNotModified_Message" xml:space="preserve">
-    <value>No matching rules found for the copied text.</value>
+    <value>No matching rules found for the copied text. The text is copied to the clipboard unchanged.</value>
   </data>
 </root>
