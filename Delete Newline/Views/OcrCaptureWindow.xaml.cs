@@ -72,7 +72,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
         var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(2) };
         byte alpha = 0;
-        const byte MAX_ALPHA = 255;   // <‑‑ 여기서 최종 투명도를 정의 (255보다 낮게)
+        const byte MAX_ALPHA = 255;
 
         timer.Tick += (s, e) =>
         {
