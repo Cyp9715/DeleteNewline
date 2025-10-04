@@ -1,6 +1,3 @@
-using Delete_Newline.Contracts.Structures;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using Windows.System;
