@@ -24,12 +24,6 @@ public sealed class WndProcService
     
     private static IntPtr _oldWndProc;
     private static WndProc? _newWndProc;
-    private static WndProcService? _instance;
-
-    public WndProcService()
-    {
-        _instance = this;
-    }
 
     public void Initialize(IntPtr _hwnd)
     {
@@ -38,11 +32,6 @@ public sealed class WndProcService
         _oldWndProc = SetWindowLongPtr(_hwnd, GWL_WNDPROC, newWndProcPtr);
         
         Debug.WriteLine("WndProcService initialized successfully");
-    }
-
-    public void Dispose()
-    {
-        Debug.WriteLine("WndProcService disposed");
     }
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
