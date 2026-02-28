@@ -11,7 +11,7 @@
 
   <Identity
     Publisher="CN=0EB9F685-7CC3-4B9F-8F3E-BA45BA39030A"
-    Version="3.0.4.0"  Name="62164CypSoft.DeleteNewline"/>
+    Version="3.1.0.0"  Name="62164CypSoft.DeleteNewline"/>
 
   <Properties>
     <DisplayName>Delete Newline</DisplayName>
@@ -20,8 +20,8 @@
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.26100.0" MaxVersionTested="10.0.26100.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.26100.0" MaxVersionTested="10.0.26100.0" />
   </Dependencies>
 
 	<Resources>
