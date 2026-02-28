@@ -6,8 +6,10 @@ using Delete_Newline.Services;
 using Windows.Globalization;
 using Windows.Media.Ocr;
 using Windows.System;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
+using System.Threading;
 using Delete_Newline.Views;
 using Delete_Newline.Helpers.Hotkeys;
 
@@ -17,7 +19,6 @@ public partial class OCRViewModel : ObservableRecipient
 {
     private readonly InAppNotificationService _inAppNotificationService;
     private readonly SettingsFileService _settingsService;
-    private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
 
     // Settings keys
     private const string OcrHotkeyKey = "OCR_Hotkey";
@@ -32,6 +33,10 @@ public partial class OCRViewModel : ObservableRecipient
     [ObservableProperty]
     private ObservableCollection<Language> _availableLanguages;
 
+    // Allow only one OCR capture window/session at a time.
+    private int _ocrSessionActive;
+    private OcrCaptureWindow? _activeOcrWindow;
+
     // OCR dedicated hotkey settings
     private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
 
@@ -41,7 +46,6 @@ public partial class OCRViewModel : ObservableRecipient
     {
         _inAppNotificationService = notificationService;
         _settingsService = settingsService;
-        _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         _availableLanguages = new ObservableCollection<Language>(OcrEngine.AvailableRecognizerLanguages);
     }
 
@@ -144,6 +148,12 @@ public partial class OCRViewModel : ObservableRecipient
     [RelayCommand]
     public void LaunchOcr()
     {
+        if (Interlocked.CompareExchange(ref _ocrSessionActive, 1, 0) == 1)
+        {
+            System.Diagnostics.Debug.WriteLine("OCR launch skipped: capture session already active.");
+            return;
+        }
+
         try
         {
             // Pre-capture desktop screenshot for background
@@ -151,13 +161,22 @@ public partial class OCRViewModel : ObservableRecipient
 
             // Create OCR window
             var ocrWindow = new OcrCaptureWindow();
+            _activeOcrWindow = ocrWindow;
+            ocrWindow.Closed += OcrWindow_Closed;
 
             // Setup fullscreen capture with preloaded background and selected language
-            ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage, false);
+            ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage);
             ocrWindow.Activate();
         }
         catch (Exception ex)
         {
+            if (_activeOcrWindow != null)
+            {
+                _activeOcrWindow.Closed -= OcrWindow_Closed;
+                _activeOcrWindow = null;
+            }
+            Interlocked.Exchange(ref _ocrSessionActive, 0);
+
             System.Diagnostics.Debug.WriteLine($"Error creating OCR window: {ex.Message}");
             _inAppNotificationService.ShowInAppNotification(
                 titleKey: "Notification_OcrLaunchFailed_Title",
@@ -165,6 +184,17 @@ public partial class OCRViewModel : ObservableRecipient
                 severity: InfoBarSeverity.Error
             );
         }
+    }
+
+    private void OcrWindow_Closed(object sender, WindowEventArgs args)
+    {
+        if (sender is OcrCaptureWindow closedWindow)
+        {
+            closedWindow.Closed -= OcrWindow_Closed;
+        }
+
+        _activeOcrWindow = null;
+        Interlocked.Exchange(ref _ocrSessionActive, 0);
     }
 
     [RelayCommand]

@@ -44,6 +44,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
         internal const uint LWA_ALPHA = 0x00000002;
         internal const int GWL_EXSTYLE = -20;
         internal const int WS_EX_LAYERED = 0x80000;
+        internal const int WS_EX_TOOLWINDOW = 0x00000080;
+        internal const int WS_EX_APPWINDOW = 0x00040000;
     }
 
     private readonly NotificationService? _notificationService;
@@ -67,7 +69,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
         isFadeInStarted = true;
         var hwnd = WindowNative.GetWindowHandle(this);
 
-        NativeMethods.SetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE, NativeMethods.GetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE) | NativeMethods.WS_EX_LAYERED);
+        ApplyOverlayWindowExStyle(hwnd);
         NativeMethods.SetLayeredWindowAttributes(hwnd, 0, 0, NativeMethods.LWA_ALPHA);
 
         var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(2) };
@@ -88,12 +90,13 @@ public sealed partial class OcrCaptureWindow : WindowEx
         this.Activated -= OnWindowActivated_FirstTime;
     }
 
-    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null, bool applyRegexEnabled = false)
+    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null)
     {
         var hwnd = WindowNative.GetWindowHandle(this);
         currentLanguage = selectedLanguage ?? new Language("en");
         backgroundImage = preloadedBackground;
         RemoveWindowFrames(hwnd);
+        ApplyOverlayWindowExStyle(hwnd);
 
         var virtualScreen = ImageHelper.GetVirtualScreenBounds();
 
@@ -145,6 +148,30 @@ public sealed partial class OcrCaptureWindow : WindowEx
             RegionClickCanvas.Focus(FocusState.Programmatic);
             MainGrid.Focus(FocusState.Programmatic);
         };
+    }
+
+    private void ApplyOverlayWindowExStyle(IntPtr hwnd)
+    {
+        try
+        {
+            int exStyle = NativeMethods.GetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE);
+            exStyle |= (NativeMethods.WS_EX_LAYERED | NativeMethods.WS_EX_TOOLWINDOW);
+            exStyle &= ~NativeMethods.WS_EX_APPWINDOW;
+            NativeMethods.SetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE, exStyle);
+
+            NativeMethods.SetWindowPos(
+                hwnd,
+                IntPtr.Zero,
+                0,
+                0,
+                0,
+                0,
+                NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOZORDER | NativeMethods.SWP_FRAMECHANGED);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to apply overlay ex style: {ex.Message}");
+        }
     }
 
     private void OcrCaptureWindow_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -289,7 +316,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
             {
                 try
                 {
-                    await ProcessOcrAsync(regionBitmap, screenRect);
+                    await ProcessOcrAsync(regionBitmap);
                 }
                 catch (Exception ex)
                 {
@@ -308,10 +335,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
         }
     }
 
-    private async Task ProcessOcrAsync(Bitmap regionBitmap, Rectangle screenRect)
+    private async Task ProcessOcrAsync(Bitmap regionBitmap)
     {
-        var ocrEngine = Windows.Media.Ocr.OcrEngine.TryCreateFromLanguage(currentLanguage);
-
         string ocrText = await OcrHelper.GetTextFromBitmapAsync(regionBitmap, currentLanguage);
 
         if (!string.IsNullOrWhiteSpace(ocrText))
