@@ -1,4 +1,5 @@
 using Microsoft.Windows.ApplicationModel.Resources;
+using Microsoft.Windows.Globalization;
 using Delete_Newline.Contracts.Services;
 
 namespace Delete_Newline.Services;
@@ -45,6 +46,8 @@ public sealed class LocalizationService : ILocalizationService
         if (Languages.Contains(languageItem) == true)
         {
             _currentLanguageItem = languageItem;
+            // Keep both language override APIs aligned so XAML/resource lookups resolve consistently.
+            ApplicationLanguages.PrimaryLanguageOverride = languageItem.Tag;
             Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = languageItem.Tag;
             _resourceContext.QualifierValues["Language"] = languageItem.Tag;
         }

@@ -8,10 +8,6 @@ public interface INavigationService
     event NavigatedEventHandler Navigated;
 
     bool CanGoBack { get; }
-    
-    IList<object>? MenuItems { get; }
-    
-    object? SettingsItem { get; }
 
     Frame? Frame { get; set; }
 
@@ -20,8 +16,6 @@ public interface INavigationService
     bool GoBack();
     
     void InitializeNavigationView(NavigationView navigationView);
-    
-    void UnregisterNavigationViewEvents();
     
     NavigationViewItem? GetSelectedItem(Type pageType);
 }

@@ -10,7 +10,6 @@ namespace Delete_Newline.Views;
 public sealed partial class ShellPage : Page
 {
     public ShellViewModel ViewModel { get; }
-    private InAppNotificationService _inAppNotificationService;
 
     public ShellPage()
     {
@@ -22,17 +21,20 @@ public sealed partial class ShellPage : Page
 
         App.MainWindow.ExtendsContentIntoTitleBar = true;
         App.MainWindow.SetTitleBar(AppTitleBar);
-        AppTitleBarText.Text = LocalizationHelper.GetLocalizedString("AppDisplayName");
+        RefreshLocalizedTexts();
 
         // Initialize InAppNotificationService
-        _inAppNotificationService = App.GetService<InAppNotificationService>();
-        _inAppNotificationService.Initialize(GlobalInfoBar);
+        var inAppNotificationService = App.GetService<InAppNotificationService>();
+        inAppNotificationService.Initialize(GlobalInfoBar);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        // Set HotkeyCollectPage as the default selected item
-        ViewModel.SelectedItem = ViewModel.NavigationService.GetSelectedItem(typeof(RegexCollectPage));
+        // Set default selected item only when no page has been navigated yet.
+        if (ViewModel.NavigationService.Frame?.Content == null)
+        {
+            ViewModel.SelectedItem = ViewModel.NavigationService.GetSelectedItem(typeof(RegexCollectPage));
+        }
     }
 
     private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
@@ -46,17 +48,11 @@ public sealed partial class ShellPage : Page
         };
     }
 
-    // These methods are now effectively handled by InAppNotificationService directly
-    // public void ShowInAppNotification(string titleKey, string messageKey, InfoBarSeverity severity = InfoBarSeverity.Informational, params object[]? messageArgs)
-    // {
-    // GlobalInfoBar.Title = LocalizationHelper.GetLocalizedString(titleKey);
-    // GlobalInfoBar.Message = LocalizationHelper.GetLocalizedString(messageKey, messageArgs ?? System.Array.Empty<object>());
-    // GlobalInfoBar.Severity = severity;
-    // GlobalInfoBar.IsOpen = true;
-    // }
-
-    // public void HideInAppNotification()
-    // {
-    // GlobalInfoBar.IsOpen = false;
-    // }
+    public void RefreshLocalizedTexts()
+    {
+        AppTitleBarText.Text = LocalizationHelper.GetLocalizedString("AppDisplayName");
+        HotkeysPageItem.Content = LocalizationHelper.GetLocalizedString("Shell_RegexExpressions.Content");
+        OCRPageItem.Content = LocalizationHelper.GetLocalizedString("Shell_OCR.Content");
+        SettingsPageItem.Content = LocalizationHelper.GetLocalizedString("Shell_Settings.Content");
+    }
 }

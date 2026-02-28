@@ -8,6 +8,7 @@ using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Services;
+using Delete_Newline.Views;
 
 namespace Delete_Newline.ViewModels;
 
@@ -15,6 +16,7 @@ public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly ILocalizationService _localizationService;
+    private readonly INavigationService _navigationService;
     private readonly IFilePickerService _filePickerService;
     private readonly SettingsFileService _localSettingsService;
     private readonly InAppNotificationService _inAppNotificationService;
@@ -46,14 +48,15 @@ public partial class SettingsViewModel : ObservableRecipient
 
     public SettingsViewModel(ILocalizationService localizationService, 
         IThemeSelectorService themeSelectorService,
+        INavigationService navigationService,
         IFilePickerService filePickerService,
-        NotificationService notificationService,
         InAppNotificationService inAppNotificationService,
         SettingsFileService localSettingsService,
         TopMostService topMostService)
     {
         _localizationService = localizationService;
         _themeSelectorService = themeSelectorService;
+        _navigationService = navigationService;
         _inAppNotificationService = inAppNotificationService;
         _localSettingsService = localSettingsService;
         _filePickerService = filePickerService;
@@ -101,14 +104,20 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand]
     private async Task SwitchLanguageAsync(LanguageItem param)
     {
-        if (param is not null)
-        {
-            _inAppNotificationService.ShowInAppNotification(
-                "Notification_LanguageChanged_Title", 
-                "Notification_LanguageChanged_Message_RestartRequired",
-                InfoBarSeverity.Warning);
-            await _localizationService.SetLanguage(param);
-        }
+        if (param is null)
+            return;
+
+        if (param.Tag == _localizationService.GetCurrentLanguageItem().Tag)
+            return;
+
+        await _localizationService.SetLanguage(param);
+        VersionDescription = GetVersionDescription();
+        RefreshCurrentUiLanguage();
+
+        _inAppNotificationService.ShowInAppNotification(
+            "Notification_LanguageChanged_Title", 
+            "Notification_LanguageChanged_Message_Applied",
+            InfoBarSeverity.Success);
     }
 
     [RelayCommand]
@@ -281,5 +290,17 @@ public partial class SettingsViewModel : ObservableRecipient
         }
 
         return $"{LocalizationHelper.GetLocalizedString("AppDisplayName")} {version.Major}.{version.Minor}.{version.Build}";
+    }
+
+    private void RefreshCurrentUiLanguage()
+    {
+        if (App.MainWindow.Content is ShellPage shellPage)
+        {
+            shellPage.RefreshLocalizedTexts();
+        }
+
+        // Rebuild only the current settings page to refresh all x:Uid resources
+        // without recreating the whole shell/navigation view.
+        _navigationService.NavigateTo(typeof(SettingsViewModel).FullName!, Guid.NewGuid().ToString(), clearNavigation: true);
     }
 }

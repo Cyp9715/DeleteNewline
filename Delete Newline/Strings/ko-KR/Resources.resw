@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -219,6 +219,9 @@
   <data name="Notification_LanguageChanged_Message_RestartRequired" xml:space="preserve">
     <value>언어 변경사항을 완전히 적용하려면 애플리케이션을 즉시 다시 시작하세요.(트레이에서 우클릭하여 재시작)</value>
   </data>
+  <data name="Notification_LanguageChanged_Message_Applied" xml:space="preserve">
+    <value>언어 변경이 즉시 적용되었습니다.</value>
+  </data>
   <data name="Notification_SettingsImported_Success_Title" xml:space="preserve">
     <value>설정 가져오기 성공</value>
   </data>
@@ -317,6 +320,10 @@
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
     <value>단축키</value>
     <comment>OCR 페이지 단축키 입력 라벨</comment>
+  </data>
+  <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
+    <value>단축키를 입력하세요...</value>
+    <comment>OCR 페이지 단축키 텍스트박스 자리표시자</comment>
   </data>
   <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
     <value>언어 설정</value>

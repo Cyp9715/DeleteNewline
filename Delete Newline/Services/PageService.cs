@@ -55,12 +55,4 @@ public sealed class PageService : IPageService
             _pages.Add(key, type);
         }
     }
-
-    public string? GetPageKey(Type pageType)
-    {
-        lock (_pages)
-        {
-            return _pages.FirstOrDefault(pair => pair.Value == pageType).Key;
-        }
-    }
 }

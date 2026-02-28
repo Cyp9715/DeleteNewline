@@ -50,6 +50,7 @@
 
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem x:Uid="Shell_Settings"
+                                    x:Name="SettingsPageItem"
                                     helpers:NavigationHelper.NavigateTo="Delete_Newline.ViewModels.SettingsViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"

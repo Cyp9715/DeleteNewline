@@ -42,9 +42,6 @@ public sealed class NavigationService : INavigationService
 
     [MemberNotNullWhen(true, nameof(Frame), nameof(_frame))]
     public bool CanGoBack => Frame != null && Frame.CanGoBack;
-    
-    public IList<object>? MenuItems => _navigationView?.MenuItems;
-    public object? SettingsItem => _navigationView?.SettingsItem;
 
     public NavigationService(IPageService pageService)
     {
@@ -57,15 +54,6 @@ public sealed class NavigationService : INavigationService
         _navigationView = navigationView;
         _navigationView.BackRequested += OnBackRequested;
         _navigationView.ItemInvoked += OnItemInvoked;
-    }
-    
-    public void UnregisterNavigationViewEvents()
-    {
-        if (_navigationView != null)
-        {
-            _navigationView.BackRequested -= OnBackRequested;
-            _navigationView.ItemInvoked -= OnItemInvoked;
-        }
     }
     
     public NavigationViewItem? GetSelectedItem(Type pageType)
@@ -95,6 +83,42 @@ public sealed class NavigationService : INavigationService
         }
         return null;
     }
+
+    private NavigationViewItem? FindMenuItemByContent(IEnumerable<object> menuItems, object? content)
+    {
+        foreach (var item in menuItems.OfType<NavigationViewItem>())
+        {
+            if (Equals(item.Content, content))
+            {
+                return item;
+            }
+
+            var child = FindMenuItemByContent(item.MenuItems, content);
+            if (child != null)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private NavigationViewItem? ResolveInvokedItem(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    {
+        if (args.InvokedItemContainer is NavigationViewItem invokedContainer)
+        {
+            return invokedContainer;
+        }
+
+        if (sender.SelectedItem is NavigationViewItem selectedItem)
+        {
+            return selectedItem;
+        }
+
+        // Fallback for cases where InvokedItemContainer is null after runtime shell/localization refresh.
+        return FindMenuItemByContent(sender.MenuItems, args.InvokedItem)
+               ?? FindMenuItemByContent(sender.FooterMenuItems, args.InvokedItem);
+    }
     
     private bool IsMenuItemForPageType(NavigationViewItem menuItem, Type sourcePageType)
     {
@@ -112,14 +136,13 @@ public sealed class NavigationService : INavigationService
         if (args.IsSettingsInvoked)
         {
             NavigateTo(typeof(SettingsViewModel).FullName!);
+            return;
         }
-        else
+
+        var selectedItem = ResolveInvokedItem(sender, args);
+        if (selectedItem?.GetValue(NavigationHelper.NavigateToProperty) is string pageKey)
         {
-            var selectedItem = args.InvokedItemContainer as NavigationViewItem;
-            if (selectedItem?.GetValue(NavigationHelper.NavigateToProperty) is string pageKey)
-            {
-                NavigateTo(pageKey);
-            }
+            NavigateTo(pageKey);
         }
     }
 
@@ -184,7 +207,7 @@ public sealed class NavigationService : INavigationService
     {
         if (sender is Frame frame)
         {
-            var clearNavigation = (bool)frame.Tag;
+            var clearNavigation = frame.Tag is bool shouldClear && shouldClear;
             if (clearNavigation)
             {
                 frame.BackStack.Clear();
