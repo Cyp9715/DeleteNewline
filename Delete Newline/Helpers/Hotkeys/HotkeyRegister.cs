@@ -58,7 +58,7 @@ public static class HotkeyRegister
 
     private static Win32Modifiers MapVirtualModifiersToWin32(VirtualKeyModifiers virtualModifiers)
     {
-        Win32Modifiers win32Modifiers = Win32Modifiers.None;
+        Win32Modifiers win32Modifiers = Win32Modifiers.MOD_NOREPEAT;
 
         if (virtualModifiers.HasFlag(VirtualKeyModifiers.Control))
             win32Modifiers |= Win32Modifiers.MOD_CONTROL;
@@ -110,7 +110,6 @@ public static class HotkeyRegister
         else
         {
             int errorCode = Marshal.GetLastWin32Error();
-            Debug.WriteLine($"This may be an intended error.");
             Debug.WriteLine($"UnregisterHotkey failed with error code: {errorCode}, ID: {hotkeyId}, _hwnd: {_hwnd}");
         }
 
@@ -154,7 +153,6 @@ public static class HotkeyRegister
     {
         return _registeredHotkeys[type].Contains(hotkey);
     }
-
 
     public static bool IsHotkeyRegisteredGlobally((VirtualKeyModifiers, VirtualKey) hotkey)
     {

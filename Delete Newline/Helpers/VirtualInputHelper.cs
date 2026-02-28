@@ -1,8 +1,7 @@
 using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
-// using System.Threading; // No longer needed directly in this file if STA thread and its sleep are gone
-using static Delete_Newline.Helpers.NativeMethods; // User added this, will use it.
+using System.Threading;
+using static Delete_Newline.Helpers.NativeMethods;
 
 namespace Delete_Newline.Helpers
 {
@@ -13,8 +12,6 @@ namespace Delete_Newline.Helpers
         // dwFlags for KEYBDINPUT
         internal const int KEYEVENTF_EXTENDEDKEY = 0x0001;
         internal const int KEYEVENTF_KEYUP = 0x0002;
-        internal const int KEYEVENTF_SCANCODE = 0x0008;
-        // internal const int KEYEVENTF_UNICODE = 0x0004; // Not used for Ctrl+C
 
         // Virtual Key Codes
         internal const short VK_LCONTROL = 0xA2;
@@ -23,6 +20,8 @@ namespace Delete_Newline.Helpers
         internal const short VK_RSHIFT = 0xA1;
         internal const short VK_LMENU = 0xA4; // Left Alt
         internal const short VK_RMENU = 0xA5; // Right Alt
+        internal const short VK_LWIN = 0x5B;
+        internal const short VK_RWIN = 0x5C;
         internal const short VK_C = 0x43;
 
         [StructLayout(LayoutKind.Sequential)]
@@ -37,8 +36,7 @@ namespace Delete_Newline.Helpers
         {
             [FieldOffset(0)]
             internal KEYBDINPUT ki;
-            // Other members (mi, hi) are not strictly needed for this keyboard-only helper
-            // but kept for struct size if an array of INPUTs were to be mixed.
+            // Keep full union shape to preserve native INPUT struct size.
             [FieldOffset(0)]
             internal MOUSEINPUT mi;
             [FieldOffset(0)]
@@ -50,8 +48,8 @@ namespace Delete_Newline.Helpers
         {
             internal short wVk;
             internal short wScan;
-            internal int dwFlags; // Changed from uint to int
-            internal int time;    // Changed from uint to int
+            internal int dwFlags;
+            internal int time;
             internal IntPtr dwExtraInfo;
         }
 
@@ -64,34 +62,25 @@ namespace Delete_Newline.Helpers
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
-
-        // Overload for single input, to match old code's SendInput(1, ref ki, ...) style if needed,
-        // but using an array of 1 is also fine with the above.
-        // For direct use:
-        // [DllImport("user32.dll", SetLastError = true)]
-        // internal static extern uint SendInput(uint nInputs, ref INPUT pInput, int cbSize);
-
-        [DllImport("user32.dll")]
-        internal static extern short MapVirtualKey(short uCode, uint uMapType); // Changed first param to short
-        // uMapType: 0 (MAPVK_VK_TO_VSC) or 2 (MAPVK_VSC_TO_VK_EX) for extended, etc.
-        // For Ctrl+C, uMapType = 0 is typically used.
-        internal const uint MAPVK_VK_TO_VSC = 0x00;
     }
 
     public static class VirtualInputHelper
     {
-        private static void SendKeyInput(short virtualKey, bool press, bool isExtended)
+        private static readonly int InputSize = Marshal.SizeOf<INPUT>();
+        private static int _isSendingCtrlC;
+
+        private static INPUT CreateKeyboardInput(short virtualKey, bool isKeyUp, bool isExtended = false)
         {
-            INPUT input = new INPUT { type = INPUT_KEYBOARD };
-            input.U.ki.wVk = virtualKey;
-            input.U.ki.wScan = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
-            
-            int flags = 0;
-            if (input.U.ki.wScan > 0)
+            INPUT input = new INPUT
             {
-                flags |= KEYEVENTF_SCANCODE;
-            }
-            if (!press)
+                type = INPUT_KEYBOARD
+            };
+
+            input.U.ki.wVk = virtualKey;
+            input.U.ki.wScan = 0;
+
+            int flags = 0;
+            if (isKeyUp)
             {
                 flags |= KEYEVENTF_KEYUP;
             }
@@ -103,34 +92,85 @@ namespace Delete_Newline.Helpers
             input.U.ki.time = 0;
             input.U.ki.dwExtraInfo = IntPtr.Zero;
 
-            INPUT[] inputs = new INPUT[] { input };
-            if (SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT))) == 0)
+            return input;
+        }
+
+        private static INPUT[] CreateModifierReleaseInputs()
+        {
+            return new INPUT[]
             {
-                System.Diagnostics.Debug.WriteLine($"SendKeyInput for VK {virtualKey:X} failed with error code: {Marshal.GetLastWin32Error()}");
+                CreateKeyboardInput(VK_LCONTROL, true),
+                CreateKeyboardInput(VK_RCONTROL, true, isExtended: true),
+                CreateKeyboardInput(VK_LSHIFT, true),
+                CreateKeyboardInput(VK_RSHIFT, true),
+                CreateKeyboardInput(VK_LMENU, true),
+                CreateKeyboardInput(VK_RMENU, true, isExtended: true),
+                CreateKeyboardInput(VK_LWIN, true, isExtended: true),
+                CreateKeyboardInput(VK_RWIN, true, isExtended: true),
+            };
+        }
+
+        private static bool SendInputs(INPUT[] inputs, string actionName)
+        {
+            uint sent = SendInput((uint)inputs.Length, inputs, InputSize);
+            if (sent != inputs.Length)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"{actionName} SendInput mismatch: expected={inputs.Length}, actual={sent}, error={Marshal.GetLastWin32Error()}");
+                return false;
             }
+
+            return true;
         }
 
-        private static void ResetStuckKeys()
+        private static void ForceReleaseModifierKeys()
         {
-            System.Diagnostics.Debug.WriteLine("Reset modifier keys...");
-            SendKeyInput(VK_LCONTROL, false, false);
-            SendKeyInput(VK_LSHIFT,   false, false);
-            SendKeyInput(VK_LMENU,    false, false);
-            SendKeyInput(VK_RCONTROL, false, true);
-            SendKeyInput(VK_RSHIFT,   false, true);
-            SendKeyInput(VK_RMENU,    false, true);
+            _ = SendInputs(CreateModifierReleaseInputs(), "ForceReleaseModifierKeys");
         }
 
-        public static void SendCtrlC()
+        public static bool SendCtrlC()
         {
-            System.Diagnostics.Debug.WriteLine("Executing SendCtrlC...");
+            if (Interlocked.Exchange(ref _isSendingCtrlC, 1) == 1)
+            {
+                System.Diagnostics.Debug.WriteLine("SendCtrlC skipped: operation already in progress.");
+                return false;
+            }
 
-            ResetStuckKeys(); 
+            try
+            {
+                INPUT[] releaseInputs = CreateModifierReleaseInputs();
+                INPUT[] ctrlCInputs =
+                {
+                    CreateKeyboardInput(VK_LCONTROL, false),
+                    CreateKeyboardInput(VK_C, false),
+                    CreateKeyboardInput(VK_C, true),
+                    CreateKeyboardInput(VK_LCONTROL, true),
+                };
 
-            SendKeyInput(VK_LCONTROL, true,  false); // Press Left Control
-            SendKeyInput(VK_C,        true,  false); // Press C
-            SendKeyInput(VK_C,        false, false); // Release C
-            SendKeyInput(VK_LCONTROL, false, false); // Release Left Control
+                // WM_HOTKEY can be raised while user modifiers are still physically down (e.g. Alt+F1).
+                // Release modifiers and send Ctrl+C as one contiguous input batch.
+                INPUT[] inputs = new INPUT[releaseInputs.Length + ctrlCInputs.Length];
+                Array.Copy(releaseInputs, 0, inputs, 0, releaseInputs.Length);
+                Array.Copy(ctrlCInputs, 0, inputs, releaseInputs.Length, ctrlCInputs.Length);
+
+                bool success = SendInputs(inputs, "SendCtrlC");
+                if (!success)
+                {
+                    ForceReleaseModifierKeys();
+                }
+
+                return success;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"SendCtrlC failed with exception: {ex.Message}");
+                ForceReleaseModifierKeys();
+                return false;
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _isSendingCtrlC, 0);
+            }
         }
     }
 } 
