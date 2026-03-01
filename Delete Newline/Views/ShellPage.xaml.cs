@@ -51,8 +51,19 @@ public sealed partial class ShellPage : Page
     public void RefreshLocalizedTexts()
     {
         AppTitleBarText.Text = LocalizationHelper.GetLocalizedString("AppDisplayName");
-        HotkeysPageItem.Content = LocalizationHelper.GetLocalizedString("Shell_RegexExpressions.Content");
-        OCRPageItem.Content = LocalizationHelper.GetLocalizedString("Shell_OCR.Content");
-        SettingsPageItem.Content = LocalizationHelper.GetLocalizedString("Shell_Settings.Content");
+        SetNavigationItemContent(HotkeysPageItem, "Shell_RegexExpressions/Content");
+        SetNavigationItemContent(OCRPageItem, "Shell_OCR/Content");
+        SetNavigationItemContent(SettingsPageItem, "Shell_Settings/Content");
+    }
+
+    private static void SetNavigationItemContent(NavigationViewItem item, string resourceKey)
+    {
+        string localized = LocalizationHelper.GetLocalizedString(resourceKey);
+
+        // Guard against exposing resource keys in the UI when a lookup fails.
+        if (string.IsNullOrWhiteSpace(localized) == false && localized != resourceKey)
+        {
+            item.Content = localized;
+        }
     }
 }
