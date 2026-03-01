@@ -63,6 +63,7 @@
                         <Grid Margin="5,5,0,0">
                             <TextBlock x:Uid="RegexPage_Label_HotkeyInput" VerticalAlignment="Center"/>
                             <TextBox x:Name="TextBox_Hotkey"
+                                     x:Uid="HotkeyInput_Placeholder"
                                      Width="335"
                                      TextAlignment="Center"
                                      HorizontalAlignment="Right"

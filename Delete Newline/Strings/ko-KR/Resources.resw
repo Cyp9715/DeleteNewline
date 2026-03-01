@@ -321,9 +321,9 @@
     <value>단축키</value>
     <comment>OCR 페이지 단축키 입력 라벨</comment>
   </data>
-  <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
+  <data name="HotkeyInput_Placeholder.PlaceholderText" xml:space="preserve">
     <value>단축키를 입력하세요...</value>
-    <comment>OCR 페이지 단축키 텍스트박스 자리표시자</comment>
+    <comment>공통 단축키 텍스트박스 자리표시자</comment>
   </data>
   <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
     <value>언어 설정</value>

@@ -320,9 +320,9 @@
     <value>Hotkey</value>
     <comment>OCR page hotkey input label</comment>
   </data>
-  <data name="OCRPage_Placeholder_Hotkey.PlaceholderText" xml:space="preserve">
+  <data name="HotkeyInput_Placeholder.PlaceholderText" xml:space="preserve">
     <value>Press shortcut keys...</value>
-    <comment>OCR page hotkey textbox placeholder</comment>
+    <comment>Shared hotkey textbox placeholder</comment>
   </data>
   <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
     <value>Language Settings</value>
