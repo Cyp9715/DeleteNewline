@@ -7,9 +7,15 @@ namespace Delete_Newline.Services;
 
 public class ClipboardMonitorService
 {
+    private const int ClipboardReadAttempts = 6;
+    private static readonly TimeSpan ClipboardReadRetryDelay = TimeSpan.FromMilliseconds(150);
+    private static readonly TimeSpan ClipboardReadTimeout = TimeSpan.FromMilliseconds(750);
+
     private readonly RegexService _regexService;
     private readonly NotificationService _notificationService;
     private readonly RegexCollectSaveService _regexCollectSaveService;
+    private readonly SemaphoreSlim _processingLock = new(1, 1);
+    private bool _isMonitoring;
 
     public ClipboardMonitorService(RegexService regexService, NotificationService notificationService, RegexCollectSaveService regexCollectSaveService)
     {
@@ -20,9 +26,15 @@ public class ClipboardMonitorService
 
     public void StartMonitoring()
     {
+        if (_isMonitoring)
+        {
+            return;
+        }
+
         try
         {
             Clipboard.ContentChanged += OnClipboardContentChanged;
+            _isMonitoring = true;
             Debug.WriteLine("[ClipboardMonitorService] Clipboard monitoring started.");
         }
         catch (Exception ex)
@@ -33,61 +45,106 @@ public class ClipboardMonitorService
 
     public void StopMonitoring()
     {
-        Clipboard.ContentChanged -= OnClipboardContentChanged;
-        Debug.WriteLine("[ClipboardMonitorService] Clipboard monitoring stopped.");
-    }
-
-    private void OnClipboardContentChanged(object? sender, object e)
-    {
-        // Check if there's content and if it's text.
-        DataPackageView dataPackageView = Clipboard.GetContent();
-        if (dataPackageView.Contains(StandardDataFormats.Text) == false)
+        if (_isMonitoring == false)
         {
-            Debug.WriteLine("[ClipboardMonitorService] is not text");
             return;
         }
 
-        string beforeText = string.Empty;
+        Clipboard.ContentChanged -= OnClipboardContentChanged;
+        _isMonitoring = false;
+        Debug.WriteLine("[ClipboardMonitorService] Clipboard monitoring stopped.");
+    }
+
+    public void RestartMonitoring()
+    {
+        StopMonitoring();
+        StartMonitoring();
+    }
+
+    private async void OnClipboardContentChanged(object? sender, object e)
+    {
+        if (App.TryConsumeActiveHotkeyIdForCopy(out int triggeredHotkeyId) == false)
+        {
+            Debug.WriteLine("[ClipboardMonitorService] Clipboard change ignored because no hotkey is pending.");
+            return;
+        }
+
+        string? beforeText = null;
+        bool lockAcquired = false;
         try
         {
-            beforeText = dataPackageView.GetTextAsync().GetAwaiter().GetResult();
-            string afterText;
-
-            // Check if a hotkey triggered this clipboard change
-            int? triggeredHotkeyId = App.ActiveHotkeyIdForCopy;
-            if (triggeredHotkeyId.HasValue)
+            await _processingLock.WaitAsync();
+            lockAcquired = true;
+            beforeText = await TryReadClipboardTextAsync();
+            if (beforeText == null)
             {
-                App.ActiveHotkeyIdForCopy = null; // Reset immediately
-                Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId.Value}. Applying regex rules.");
-                afterText = _regexService.ApplyRegexRules(beforeText, triggeredHotkeyId.Value);
-
-                if (!string.IsNullOrEmpty(afterText))
-                {
-                    if (beforeText != afterText)
-                    {
-                        // Text was modified
-                        UpdateClipboardContent(afterText, triggeredHotkeyId, true);
-                    }
-                    else
-                    {
-                        // Text was not modified - no matching rules
-                        UpdateClipboardContent(afterText, triggeredHotkeyId, false);
-                    }
-                }
+                Debug.WriteLine($"[ClipboardMonitorService] Clipboard text read timed out for Hotkey ID: {triggeredHotkeyId}.");
+                return;
             }
-            else
+
+            Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId}. Applying regex rules.");
+            string afterText = _regexService.ApplyRegexRules(beforeText, triggeredHotkeyId);
+
+            if (string.IsNullOrEmpty(afterText) == false)
             {
-                Debug.WriteLine("[ClipboardMonitorService] General clipboard change. No regex processing.");
-                afterText = beforeText;
+                if (beforeText != afterText)
+                {
+                    // Text was modified
+                    UpdateClipboardContent(afterText, triggeredHotkeyId, true);
+                }
+                else
+                {
+                    // Text was not modified - no matching rules
+                    UpdateClipboardContent(afterText, triggeredHotkeyId, false);
+                }
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content. Raw text snippet was '{beforeText.Substring(0, Math.Min(beforeText.Length,50))}...': {ex.Message}");
+            string snippet = beforeText == null ? string.Empty : beforeText.Substring(0, Math.Min(beforeText.Length, 50));
+            Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content. Raw text snippet was '{snippet}...': {ex.Message}");
+        }
+        finally
+        {
+            if (lockAcquired)
+            {
+                _processingLock.Release();
+            }
         }
     }
 
-    private void UpdateClipboardContent(string text, int? triggeredHotkeyId, bool wasModified)
+    private async Task<string?> TryReadClipboardTextAsync()
+    {
+        for (int attempt = 0; attempt < ClipboardReadAttempts; attempt++)
+        {
+            try
+            {
+                DataPackageView dataPackageView = Clipboard.GetContent();
+                if (dataPackageView.Contains(StandardDataFormats.Text) == false)
+                {
+                    Debug.WriteLine("[ClipboardMonitorService] Clipboard content is not text yet.");
+                }
+                else
+                {
+                    return await dataPackageView.GetTextAsync().AsTask().WaitAsync(ClipboardReadTimeout);
+                }
+            }
+            catch (TimeoutException)
+            {
+                Debug.WriteLine($"[ClipboardMonitorService] Timed out while reading clipboard text on attempt {attempt + 1}.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ClipboardMonitorService] Clipboard read attempt {attempt + 1} failed: {ex.Message}");
+            }
+
+            await Task.Delay(ClipboardReadRetryDelay);
+        }
+
+        return null;
+    }
+
+    private void UpdateClipboardContent(string text, int triggeredHotkeyId, bool wasModified)
     {
         var dataPackage = new DataPackage();
         dataPackage.SetText(text);
@@ -96,11 +153,11 @@ public class ClipboardMonitorService
         {
             Clipboard.SetContent(dataPackage);
 
-            if (triggeredHotkeyId.HasValue && _notificationService.GetEnableNotification())
+            if (_notificationService.GetEnableNotification())
             {
                 if (wasModified)
                 {
-                    ShowModifiedNotification(triggeredHotkeyId.Value);
+                    ShowModifiedNotification(triggeredHotkeyId);
                 }
                 else
                 {

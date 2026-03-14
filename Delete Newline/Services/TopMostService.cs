@@ -16,8 +16,13 @@ public class TopMostService
         if (storedSetting.HasValue)
         {
             EnableTopMost = storedSetting.Value;
-            SetWindowTopMost(App.MainWindow, EnableTopMost);
+            ReapplyWindowTopMost();
         }
+    }
+
+    public void ReapplyWindowTopMost()
+    {
+        SetWindowTopMost(App.MainWindow, EnableTopMost);
     }
 
     public void SetWindowTopMost(Window window, bool topMost)

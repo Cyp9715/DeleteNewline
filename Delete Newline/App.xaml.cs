@@ -11,6 +11,7 @@ using Delete_Newline.ViewModels;
 using Delete_Newline.Views;
 
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Delete_Newline;
 
@@ -20,8 +21,8 @@ public partial class App : Application
     private const string MutexName = "Cyp:DeleteNewlineMutex";
     private const string WindowTitle = "Delete Newline";
 
-    // State for currently triggered hotkey expecting a copy action
-    public static int? ActiveHotkeyIdForCopy { get; set; }
+    private const int NoPendingHotkeyId = -1;
+    private static int _pendingHotkeyIdForCopy = NoPendingHotkeyId;
 
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -59,6 +60,29 @@ public partial class App : Application
         }
 
         return service;
+    }
+
+    public static void SetActiveHotkeyIdForCopy(int hotkeyId)
+    {
+        Interlocked.Exchange(ref _pendingHotkeyIdForCopy, hotkeyId);
+    }
+
+    public static bool TryConsumeActiveHotkeyIdForCopy(out int hotkeyId)
+    {
+        int consumedHotkeyId = Interlocked.Exchange(ref _pendingHotkeyIdForCopy, NoPendingHotkeyId);
+        if (consumedHotkeyId == NoPendingHotkeyId)
+        {
+            hotkeyId = NoPendingHotkeyId;
+            return false;
+        }
+
+        hotkeyId = consumedHotkeyId;
+        return true;
+    }
+
+    public static void ClearActiveHotkeyIdForCopy()
+    {
+        Interlocked.Exchange(ref _pendingHotkeyIdForCopy, NoPendingHotkeyId);
     }
 
     public App()
@@ -121,6 +145,7 @@ public partial class App : Application
                 services.AddSingleton<TrayIconService>();
                 services.AddSingleton<TopMostService>();
                 services.AddSingleton<InAppNotificationService>();
+                services.AddSingleton<ResumeRecoveryService>();
 
                 // Add RegexService
                 services.AddSingleton<RegexService>();

@@ -28,6 +28,9 @@ public sealed class TrayIconService
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr LoadImage(IntPtr hInstance, string lpszName, uint uType, int cxDesired, int cyDesired, uint fuLoad);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool DestroyIcon(IntPtr hIcon);
+
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     public static extern bool Shell_NotifyIcon(uint dwMessage, in NOTIFYICONDATA lpData);
 
@@ -42,6 +45,7 @@ public sealed class TrayIconService
     private const uint LR_LOADFROMFILE = 0x00000010;
 
     private IntPtr _hwnd;
+    private IntPtr _iconHandle;
 
     // sync notification
     private readonly NotificationService _notificationService;
@@ -86,9 +90,12 @@ public sealed class TrayIconService
             uID = 1,
             uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE,
             uCallbackMessage = WM_TRAYICON,
-            hIcon = LoadIcon(),
             szTip = LocalizationHelper.GetLocalizedString("TrayIcon_Title")
         };
+
+        ReleaseIconHandle();
+        _iconHandle = LoadIcon();
+        nid.hIcon = _iconHandle;
 
         bool success = Shell_NotifyIcon(NIM_ADD, nid);
         if (success == false)
@@ -108,6 +115,18 @@ public sealed class TrayIconService
         };
 
         Shell_NotifyIcon(NIM_DELETE, nid);
+        ReleaseIconHandle();
+    }
+
+    public void RefreshTrayIcon()
+    {
+        if (_hwnd == IntPtr.Zero)
+        {
+            return;
+        }
+
+        RemoveTrayIcon();
+        AddTrayIcon();
     }
 
 
@@ -161,5 +180,16 @@ public sealed class TrayIconService
 
         TrackPopupMenuEx(hMenu, 0, pt.X, pt.Y, _hwnd, IntPtr.Zero);
         DestroyMenu(hMenu);
+    }
+
+    private void ReleaseIconHandle()
+    {
+        if (_iconHandle == IntPtr.Zero)
+        {
+            return;
+        }
+
+        DestroyIcon(_iconHandle);
+        _iconHandle = IntPtr.Zero;
     }
 }

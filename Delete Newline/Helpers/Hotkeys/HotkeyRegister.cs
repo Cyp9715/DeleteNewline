@@ -48,12 +48,19 @@ public static class HotkeyRegister
         {
             _registeredHotkeys[type] = new HashSet<(VirtualKeyModifiers, VirtualKey)>();
         }
+    }
 
-        if (MainWindow.hwnd != nint.Zero)
-            _hwnd = MainWindow.hwnd;
-        else
-            // If hwnd is not set, we need to ensure it's initialized properly
+    private static void EnsureWindowHandle()
+    {
+        if (MainWindow.hwnd == nint.Zero)
+        {
             throw new InvalidOperationException("MainWindow hwnd is not initialized. Ensure MainWindow is created before using HotkeyRegister.");
+        }
+
+        if (_hwnd != MainWindow.hwnd)
+        {
+            _hwnd = MainWindow.hwnd;
+        }
     }
 
     private static Win32Modifiers MapVirtualModifiersToWin32(VirtualKeyModifiers virtualModifiers)
@@ -74,6 +81,8 @@ public static class HotkeyRegister
 
     public static bool RegisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type = HotkeyType.Regex)
     {
+        EnsureWindowHandle();
+
         if (IsHotkeyRegistered(hotkey, type))
             return false;
 
@@ -97,6 +106,8 @@ public static class HotkeyRegister
 
     public static void UnregisterHotkey((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type = HotkeyType.Regex)
     {
+        EnsureWindowHandle();
+
         if (!_registeredHotkeys[type].Contains(hotkey))
             return;
 
@@ -124,6 +135,8 @@ public static class HotkeyRegister
 
     public static void DisableAllHotkeys()
     {
+        EnsureWindowHandle();
+
         foreach (var type in _registeredHotkeys.Keys)
         {
             foreach (var hotkey in _registeredHotkeys[type])
@@ -137,6 +150,8 @@ public static class HotkeyRegister
 
     public static void EnableAllHotkeys()
     {
+        EnsureWindowHandle();
+
         foreach (var type in _registeredHotkeys.Keys)
         {
             foreach (var hotkey in _registeredHotkeys[type])
@@ -147,6 +162,32 @@ public static class HotkeyRegister
             }
         }
         Debug.WriteLine("All hotkeys re-enabled");
+    }
+
+    public static void RefreshAllHotkeys()
+    {
+        EnsureWindowHandle();
+
+        foreach (var entry in _registeredHotkeys)
+        {
+            foreach (var hotkey in entry.Value.ToList())
+            {
+                int hotkeyId = HotkeyHasher.GenerateHotkeyHash(hotkey);
+                Win32Modifiers win32Modifiers = MapVirtualModifiersToWin32(hotkey.Item1);
+
+                _ = UnregisterHotKey(_hwnd, hotkeyId);
+                bool result = RegisterHotKey(_hwnd, hotkeyId, (uint)win32Modifiers, (uint)hotkey.Item2);
+
+                if (result)
+                {
+                    Debug.WriteLine($"RefreshAllHotkeys succeeded. Type={entry.Key}, ID={hotkeyId}, hwnd={_hwnd}");
+                }
+                else
+                {
+                    Debug.WriteLine($"RefreshAllHotkeys failed. Type={entry.Key}, ID={hotkeyId}, hwnd={_hwnd}, error={Marshal.GetLastWin32Error()}");
+                }
+            }
+        }
     }
 
     public static bool IsHotkeyRegistered((VirtualKeyModifiers, VirtualKey) hotkey, HotkeyType type)
