@@ -95,14 +95,7 @@ Get **Delete Newline** from the Microsoft Store:
 
 ## 🖥️ Requirements
 - Windows 11 (build 26100 or later)
-- WinUI 3 runtime — installed automatically by the Microsoft Store
-
----
-
-## 🛠️ Built With
-
-- **C# / .NET**
-- **WinUI 3** — modern native Windows UI framework
+- .NET 10
 
 ---
 
@@ -112,9 +105,3 @@ Bug reports, feature ideas, and pull requests are welcome.
 
 - 🐛 [Report a bug](https://github.com/Cyp9715/DeleteNewline/issues/new)
 - 💡 [Request a feature](https://github.com/Cyp9715/DeleteNewline/issues/new)
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
