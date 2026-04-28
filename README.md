@@ -2,7 +2,7 @@
 
 [![Microsoft Store](https://img.shields.io/badge/Get_it_from-Microsoft_Store-blue?logo=microsoft)](https://apps.microsoft.com/detail/9nc17sl0vv5s)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11-0078D4)](#-requirements)
+[![Platform](https://img.shields.io/badge/Platform-Windows_11-0078D4)](#-requirements)
 [![Built with](https://img.shields.io/badge/Built_with-WinUI_3-purple)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
 
 > Stop reopening Notepad just to run Find & Replace. Save your regex rules once, assign a hotkey, then: **select → hotkey → paste.** Anywhere.
