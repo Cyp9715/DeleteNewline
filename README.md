@@ -101,7 +101,4 @@ Get **Delete Newline** from the Microsoft Store:
 
 ## 🤝 Contributing
 
-Bug reports, feature ideas, and pull requests are welcome.
-
-- 🐛 [Report a bug](https://github.com/Cyp9715/DeleteNewline/issues/new)
-- 💡 [Request a feature](https://github.com/Cyp9715/DeleteNewline/issues/new)
+Bug reports, feature ideas, and pull requests are welcome. [#](https://github.com/Cyp9715/DeleteNewline/issues)
