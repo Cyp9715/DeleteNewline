@@ -83,11 +83,6 @@ Convert between date formats, normalize separators, fix inconsistent casing — 
 |---|---|---|
 | `(\d{4})-(\d{2})-(\d{2})` | `$2/$3/$1` | `2025-04-28` → `04/28/2025` |
 
-### 🔒 Anonymize logs before sharing
-Replace IP addresses, emails, or user IDs with placeholders before pasting into a bug report or chat.
-
-The principle is the same for all of them: **define once, use forever, anywhere.**
-
 ---
 
 ## 📥 Download
