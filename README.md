@@ -1,36 +1,127 @@
 # Delete Newline
 
-## The Ultimate Hotkey Tool for On-the-Fly Text Transformation.
+[![Microsoft Store](https://img.shields.io/badge/Get_it_from-Microsoft_Store-blue?logo=microsoft)](https://apps.microsoft.com/detail/9nc17sl0vv5s)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11-0078D4)](#-requirements)
+[![Built with](https://img.shields.io/badge/Built_with-WinUI_3-purple)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
 
-Delete Newline elevates your productivity by allowing you to instantly reformat, clean, and modify text from any application. Simply select text anywhere(in your browser, code editor, or document) and press a hotkey. Delete Newline automatically grabs the selected text, processes it through your custom rules, and places the result on your clipboard, ready to be pasted.
+> Stop reopening Notepad just to run Find & Replace. Save your regex rules once, assign a hotkey, then: **select → hotkey → paste.** Anywhere.
 
-It's a seamless workflow designed for developers, editors, and anyone who needs to transform text instantly without the tedious copy-paste-edit cycle.
+**Delete Newline** is a system-wide hotkey tool for instant text transformation. Highlight any text in any application — your browser, code editor, PDF reader, chat window — press a hotkey, and the transformed result lands on your clipboard, ready to paste.
 
-<img width="1071" alt="452765660-4e9354ad-0f77-46bf-a30b-135018f6390c" src="https://github.com/user-attachments/assets/f50d322d-ac33-4383-bb55-cd43c053038d" />
+No more *copy → open editor → paste → find/replace → copy → paste back*. Just one keystroke.
 
-## How It Works
+![Main interface](https://github.com/user-attachments/assets/f50d322d-ac33-4383-bb55-cd43c053038d)
+
+---
+
+## ✨ Features
+
+- 🔗 **Chained regex rules** — apply multiple find/replace patterns in sequence
+- ⌨️ **Multiple hotkey profiles** — bind different rule chains to different shortcuts
+- 🌐 **Works anywhere** — capture selected text from any Windows application
+- 📋 **Auto-clipboard** — transformed text is ready to paste immediately
+- ⚡ **Zero friction** — no GUI popup, no extra clicks, no context switching
+
+---
+
+## 🚀 How It Works
 
 ### ⚙️ One-Time Setup
 
-You first need to teach Delete Newline what you want to do. This setup is only required once per workflow.
+Tell Delete Newline what you want to do. This setup is required only once per workflow.
 
-1. Create a Rule Chain: Inside the app, add one or more Regex rules to define your desired text transformation.
-2. Assign a Hotkey: Assign a unique keyboard shortcut to that specific rule chain.
+1. **Create a rule chain** — add one or more regex rules that define your transformation
+2. **Assign a hotkey** — bind a unique keyboard shortcut to that rule chain
 
-Once your hotkey is set, you're ready for the daily workflow.
+### ⚡ Daily Workflow
 
-### ⚡Daily Workflow
+Once it's set up, the daily flow is dead simple:
 
-Your daily use is elegantly simple and free of extra steps:
+1. **Select** any text (mouse drag or keyboard selection)
+2. **Press** your custom hotkey
+3. **Paste** — the transformed text is on your clipboard, ready to go
 
-1. Select Text: Highlight(mouse drag) any text in any application.
-2. Press Hotkey: Press the custom hotkey you configured.
-3. Paste Result: The transformed text is now on your clipboard, ready to be pasted anywhere.
+![Workflow demo](https://github.com/user-attachments/assets/3e82b981-9132-4b5c-ad44-fc4c62de8891)
 
-![image](https://github.com/user-attachments/assets/3e82b981-9132-4b5c-ad44-fc4c62de8891)
+---
 
-## 📥 How to Download
+## 💡 Use Cases
 
-You can download `Delete Newline` directly from the Microsoft Store.
+A few real-world examples of what you can build with regex chains:
 
-[![Get it from the Microsoft Store](https://img.shields.io/badge/Get_it_from_the-Microsoft_Store-blue.svg)](https://apps.microsoft.com/detail/9nc17sl0vv5s?hl=en-US&gl=US)
+### 📄 Clean up text copied from PDFs
+PDFs frequently break sentences with hard line breaks. Restore the original flow in one keystroke.
+
+| Pattern | Replace with |
+|---|---|
+| `\r\n` | ` ` (single space) |
+
+### 🔗 Strip tracking parameters from URLs
+Remove `utm_*`, `fbclid`, `gclid`, and other junk before sharing a link. This is a great example of **chained rules** — three small rules combine into a robust cleaner:
+
+| # | Pattern | Replace with | What it does |
+|---|---|---|---|
+| 1 | `[?&](utm_[^=]+\|fbclid\|gclid)=[^&]*` | (empty) | Removes each tracking param with its separator |
+| 2 | `^([^?\n]*)&` | `$1?` | Repairs URLs that lost their leading `?` |
+| 3 | `\?$` | (empty) | Trims a bare trailing `?` if all params were tracking |
+
+### 📝 Convert Markdown to plain text
+Chain rules to strip formatting — perfect for pasting into plain-text fields. **Rule order matters**: bold must run before italic, or `**word**` gets mangled into `*word*`.
+
+| # | Pattern | Replace with | What it does |
+|---|---|---|---|
+| 1 | `\*\*(.+?)\*\*` | `$1` | Remove bold |
+| 2 | `\*(.+?)\*` | `$1` | Remove italic (must run after rule 1) |
+| 3 | `\[([^\]]+)\]\([^)]+\)` | `$1` | Convert links to plain text |
+| 4 | `(?m)^#+\s+` | (empty) | Strip heading markers (`#`, `##`, …) |
+
+### 📅 Reformat dates and data on the fly
+Convert between date formats, normalize separators, fix inconsistent casing — without leaving the app you're already in.
+
+| Pattern | Replace with | Result |
+|---|---|---|
+| `(\d{4})-(\d{2})-(\d{2})` | `$2/$3/$1` | `2025-04-28` → `04/28/2025` |
+
+### 🔒 Anonymize logs before sharing
+Replace IP addresses, emails, or user IDs with placeholders before pasting into a bug report or chat.
+
+The principle is the same for all of them: **define once, use forever, anywhere.**
+
+---
+
+## 📥 Download
+
+Get **Delete Newline** from the Microsoft Store:
+
+[![Get it from the Microsoft Store](https://img.shields.io/badge/Get_it_from-Microsoft_Store-blue?logo=microsoft&style=for-the-badge)](https://apps.microsoft.com/detail/9nc17sl0vv5s?hl=en-US&gl=US)
+
+---
+
+## 🖥️ Requirements
+
+- Windows 10, version 1809 (build 17763) or later
+- Windows 11 (recommended)
+- WinUI 3 runtime — installed automatically by the Microsoft Store
+
+---
+
+## 🛠️ Built With
+
+- **C# / .NET**
+- **WinUI 3** — modern native Windows UI framework
+
+---
+
+## 🤝 Contributing
+
+Bug reports, feature ideas, and pull requests are welcome.
+
+- 🐛 [Report a bug](https://github.com/Cyp9715/DeleteNewline/issues/new)
+- 💡 [Request a feature](https://github.com/Cyp9715/DeleteNewline/issues/new)
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
