@@ -76,8 +76,8 @@ Chain rules to strip formatting — perfect for pasting into plain-text fields. 
 | 3 | `\[([^\]]+)\]\([^)]+\)` | `$1` | Convert links to plain text |
 | 4 | `(?m)^#+\s+` | (empty) | Strip heading markers (`#`, `##`, …) |
 
-### 📅 Reformat dates and data on the fly
-Convert between date formats, normalize separators, fix inconsistent casing — without leaving the app you're already in.
+### 📅 Reformat dates on the fly
+Swap date formats without leaving the app you're already in.
 
 | Pattern | Replace with | Result |
 |---|---|---|
