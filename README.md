@@ -94,9 +94,7 @@ Get **Delete Newline** from the Microsoft Store:
 ---
 
 ## 🖥️ Requirements
-
-- Windows 10, version 1809 (build 17763) or later
-- Windows 11 (recommended)
+- Windows 11 (build 26100 or later)
 - WinUI 3 runtime — installed automatically by the Microsoft Store
 
 ---
