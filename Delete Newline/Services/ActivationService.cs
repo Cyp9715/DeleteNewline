@@ -5,6 +5,7 @@ using Delete_Newline.Contracts.Services;
 using Delete_Newline.Views;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.ViewModels;
+using Delete_Newline.Services.Mcp;
 
 namespace Delete_Newline.Services;
 
@@ -22,6 +23,7 @@ public sealed class ActivationService : IActivationService
     private readonly TopMostService _topMostService;
     private readonly TrayIconService _trayIconService;
     private readonly OCRViewModel _ocrViewModel;
+    private readonly McpAccessService _mcpAccessService;
 
     private UIElement? _shell = null;
 
@@ -36,7 +38,8 @@ public sealed class ActivationService : IActivationService
         WndProcService wndProcService,
         TopMostService topMostService,
         TrayIconService trayIconService,
-        OCRViewModel ocrViewModel)
+        OCRViewModel ocrViewModel,
+        McpAccessService mcpAccessService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
@@ -50,6 +53,7 @@ public sealed class ActivationService : IActivationService
         _topMostService = topMostService;
         _trayIconService = trayIconService;
         _ocrViewModel = ocrViewModel;
+        _mcpAccessService = mcpAccessService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -60,7 +64,7 @@ public sealed class ActivationService : IActivationService
             await HandleActivationAsync(activationArgs);
             await InitializeEssentialServicesAsync();
             InitializeWindowDependentServices();
-            InitializeRemainingServices();
+            await InitializeRemainingServicesAsync();
 
             _themeSelectorService.SetRequestedTheme();
         }
@@ -99,12 +103,13 @@ public sealed class ActivationService : IActivationService
         _trayIconService.Initialize(hwnd);
     }
 
-    private void InitializeRemainingServices()
+    private async Task InitializeRemainingServicesAsync()
     {
         _localizationService.Initialize();
         _themeSelectorService.Initialize();
         _topMostService.Initialize();
         _regexCollectSaveService.Initialize();
         _ocrViewModel.Initialize();
+        await _mcpAccessService.InitializeAsync();
     }
 }

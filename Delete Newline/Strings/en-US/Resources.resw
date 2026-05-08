@@ -144,6 +144,9 @@
   <data name="Settings_Notification.Text" xml:space="preserve">
     <value>Notification</value>
   </data>
+  <data name="Settings_McpServer.Text" xml:space="preserve">
+    <value>MCP Server</value>
+  </data>
   <data name="Settings_TopMost.Text" xml:space="preserve">
     <value>Always on Top</value>
   </data>
@@ -161,6 +164,12 @@
   </data>
   <data name="Settings_Notification_Description.Text" xml:space="preserve">
     <value>Shows Windows notifications when hotkey-triggered regex and OCR tasks complete.</value>
+  </data>
+  <data name="Settings_McpServer_Description.Text" xml:space="preserve">
+    <value>Lets local LLM tools read and edit app settings via MCP. Turn off to block access.</value>
+  </data>
+  <data name="Settings_McpServer_Port.Text" xml:space="preserve">
+    <value>Port</value>
   </data>
   <data name="Settings_TopMost_Description.Text" xml:space="preserve">
     <value>Keeps the application window on top of other windows.</value>
@@ -228,6 +237,9 @@
   <data name="Notification_SettingsImported_Success_Message_RestartRequired" xml:space="preserve">
     <value>Settings have been successfully imported. Please restart the application immediately to apply all changes. (Right-click the icon in the tray to restart)</value>
   </data>
+  <data name="Notification_SettingsImported_Success_Message_Applied" xml:space="preserve">
+    <value>Settings have been successfully imported and applied immediately.</value>
+  </data>
   <data name="Notification_SettingsImport_Error_Title" xml:space="preserve">
     <value>Import Failed</value>
   </data>
@@ -249,6 +261,12 @@
   <data name="Notification_SettingsExport_Error_General_Message" xml:space="preserve">
     <value>An unexpected error occurred while exporting settings.</value>
   </data>
+  <data name="Notification_McpServer_Error_Title" xml:space="preserve">
+    <value>MCP Server Error</value>
+  </data>
+  <data name="Notification_McpServer_Error_Message" xml:space="preserve">
+    <value>Failed to change MCP server state or port. Check whether another application is already using the configured port.</value>
+  </data>
   <data name="AppDisplayName" xml:space="preserve">
     <value>Delete Newline</value>
   </data>
@@ -257,6 +275,9 @@
   </data>
   <data name="TrayIcon_Menu_Notification" xml:space="preserve">
     <value>Notification</value>
+  </data>
+  <data name="TrayIcon_Menu_McpServer" xml:space="preserve">
+    <value>MCP Server</value>
   </data>
   <data name="TrayIcon_Menu_Exit" xml:space="preserve">
     <value>Exit Delete Newline</value>

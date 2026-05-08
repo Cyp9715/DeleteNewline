@@ -7,6 +7,7 @@ using Delete_Newline.Contracts.Services;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Core.Services;
 using Delete_Newline.Services;
+using Delete_Newline.Services.Mcp;
 using Delete_Newline.ViewModels;
 using Delete_Newline.Views;
 
@@ -139,6 +140,7 @@ public partial class App : Application
 
                 // Services, not need Interface.
                 services.AddSingleton<SettingsFileService>();
+                services.AddSingleton<SettingsImportApplyService>();
                 services.AddSingleton<RegexCollectSaveService>();
                 services.AddSingleton<WndProcService>();
                 services.AddSingleton<NotificationService>();
@@ -146,6 +148,14 @@ public partial class App : Application
                 services.AddSingleton<TopMostService>();
                 services.AddSingleton<InAppNotificationService>();
                 services.AddSingleton<ResumeRecoveryService>();
+
+                // MCP Services
+                services.AddSingleton<McpAccessService>();
+                services.AddSingleton<LocalMcpHttpServerService>();
+                services.AddSingleton<IMcpRegexConfigurationRepository, RegexCollectMcpConfigurationRepository>();
+                services.AddSingleton<IMcpSettingsRepository, AppMcpSettingsRepository>();
+                services.AddSingleton<IMcpOcrConfigurationRepository, OcrMcpConfigurationRepository>();
+                services.AddSingleton<DeleteNewlineMcpToolService>();
 
                 // Add RegexService
                 services.AddSingleton<RegexService>();

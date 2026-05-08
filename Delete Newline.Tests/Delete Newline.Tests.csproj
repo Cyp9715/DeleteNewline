@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.26100.0</TargetPlatformMinVersion>
+    <WindowsSdkPackageVersion>10.0.26100.84</WindowsSdkPackageVersion>
+    <RootNamespace>Delete_Newline.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <AppxPackage>false</AppxPackage>
+    <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
+    <AppxGeneratePrisForPortableLibrariesEnabled>false</AppxGeneratePrisForPortableLibrariesEnabled>
+    <IncludeProjectPriFile>false</IncludeProjectPriFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Delete Newline\Contracts\Structures\HotkeyStructure.cs" Link="Linked\Contracts\Structures\HotkeyStructure.cs" />
+    <Compile Include="..\Delete Newline\Contracts\Structures\RegexChainStructure.cs" Link="Linked\Contracts\Structures\RegexChainStructure.cs" />
+    <Compile Include="..\Delete Newline\Contracts\Structures\RegexPageStructure.cs" Link="Linked\Contracts\Structures\RegexPageStructure.cs" />
+    <Compile Include="..\Delete Newline\Helpers\Hotkeys\HotkeyFomatter.cs" Link="Linked\Helpers\HotkeyFomatter.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\DeleteNewlineMcpToolService.cs" Link="Linked\Services\Mcp\DeleteNewlineMcpToolService.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\IMcpOcrConfigurationRepository.cs" Link="Linked\Services\Mcp\IMcpOcrConfigurationRepository.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\IMcpRegexConfigurationRepository.cs" Link="Linked\Services\Mcp\IMcpRegexConfigurationRepository.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\IMcpSettingsRepository.cs" Link="Linked\Services\Mcp\IMcpSettingsRepository.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\InMemoryMcpSettingsRepository.cs" Link="Linked\Services\Mcp\InMemoryMcpSettingsRepository.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\InMemoryMcpOcrConfigurationRepository.cs" Link="Linked\Services\Mcp\InMemoryMcpOcrConfigurationRepository.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\InMemoryRegexConfigurationRepository.cs" Link="Linked\Services\Mcp\InMemoryRegexConfigurationRepository.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\LocalMcpHttpServerService.cs" Link="Linked\Services\Mcp\LocalMcpHttpServerService.cs" />
+    <Compile Include="..\Delete Newline\Services\SettingsImportApplyService.cs" Link="Linked\Services\SettingsImportApplyService.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\McpPortPolicy.cs" Link="Linked\Services\Mcp\McpPortPolicy.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\McpToolDescriptor.cs" Link="Linked\Services\Mcp\McpToolDescriptor.cs" />
+    <Compile Include="..\Delete Newline\Services\Mcp\McpToolResult.cs" Link="Linked\Services\Mcp\McpToolResult.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

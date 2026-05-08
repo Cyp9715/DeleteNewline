@@ -35,7 +35,7 @@
                             
                             <StackPanel Grid.Column="1"
                                         VerticalAlignment="Top">
-                                <TextBlock Text="{Binding Hotkey, Mode=OneWay}"
+                                <TextBlock Text="{Binding Hotkey.DisplayText, Mode=OneWay}"
                                            FontWeight="SemiBold"
                                            FontSize="12"
                                            HorizontalAlignment="Right"

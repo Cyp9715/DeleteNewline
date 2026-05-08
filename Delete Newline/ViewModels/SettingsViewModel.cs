@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Diagnostics;
 using Windows.ApplicationModel;
 using Microsoft.UI.Xaml;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -8,6 +9,7 @@ using Delete_Newline.Contracts.Services;
 using Delete_Newline.Helpers;
 using Delete_Newline.Core.Contracts.Services;
 using Delete_Newline.Services;
+using Delete_Newline.Services.Mcp;
 using Delete_Newline.Views;
 
 namespace Delete_Newline.ViewModels;
@@ -21,6 +23,8 @@ public partial class SettingsViewModel : ObservableRecipient
     private readonly SettingsFileService _localSettingsService;
     private readonly InAppNotificationService _inAppNotificationService;
     private readonly TopMostService _topMostService;
+    private readonly McpAccessService _mcpAccessService;
+    private readonly SettingsImportApplyService _settingsImportApplyService;
 
     [ObservableProperty]
     private string _versionDescription;
@@ -46,13 +50,24 @@ public partial class SettingsViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _enableStartupTask;
 
+    [ObservableProperty]
+    private bool _enableMcpServer;
+
+    [ObservableProperty]
+    private double _mcpPort;
+
+    [ObservableProperty]
+    private bool _isMcpPortEditable;
+
     public SettingsViewModel(ILocalizationService localizationService, 
         IThemeSelectorService themeSelectorService,
         INavigationService navigationService,
         IFilePickerService filePickerService,
         InAppNotificationService inAppNotificationService,
         SettingsFileService localSettingsService,
-        TopMostService topMostService)
+        TopMostService topMostService,
+        McpAccessService mcpAccessService,
+        SettingsImportApplyService settingsImportApplyService)
     {
         _localizationService = localizationService;
         _themeSelectorService = themeSelectorService;
@@ -61,6 +76,8 @@ public partial class SettingsViewModel : ObservableRecipient
         _localSettingsService = localSettingsService;
         _filePickerService = filePickerService;
         _topMostService = topMostService;
+        _mcpAccessService = mcpAccessService;
+        _settingsImportApplyService = settingsImportApplyService;
 
         AvailableLanguages = _localizationService.Languages;
         SelectedLanguage = _localizationService.GetCurrentLanguageItem();
@@ -69,11 +86,16 @@ public partial class SettingsViewModel : ObservableRecipient
         EnableNotification = App.GetService<NotificationService>().GetEnableNotification();
         EnableTopMost = _topMostService.EnableTopMost;
         EnableStartOnTray = _localSettingsService.ReadSetting<bool>(DefaultStartOnTray);
+        EnableMcpServer = _mcpAccessService.GetEnableMcp();
+        IsMcpPortEditable = !EnableMcpServer;
+        McpPort = _mcpAccessService.GetPort();
 
         // Load initial startup task state
         InitializeStartupTaskStateAsync();
 
         App.GetService<NotificationService>().EnableNotificationChanged += OnNotificationEnabledChanged!;
+        _mcpAccessService.EnableMcpChanged += OnMcpEnabledChanged!;
+        _mcpAccessService.McpPortChanged += OnMcpPortChanged!;
     }
 
     protected override void OnActivated()
@@ -90,6 +112,37 @@ public partial class SettingsViewModel : ObservableRecipient
     private void OnNotificationEnabledChanged(object sender, bool isEnabled)
     {
         EnableNotification = isEnabled;
+    }
+
+    private void OnMcpEnabledChanged(object sender, bool isEnabled)
+    {
+        var dispatcherQueue = App.MainWindow.DispatcherQueue;
+        if (dispatcherQueue.HasThreadAccess)
+        {
+            EnableMcpServer = isEnabled;
+        }
+        else
+        {
+            dispatcherQueue.TryEnqueue(() => EnableMcpServer = isEnabled);
+        }
+    }
+
+    private void OnMcpPortChanged(object sender, int port)
+    {
+        var dispatcherQueue = App.MainWindow.DispatcherQueue;
+        if (dispatcherQueue.HasThreadAccess)
+        {
+            McpPort = port;
+        }
+        else
+        {
+            dispatcherQueue.TryEnqueue(() => McpPort = port);
+        }
+    }
+
+    partial void OnEnableMcpServerChanged(bool value)
+    {
+        IsMcpPortEditable = !value;
     }
 
     [RelayCommand]
@@ -124,6 +177,99 @@ public partial class SettingsViewModel : ObservableRecipient
     private async Task ToggleNotificationAsync(bool isChecked)
     {
         await App.GetService<NotificationService>().SetEnableNotificationAsync(isChecked);
+    }
+
+    [RelayCommand]
+    private async Task ToggleMcpServerAsync(bool isChecked)
+    {
+        try
+        {
+            if (isChecked && !await TryChangeMcpPortAsync(McpPort))
+            {
+                EnableMcpServer = _mcpAccessService.GetEnableMcp();
+                return;
+            }
+
+            await _mcpAccessService.SetEnableMcpAsync(isChecked);
+        }
+        catch (Exception)
+        {
+            EnableMcpServer = _mcpAccessService.GetEnableMcp();
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_McpServer_Error_Title",
+                "Notification_McpServer_Error_Message",
+                InfoBarSeverity.Error);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ChangeMcpPortAsync(double value)
+    {
+        await TryChangeMcpPortAsync(value);
+    }
+
+    private async Task<bool> TryChangeMcpPortAsync(double value)
+    {
+        if (_mcpAccessService.GetEnableMcp())
+        {
+            int currentPort = _mcpAccessService.GetPort();
+            McpPort = currentPort;
+            if (TryGetWholePort(value, out int requestedPort) && requestedPort == currentPort)
+            {
+                return true;
+            }
+
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_McpServer_Error_Title",
+                "Notification_McpServer_Error_Message",
+                InfoBarSeverity.Error);
+            return false;
+        }
+
+        if (!TryGetWholePort(value, out int port) || !McpPortPolicy.IsValidPort(port))
+        {
+            McpPort = _mcpAccessService.GetPort();
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_McpServer_Error_Title",
+                "Notification_McpServer_Error_Message",
+                InfoBarSeverity.Error);
+            return false;
+        }
+
+        try
+        {
+            await _mcpAccessService.SetPortAsync(port);
+            McpPort = _mcpAccessService.GetPort();
+            return true;
+        }
+        catch (Exception)
+        {
+            McpPort = _mcpAccessService.GetPort();
+            EnableMcpServer = _mcpAccessService.GetEnableMcp();
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_McpServer_Error_Title",
+                "Notification_McpServer_Error_Message",
+                InfoBarSeverity.Error);
+            return false;
+        }
+    }
+
+    private static bool TryGetWholePort(double value, out int port)
+    {
+        port = default;
+        if (double.IsNaN(value) || double.IsInfinity(value))
+        {
+            return false;
+        }
+
+        double rounded = Math.Round(value);
+        if (Math.Abs(value - rounded) > double.Epsilon || rounded < int.MinValue || rounded > int.MaxValue)
+        {
+            return false;
+        }
+
+        port = (int)rounded;
+        return true;
     }
 
     [RelayCommand]
@@ -245,10 +391,30 @@ public partial class SettingsViewModel : ObservableRecipient
         string? importFilePath = await _filePickerService.PickOpenFileAsync();
         if (!string.IsNullOrEmpty(importFilePath))
         {
+            IReadOnlyDictionary<string, Newtonsoft.Json.Linq.JToken> previousSettings = _localSettingsService.GetAllSettingsSnapshot();
             var success = await _localSettingsService.ImportSettingsAsync(importFilePath);
             if (success)
             {
-                _inAppNotificationService.ShowInAppNotification("Notification_SettingsImported_Success_Title", "Notification_SettingsImported_Success_Message_RestartRequired", InfoBarSeverity.Success);
+                try
+                {
+                    await _settingsImportApplyService.ApplyAsync(_localSettingsService.GetAllSettingsSnapshot());
+                    _inAppNotificationService.ShowInAppNotification("Notification_SettingsImported_Success_Title", "Notification_SettingsImported_Success_Message_Applied", InfoBarSeverity.Success);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error applying imported settings: {ex}");
+                    await _localSettingsService.ReplaceSettingsAsync(previousSettings);
+                    try
+                    {
+                        await _settingsImportApplyService.ApplyAsync(previousSettings);
+                    }
+                    catch (Exception rollbackEx)
+                    {
+                        Debug.WriteLine($"Error rolling back imported settings: {rollbackEx}");
+                    }
+
+                    _inAppNotificationService.ShowInAppNotification("Notification_SettingsImport_Error_Title", "Notification_SettingsImport_Error_General_Message", InfoBarSeverity.Error);
+                }
             }
             else
             {

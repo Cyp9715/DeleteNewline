@@ -85,6 +85,18 @@ public sealed class SettingsFileService
         await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json).ConfigureAwait(false);
     }
 
+    public IReadOnlyDictionary<string, JToken> GetAllSettingsSnapshot()
+    {
+        return new Dictionary<string, JToken>(_settings);
+    }
+
+    public async Task ReplaceSettingsAsync(IReadOnlyDictionary<string, JToken> settings)
+    {
+        _settings = new Dictionary<string, JToken>(settings);
+        var json = JsonConvert.SerializeObject(_settings, Formatting.Indented);
+        await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json).ConfigureAwait(false);
+    }
+
     public async Task<bool> ExportSettingsAsync(string exportFilePath)
     {
         try

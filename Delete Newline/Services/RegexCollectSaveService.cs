@@ -19,6 +19,7 @@ public sealed class RegexCollectSaveService
 
     private const string RegexCollectionSettingsKey = "RegexCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
+    private bool _suppressAutoSave;
 
     public RegexCollectSaveService(SettingsFileService localSettingsService, 
                                     InAppNotificationService inAppNotificationService)
@@ -108,8 +109,56 @@ public sealed class RegexCollectSaveService
         }
     }
 
+    public void ReplaceRegexConfigs(IReadOnlyList<RegexPageStructure> configs)
+    {
+        _suppressAutoSave = true;
+        try
+        {
+            foreach (RegexPageStructure existing in RegexConfigs.ToList())
+            {
+                Unsubscribe(existing);
+                if (existing.Hotkey.Modifiers != VirtualKeyModifiers.None && existing.Hotkey.Key != VirtualKey.None)
+                {
+                    HotkeyRegister.UnregisterHotkey((existing.Hotkey.Modifiers, existing.Hotkey.Key));
+                }
+            }
+
+            RegexConfigs.Clear();
+
+            List<string> failedHotkeyStrings = [];
+            foreach (RegexPageStructure config in configs)
+            {
+                config.IsRegistrationFailed = false;
+                RegexConfigs.Add(config);
+                Subscribe(config);
+
+                if (config.Hotkey.Modifiers == VirtualKeyModifiers.None || config.Hotkey.Key == VirtualKey.None)
+                {
+                    continue;
+                }
+
+                if (HotkeyRegister.RegisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key)) == false)
+                {
+                    config.IsRegistrationFailed = true;
+                    failedHotkeyStrings.Add(config.Hotkey.ToString());
+                }
+            }
+
+            ShowFailedRegistrationNotification(failedHotkeyStrings);
+        }
+        finally
+        {
+            _suppressAutoSave = false;
+        }
+    }
+
     private async void OnRegexConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        if (_suppressAutoSave)
+        {
+            return;
+        }
+
         if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
         {
             foreach (RegexPageStructure config in e.NewItems)

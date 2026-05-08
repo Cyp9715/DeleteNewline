@@ -252,6 +252,76 @@
                         </ToggleSwitch>
                     </Grid>
                 </Border>
+
+                <!-- MCP Server Setting -->
+                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="0,0,0,5"
+                        Padding="15">
+                    <Grid VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
+                            <TextBlock x:Uid="Settings_McpServer"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap" />
+                            <TextBlock x:Uid="Settings_McpServer_Description"
+                                       Opacity="0.6"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Spacing="12"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right">
+                            <TextBlock x:Uid="Settings_McpServer_Port"
+                                       VerticalAlignment="Center"
+                                       Opacity="0.8" />
+                            <NumberBox x:Name="McpPortNumberBox"
+                                       Width="68"
+                                       MinWidth="68"
+                                       Minimum="1"
+                                       Maximum="65535"
+                                       SmallChange="1"
+                                       LargeChange="100"
+                                       SpinButtonPlacementMode="Hidden"
+                                       ValidationMode="Disabled"
+                                       IsEnabled="{x:Bind ViewModel.IsMcpPortEditable, Mode=OneWay}"
+                                       Value="{x:Bind ViewModel.McpPort, Mode=TwoWay}"
+                                       VerticalAlignment="Center">
+                                <behaviors:Interaction.Behaviors>
+                                    <core:EventTriggerBehavior EventName="TextSubmitted">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.ChangeMcpPortCommand}"
+                                                                  CommandParameter="{Binding Value, ElementName=McpPortNumberBox}" />
+                                    </core:EventTriggerBehavior>
+                                    <core:EventTriggerBehavior EventName="LostFocus">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.ChangeMcpPortCommand}"
+                                                                  CommandParameter="{Binding Value, ElementName=McpPortNumberBox}" />
+                                    </core:EventTriggerBehavior>
+                                </behaviors:Interaction.Behaviors>
+                            </NumberBox>
+                            <ToggleSwitch x:Name="McpServerToggleSwitch"
+                                          IsOn="{x:Bind ViewModel.EnableMcpServer, Mode=TwoWay}"
+                                          Style="{StaticResource CompactToggleSwitch}"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Right">
+                                <behaviors:Interaction.Behaviors>
+                                    <core:EventTriggerBehavior EventName="Toggled">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.ToggleMcpServerCommand}"
+                                                                  CommandParameter="{Binding IsOn, ElementName=McpServerToggleSwitch}" />
+                                    </core:EventTriggerBehavior>
+                                </behaviors:Interaction.Behaviors>
+                            </ToggleSwitch>
+                        </StackPanel>
+                    </Grid>
+                </Border>
             </StackPanel>
 
             <!-- bottom dynamic layout -->

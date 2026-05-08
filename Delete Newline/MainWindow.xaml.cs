@@ -1,4 +1,5 @@
 using Delete_Newline.Services;
+using Delete_Newline.Services.Mcp;
 using Delete_Newline.ViewModels;
 using Microsoft.UI.Dispatching;
 using System.Runtime.InteropServices;
@@ -132,6 +133,18 @@ public sealed partial class MainWindow : WindowEx
                     case TrayIconService.ID_NOTIFICATION:
                         var notificationService = App.GetService<NotificationService>();
                         await notificationService.SetEnableNotificationAsync(!notificationService.GetEnableNotification());
+                        break;
+
+                    case TrayIconService.ID_MCP_SERVER:
+                        var mcpAccessService = App.GetService<McpAccessService>();
+                        try
+                        {
+                            await mcpAccessService.SetEnableMcpAsync(!mcpAccessService.GetEnableMcp());
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Failed to toggle MCP server from tray: {ex}");
+                        }
                         break;
                 }
                 break;

@@ -1,4 +1,5 @@
 using Delete_Newline.Helpers;
+using Delete_Newline.Services.Mcp;
 using System.Runtime.InteropServices;
 namespace Delete_Newline.Services;
 
@@ -49,10 +50,12 @@ public sealed class TrayIconService
 
     // sync notification
     private readonly NotificationService _notificationService;
+    private readonly McpAccessService _mcpAccessService;
 
-    public TrayIconService(NotificationService notificationService)
+    public TrayIconService(NotificationService notificationService, McpAccessService mcpAccessService)
     {
         _notificationService = notificationService;
+        _mcpAccessService = mcpAccessService;
     }
 
     public void Initialize(IntPtr hwnd)
@@ -164,6 +167,7 @@ public sealed class TrayIconService
 
     public const int ID_EXIT = 1;
     public const int ID_NOTIFICATION = 2;
+    public const int ID_MCP_SERVER = 3;
 
     public void ShowContextMenu()
     {
@@ -172,6 +176,10 @@ public sealed class TrayIconService
         // Add Notification Menu
         uint notificationFlags = MF_STRING | (_notificationService.GetEnableNotification() ? MF_CHECKED : 0);
         AppendMenu(hMenu, notificationFlags, (IntPtr)ID_NOTIFICATION, LocalizationHelper.GetLocalizedString("TrayIcon_Menu_Notification"));
+
+        // Add MCP Server Menu
+        uint mcpFlags = MF_STRING | (_mcpAccessService.GetEnableMcp() ? MF_CHECKED : 0);
+        AppendMenu(hMenu, mcpFlags, (IntPtr)ID_MCP_SERVER, LocalizationHelper.GetLocalizedString("TrayIcon_Menu_McpServer"));
 
         AppendMenu(hMenu, 0, (IntPtr)ID_EXIT, LocalizationHelper.GetLocalizedString("TrayIcon_Menu_Exit"));
 

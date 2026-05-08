@@ -21,8 +21,8 @@ public partial class OCRViewModel : ObservableRecipient
     private readonly SettingsFileService _settingsService;
 
     // Settings keys
-    private const string OcrHotkeyKey = "OCR_Hotkey";
-    private const string OcrLanguageTagKey = "OCR_LanguageTag";
+    public const string OcrHotkeySettingsKey = "OCR_Hotkey";
+    public const string OcrLanguageTagSettingsKey = "OCR_LanguageTag";
 
     [ObservableProperty]
     private Language? _selectedLanguage;
@@ -35,10 +35,95 @@ public partial class OCRViewModel : ObservableRecipient
 
     // Allow only one OCR capture window/session at a time.
     private int _ocrSessionActive;
+    private bool _suppressLanguageAutoSave;
     private OcrCaptureWindow? _activeOcrWindow;
 
     // OCR dedicated hotkey settings
     private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
+
+    public IReadOnlyList<string> AvailableLanguageTags => AvailableLanguages.Select(language => language.LanguageTag).ToArray();
+
+    public string? CurrentLanguageTag => SelectedLanguage?.LanguageTag;
+
+    public HotkeyStructure CurrentHotkey => new()
+    {
+        Modifiers = _ocrHotkey.Modifiers,
+        Key = _ocrHotkey.Key
+    };
+
+    public async Task SetOcrSettingsAsync(string? languageTag, HotkeyStructure? hotkey)
+    {
+        if (!string.IsNullOrWhiteSpace(languageTag))
+        {
+            Language? language = AvailableLanguages.FirstOrDefault(item => item.LanguageTag.Equals(languageTag, StringComparison.OrdinalIgnoreCase));
+            if (language == null)
+            {
+                string supported = string.Join(", ", AvailableLanguages.Select(item => item.LanguageTag));
+                throw new ArgumentException($"Unsupported OCR language '{languageTag}'. Supported language tags: {supported}.");
+            }
+
+            _suppressLanguageAutoSave = true;
+            try
+            {
+                SelectedLanguage = language;
+            }
+            finally
+            {
+                _suppressLanguageAutoSave = false;
+            }
+
+            await SaveOcrLanguageAsync();
+        }
+
+        if (hotkey != null)
+        {
+            await SetOcrHotkeyAsync(hotkey);
+        }
+    }
+
+    private async Task SetOcrHotkeyAsync(HotkeyStructure hotkey)
+    {
+        var newHotkey = (hotkey.Modifiers, hotkey.Key);
+        var oldHotkey = (_ocrHotkey.Modifiers, _ocrHotkey.Key);
+
+        if (newHotkey == oldHotkey)
+        {
+            await SaveOcrHotkeyAsync();
+            return;
+        }
+
+        if (oldHotkey.Key != VirtualKey.None)
+        {
+            HotkeyRegister.UnregisterHotkey(oldHotkey, HotkeyType.Ocr);
+        }
+
+        try
+        {
+            if (HotkeyRegister.IsHotkeyRegisteredGlobally(newHotkey))
+            {
+                throw new InvalidOperationException($"Hotkey '{hotkey}' is already registered.");
+            }
+
+            if (newHotkey.Key != VirtualKey.None && HotkeyRegister.RegisterHotkey(newHotkey, HotkeyType.Ocr) == false)
+            {
+                throw new InvalidOperationException($"Failed to register OCR hotkey '{hotkey}'.");
+            }
+
+            _ocrHotkey.Modifiers = newHotkey.Modifiers;
+            _ocrHotkey.Key = newHotkey.Key;
+            await SaveOcrHotkeyAsync();
+        }
+        catch
+        {
+            if (oldHotkey.Key != VirtualKey.None)
+            {
+                HotkeyRegister.RegisterHotkey(oldHotkey, HotkeyType.Ocr);
+            }
+
+            UpdateDisplayHotkey();
+            throw;
+        }
+    }
 
     public OCRViewModel(
         InAppNotificationService notificationService,
@@ -52,7 +137,7 @@ public partial class OCRViewModel : ObservableRecipient
     public void Initialize()
     {
         // Load OCR hotkey
-        var savedHotkey = _settingsService.ReadSetting<HotkeyStructure>(OcrHotkeyKey);
+        var savedHotkey = _settingsService.ReadSetting<HotkeyStructure>(OcrHotkeySettingsKey);
 
         if (savedHotkey != null)
         {
@@ -74,7 +159,7 @@ public partial class OCRViewModel : ObservableRecipient
 
     private void LoadSavedLanguage()
     {
-        var savedLanguageTag = _settingsService.ReadSetting<string>(OcrLanguageTagKey);
+        var savedLanguageTag = _settingsService.ReadSetting<string>(OcrLanguageTagSettingsKey);
 
         if (!string.IsNullOrEmpty(savedLanguageTag))
         {
@@ -111,7 +196,7 @@ public partial class OCRViewModel : ObservableRecipient
     {
         try
         {
-            await _settingsService.SaveSettingAsync(OcrHotkeyKey, _ocrHotkey);
+            await _settingsService.SaveSettingAsync(OcrHotkeySettingsKey, _ocrHotkey);
             // Update display after saving
             UpdateDisplayHotkey();
         }
@@ -127,7 +212,7 @@ public partial class OCRViewModel : ObservableRecipient
         {
             try
             {
-                await _settingsService.SaveSettingAsync(OcrLanguageTagKey, SelectedLanguage.LanguageTag);
+                await _settingsService.SaveSettingAsync(OcrLanguageTagSettingsKey, SelectedLanguage.LanguageTag);
             }
             catch (Exception ex)
             {
@@ -139,7 +224,7 @@ public partial class OCRViewModel : ObservableRecipient
     // Handle OCR Language changes
     partial void OnSelectedLanguageChanged(Language? value)
     {
-        if (value != null)
+        if (value != null && !_suppressLanguageAutoSave)
         {
             _ = SaveOcrLanguageAsync();
         }
