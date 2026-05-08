@@ -283,10 +283,53 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         Assert.DoesNotContain("EventName=\"ValueChanged\"", mcpPortNumberBoxBlock);
         Assert.Contains("ValidationMode=\"Disabled\"", mcpPortNumberBoxBlock);
-        Assert.Contains("Width=\"68\"", mcpPortNumberBoxBlock);
-        Assert.Contains("MinWidth=\"68\"", mcpPortNumberBoxBlock);
+        Assert.Contains("Width=\"125\"", mcpPortNumberBoxBlock);
+        Assert.Contains("MinWidth=\"125\"", mcpPortNumberBoxBlock);
+        Assert.Contains("PlaceholderText=\"Port\"", mcpPortNumberBoxBlock);
         Assert.Contains("EventName=\"LostFocus\"", mcpPortNumberBoxBlock);
         Assert.Contains("EventName=\"TextSubmitted\"", mcpPortNumberBoxBlock);
+    }
+
+    [Fact]
+    public void SettingsPage_AlignsMcpPortInputWithThemeAndLanguageSelectors()
+    {
+        string settingsPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "SettingsPage.xaml"));
+        string mcpServerBlock = ExtractElementBlock(settingsPageXaml, "<!-- MCP Server Setting -->", "</Border>");
+
+        Assert.Equal(3, CountOccurrences(settingsPageXaml, "<ColumnDefinition Width=\"220\" />"));
+        Assert.DoesNotContain("Settings_McpServer_Port", mcpServerBlock);
+        Assert.Contains("Width=\"220\"", mcpServerBlock);
+        Assert.Contains("HorizontalAlignment=\"Left\"", mcpServerBlock);
+    }
+
+    [Fact]
+    public void McpPortPolicy_DefaultsMcpServerOffAndUsesBlankPortDisplayUntilExplicitlyConfigured()
+    {
+        Assert.False(McpPortPolicy.DefaultEnabled);
+        Assert.True(double.IsNaN(McpPortPolicy.ToDisplayPortValue(McpPortPolicy.DefaultPort, isMcpEnabled: false, hasExplicitPort: false)));
+        Assert.Equal(McpPortPolicy.DefaultPort, McpPortPolicy.ToDisplayPortValue(McpPortPolicy.DefaultPort, isMcpEnabled: true, hasExplicitPort: false));
+        Assert.Equal(McpPortPolicy.DefaultPort, McpPortPolicy.ToDisplayPortValue(McpPortPolicy.DefaultPort, isMcpEnabled: false, hasExplicitPort: true));
+    }
+
+    [Fact]
+    public void RegexCollectPage_AllowsShiftRangeSelectionAndRemovesSelectedItems()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+
+        Assert.Contains("x:Name=\"RegexConfigGridView\"", regexCollectPageXaml);
+        Assert.Contains("SelectionMode=\"Extended\"", regexCollectPageXaml);
+        Assert.Contains("CommandParameter=\"{Binding SelectedItems, ElementName=RegexConfigGridView}\"", regexCollectPageXaml);
+        Assert.Contains("RightTapped=\"RegexConfigCard_RightTapped\"", regexCollectPageXaml);
+    }
+
+    [Fact]
+    public void RegexCollectPage_RightClickSelectsUnselectedCardBeforeRemoving()
+    {
+        string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
+
+        Assert.Contains("RegexConfigCard_RightTapped", regexCollectPageCodeBehind);
+        Assert.Contains("RegexConfigGridView.SelectedItems", regexCollectPageCodeBehind);
+        Assert.Contains("SelectedItems.Clear", regexCollectPageCodeBehind);
     }
 
     [Fact]
@@ -494,6 +537,19 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.True(endIndex >= 0, $"Missing end marker: {endMarker}");
 
         return source[startIndex..(endIndex + endMarker.Length)];
+    }
+
+    private static int CountOccurrences(string source, string value)
+    {
+        int count = 0;
+        int index = 0;
+        while ((index = source.IndexOf(value, index, StringComparison.Ordinal)) >= 0)
+        {
+            count++;
+            index += value.Length;
+        }
+
+        return count;
     }
 
     private static int GetFreeTcpPort()

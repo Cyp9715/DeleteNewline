@@ -36,12 +36,31 @@ public partial class RegexCollectViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void RemoveRegex(RegexPageStructure regexConfig)
+    private async Task RemoveRegexAsync(object? parameter)
     {
-        if (regexConfig is not null)
+        IReadOnlyList<RegexPageStructure> targets = GetRemovalTargets(parameter);
+        if (targets.Count > 0)
         {
-            _regexCollectSaveService.RemoveRegexConfig(regexConfig);
+            await _regexCollectSaveService.RemoveRegexConfigsAsync(targets);
         }
+    }
+
+    private static IReadOnlyList<RegexPageStructure> GetRemovalTargets(object? parameter)
+    {
+        if (parameter is RegexPageStructure regexConfig)
+        {
+            return [regexConfig];
+        }
+
+        if (parameter is System.Collections.IEnumerable selectedItems)
+        {
+            return selectedItems
+                .OfType<RegexPageStructure>()
+                .Distinct()
+                .ToArray();
+        }
+
+        return [];
     }
 
     [RelayCommand]

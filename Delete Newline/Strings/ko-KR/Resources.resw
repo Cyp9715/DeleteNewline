@@ -168,9 +168,6 @@
   <data name="Settings_McpServer_Description.Text" xml:space="preserve">
     <value>로컬 LLM이 MCP로 앱 설정을 조회/수정하게 합니다. 끄면 접근을 차단합니다.</value>
   </data>
-  <data name="Settings_McpServer_Port.Text" xml:space="preserve">
-    <value>포트</value>
-  </data>
   <data name="Settings_TopMost_Description.Text" xml:space="preserve">
     <value>애플리케이션 창을 다른 창들 위에 유지합니다.</value>
   </data>

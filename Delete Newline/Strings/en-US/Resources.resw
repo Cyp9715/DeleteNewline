@@ -168,9 +168,6 @@
   <data name="Settings_McpServer_Description.Text" xml:space="preserve">
     <value>Lets local LLM tools read and edit app settings via MCP. Turn off to block access.</value>
   </data>
-  <data name="Settings_McpServer_Port.Text" xml:space="preserve">
-    <value>Port</value>
-  </data>
   <data name="Settings_TopMost_Description.Text" xml:space="preserve">
     <value>Keeps the application window on top of other windows.</value>
   </data>

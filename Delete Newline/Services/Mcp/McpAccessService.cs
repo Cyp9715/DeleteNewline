@@ -39,14 +39,13 @@ public sealed class McpAccessService
         else
         {
             _mcpPort = DefaultPort;
-            await _settingsFileService.SaveSettingAsync(McpPortSettingsKey, _mcpPort);
         }
 
         bool? storedSetting = _settingsFileService.ReadSetting<bool?>(McpEnabledSettingsKey);
         if (!storedSetting.HasValue)
         {
-            _enableMcp = false;
-            await _settingsFileService.SaveSettingAsync(McpEnabledSettingsKey, false);
+            _enableMcp = McpPortPolicy.DefaultEnabled;
+            await _settingsFileService.SaveSettingAsync(McpEnabledSettingsKey, McpPortPolicy.DefaultEnabled);
         }
         else
         {

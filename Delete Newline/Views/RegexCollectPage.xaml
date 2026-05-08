@@ -12,8 +12,10 @@
     </Page.Resources>
 
     <Grid>
-        <GridView ItemsSource="{x:Bind ViewModel.RegexConfigs, Mode=OneWay}"
+        <GridView x:Name="RegexConfigGridView"
+                  ItemsSource="{x:Bind ViewModel.RegexConfigs, Mode=OneWay}"
                   Padding="12"
+                  SelectionMode="Extended"
                   CanReorderItems="True"
                   CanDragItems="True"
                   AllowDrop="True">
@@ -26,6 +28,7 @@
                         <Grid Width="310"
                               Height="90"
                               Padding="12"
+                              RightTapped="RegexConfigCard_RightTapped"
                               Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
 
                             <Grid.ColumnDefinitions>
@@ -52,7 +55,7 @@
                                     <MenuFlyoutItem Text="Remove"
                                                     Icon="Delete"
                                                     Command="{Binding DataContext.RemoveRegexCommand, ElementName=RootPage}"
-                                                    CommandParameter="{Binding}">
+                                                    CommandParameter="{Binding SelectedItems, ElementName=RegexConfigGridView}">
                                     </MenuFlyoutItem>
                                 </MenuFlyout>
                             </Grid.ContextFlyout>

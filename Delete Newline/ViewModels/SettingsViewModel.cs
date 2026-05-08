@@ -25,6 +25,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private readonly TopMostService _topMostService;
     private readonly McpAccessService _mcpAccessService;
     private readonly SettingsImportApplyService _settingsImportApplyService;
+    private bool _hasExplicitMcpPortSetting;
 
     [ObservableProperty]
     private string _versionDescription;
@@ -88,7 +89,9 @@ public partial class SettingsViewModel : ObservableRecipient
         EnableStartOnTray = _localSettingsService.ReadSetting<bool>(DefaultStartOnTray);
         EnableMcpServer = _mcpAccessService.GetEnableMcp();
         IsMcpPortEditable = !EnableMcpServer;
-        McpPort = _mcpAccessService.GetPort();
+        int? storedMcpPort = _localSettingsService.ReadSetting<int?>(McpAccessService.McpPortSettingsKey);
+        _hasExplicitMcpPortSetting = storedMcpPort.HasValue && McpPortPolicy.IsValidPort(storedMcpPort.Value);
+        McpPort = GetMcpPortDisplayValue();
 
         // Load initial startup task state
         InitializeStartupTaskStateAsync();
@@ -120,29 +123,39 @@ public partial class SettingsViewModel : ObservableRecipient
         if (dispatcherQueue.HasThreadAccess)
         {
             EnableMcpServer = isEnabled;
+            McpPort = GetMcpPortDisplayValue();
         }
         else
         {
-            dispatcherQueue.TryEnqueue(() => EnableMcpServer = isEnabled);
+            dispatcherQueue.TryEnqueue(() =>
+            {
+                EnableMcpServer = isEnabled;
+                McpPort = GetMcpPortDisplayValue();
+            });
         }
     }
 
     private void OnMcpPortChanged(object sender, int port)
     {
+        _hasExplicitMcpPortSetting = true;
         var dispatcherQueue = App.MainWindow.DispatcherQueue;
         if (dispatcherQueue.HasThreadAccess)
         {
-            McpPort = port;
+            McpPort = GetMcpPortDisplayValue();
         }
         else
         {
-            dispatcherQueue.TryEnqueue(() => McpPort = port);
+            dispatcherQueue.TryEnqueue(() => McpPort = GetMcpPortDisplayValue());
         }
     }
 
     partial void OnEnableMcpServerChanged(bool value)
     {
         IsMcpPortEditable = !value;
+        if (!value && !_hasExplicitMcpPortSetting)
+        {
+            McpPort = GetMcpPortDisplayValue();
+        }
     }
 
     [RelayCommand]
@@ -191,6 +204,8 @@ public partial class SettingsViewModel : ObservableRecipient
             }
 
             await _mcpAccessService.SetEnableMcpAsync(isChecked);
+            EnableMcpServer = _mcpAccessService.GetEnableMcp();
+            McpPort = GetMcpPortDisplayValue();
         }
         catch (Exception)
         {
@@ -210,6 +225,12 @@ public partial class SettingsViewModel : ObservableRecipient
 
     private async Task<bool> TryChangeMcpPortAsync(double value)
     {
+        if (McpPortPolicy.IsBlankDisplayPortValue(value))
+        {
+            McpPort = GetMcpPortDisplayValue();
+            return true;
+        }
+
         if (_mcpAccessService.GetEnableMcp())
         {
             int currentPort = _mcpAccessService.GetPort();
@@ -228,7 +249,7 @@ public partial class SettingsViewModel : ObservableRecipient
 
         if (!TryGetWholePort(value, out int port) || !McpPortPolicy.IsValidPort(port))
         {
-            McpPort = _mcpAccessService.GetPort();
+            McpPort = GetMcpPortDisplayValue();
             _inAppNotificationService.ShowInAppNotification(
                 "Notification_McpServer_Error_Title",
                 "Notification_McpServer_Error_Message",
@@ -239,12 +260,13 @@ public partial class SettingsViewModel : ObservableRecipient
         try
         {
             await _mcpAccessService.SetPortAsync(port);
-            McpPort = _mcpAccessService.GetPort();
+            _hasExplicitMcpPortSetting = true;
+            McpPort = GetMcpPortDisplayValue();
             return true;
         }
         catch (Exception)
         {
-            McpPort = _mcpAccessService.GetPort();
+            McpPort = GetMcpPortDisplayValue();
             EnableMcpServer = _mcpAccessService.GetEnableMcp();
             _inAppNotificationService.ShowInAppNotification(
                 "Notification_McpServer_Error_Title",
@@ -252,6 +274,14 @@ public partial class SettingsViewModel : ObservableRecipient
                 InfoBarSeverity.Error);
             return false;
         }
+    }
+
+    private double GetMcpPortDisplayValue()
+    {
+        return McpPortPolicy.ToDisplayPortValue(
+            _mcpAccessService.GetPort(),
+            _mcpAccessService.GetEnableMcp(),
+            _hasExplicitMcpPortSetting);
     }
 
     private static bool TryGetWholePort(double value, out int port)

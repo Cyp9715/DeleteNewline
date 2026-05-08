@@ -6,6 +6,7 @@ public static class McpPortPolicy
 {
     public const string EnabledSettingsKey = "McpEnabled";
     public const string PortSettingsKey = "McpPort";
+    public const bool DefaultEnabled = false;
     public const int DefaultPort = 39333;
     public const int MinPort = 1;
     public const int MaxPort = 65535;
@@ -66,6 +67,16 @@ public static class McpPortPolicy
             long longValue when longValue is >= MinPort and <= MaxPort => (int)longValue,
             _ => null
         };
+    }
+
+    public static double ToDisplayPortValue(int port, bool isMcpEnabled, bool hasExplicitPort)
+    {
+        return isMcpEnabled || hasExplicitPort ? port : double.NaN;
+    }
+
+    public static bool IsBlankDisplayPortValue(double value)
+    {
+        return double.IsNaN(value);
     }
 
     public static void EnsureCanChangePort(bool isMcpEnabled, int? currentPort, int requestedPort)

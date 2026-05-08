@@ -98,14 +98,54 @@ public sealed class RegexCollectSaveService
 
     public void RemoveRegexConfig(RegexPageStructure config)
     {
-        if (RegexConfigs.Remove(config))
-        {
-            Unsubscribe(config);
+        RemoveRegexConfigCore(config);
+    }
 
-            if (config!.Hotkey!.Modifiers != VirtualKeyModifiers.None && config.Hotkey.Key != VirtualKey.None)
+    public async Task RemoveRegexConfigsAsync(IEnumerable<RegexPageStructure> configs)
+    {
+        RegexPageStructure[] configsToRemove = configs
+            .Where(config => config is not null && RegexConfigs.Contains(config))
+            .Distinct()
+            .ToArray();
+
+        if (configsToRemove.Length == 0)
+        {
+            return;
+        }
+
+        _suppressAutoSave = true;
+        try
+        {
+            foreach (RegexPageStructure config in configsToRemove)
             {
-                HotkeyRegister.UnregisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
+                RemoveRegexConfigCore(config);
             }
+        }
+        finally
+        {
+            _suppressAutoSave = false;
+        }
+
+        await SaveSettingsAsync();
+    }
+
+    private bool RemoveRegexConfigCore(RegexPageStructure config)
+    {
+        if (!RegexConfigs.Remove(config))
+        {
+            return false;
+        }
+
+        Unsubscribe(config);
+        UnregisterHotkey(config);
+        return true;
+    }
+
+    private static void UnregisterHotkey(RegexPageStructure config)
+    {
+        if (config.Hotkey.Modifiers != VirtualKeyModifiers.None && config.Hotkey.Key != VirtualKey.None)
+        {
+            HotkeyRegister.UnregisterHotkey((config.Hotkey.Modifiers, config.Hotkey.Key));
         }
     }
 
