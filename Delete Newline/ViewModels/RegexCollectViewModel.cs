@@ -36,7 +36,12 @@ public partial class RegexCollectViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private async Task RemoveRegexAsync(object? parameter)
+    private Task RemoveRegexAsync(object? parameter)
+    {
+        return RemoveRegexConfigsAsync(parameter);
+    }
+
+    public async Task RemoveRegexConfigsAsync(object? parameter)
     {
         IReadOnlyList<RegexPageStructure> targets = GetRemovalTargets(parameter);
         if (targets.Count > 0)

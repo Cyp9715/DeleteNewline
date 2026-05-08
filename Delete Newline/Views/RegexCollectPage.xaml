@@ -54,8 +54,7 @@
                                 <MenuFlyout>
                                     <MenuFlyoutItem Text="Remove"
                                                     Icon="Delete"
-                                                    Command="{Binding DataContext.RemoveRegexCommand, ElementName=RootPage}"
-                                                    CommandParameter="{Binding SelectedItems, ElementName=RegexConfigGridView}">
+                                                    Click="RemoveRegexMenuFlyoutItem_Click">
                                     </MenuFlyoutItem>
                                 </MenuFlyout>
                             </Grid.ContextFlyout>

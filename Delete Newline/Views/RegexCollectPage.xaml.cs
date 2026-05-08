@@ -35,4 +35,22 @@ public sealed partial class RegexCollectPage : Page
         RegexConfigGridView.SelectedItems.Clear();
         RegexConfigGridView.SelectedItems.Add(regexConfig);
     }
+
+    private async void RemoveRegexMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+    {
+        RegexPageStructure[] selectedRegexConfigs = RegexConfigGridView.SelectedItems
+            .OfType<RegexPageStructure>()
+            .ToArray();
+
+        if (selectedRegexConfigs.Length > 0)
+        {
+            await ViewModel.RemoveRegexConfigsAsync(selectedRegexConfigs);
+            return;
+        }
+
+        if (sender is FrameworkElement { DataContext: RegexPageStructure regexConfig })
+        {
+            await ViewModel.RemoveRegexConfigsAsync(regexConfig);
+        }
+    }
 }

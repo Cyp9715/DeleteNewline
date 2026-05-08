@@ -283,8 +283,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         Assert.DoesNotContain("EventName=\"ValueChanged\"", mcpPortNumberBoxBlock);
         Assert.Contains("ValidationMode=\"Disabled\"", mcpPortNumberBoxBlock);
-        Assert.Contains("Width=\"125\"", mcpPortNumberBoxBlock);
-        Assert.Contains("MinWidth=\"125\"", mcpPortNumberBoxBlock);
+        Assert.Contains("Width=\"68\"", mcpPortNumberBoxBlock);
+        Assert.Contains("MinWidth=\"68\"", mcpPortNumberBoxBlock);
         Assert.Contains("PlaceholderText=\"Port\"", mcpPortNumberBoxBlock);
         Assert.Contains("EventName=\"LostFocus\"", mcpPortNumberBoxBlock);
         Assert.Contains("EventName=\"TextSubmitted\"", mcpPortNumberBoxBlock);
@@ -294,12 +294,19 @@ public sealed class DeleteNewlineMcpToolServiceTests
     public void SettingsPage_AlignsMcpPortInputWithThemeAndLanguageSelectors()
     {
         string settingsPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "SettingsPage.xaml"));
+        string themeBlock = ExtractElementBlock(settingsPageXaml, "<!-- Theme Setting -->", "</Border>");
+        string languageBlock = ExtractElementBlock(settingsPageXaml, "<!-- Language Setting -->", "</Border>");
         string mcpServerBlock = ExtractElementBlock(settingsPageXaml, "<!-- MCP Server Setting -->", "</Border>");
 
-        Assert.Equal(3, CountOccurrences(settingsPageXaml, "<ColumnDefinition Width=\"220\" />"));
+        Assert.Contains("<ColumnDefinition Width=\"Auto\" />", themeBlock);
+        Assert.Contains("<ColumnDefinition Width=\"Auto\" />", languageBlock);
+        Assert.Contains("<ColumnDefinition Width=\"Auto\" />", mcpServerBlock);
+        Assert.Contains("HorizontalAlignment=\"Right\"", themeBlock);
+        Assert.Contains("HorizontalAlignment=\"Right\"", languageBlock);
+        Assert.Contains("HorizontalAlignment=\"Right\"", mcpServerBlock);
         Assert.DoesNotContain("Settings_McpServer_Port", mcpServerBlock);
-        Assert.Contains("Width=\"220\"", mcpServerBlock);
-        Assert.Contains("HorizontalAlignment=\"Left\"", mcpServerBlock);
+        Assert.Contains("Width=\"125\"", mcpServerBlock);
+        Assert.Contains("<ColumnDefinition Width=\"68\" />", mcpServerBlock);
     }
 
     [Fact]
@@ -318,7 +325,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         Assert.Contains("x:Name=\"RegexConfigGridView\"", regexCollectPageXaml);
         Assert.Contains("SelectionMode=\"Extended\"", regexCollectPageXaml);
-        Assert.Contains("CommandParameter=\"{Binding SelectedItems, ElementName=RegexConfigGridView}\"", regexCollectPageXaml);
+        Assert.Contains("Click=\"RemoveRegexMenuFlyoutItem_Click\"", regexCollectPageXaml);
+        Assert.DoesNotContain("CommandParameter=\"{Binding SelectedItems, ElementName=RegexConfigGridView}\"", regexCollectPageXaml);
         Assert.Contains("RightTapped=\"RegexConfigCard_RightTapped\"", regexCollectPageXaml);
     }
 
@@ -328,8 +336,10 @@ public sealed class DeleteNewlineMcpToolServiceTests
         string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
 
         Assert.Contains("RegexConfigCard_RightTapped", regexCollectPageCodeBehind);
+        Assert.Contains("RemoveRegexMenuFlyoutItem_Click", regexCollectPageCodeBehind);
         Assert.Contains("RegexConfigGridView.SelectedItems", regexCollectPageCodeBehind);
         Assert.Contains("SelectedItems.Clear", regexCollectPageCodeBehind);
+        Assert.Contains("await ViewModel.RemoveRegexConfigsAsync", regexCollectPageCodeBehind);
     }
 
     [Fact]
@@ -537,19 +547,6 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.True(endIndex >= 0, $"Missing end marker: {endMarker}");
 
         return source[startIndex..(endIndex + endMarker.Length)];
-    }
-
-    private static int CountOccurrences(string source, string value)
-    {
-        int count = 0;
-        int index = 0;
-        while ((index = source.IndexOf(value, index, StringComparison.Ordinal)) >= 0)
-        {
-            count++;
-            index += value.Length;
-        }
-
-        return count;
     }
 
     private static int GetFreeTcpPort()

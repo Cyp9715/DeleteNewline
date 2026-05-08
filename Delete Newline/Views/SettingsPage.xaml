@@ -100,7 +100,7 @@
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
@@ -120,7 +120,7 @@
                                   SelectedValue="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}"
                                   SelectedValuePath="Tag"
                                   VerticalAlignment="Center"
-                                  HorizontalAlignment="Left">
+                                  HorizontalAlignment="Right">
                             <behaviors:Interaction.Behaviors>
                                 <core:EventTriggerBehavior EventName="SelectionChanged">
                                     <core:InvokeCommandAction Command="{x:Bind ViewModel.SwitchThemeCommand}"
@@ -143,7 +143,7 @@
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
@@ -164,7 +164,7 @@
                                   SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
                                   DisplayMemberPath="DisplayName"
                                   VerticalAlignment="Center"
-                                  HorizontalAlignment="Left">
+                                  HorizontalAlignment="Right">
                             <behaviors:Interaction.Behaviors>
                                 <core:EventTriggerBehavior EventName="SelectionChanged">
                                     <core:InvokeCommandAction Command="{x:Bind ViewModel.SwitchLanguageCommand}"
@@ -262,7 +262,7 @@
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
@@ -276,15 +276,19 @@
                                        Margin="0,4,0,0" />
                         </StackPanel>
 
-                        <StackPanel Grid.Column="1"
-                                    Width="220"
-                                    Orientation="Horizontal"
-                                    Spacing="12"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Left">
+                        <Grid Grid.Column="1"
+                              Width="125"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Right">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="68" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
                             <NumberBox x:Name="McpPortNumberBox"
-                                       Width="125"
-                                       MinWidth="125"
+                                       Grid.Column="0"
+                                       Width="68"
+                                       MinWidth="68"
                                        PlaceholderText="Port"
                                        Minimum="1"
                                        Maximum="65535"
@@ -307,6 +311,7 @@
                                 </behaviors:Interaction.Behaviors>
                             </NumberBox>
                             <ToggleSwitch x:Name="McpServerToggleSwitch"
+                                          Grid.Column="2"
                                           IsOn="{x:Bind ViewModel.EnableMcpServer, Mode=TwoWay}"
                                           Style="{StaticResource CompactToggleSwitch}"
                                           VerticalAlignment="Center"
@@ -318,7 +323,7 @@
                                     </core:EventTriggerBehavior>
                                 </behaviors:Interaction.Behaviors>
                             </ToggleSwitch>
-                        </StackPanel>
+                        </Grid>
                     </Grid>
                 </Border>
             </StackPanel>
