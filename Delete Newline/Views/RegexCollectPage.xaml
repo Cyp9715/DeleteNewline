@@ -54,7 +54,7 @@
                                        Text="{Binding Hotkey.DisplayText, Mode=OneWay}"
                                        FontWeight="SemiBold"
                                        FontSize="12"
-                                       VerticalAlignment="Center"
+                                       VerticalAlignment="Top"
                                        Margin="8,0,0,0"
                                        Foreground="{Binding IsRegistrationFailed, Converter={StaticResource BooleanToFailedBrushConverter}, Mode=OneWay}" />
                                 </Grid>
