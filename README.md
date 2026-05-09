@@ -22,6 +22,7 @@ No more *copy → open editor → paste → find/replace → copy → paste back
 - 🌐 **Works anywhere** — capture selected text from any Windows application
 - 📋 **Auto-clipboard** — transformed text is ready to paste immediately
 - ⚡ **Zero friction** — no GUI popup, no extra clicks, no context switching
+- 🤖 **MCP server built in** — let an AI assistant author, edit, and test your regex profiles for you ([details ↓](#-ai-control-via-mcp))
 
 ---
 
@@ -82,6 +83,41 @@ Swap date formats without leaving the app you're already in.
 | Pattern | Replace with | Result |
 |---|---|---|
 | `(\d{4})-(\d{2})-(\d{2})` | `$2/$3/$1` | `2025-04-28` → `04/28/2025` |
+
+---
+
+## 🤖 AI control via MCP
+
+Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Desktop, MCP Inspector, custom agents, …) and let it manage your regex profiles by conversation:
+
+> *"Make me a hotkey that strips Markdown bold/italic and binds to Ctrl+Shift+M."*
+> *"Test this chain on my last clipboard paste before saving it."*
+> *"Switch OCR to Korean and turn on tray-on-launch."*
+
+The server runs **locally on loopback only** (`127.0.0.1`) — nothing is exposed to the network.
+
+### Available tools
+
+| Tool | Purpose |
+|---|---|
+| `get_regex_profiles` | List every saved regex profile, hotkey, and chain |
+| `upsert_regex_profile` | Create or update a profile (name, comment, hotkey, chain). Saved and re-registered immediately |
+| `delete_regex_profile` | Remove a profile and unregister its hotkey |
+| `test_regex_chain` | Dry-run a chain on input text without touching saved settings |
+| `get_ocr_settings` / `set_ocr_settings` | Read or change OCR language and OCR hotkey |
+| `get_app_settings` / `set_app_setting` | Read or change app preferences (theme, language, notification, top-most, start-on-tray, startup-task, MCP enabled, MCP port) |
+
+### Enable it
+
+1. Open **Settings** in Delete Newline.
+2. Toggle **Enable MCP server** on. (The default port is `39333`; change it while MCP is disabled if you need to.)
+3. Point your client at the endpoint:
+
+   ```
+   http://127.0.0.1:39333/mcp
+   ```
+
+That's it — your assistant can now read and write Delete Newline state through the same surface the GUI uses. Hotkey changes are re-registered the moment they're saved, so transformations are usable on the next keystroke.
 
 ---
 
