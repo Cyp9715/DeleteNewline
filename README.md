@@ -7,7 +7,7 @@
 
 > Stop reopening Notepad just to run Find & Replace. Save your regex rules once, assign a hotkey, then: **select → hotkey → paste.** Anywhere.
 
-**Delete Newline** is a system-wide hotkey tool for instant text transformation. Highlight any text in any application — your browser, code editor, PDF reader, chat window — press a hotkey, and the transformed result lands on your clipboard, ready to paste.
+**Delete Newline** is a system-wide hotkey tool for instant text transformation. Drag-select text in any application, press your hotkey, and the selection is instantly run through your regex rules and pushed to the clipboard - ready to paste. Your browser, code editor, PDF reader, chat window - it doesn't matter where the text lives.
 
 No more *copy → open editor → paste → find/replace → copy → paste back*. Just one keystroke.
 
@@ -17,12 +17,11 @@ No more *copy → open editor → paste → find/replace → copy → paste back
 
 ## ✨ Features
 
-- 🔗 **Chained regex rules** — apply multiple find/replace patterns in sequence
-- ⌨️ **Multiple hotkey profiles** — bind different rule chains to different shortcuts
-- 🌐 **Works anywhere** — capture selected text from any Windows application
-- 📋 **Auto-clipboard** — transformed text is ready to paste immediately
-- ⚡ **Zero friction** — no GUI popup, no extra clicks, no context switching
-- 🤖 **MCP server built in** — let an AI assistant author, edit, and test your regex profiles for you ([details ↓](#-ai-control-via-mcp))
+- 🔗 **Chained regex rules** - apply multiple find/replace patterns in sequence
+- ⌨️ **Multiple hotkey profiles** - bind different rule chains to different shortcuts
+- 🌐 **Works anywhere** - capture selected text from any Windows application
+- 📋 **Auto-clipboard** - transformed text is ready to paste immediately
+- 🤖 **MCP server built in** - let an AI assistant author, edit, and test your regex profiles for you ([details ↓](#-ai-control-via-mcp))
 
 ---
 
@@ -32,8 +31,8 @@ No more *copy → open editor → paste → find/replace → copy → paste back
 
 Tell Delete Newline what you want to do. This setup is required only once per workflow.
 
-1. **Create a rule chain** — add one or more regex rules that define your transformation
-2. **Assign a hotkey** — bind a unique keyboard shortcut to that rule chain
+1. **Create a rule chain** - add one or more regex rules that define your transformation
+2. **Assign a hotkey** - bind a unique keyboard shortcut to that rule chain
 
 ### ⚡ Daily Workflow
 
@@ -41,7 +40,7 @@ Once it's set up, the daily flow is dead simple:
 
 1. **Select** any text (mouse drag or keyboard selection)
 2. **Press** your custom hotkey
-3. **Paste** — the transformed text is on your clipboard, ready to go
+3. **Paste** - the transformed text is on your clipboard, ready to go
 
 ![Workflow demo](https://github.com/user-attachments/assets/3e82b981-9132-4b5c-ad44-fc4c62de8891)
 
@@ -59,7 +58,7 @@ PDFs frequently break sentences with hard line breaks. Restore the original flow
 | `[\r\n|\n]` | ` ` (single space) |
 
 ### 🔗 Strip tracking parameters from URLs
-Remove `utm_*`, `fbclid`, `gclid`, and other junk before sharing a link. This is a great example of **chained rules** — three small rules combine into a robust cleaner:
+Remove `utm_*`, `fbclid`, `gclid`, and other junk before sharing a link. This is a great example of **chained rules** - three small rules combine into a robust cleaner:
 
 | # | Pattern | Replace with | What it does |
 |---|---|---|---|
@@ -68,7 +67,7 @@ Remove `utm_*`, `fbclid`, `gclid`, and other junk before sharing a link. This is
 | 3 | `\?$` | (empty) | Trims a bare trailing `?` if all params were tracking |
 
 ### 📝 Convert Markdown to plain text
-Chain rules to strip formatting — perfect for pasting into plain-text fields. **Rule order matters**: bold must run before italic, or `**word**` gets mangled into `*word*`.
+Chain rules to strip formatting - perfect for pasting into plain-text fields. **Rule order matters**: bold must run before italic, or `**word**` gets mangled into `*word*`.
 
 | # | Pattern | Replace with | What it does |
 |---|---|---|---|
@@ -88,25 +87,25 @@ Swap date formats without leaving the app you're already in.
 
 ## 🤖 AI control via MCP
 
-Specifying complex regular expressions is incredibly tricky — and asking an AI to write one, then copy-pasting it back, is an exhausting cycle. To address this pain point, Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Code, GPT Codex, local agents, …) and let it manage your settings profiles through conversation:
+Specifying complex regular expressions is incredibly tricky - and asking an AI to write one, then copy-pasting it back, is an exhausting cycle. To address this pain point, Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Code, GPT Codex, local agents, …) and let it manage your settings profiles through conversation:
 
 > "There's an MCP server on 127.0.0.1:39333 (streamable HTTP). Probe it, then make a hotkey that strips Markdown bold/italic and bind it to Ctrl+Shift+M."
 
 <img width="2373" height="1155" alt="image" src="https://github.com/user-attachments/assets/2123f442-5641-4080-bce1-e8bc13c8519e" />
 
-### How do I check the MCP tools?
-
-You normally don't need to check the MCP tools at all. But if you're a developer — or just want to see how MCP works under the hood — run `npx @modelcontextprotocol/inspector` in your command prompt (Node.js required).
-
-<img width="2817" height="1320" alt="image" src="https://github.com/user-attachments/assets/3d502f4c-8229-455d-b7b5-271b66b93d8a" />
-
 ### Enable it
 
 1. Open **Settings** in Delete Newline.
 2. Toggle **MCP server** on. (The default port is `39333`; change it while MCP is disabled if you need to.)
-3. Chat with your AI! (Only MCP-capable clients work — Claude Code, GPT Codex, or other local LLMs.)
+3. Chat with your AI! (Only MCP-capable clients work - Claude Code, GPT Codex, or other local LLMs.)
 
-That's it — your assistant can now read and write Delete Newline state through the same surface the GUI uses. Hotkey changes are re-registered the moment they're saved, so transformations are usable on the next keystroke.
+That's it - your assistant can now read and write Delete Newline state through the same surface the GUI uses. Hotkey changes are re-registered the moment they're saved, so transformations are usable on the next keystroke.
+
+### How do I check the MCP tools?
+
+You normally don't need to check the MCP tools at all. But if you're a developer - or just want to see how MCP works under the hood - run `npx @modelcontextprotocol/inspector` in your command prompt (Node.js required).
+
+<img width="2817" height="1320" alt="image" src="https://github.com/user-attachments/assets/3d502f4c-8229-455d-b7b5-271b66b93d8a" />
 
 ---
 
