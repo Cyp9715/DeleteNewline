@@ -88,7 +88,7 @@ Swap date formats without leaving the app you're already in.
 
 ## 🤖 AI control via MCP
 
-Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Desktop, MCP Inspector, custom agents, …) and let it manage your regex profiles by conversation:
+Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Code, GPT Codex, Local agents, …) and let it manage your regex profiles by conversation:
 
 > *"Make me a hotkey that strips Markdown bold/italic and binds to Ctrl+Shift+M."*
 > *"Test this chain on my last clipboard paste before saving it."*
