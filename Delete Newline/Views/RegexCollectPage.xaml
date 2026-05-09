@@ -35,20 +35,34 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            
+
                             <StackPanel Grid.Column="1"
-                                        VerticalAlignment="Top">
-                                <TextBlock Text="{Binding Hotkey.DisplayText, Mode=OneWay}"
-                                           FontWeight="SemiBold"
-                                           FontSize="12"
-                                           HorizontalAlignment="Right"
-                                           Foreground="{Binding IsRegistrationFailed, Converter={StaticResource BooleanToFailedBrushConverter}, Mode=OneWay}" />
-                                <TextBlock Text="{Binding HotkeyName}"
-                                           FontWeight="SemiBold"
-                                           FontSize="16" />
+                                VerticalAlignment="Top">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                       Text="{Binding HotkeyName}"
+                                       FontWeight="SemiBold"
+                                       FontSize="16"
+                                       VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Column="1"
+                                       Text="{Binding Hotkey.DisplayText, Mode=OneWay}"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0"
+                                       Foreground="{Binding IsRegistrationFailed, Converter={StaticResource BooleanToFailedBrushConverter}, Mode=OneWay}" />
+                                </Grid>
+
                                 <TextBlock Text="{Binding HotkeyComment}"
-                                           FontSize="12"
-                                           TextWrapping="Wrap" />
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,2,0,0" />
                             </StackPanel>
                             <Grid.ContextFlyout>
                                 <MenuFlyout>
@@ -67,7 +81,7 @@
                             </behaviors:Interaction.Behaviors>
                         </Grid>
                     </Border>
-                </DataTemplate>                    
+                </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
 
