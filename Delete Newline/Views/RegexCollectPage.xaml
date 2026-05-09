@@ -27,7 +27,7 @@
                             Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
                         <Grid Width="310"
                               Height="90"
-                              Padding="12"
+                              Padding="12,8,12,8"
                               RightTapped="RegexConfigCard_RightTapped"
                               Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
 
@@ -36,9 +36,13 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="1"
-                                VerticalAlignment="Top">
-                                <Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
@@ -56,14 +60,20 @@
                                        FontSize="12"
                                        VerticalAlignment="Top"
                                        Margin="8,0,0,0"
-                                       Foreground="{Binding IsRegistrationFailed, Converter={StaticResource BooleanToFailedBrushConverter}, Mode=OneWay}" />
+                                       Foreground="{Binding IsRegistrationFailed, 
+                                        Converter={StaticResource BooleanToFailedBrushConverter}, 
+                                        Mode=OneWay}" />
                                 </Grid>
 
-                                <TextBlock Text="{Binding HotkeyComment}"
+                                <TextBlock Grid.Row="1"
+                                   Text="{Binding HotkeyComment}"
                                    FontSize="11"
                                    TextWrapping="Wrap"
+                                   MaxLines="3"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center"
                                    Margin="0,2,0,0" />
-                            </StackPanel>
+                            </Grid>
                             <Grid.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuFlyoutItem Text="Remove"
