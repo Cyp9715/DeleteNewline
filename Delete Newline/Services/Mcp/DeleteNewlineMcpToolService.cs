@@ -85,7 +85,6 @@ public sealed class DeleteNewlineMcpToolService
                         "type": "object",
                         "properties": {
                           "regex": { "type": "string" },
-                          "regexExpression": { "type": "string" },
                           "replace": { "type": "string" }
                         },
                         "additionalProperties": false
@@ -133,7 +132,6 @@ public sealed class DeleteNewlineMcpToolService
                         "type": "object",
                         "properties": {
                           "regex": { "type": "string" },
-                          "regexExpression": { "type": "string" },
                           "replace": { "type": "string" }
                         },
                         "additionalProperties": false
@@ -485,7 +483,7 @@ public sealed class DeleteNewlineMcpToolService
 
         foreach (JsonElement itemElement in chainElement.EnumerateArray())
         {
-            string regex = GetString(itemElement, "regex") ?? GetString(itemElement, "regexExpression") ?? string.Empty;
+            string regex = GetString(itemElement, "regex") ?? string.Empty;
             string replace = GetString(itemElement, "replace") ?? string.Empty;
             yield return new ChainItem
             {
