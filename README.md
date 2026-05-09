@@ -56,14 +56,14 @@ PDFs frequently break sentences with hard line breaks. Restore the original flow
 
 | Pattern | Replace with |
 |---|---|
-| `[\r\n\|\n]` | ` ` (single space) |
+| `[\r\n|\n]` | ` ` (single space) |
 
 ### 🔗 Strip tracking parameters from URLs
 Remove `utm_*`, `fbclid`, `gclid`, and other junk before sharing a link. This is a great example of **chained rules** — three small rules combine into a robust cleaner:
 
 | # | Pattern | Replace with | What it does |
 |---|---|---|---|
-| 1 | `[?&](utm_[^=]+\|fbclid\|gclid)=[^&]*` | (empty) | Removes each tracking param with its separator |
+| 1 | `[?&](utm_[^=]+|fbclid|gclid)=[^&]*` | (empty) | Removes each tracking param with its separator |
 | 2 | `^([^?\n]*)&` | `$1?` | Repairs URLs that lost their leading `?` |
 | 3 | `\?$` | (empty) | Trims a bare trailing `?` if all params were tracking |
 
@@ -88,34 +88,23 @@ Swap date formats without leaving the app you're already in.
 
 ## 🤖 AI control via MCP
 
-Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Code, GPT Codex, Local agents, …) and let it manage your regex profiles by conversation:
+Specifying complex regular expressions is incredibly tricky — and asking an AI to write one, then copy-pasting it back, is an exhausting cycle. To address this pain point, Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Code, GPT Codex, local agents, …) and let it manage your settings profiles through conversation:
 
-> *"Make me a hotkey that strips Markdown bold/italic and binds to Ctrl+Shift+M."*
-> *"Test this chain on my last clipboard paste before saving it."*
-> *"Switch OCR to Korean and turn on tray-on-launch."*
+> "There's an MCP server on 127.0.0.1:39333 (streamable HTTP). Probe it, then make a hotkey that strips Markdown bold/italic and bind it to Ctrl+Shift+M."
 
-The server runs **locally on loopback only** (`127.0.0.1`) — nothing is exposed to the network.
+<img width="2373" height="1155" alt="image" src="https://github.com/user-attachments/assets/2123f442-5641-4080-bce1-e8bc13c8519e" />
 
-### Available tools
+### How do I check the MCP tools?
 
-| Tool | Purpose |
-|---|---|
-| `get_regex_profiles` | List every saved regex profile, hotkey, and chain |
-| `upsert_regex_profile` | Create or update a profile (name, comment, hotkey, chain). Saved and re-registered immediately |
-| `delete_regex_profile` | Remove a profile and unregister its hotkey |
-| `test_regex_chain` | Dry-run a chain on input text without touching saved settings |
-| `get_ocr_settings` / `set_ocr_settings` | Read or change OCR language and OCR hotkey |
-| `get_app_settings` / `set_app_setting` | Read or change app preferences (theme, language, notification, top-most, start-on-tray, startup-task, MCP enabled, MCP port) |
+You normally don't need to check the MCP tools at all. But if you're a developer — or just want to see how MCP works under the hood — run `npx @modelcontextprotocol/inspector` in your command prompt (Node.js required).
+
+<img width="2817" height="1320" alt="image" src="https://github.com/user-attachments/assets/3d502f4c-8229-455d-b7b5-271b66b93d8a" />
 
 ### Enable it
 
 1. Open **Settings** in Delete Newline.
-2. Toggle **Enable MCP server** on. (The default port is `39333`; change it while MCP is disabled if you need to.)
-3. Point your client at the endpoint:
-
-   ```
-   http://127.0.0.1:39333/mcp
-   ```
+2. Toggle **MCP server** on. (The default port is `39333`; change it while MCP is disabled if you need to.)
+3. Chat with your AI! (Only MCP-capable clients work — Claude Code, GPT Codex, or other local LLMs.)
 
 That's it — your assistant can now read and write Delete Newline state through the same surface the GUI uses. Hotkey changes are re-registered the moment they're saved, so transformations are usable on the next keystroke.
 
