@@ -7,12 +7,10 @@ namespace Delete_Newline.Converters;
 
 public class BooleanToFailedBrushConverter : IValueConverter
 {
-    private static readonly SolidColorBrush FailedBrush = new(Colors.Red);
-    private static readonly SolidColorBrush DefaultBrush = new(Colors.Gray);
-
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        return value is bool isFailed && isFailed ? FailedBrush : DefaultBrush;
+        bool isFailed = value is bool b && b;
+        return new SolidColorBrush(isFailed ? Colors.Red : Colors.Gray);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
