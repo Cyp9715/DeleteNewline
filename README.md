@@ -21,7 +21,7 @@ No more *copy → open editor → paste → find/replace → copy → paste back
 - ⌨️ **Multiple hotkey profiles** - bind different rule chains to different shortcuts
 - 🌐 **Works anywhere** - capture selected text from any Windows application
 - 📋 **Auto-clipboard** - transformed text is ready to paste immediately
-- 🤖 **MCP server built in** - let an AI assistant author, edit, and test your regex profiles for you ([details ↓](#-ai-control-via-mcp))
+- 🤖 **MCP server built in** - let an AI assistant author, edit, and test your regex profiles for you
 
 ---
 
