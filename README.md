@@ -77,7 +77,7 @@ Chain rules to strip formatting - perfect for pasting into plain-text fields. **
 | 4 | `(?m)^#+\s+` | (empty) | Strip heading markers (`#`, `##`, …) |
 
 ### 📅 Reformat dates on the fly
-Swap date formats without leaving the app you're already in.
+Swap date formats.
 
 | Pattern | Replace with | Result |
 |---|---|---|
