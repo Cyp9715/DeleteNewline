@@ -55,14 +55,14 @@ PDFs frequently break sentences with hard line breaks. Restore the original flow
 
 | Pattern | Replace with |
 |---|---|
-| `[\r\n|\n]` | ` ` (single space) |
+| `[\r\n\|\n]` | ` ` (single space) |
 
 ### 🔗 Strip tracking parameters from URLs
 Remove `utm_*`, `fbclid`, `gclid`, and other junk before sharing a link. This is a great example of **chained rules** - three small rules combine into a robust cleaner:
 
 | # | Pattern | Replace with | What it does |
 |---|---|---|---|
-| 1 | `[?&](utm_[^=]+|fbclid|gclid)=[^&]*` | (empty) | Removes each tracking param with its separator |
+| 1 | `[?&](utm_[^=]+\|fbclid\|gclid)=[^&]*` | (empty) | Removes each tracking param with its separator |
 | 2 | `^([^?\n]*)&` | `$1?` | Repairs URLs that lost their leading `?` |
 | 3 | `\?$` | (empty) | Trims a bare trailing `?` if all params were tracking |
 
