@@ -286,7 +286,7 @@ public sealed class LocalMcpHttpServerService
                 ["title"] = "Delete Newline",
                 ["version"] = assemblyVersion?.ToString() ?? "0.0.0"
             },
-            ["instructions"] = "Suggested workflow for small or local models: 1) call get_app_settings and get_regex_profiles before changing anything; 2) use test_regex_chain to verify complex regular-expression chains against sample text; 3) call upsert_regex_profile only after the test output is correct; 4) change McpPort only while McpEnabled is false; 5) setting McpEnabled to false immediately disables external MCP access. Use standard MCP tool descriptions, inputSchema descriptions, and tool annotations as the authoritative guide."
+            ["instructions"] = "Suggested workflow for small or local models: 1) call get_app_settings and get_regex_profiles before changing anything; 2) use test_regex_chain to verify complex regular-expression chains against sample text; 3) for one-rule edits prefer insert_regex_chain_item, update_regex_chain_item, or delete_regex_chain_item so existing rules shift automatically instead of being rebuilt from memory; 4) call upsert_regex_profile only when creating a new profile or replacing a full profile; 5) change McpPort only while McpEnabled is false; 6) setting McpEnabled to false immediately disables external MCP access. Use standard MCP tool descriptions, inputSchema descriptions, and tool annotations as the authoritative guide."
         };
     }
 

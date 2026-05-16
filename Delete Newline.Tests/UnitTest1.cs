@@ -23,6 +23,9 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         Assert.Contains("get_regex_profiles", toolNames);
         Assert.Contains("upsert_regex_profile", toolNames);
+        Assert.Contains("insert_regex_chain_item", toolNames);
+        Assert.Contains("update_regex_chain_item", toolNames);
+        Assert.Contains("delete_regex_chain_item", toolNames);
         Assert.Contains("delete_regex_profile", toolNames);
         Assert.Contains("test_regex_chain", toolNames);
         Assert.Contains("get_app_settings", toolNames);
@@ -102,6 +105,109 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Equal("hello---world", saved.InputText);
         Assert.Equal(VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift, saved.Hotkey.Modifiers);
         Assert.Equal(VirtualKey.Q, saved.Hotkey.Key);
+    }
+
+    [Fact]
+    public async Task RegexChainTools_InsertUpdateAndDeleteSingleRulesWithoutRebuildingWholeProfile()
+    {
+        var existing = new RegexPageStructure
+        {
+            HotkeyName = "Cleanup",
+            HotkeyComment = "profile used by MCP"
+        };
+        existing.RegexChain.ChainItems.Add(new ChainItem { RegexExpression = "one", Replace = "1" });
+        existing.RegexChain.ChainItems.Add(new ChainItem { RegexExpression = "three", Replace = "3" });
+
+        var regexRepository = new InMemoryRegexConfigurationRepository(existing);
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        using var insertArguments = JsonDocument.Parse("""
+        {
+          "profileIndex": 0,
+          "chainIndex": 1,
+          "regex": "two",
+          "replace": "2"
+        }
+        """);
+        McpToolResult insertResult = await service.ExecuteAsync("insert_regex_chain_item", insertArguments.RootElement, CancellationToken.None);
+
+        Assert.False(insertResult.IsError, insertResult.Text);
+        Assert.Equal(["one", "two", "three"], regexRepository.RegexConfigs[0].RegexChain.ChainItems.Select(item => item.RegexExpression));
+        Assert.Equal(["1", "2", "3"], regexRepository.RegexConfigs[0].RegexChain.ChainItems.Select(item => item.Replace));
+
+        using var updateArguments = JsonDocument.Parse("""
+        {
+          "profileIndex": 0,
+          "chainIndex": 1,
+          "regex": "two+",
+          "replace": "TWO"
+        }
+        """);
+        McpToolResult updateResult = await service.ExecuteAsync("update_regex_chain_item", updateArguments.RootElement, CancellationToken.None);
+
+        Assert.False(updateResult.IsError, updateResult.Text);
+        Assert.Equal("two+", regexRepository.RegexConfigs[0].RegexChain.ChainItems[1].RegexExpression);
+        Assert.Equal("TWO", regexRepository.RegexConfigs[0].RegexChain.ChainItems[1].Replace);
+
+        using var deleteArguments = JsonDocument.Parse("""
+        {
+          "profileIndex": 0,
+          "chainIndex": 0
+        }
+        """);
+        McpToolResult deleteResult = await service.ExecuteAsync("delete_regex_chain_item", deleteArguments.RootElement, CancellationToken.None);
+
+        Assert.False(deleteResult.IsError, deleteResult.Text);
+        Assert.Equal(["two+", "three"], regexRepository.RegexConfigs[0].RegexChain.ChainItems.Select(item => item.RegexExpression));
+        Assert.Equal(3, regexRepository.SaveCount);
+    }
+
+    [Fact]
+    public void ListTools_DescribesIndexSafeRegexChainEditingWorkflow()
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        var tools = service.ListTools();
+        string[] toolNames = tools.Select(tool => tool.Name).ToArray();
+
+        Assert.Contains("insert_regex_chain_item", toolNames);
+        Assert.Contains("update_regex_chain_item", toolNames);
+        Assert.Contains("delete_regex_chain_item", toolNames);
+
+        McpToolDescriptor insertTool = tools.Single(tool => tool.Name == "insert_regex_chain_item");
+        Assert.Contains("shifts", insertTool.Description, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("get_regex_profiles", insertTool.Description);
+        Assert.Contains("test_regex_chain", insertTool.Description);
+        Assert.Contains("profileIndex", insertTool.InputSchema.GetRawText());
+        Assert.Contains("chainIndex", insertTool.InputSchema.GetRawText());
+    }
+
+    [Fact]
+    public async Task TestRegexChain_UsesSameReplacementSemanticsAsRuntimeRegexService()
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        using var arguments = JsonDocument.Parse("""
+        {
+          "input": "first,second",
+          "chain": [
+            { "regex": ",", "replace": "\\n" }
+          ]
+        }
+        """);
+
+        McpToolResult result = await service.ExecuteAsync("test_regex_chain", arguments.RootElement, CancellationToken.None);
+
+        Assert.False(result.IsError, result.Text);
+        Assert.Equal("first\nsecond", result.StructuredContent!.Value.GetProperty("output").GetString());
     }
 
     [Fact]
@@ -382,6 +488,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
             Assert.Contains("Suggested workflow", instructions);
             Assert.Contains("get_regex_profiles", instructions);
             Assert.Contains("test_regex_chain", instructions);
+            Assert.Contains("insert_regex_chain_item", instructions);
             Assert.Contains("McpPort", instructions);
 
             using JsonDocument tools = await PostJsonRpcAsync(client, port, """

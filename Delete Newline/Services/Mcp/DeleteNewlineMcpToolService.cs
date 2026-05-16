@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Services;
 using Windows.System;
 
 namespace Delete_Newline.Services.Mcp;
@@ -12,8 +13,6 @@ public sealed class DeleteNewlineMcpToolService
     {
         WriteIndented = true
     };
-
-    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(1);
 
     private readonly IMcpRegexConfigurationRepository _regexRepository;
     private readonly IMcpSettingsRepository _settingsRepository;
@@ -48,12 +47,12 @@ public sealed class DeleteNewlineMcpToolService
             {
                 Name = "upsert_regex_profile",
                 Title = "Create or update a regex profile",
-                Description = "Create a new regex profile or update an existing zero-based profile. Supports profile name/comment, hotkey, test input text, and regex chain. Changes are saved immediately and hotkeys are re-registered immediately.",
+                Description = "Create a new regex profile or replace an existing zero-based profile. Supports profile name/comment, hotkey, test input text, and a full regex chain. For editing one rule in the middle, prefer insert_regex_chain_item, update_regex_chain_item, or delete_regex_chain_item so the model does not need to delete/recreate and renumber the whole chain. Changes are saved immediately and hotkeys are re-registered immediately.",
                 InputSchema = Schema("""
                 {
                   "type": "object",
                   "properties": {
-                    "index": { "type": "integer", "minimum": 0, "description": "Existing zero-based profile index to update. Omit to append." },
+                    "index": { "type": "integer", "minimum": 0, "description": "Existing zero-based profile index to replace. Omit to append a new profile." },
                     "name": { "type": "string", "description": "Profile display name. Required for new profiles." },
                     "comment": { "type": "string", "description": "Profile description/comment." },
                     "inputText": { "type": "string", "description": "Saved test input text shown on the Regex page." },
@@ -81,11 +80,12 @@ public sealed class DeleteNewlineMcpToolService
                     },
                     "chain": {
                       "type": "array",
+                      "description": "Full ordered regex chain. Use insert/update/delete_regex_chain_item for one-rule edits instead of rebuilding this array.",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "regex": { "type": "string" },
-                          "replace": { "type": "string" }
+                          "regex": { "type": "string", "description": "Delete Newline/.NET regular expression pattern. Test with test_regex_chain before saving complex patterns." },
+                          "replace": { "type": "string", "description": "Replacement text. Delete Newline unescapes sequences such as \\n before Regex.Replace, matching the Regex page/runtime behavior." }
                         },
                         "additionalProperties": false
                       }
@@ -99,14 +99,79 @@ public sealed class DeleteNewlineMcpToolService
             },
             new McpToolDescriptor
             {
-                Name = "delete_regex_profile",
-                Title = "Delete a regex profile",
-                Description = "Delete a regex profile by zero-based index and unregister its hotkey immediately.",
+                Name = "insert_regex_chain_item",
+                Title = "Insert one regex rule into a profile chain",
+                Description = "Insert a single regex rule at profileIndex/chainIndex. Use this instead of deleting and recreating a whole profile when adding a rule in the middle: the existing rule at chainIndex and every later rule shifts right automatically. chainIndex is zero-based and may equal the current chain length to append. Recommended workflow: call get_regex_profiles, optionally call test_regex_chain with sample text, then call this tool. Changes are saved immediately.",
                 InputSchema = Schema("""
                 {
                   "type": "object",
                   "properties": {
-                    "index": { "type": "integer", "minimum": 0 }
+                    "profileIndex": { "type": "integer", "minimum": 0, "description": "Zero-based profile index returned by get_regex_profiles." },
+                    "chainIndex": { "type": "integer", "minimum": 0, "description": "Zero-based insertion position within that profile's chain. 0 inserts first; current chain length appends last." },
+                    "regex": { "type": "string", "description": "Rule pattern using Delete Newline/.NET regex syntax." },
+                    "replace": { "type": "string", "description": "Replacement text. Omit or use empty string to delete matches." }
+                  },
+                  "required": ["profileIndex", "chainIndex", "regex"],
+                  "additionalProperties": false
+                }
+                """),
+                ReadOnly = false,
+                Destructive = true
+            },
+            new McpToolDescriptor
+            {
+                Name = "update_regex_chain_item",
+                Title = "Update one regex rule in a profile chain",
+                Description = "Update exactly one existing regex rule at profileIndex/chainIndex without rebuilding the rest of the profile. Provide regex, replace, or both; omitted fields keep their current value. Use get_regex_profiles first to locate the profile/rule and test_regex_chain before saving risky regex changes. Changes are saved immediately.",
+                InputSchema = Schema("""
+                {
+                  "type": "object",
+                  "properties": {
+                    "profileIndex": { "type": "integer", "minimum": 0, "description": "Zero-based profile index returned by get_regex_profiles." },
+                    "chainIndex": { "type": "integer", "minimum": 0, "description": "Zero-based existing rule index within the profile's chain." },
+                    "regex": { "type": "string", "description": "New regex pattern. Omit to keep the existing pattern." },
+                    "replace": { "type": "string", "description": "New replacement text. Omit to keep the existing replacement." }
+                  },
+                  "required": ["profileIndex", "chainIndex"],
+                  "anyOf": [
+                    { "required": ["regex"] },
+                    { "required": ["replace"] }
+                  ],
+                  "additionalProperties": false
+                }
+                """),
+                ReadOnly = false,
+                Destructive = true
+            },
+            new McpToolDescriptor
+            {
+                Name = "delete_regex_chain_item",
+                Title = "Delete one regex rule from a profile chain",
+                Description = "Delete exactly one regex rule at profileIndex/chainIndex without rebuilding the profile. Later rules shift left automatically. Use get_regex_profiles first to verify the target. Changes are saved immediately.",
+                InputSchema = Schema("""
+                {
+                  "type": "object",
+                  "properties": {
+                    "profileIndex": { "type": "integer", "minimum": 0, "description": "Zero-based profile index returned by get_regex_profiles." },
+                    "chainIndex": { "type": "integer", "minimum": 0, "description": "Zero-based existing rule index within the profile's chain to delete." }
+                  },
+                  "required": ["profileIndex", "chainIndex"],
+                  "additionalProperties": false
+                }
+                """),
+                ReadOnly = false,
+                Destructive = true
+            },
+            new McpToolDescriptor
+            {
+                Name = "delete_regex_profile",
+                Title = "Delete a regex profile",
+                Description = "Delete a whole regex profile by zero-based profile index and unregister its hotkey immediately. To delete only one rule inside a profile, use delete_regex_chain_item instead.",
+                InputSchema = Schema("""
+                {
+                  "type": "object",
+                  "properties": {
+                    "index": { "type": "integer", "minimum": 0, "description": "Zero-based profile index returned by get_regex_profiles." }
                   },
                   "required": ["index"],
                   "additionalProperties": false
@@ -119,20 +184,22 @@ public sealed class DeleteNewlineMcpToolService
             {
                 Name = "test_regex_chain",
                 Title = "Test a regex chain",
-                Description = "Apply either an existing profile's chain or an inline chain to input text and return the output without changing saved settings.",
+                Description = "Apply either an existing profile's chain or an inline chain to sample input text and return the output without changing saved settings. This uses the same shared regex processing code as Delete Newline's Regex page/runtime, including RegexOptions.Multiline and replacement unescaping, so use it as a dry run before saving regex changes.",
                 InputSchema = Schema("""
                 {
                   "type": "object",
                   "properties": {
-                    "input": { "type": "string" },
-                    "index": { "type": "integer", "minimum": 0, "description": "Existing profile index to test." },
+                    "input": { "type": "string", "description": "Sample input text to transform." },
+                    "profileIndex": { "type": "integer", "minimum": 0, "description": "Existing zero-based profile index to test. Preferred over the legacy index alias." },
+                    "index": { "type": "integer", "minimum": 0, "description": "Backward-compatible alias for profileIndex." },
                     "chain": {
                       "type": "array",
+                      "description": "Inline ordered chain to test without saving. If provided, it is used instead of profileIndex/index.",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "regex": { "type": "string" },
-                          "replace": { "type": "string" }
+                          "regex": { "type": "string", "description": "Delete Newline/.NET regular expression pattern." },
+                          "replace": { "type": "string", "description": "Replacement text using Delete Newline runtime semantics; e.g. \\n becomes a newline before Regex.Replace." }
                         },
                         "additionalProperties": false
                       }
@@ -236,6 +303,9 @@ public sealed class DeleteNewlineMcpToolService
             {
                 "get_regex_profiles" => GetRegexProfiles(),
                 "upsert_regex_profile" => await UpsertRegexProfileAsync(arguments, cancellationToken),
+                "insert_regex_chain_item" => await InsertRegexChainItemAsync(arguments, cancellationToken),
+                "update_regex_chain_item" => await UpdateRegexChainItemAsync(arguments, cancellationToken),
+                "delete_regex_chain_item" => await DeleteRegexChainItemAsync(arguments, cancellationToken),
                 "delete_regex_profile" => await DeleteRegexProfileAsync(arguments, cancellationToken),
                 "test_regex_chain" => TestRegexChain(arguments),
                 "get_ocr_settings" => GetOcrSettings(),
@@ -327,6 +397,98 @@ public sealed class DeleteNewlineMcpToolService
         });
     }
 
+    private async Task<McpToolResult> InsertRegexChainItemAsync(JsonElement arguments, CancellationToken cancellationToken)
+    {
+        int profileIndex = GetRequiredInt32(arguments, "profileIndex");
+        int chainIndex = GetRequiredInt32(arguments, "chainIndex");
+        string regex = GetString(arguments, "regex") ?? throw new ArgumentException("regex is required.");
+        string replace = GetString(arguments, "replace") ?? string.Empty;
+
+        RegexPageStructure config = CloneRegexProfile(GetRegexProfileOrThrow(profileIndex));
+        ObservableCollection<ChainItem> chainItems = config.RegexChain.ChainItems;
+        if (chainIndex < 0 || chainIndex > chainItems.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(chainIndex), $"chainIndex {chainIndex} is outside the valid insertion range 0..{chainItems.Count} for profileIndex {profileIndex}.");
+        }
+
+        ChainItem insertedItem = new()
+        {
+            RegexExpression = regex,
+            Replace = replace
+        };
+        chainItems.Insert(chainIndex, insertedItem);
+
+        await _regexRepository.UpsertAsync(profileIndex, config, cancellationToken);
+        RegexPageStructure savedProfile = GetSavedRegexProfileOrFallback(profileIndex, config);
+        return JsonSuccess(new
+        {
+            saved = true,
+            profileIndex,
+            chainIndex,
+            insertedItem = ToChainItemDto(insertedItem),
+            profile = ToProfileDto(savedProfile, profileIndex)
+        });
+    }
+
+    private async Task<McpToolResult> UpdateRegexChainItemAsync(JsonElement arguments, CancellationToken cancellationToken)
+    {
+        int profileIndex = GetRequiredInt32(arguments, "profileIndex");
+        int chainIndex = GetRequiredInt32(arguments, "chainIndex");
+        bool hasRegex = TryGetString(arguments, "regex", out string regex);
+        bool hasReplace = TryGetString(arguments, "replace", out string replace);
+        if (!hasRegex && !hasReplace)
+        {
+            throw new ArgumentException("Provide regex and/or replace.");
+        }
+
+        RegexPageStructure config = CloneRegexProfile(GetRegexProfileOrThrow(profileIndex));
+        ObservableCollection<ChainItem> chainItems = config.RegexChain.ChainItems;
+        EnsureExistingChainIndex(profileIndex, chainIndex, chainItems.Count);
+
+        ChainItem existingItem = chainItems[chainIndex];
+        ChainItem updatedItem = new()
+        {
+            RegexExpression = hasRegex ? regex : existingItem.RegexExpression,
+            Replace = hasReplace ? replace : existingItem.Replace
+        };
+        chainItems[chainIndex] = updatedItem;
+
+        await _regexRepository.UpsertAsync(profileIndex, config, cancellationToken);
+        RegexPageStructure savedProfile = GetSavedRegexProfileOrFallback(profileIndex, config);
+        return JsonSuccess(new
+        {
+            saved = true,
+            profileIndex,
+            chainIndex,
+            updatedItem = ToChainItemDto(updatedItem),
+            profile = ToProfileDto(savedProfile, profileIndex)
+        });
+    }
+
+    private async Task<McpToolResult> DeleteRegexChainItemAsync(JsonElement arguments, CancellationToken cancellationToken)
+    {
+        int profileIndex = GetRequiredInt32(arguments, "profileIndex");
+        int chainIndex = GetRequiredInt32(arguments, "chainIndex");
+
+        RegexPageStructure config = CloneRegexProfile(GetRegexProfileOrThrow(profileIndex));
+        ObservableCollection<ChainItem> chainItems = config.RegexChain.ChainItems;
+        EnsureExistingChainIndex(profileIndex, chainIndex, chainItems.Count);
+
+        ChainItem removedItem = chainItems[chainIndex];
+        chainItems.RemoveAt(chainIndex);
+
+        await _regexRepository.UpsertAsync(profileIndex, config, cancellationToken);
+        RegexPageStructure savedProfile = GetSavedRegexProfileOrFallback(profileIndex, config);
+        return JsonSuccess(new
+        {
+            saved = true,
+            profileIndex,
+            chainIndex,
+            deletedItem = ToChainItemDto(removedItem),
+            profile = ToProfileDto(savedProfile, profileIndex)
+        });
+    }
+
     private async Task<McpToolResult> DeleteRegexProfileAsync(JsonElement arguments, CancellationToken cancellationToken)
     {
         if (!TryGetInt32(arguments, "index", out int index))
@@ -350,16 +512,20 @@ public sealed class DeleteNewlineMcpToolService
         {
             chain = ParseChain(inlineChain.Value).ToArray();
         }
+        else if (TryGetInt32(arguments, "profileIndex", out int profileIndex) && profileIndex >= 0 && profileIndex < _regexRepository.RegexConfigs.Count)
+        {
+            chain = _regexRepository.RegexConfigs[profileIndex].RegexChain.ChainItems.ToArray();
+        }
         else if (TryGetInt32(arguments, "index", out int index) && index >= 0 && index < _regexRepository.RegexConfigs.Count)
         {
             chain = _regexRepository.RegexConfigs[index].RegexChain.ChainItems.ToArray();
         }
         else
         {
-            throw new ArgumentException("Provide either chain or a valid index.");
+            throw new ArgumentException("Provide either chain or a valid profileIndex.");
         }
 
-        string output = ApplyRegexChain(input, chain);
+        string output = RegexTextProcessor.ApplyRegexChain(input, chain, "Invalid regex");
         return JsonSuccess(new { input, output });
     }
 
@@ -454,24 +620,6 @@ public sealed class DeleteNewlineMcpToolService
             value = _settingsRepository.GetValue(key) ?? value,
             settings = _settingsRepository.GetAllSettings()
         });
-    }
-
-    private static string ApplyRegexChain(string input, IReadOnlyList<ChainItem> chain)
-    {
-        string output = input;
-        foreach (ChainItem item in chain)
-        {
-            string pattern = item.RegexExpression ?? string.Empty;
-            if (string.IsNullOrEmpty(pattern))
-            {
-                continue;
-            }
-
-            Regex regex = new(pattern, RegexOptions.None, RegexTimeout);
-            output = regex.Replace(output, item.Replace ?? string.Empty);
-        }
-
-        return output;
     }
 
     private static IEnumerable<ChainItem> ParseChain(JsonElement chainElement)
@@ -670,6 +818,59 @@ public sealed class DeleteNewlineMcpToolService
         return supportedKeys.Any(supportedKey => supportedKey.Equals(key, StringComparison.OrdinalIgnoreCase));
     }
 
+    private RegexPageStructure GetRegexProfileOrThrow(int profileIndex)
+    {
+        if (profileIndex < 0 || profileIndex >= _regexRepository.RegexConfigs.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(profileIndex), $"Regex profile profileIndex {profileIndex} does not exist. Call get_regex_profiles to inspect available profile indexes.");
+        }
+
+        return _regexRepository.RegexConfigs[profileIndex];
+    }
+
+    private RegexPageStructure GetSavedRegexProfileOrFallback(int profileIndex, RegexPageStructure fallback)
+    {
+        return profileIndex >= 0 && profileIndex < _regexRepository.RegexConfigs.Count
+            ? _regexRepository.RegexConfigs[profileIndex]
+            : fallback;
+    }
+
+    private static void EnsureExistingChainIndex(int profileIndex, int chainIndex, int chainCount)
+    {
+        if (chainIndex >= 0 && chainIndex < chainCount)
+        {
+            return;
+        }
+
+        string validRange = chainCount > 0 ? $"0..{chainCount - 1}" : "none because the chain is empty";
+        throw new ArgumentOutOfRangeException(nameof(chainIndex), $"chainIndex {chainIndex} is outside the valid existing range {validRange} for profileIndex {profileIndex}.");
+    }
+
+    private static RegexPageStructure CloneRegexProfile(RegexPageStructure source)
+    {
+        return new RegexPageStructure
+        {
+            HotkeyName = source.HotkeyName,
+            HotkeyComment = source.HotkeyComment,
+            Hotkey = CloneHotkey(source.Hotkey),
+            InputText = source.InputText,
+            IsRegistrationFailed = source.IsRegistrationFailed,
+            RegexChain = new RegexChainStructure
+            {
+                ChainItems = new ObservableCollection<ChainItem>(source.RegexChain.ChainItems.Select(CloneChainItem))
+            }
+        };
+    }
+
+    private static object ToChainItemDto(ChainItem item)
+    {
+        return new
+        {
+            regex = item.RegexExpression ?? string.Empty,
+            replace = item.Replace ?? string.Empty
+        };
+    }
+
     private static object ToProfileDto(RegexPageStructure config, int index)
     {
         return new
@@ -755,6 +956,34 @@ public sealed class DeleteNewlineMcpToolService
         return property.HasValue && property.Value.ValueKind == JsonValueKind.String
             ? property.Value.GetString()
             : null;
+    }
+
+    private static bool TryGetString(JsonElement element, string propertyName, out string value)
+    {
+        JsonElement? property = GetProperty(element, propertyName);
+        if (!property.HasValue)
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        if (property.Value.ValueKind != JsonValueKind.String)
+        {
+            throw new ArgumentException($"{propertyName} must be a string.");
+        }
+
+        value = property.Value.GetString() ?? string.Empty;
+        return true;
+    }
+
+    private static int GetRequiredInt32(JsonElement element, string propertyName)
+    {
+        if (TryGetInt32(element, propertyName, out int value))
+        {
+            return value;
+        }
+
+        throw new ArgumentException($"{propertyName} is required and must be an integer.");
     }
 
     private static bool TryGetInt32(JsonElement element, string propertyName, out int value)
