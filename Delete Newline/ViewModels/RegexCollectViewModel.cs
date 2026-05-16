@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delete_Newline.Contracts.Services;
@@ -16,12 +18,83 @@ public partial class RegexCollectViewModel : ObservableRecipient
     [ObservableProperty]
     private ObservableCollection<RegexPageStructure> _regexConfigs;
 
+    [ObservableProperty]
+    private ObservableCollection<RegexPageStructure> _filteredRegexConfigs = [];
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    [ObservableProperty]
+    private bool _isSearchVisible;
+
+    public bool CanReorderRegexConfigs => string.IsNullOrWhiteSpace(SearchText);
+
     public RegexCollectViewModel(RegexCollectSaveService regexCollectSaveService,
         INavigationService navigationService)
     {
         _regexCollectSaveService = regexCollectSaveService;
         NavigationService = navigationService;
         RegexConfigs = _regexCollectSaveService.RegexConfigs;
+        FilteredRegexConfigs = RegexConfigs;
+        RegexConfigs.CollectionChanged += RegexConfigs_CollectionChanged;
+        foreach (RegexPageStructure regexConfig in RegexConfigs)
+        {
+            regexConfig.PropertyChanged += RegexConfig_PropertyChanged;
+        }
+    }
+
+    private void RegexConfigs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (RegexPageStructure regexConfig in e.OldItems)
+            {
+                regexConfig.PropertyChanged -= RegexConfig_PropertyChanged;
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (RegexPageStructure regexConfig in e.NewItems)
+            {
+                regexConfig.PropertyChanged += RegexConfig_PropertyChanged;
+            }
+        }
+
+        RefreshFilteredRegexConfigs();
+    }
+
+    private void RegexConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(RegexPageStructure.HotkeyName))
+        {
+            RefreshFilteredRegexConfigs();
+        }
+    }
+
+    partial void OnSearchTextChanged(string value)
+    {
+        RefreshFilteredRegexConfigs();
+        OnPropertyChanged(nameof(CanReorderRegexConfigs));
+    }
+
+    public void ShowSearch()
+    {
+        IsSearchVisible = true;
+        RefreshFilteredRegexConfigs();
+    }
+
+    public void HideSearch()
+    {
+        IsSearchVisible = false;
+        SearchText = string.Empty;
+    }
+
+    private void RefreshFilteredRegexConfigs()
+    {
+        FilteredRegexConfigs = string.IsNullOrWhiteSpace(SearchText)
+            ? RegexConfigs
+            : new ObservableCollection<RegexPageStructure>(RegexProfileFilter.FilterByName(RegexConfigs, SearchText));
     }
 
     public string GetHotkeyDisplayText(RegexPageStructure config)

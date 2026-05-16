@@ -462,6 +462,55 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void RegexProfileFilter_FiltersByHotkeyNameCaseInsensitivelyAndRestoresAllForEmptySearch()
+    {
+        RegexPageStructure[] profiles =
+        [
+            new() { HotkeyName = "Markdown Cleanup" },
+            new() { HotkeyName = "URL Cleaner" },
+            new() { HotkeyName = "OCR Normalize" }
+        ];
+
+        string[] matchedNames = RegexProfileFilter.FilterByName(profiles, "mark")
+            .Select(profile => profile.HotkeyName)
+            .ToArray();
+        string[] allNames = RegexProfileFilter.FilterByName(profiles, string.Empty)
+            .Select(profile => profile.HotkeyName)
+            .ToArray();
+
+        Assert.Equal(["Markdown Cleanup"], matchedNames);
+        Assert.Equal(["Markdown Cleanup", "URL Cleaner", "OCR Normalize"], allNames);
+    }
+
+    [Fact]
+    public void RegexCollectPage_CtrlFShowsLiveNameSearchOverlay()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+        string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
+        string regexCollectViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "RegexCollectViewModel.cs"));
+
+        Assert.Contains("ItemsSource=\"{x:Bind ViewModel.FilteredRegexConfigs, Mode=OneWay}\"", regexCollectPageXaml);
+        Assert.Contains("x:Name=\"RegexSearchOverlay\"", regexCollectPageXaml);
+        Assert.Contains("HorizontalAlignment=\"Center\"", regexCollectPageXaml);
+        Assert.Contains("VerticalAlignment=\"Top\"", regexCollectPageXaml);
+        Assert.Contains("TextChanged=\"RegexSearchTextBox_TextChanged\"", regexCollectPageXaml);
+        Assert.Contains("KeyDown=\"RegexSearchTextBox_KeyDown\"", regexCollectPageXaml);
+
+        Assert.Contains("<KeyboardAccelerator", regexCollectPageXaml);
+        Assert.Contains("Key=\"F\"", regexCollectPageXaml);
+        Assert.Contains("Modifiers=\"Control\"", regexCollectPageXaml);
+        Assert.Contains("Invoked=\"SearchKeyboardAccelerator_Invoked\"", regexCollectPageXaml);
+        Assert.Contains("SearchKeyboardAccelerator_Invoked", regexCollectPageCodeBehind);
+        Assert.Contains("ViewModel.ShowSearch()", regexCollectPageCodeBehind);
+        Assert.Contains("RegexSearchTextBox.Focus", regexCollectPageCodeBehind);
+        Assert.Contains("ViewModel.SearchText = RegexSearchTextBox.Text", regexCollectPageCodeBehind);
+
+        Assert.Contains("FilteredRegexConfigs", regexCollectViewModel);
+        Assert.Contains("RegexProfileFilter.FilterByName", regexCollectViewModel);
+        Assert.Contains("partial void OnSearchTextChanged", regexCollectViewModel);
+    }
+
+    [Fact]
     public async Task LocalHttpServer_HandlesInitializeAndToolsListOverMcpJsonRpc()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();

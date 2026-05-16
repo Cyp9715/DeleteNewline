@@ -37,6 +37,7 @@
     <Compile Include="..\Delete Newline\Services\Mcp\InMemoryRegexConfigurationRepository.cs" Link="Linked\Services\Mcp\InMemoryRegexConfigurationRepository.cs" />
     <Compile Include="..\Delete Newline\Services\Mcp\LocalMcpHttpServerService.cs" Link="Linked\Services\Mcp\LocalMcpHttpServerService.cs" />
     <Compile Include="..\Delete Newline\Services\RegexTextProcessor.cs" Link="Linked\Services\RegexTextProcessor.cs" />
+    <Compile Include="..\Delete Newline\Services\RegexProfileFilter.cs" Link="Linked\Services\RegexProfileFilter.cs" />
     <Compile Include="..\Delete Newline\Services\SettingsImportApplyService.cs" Link="Linked\Services\SettingsImportApplyService.cs" />
     <Compile Include="..\Delete Newline\Services\Mcp\McpPortPolicy.cs" Link="Linked\Services\Mcp\McpPortPolicy.cs" />
     <Compile Include="..\Delete Newline\Services\Mcp\McpToolDescriptor.cs" Link="Linked\Services\Mcp\McpToolDescriptor.cs" />

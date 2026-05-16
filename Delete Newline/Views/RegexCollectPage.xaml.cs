@@ -21,6 +21,44 @@ public sealed partial class RegexCollectPage : Page
         DataContext = ViewModel;
     }
 
+    private void SearchKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        ShowRegexSearchBox();
+        args.Handled = true;
+    }
+
+    private void RegexSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        ViewModel.SearchText = RegexSearchTextBox.Text;
+    }
+
+    private void RegexSearchTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Escape)
+        {
+            return;
+        }
+
+        HideRegexSearchBox();
+        e.Handled = true;
+    }
+
+    private void ShowRegexSearchBox()
+    {
+        ViewModel.ShowSearch();
+        RegexSearchOverlay.Visibility = Visibility.Visible;
+        RegexSearchTextBox.Focus(FocusState.Keyboard);
+        RegexSearchTextBox.SelectAll();
+    }
+
+    private void HideRegexSearchBox()
+    {
+        ViewModel.HideSearch();
+        RegexSearchTextBox.Text = string.Empty;
+        RegexSearchOverlay.Visibility = Visibility.Collapsed;
+        RegexConfigGridView.Focus(FocusState.Programmatic);
+    }
+
     private void RegexConfigCard_RightTapped(object sender, RightTappedRoutedEventArgs e)
     {
         if (sender is not FrameworkElement { DataContext: RegexPageStructure regexConfig })
