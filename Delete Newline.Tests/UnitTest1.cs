@@ -449,6 +449,19 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void RegexCollectPage_EscapeClearsExtendedSelection()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+        string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
+
+        Assert.Contains("KeyDown=\"RegexConfigGridView_KeyDown\"", regexCollectPageXaml);
+        Assert.Contains("RegexConfigGridView_KeyDown", regexCollectPageCodeBehind);
+        Assert.Contains("VirtualKey.Escape", regexCollectPageCodeBehind);
+        Assert.Contains("RegexConfigGridView.SelectedItems.Clear", regexCollectPageCodeBehind);
+        Assert.Contains("e.Handled = true", regexCollectPageCodeBehind);
+    }
+
+    [Fact]
     public async Task LocalHttpServer_HandlesInitializeAndToolsListOverMcpJsonRpc()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();

@@ -3,6 +3,7 @@ using Delete_Newline.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Windows.System;
 
 namespace Delete_Newline.Views;
 
@@ -34,6 +35,22 @@ public sealed partial class RegexCollectPage : Page
 
         RegexConfigGridView.SelectedItems.Clear();
         RegexConfigGridView.SelectedItems.Add(regexConfig);
+    }
+
+    private void RegexConfigGridView_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Escape)
+        {
+            return;
+        }
+
+        if (RegexConfigGridView.SelectedItems.Count == 0)
+        {
+            return;
+        }
+
+        RegexConfigGridView.SelectedItems.Clear();
+        e.Handled = true;
     }
 
     private async void RemoveRegexMenuFlyoutItem_Click(object sender, RoutedEventArgs e)

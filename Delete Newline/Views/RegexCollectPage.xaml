@@ -18,7 +18,8 @@
                   SelectionMode="Extended"
                   CanReorderItems="True"
                   CanDragItems="True"
-                  AllowDrop="True">
+                  AllowDrop="True"
+                  KeyDown="RegexConfigGridView_KeyDown">
 
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="structures:RegexPageStructure">
