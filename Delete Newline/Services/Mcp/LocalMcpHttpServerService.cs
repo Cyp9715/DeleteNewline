@@ -9,6 +9,12 @@ namespace Delete_Newline.Services.Mcp;
 
 public sealed class LocalMcpHttpServerService
 {
+    private const string ServerInstructions = """
+        Delete Newline is a Windows system-wide hotkey tool for instant text transformation. Users select text in any application, press a configured hotkey, and Delete Newline runs the selected text through the profile's ordered regex rules, then places the transformed text on the clipboard ready to paste. A regex profile is a named hotkey configuration with optional notes, sample input text, and a regex chain; rule order matters. Delete Newline also exposes OCR hotkey/language settings and app settings through MCP.
+
+        Suggested workflow for small or local models: 1) call get_app_settings and get_regex_profiles before changing anything; 2) use test_regex_chain to verify complex regular-expression chains against sample text; 3) for one-rule edits prefer insert_regex_chain_item, update_regex_chain_item, or delete_regex_chain_item so existing rules shift automatically instead of being rebuilt from memory; 4) call upsert_regex_profile only when creating a new profile or replacing a full profile; 5) change McpPort only while McpEnabled is false; 6) setting McpEnabled to false immediately disables external MCP access. Use standard MCP tool descriptions, inputSchema descriptions, and tool annotations as the authoritative guide.
+        """;
+
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
         WriteIndented = false
@@ -286,7 +292,7 @@ public sealed class LocalMcpHttpServerService
                 ["title"] = "Delete Newline",
                 ["version"] = assemblyVersion?.ToString() ?? "0.0.0"
             },
-            ["instructions"] = "Suggested workflow for small or local models: 1) call get_app_settings and get_regex_profiles before changing anything; 2) use test_regex_chain to verify complex regular-expression chains against sample text; 3) for one-rule edits prefer insert_regex_chain_item, update_regex_chain_item, or delete_regex_chain_item so existing rules shift automatically instead of being rebuilt from memory; 4) call upsert_regex_profile only when creating a new profile or replacing a full profile; 5) change McpPort only while McpEnabled is false; 6) setting McpEnabled to false immediately disables external MCP access. Use standard MCP tool descriptions, inputSchema descriptions, and tool annotations as the authoritative guide."
+            ["instructions"] = ServerInstructions
         };
     }
 

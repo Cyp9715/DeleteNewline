@@ -575,6 +575,10 @@ public sealed class DeleteNewlineMcpToolServiceTests
             Assert.True(initializeResult.GetProperty("capabilities").TryGetProperty("tools", out _));
 
             string instructions = initializeResult.GetProperty("instructions").GetString()!;
+            Assert.Contains("system-wide hotkey tool", instructions);
+            Assert.Contains("selected text", instructions);
+            Assert.Contains("regex rules", instructions);
+            Assert.Contains("clipboard", instructions);
             Assert.Contains("Suggested workflow", instructions);
             Assert.Contains("get_regex_profiles", instructions);
             Assert.Contains("test_regex_chain", instructions);
