@@ -89,7 +89,7 @@ Swap date formats.
 
 Specifying complex regular expressions is incredibly tricky - and asking an AI to write one, then copy-pasting it back, is an exhausting cycle. To address this pain point, Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Code, GPT Codex, local agents, …) and let it manage your settings profiles through conversation:
 
-> "There's an MCP server on 127.0.0.1:39333 (streamable HTTP). Probe it, then make a hotkey that strips Markdown bold/italic and bind it to Ctrl+Shift+M."
+> "There's an MCP server on 127.0.0.1:39333/mcp (streamable HTTP). Probe it, then make a hotkey that strips Markdown bold/italic and bind it to Ctrl+Shift+M."
 
 <img width="2373" height="1155" alt="image" src="https://github.com/user-attachments/assets/2123f442-5641-4080-bce1-e8bc13c8519e" />
 
