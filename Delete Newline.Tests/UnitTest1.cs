@@ -2,7 +2,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Xml.Linq;
 using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Helpers;
 using Delete_Newline.Services;
 using Delete_Newline.Services.Mcp;
 using Windows.System;
@@ -156,6 +158,29 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Equal("Alt + Number1", ocrRepository.Hotkey.DisplayText);
     }
 
+    [Theory]
+    [InlineData("\"Ctrl+Backspace\"", VirtualKeyModifiers.Control, VirtualKey.Back)]
+    [InlineData("\"Ctrl+Left Arrow\"", VirtualKeyModifiers.Control, VirtualKey.Left)]
+    [InlineData("\"Ctrl+Page Up\"", VirtualKeyModifiers.Control, VirtualKey.PageUp)]
+    [InlineData("{\"modifiers\":\"Shift\",\"key\":\"Spacebar\"}", VirtualKeyModifiers.Shift, VirtualKey.Space)]
+    [InlineData("{\"modifiers\":\"Alt\",\"key\":\"Return\"}", VirtualKeyModifiers.Menu, VirtualKey.Enter)]
+    [InlineData("{\"modifiers\":\"Control\",\"key\":\"Del\"}", VirtualKeyModifiers.Control, VirtualKey.Delete)]
+    public async Task SetOcrSettings_AcceptsCommonHumanHotkeyAliases(string hotkeyJson, VirtualKeyModifiers expectedModifiers, VirtualKey expectedKey)
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        using var arguments = JsonDocument.Parse($"{{\"hotkey\":{hotkeyJson}}}");
+
+        var result = await service.ExecuteAsync("set_ocr_settings", arguments.RootElement, CancellationToken.None);
+
+        Assert.False(result.IsError, result.Text);
+        Assert.Equal(expectedModifiers, ocrRepository.Hotkey.Modifiers);
+        Assert.Equal(expectedKey, ocrRepository.Hotkey.Key);
+    }
+
     [Fact]
     public void ListTools_GuidesModelsToUseNamedNumberHotkeysInsteadOfRawIntegers()
     {
@@ -167,8 +192,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
         McpToolDescriptor upsertTool = service.ListTools().Single(tool => tool.Name == "upsert_regex_profile");
         McpToolDescriptor setOcrTool = service.ListTools().Single(tool => tool.Name == "set_ocr_settings");
 
-        AssertHotkeyKeySchemaGuidesModelsToNamedNumberKeys(upsertTool);
-        AssertHotkeyKeySchemaGuidesModelsToNamedNumberKeys(setOcrTool);
+        AssertHotkeyKeySchemaGuidesModelsToNamedAndCommonKeys(upsertTool);
+        AssertHotkeyKeySchemaGuidesModelsToNamedAndCommonKeys(setOcrTool);
     }
 
     [Fact]
@@ -434,6 +459,19 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Equal("Ctrl + Shift + S", hotkey.DisplayText);
         Assert.Contains(nameof(HotkeyStructure.DisplayText), changedProperties);
         Assert.True(changedProperties.Count(propertyName => propertyName == nameof(HotkeyStructure.DisplayText)) >= 2);
+    }
+
+    [Theory]
+    [InlineData(VirtualKey.Back, "Ctrl + Backspace")]
+    [InlineData(VirtualKey.Left, "Ctrl + Left Arrow")]
+    [InlineData(VirtualKey.Right, "Ctrl + Right Arrow")]
+    [InlineData(VirtualKey.PageUp, "Ctrl + Page Up")]
+    [InlineData(VirtualKey.PageDown, "Ctrl + Page Down")]
+    [InlineData(VirtualKey.Space, "Ctrl + Space")]
+    [InlineData(VirtualKey.Enter, "Ctrl + Enter")]
+    public void HotkeyFormatter_DisplaysCommonKeysIntuitively(VirtualKey key, string expectedDisplayText)
+    {
+        Assert.Equal(expectedDisplayText, HotkeyFormatter.GetDisplayText(VirtualKeyModifiers.Control, key));
     }
 
     [Fact]
@@ -841,7 +879,22 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Equal(1, regexRepository.SaveCount);
     }
 
-    private static void AssertHotkeyKeySchemaGuidesModelsToNamedNumberKeys(McpToolDescriptor tool)
+    [Fact]
+    public void ProjectVersion_IsConsistentAt315()
+    {
+        XDocument project = XDocument.Load(LocateSourceFile("Delete Newline", "Delete Newline.csproj"));
+        XDocument manifest = XDocument.Load(LocateSourceFile("Delete Newline", "Package.appxmanifest"));
+
+        Assert.Equal("3.1.5", project.Descendants("Version").Single().Value);
+        Assert.Equal("3.1.5.0", project.Descendants("AssemblyVersion").Single().Value);
+        Assert.Equal("3.1.5.0", project.Descendants("FileVersion").Single().Value);
+
+        XNamespace packageNamespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
+        XElement identity = manifest.Root!.Element(packageNamespace + "Identity")!;
+        Assert.Equal("3.1.5.0", identity.Attribute("Version")!.Value);
+    }
+
+    private static void AssertHotkeyKeySchemaGuidesModelsToNamedAndCommonKeys(McpToolDescriptor tool)
     {
         JsonElement hotkeySchema = tool.InputSchema
             .GetProperty("properties")
@@ -850,6 +903,9 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("Number0", hotkeyDescription);
         Assert.Contains("Number9", hotkeyDescription);
         Assert.Contains("Do not send JSON numbers", hotkeyDescription);
+        Assert.Contains("Backspace", hotkeyDescription);
+        Assert.Contains("Left Arrow", hotkeyDescription);
+        Assert.Contains("Page Up", hotkeyDescription);
 
         JsonElement keySchema = hotkeySchema
             .GetProperty("oneOf")[1]
@@ -861,6 +917,9 @@ public sealed class DeleteNewlineMcpToolServiceTests
         string keyDescription = keySchema.GetProperty("description").GetString()!;
         Assert.Contains("Number1", keyDescription);
         Assert.Contains("JSON numbers", keyDescription);
+        Assert.Contains("Backspace", keyDescription);
+        Assert.Contains("Spacebar", keyDescription);
+        Assert.Contains("Del", keyDescription);
     }
 
     private static async Task<JsonDocument> PostJsonRpcAsync(HttpClient client, int port, string json)

@@ -49,10 +49,15 @@ public static class HotkeyFormatter
     {
         return key switch
         {
+            VirtualKey.Back => "Backspace",
             VirtualKey.Space => "Space",
             VirtualKey.Escape => "Esc",
             VirtualKey.Left => "Left Arrow",
+            VirtualKey.Up => "Up Arrow",
             VirtualKey.Right => "Right Arrow",
+            VirtualKey.Down => "Down Arrow",
+            VirtualKey.PageUp => "Page Up",
+            VirtualKey.PageDown => "Page Down",
             _ => key.ToString(),
         };
     }
@@ -86,7 +91,7 @@ public static class HotkeyFormatter
             parts.Add("Win");
 
         if (key != VirtualKey.None)
-            parts.Add(key.ToString());
+            parts.Add(GetKeyString(key));
 
         return string.Join(" + ", parts);
     }
