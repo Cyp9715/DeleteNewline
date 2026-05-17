@@ -108,6 +108,70 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public async Task UpsertRegexProfile_TreatsDigitHotkeyStringAsKeyboardNumberKey()
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        using var arguments = JsonDocument.Parse("""
+        {
+          "name": "Numeric hotkey",
+          "hotkey": "Alt+1",
+          "chain": []
+        }
+        """);
+
+        var result = await service.ExecuteAsync("upsert_regex_profile", arguments.RootElement, CancellationToken.None);
+
+        Assert.False(result.IsError, result.Text);
+        Assert.Equal(VirtualKeyModifiers.Menu, regexRepository.RegexConfigs[0].Hotkey.Modifiers);
+        Assert.Equal(VirtualKey.Number1, regexRepository.RegexConfigs[0].Hotkey.Key);
+        Assert.Equal("Alt + Number1", regexRepository.RegexConfigs[0].Hotkey.DisplayText);
+    }
+
+    [Fact]
+    public async Task SetOcrSettings_TreatsSingleDigitKeyNumberAsKeyboardNumberKey()
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        using var arguments = JsonDocument.Parse("""
+        {
+          "hotkey": {
+            "modifiers": "Alt",
+            "key": 1
+          }
+        }
+        """);
+
+        var result = await service.ExecuteAsync("set_ocr_settings", arguments.RootElement, CancellationToken.None);
+
+        Assert.False(result.IsError, result.Text);
+        Assert.Equal(VirtualKeyModifiers.Menu, ocrRepository.Hotkey.Modifiers);
+        Assert.Equal(VirtualKey.Number1, ocrRepository.Hotkey.Key);
+        Assert.Equal("Alt + Number1", ocrRepository.Hotkey.DisplayText);
+    }
+
+    [Fact]
+    public void ListTools_GuidesModelsToUseNamedNumberHotkeysInsteadOfRawIntegers()
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        McpToolDescriptor upsertTool = service.ListTools().Single(tool => tool.Name == "upsert_regex_profile");
+        McpToolDescriptor setOcrTool = service.ListTools().Single(tool => tool.Name == "set_ocr_settings");
+
+        AssertHotkeyKeySchemaGuidesModelsToNamedNumberKeys(upsertTool);
+        AssertHotkeyKeySchemaGuidesModelsToNamedNumberKeys(setOcrTool);
+    }
+
+    [Fact]
     public async Task RegexChainTools_InsertUpdateAndDeleteSingleRulesWithoutRebuildingWholeProfile()
     {
         var existing = new RegexPageStructure
@@ -646,6 +710,9 @@ public sealed class DeleteNewlineMcpToolServiceTests
             Assert.Contains("UTF-8", instructions);
             Assert.Contains("PowerShell", instructions);
             Assert.Contains("ANSI", instructions);
+            Assert.Contains("Number0", instructions);
+            Assert.Contains("Number9", instructions);
+            Assert.Contains("Do not send JSON numbers", instructions);
 
             using JsonDocument tools = await PostJsonRpcAsync(client, port, """
             {
@@ -772,6 +839,28 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Equal(VirtualKey.O, ocrRepository.Hotkey.Key);
         Assert.Equal(1, ocrRepository.SaveCount);
         Assert.Equal(1, regexRepository.SaveCount);
+    }
+
+    private static void AssertHotkeyKeySchemaGuidesModelsToNamedNumberKeys(McpToolDescriptor tool)
+    {
+        JsonElement hotkeySchema = tool.InputSchema
+            .GetProperty("properties")
+            .GetProperty("hotkey");
+        string hotkeyDescription = hotkeySchema.GetProperty("description").GetString()!;
+        Assert.Contains("Number0", hotkeyDescription);
+        Assert.Contains("Number9", hotkeyDescription);
+        Assert.Contains("Do not send JSON numbers", hotkeyDescription);
+
+        JsonElement keySchema = hotkeySchema
+            .GetProperty("oneOf")[1]
+            .GetProperty("properties")
+            .GetProperty("key");
+        Assert.True(keySchema.TryGetProperty("type", out JsonElement keyType), keySchema.GetRawText());
+        Assert.Equal("string", keyType.GetString());
+
+        string keyDescription = keySchema.GetProperty("description").GetString()!;
+        Assert.Contains("Number1", keyDescription);
+        Assert.Contains("JSON numbers", keyDescription);
     }
 
     private static async Task<JsonDocument> PostJsonRpcAsync(HttpClient client, int port, string json)

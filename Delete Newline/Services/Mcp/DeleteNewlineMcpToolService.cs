@@ -58,20 +58,20 @@ public sealed class DeleteNewlineMcpToolService
                     "inputText": { "type": "string", "description": "Saved test input text shown on the Regex page." },
                     "input": { "type": "string", "description": "Alias for inputText." },
                     "hotkey": {
-                      "description": "Hotkey string like 'Control+Shift+Q' or object with modifiers/key.",
+                      "description": "Hotkey string like 'Control+Shift+Q', 'Alt+Number1', or 'Alt+1', or object with modifiers/key. For keyboard number-row keys use Number0..Number9 (digit text 0..9 is also accepted). Do not send JSON numbers for hotkey keys; Windows virtual-key value 1 means LeftButton, not the keyboard 1 key.",
                       "oneOf": [
-                        { "type": "string" },
+                        { "type": "string", "description": "Preferred concise form. Examples: Control+Shift+Q, Alt+Number1, Alt+1." },
                         {
                           "type": "object",
                           "properties": {
                             "modifiers": {
+                              "description": "Modifier names as a '+' string such as Control+Shift or an array such as [Control, Shift]. Alt is accepted as an alias for Menu.",
                               "oneOf": [
                                 { "type": "string" },
-                                { "type": "array", "items": { "type": "string" } },
-                                { "type": "integer" }
+                                { "type": "array", "items": { "type": "string" } }
                               ]
                             },
-                            "key": { "oneOf": [ { "type": "string" }, { "type": "integer" } ] }
+                            "key": { "type": "string", "description": "Windows.System.VirtualKey name such as Q, F1, Enter, Escape, Space, or Number1. For keyboard number-row keys use Number0..Number9; digit strings like '1' are accepted and normalized to Number1. Do not send JSON numbers for keys." }
                           },
                           "required": ["key"],
                           "additionalProperties": false
@@ -235,20 +235,20 @@ public sealed class DeleteNewlineMcpToolService
                     "languageTag": { "type": "string", "description": "OCR recognizer language tag, e.g. en-US or ko-KR." },
                     "language": { "type": "string", "description": "Alias for languageTag." },
                     "hotkey": {
-                      "description": "Hotkey string like 'Control+Menu+O' or object with modifiers/key.",
+                      "description": "Hotkey string like 'Control+Menu+O', 'Alt+Number1', or 'Alt+1', or object with modifiers/key. For keyboard number-row keys use Number0..Number9 (digit text 0..9 is also accepted). Do not send JSON numbers for hotkey keys; Windows virtual-key value 1 means LeftButton, not the keyboard 1 key.",
                       "oneOf": [
-                        { "type": "string" },
+                        { "type": "string", "description": "Preferred concise form. Examples: Control+Menu+O, Alt+Number1, Alt+1." },
                         {
                           "type": "object",
                           "properties": {
                             "modifiers": {
+                              "description": "Modifier names as a '+' string such as Control+Menu or an array such as [Control, Menu]. Alt is accepted as an alias for Menu.",
                               "oneOf": [
                                 { "type": "string" },
-                                { "type": "array", "items": { "type": "string" } },
-                                { "type": "integer" }
+                                { "type": "array", "items": { "type": "string" } }
                               ]
                             },
-                            "key": { "oneOf": [ { "type": "string" }, { "type": "integer" } ] }
+                            "key": { "type": "string", "description": "Windows.System.VirtualKey name such as O, F1, Enter, Escape, Space, or Number1. For keyboard number-row keys use Number0..Number9; digit strings like '1' are accepted and normalized to Number1. Do not send JSON numbers for keys." }
                           },
                           "required": ["key"],
                           "additionalProperties": false
@@ -733,7 +733,7 @@ public sealed class DeleteNewlineMcpToolService
     {
         if (keyElement.ValueKind == JsonValueKind.Number && keyElement.TryGetInt32(out int keyCode))
         {
-            return (VirtualKey)keyCode;
+            return ParseVirtualKeyCode(keyCode);
         }
 
         if (keyElement.ValueKind == JsonValueKind.String)
@@ -752,19 +752,20 @@ public sealed class DeleteNewlineMcpToolService
             throw new ArgumentException("hotkey key cannot be empty.");
         }
 
-        if (int.TryParse(normalized, out int keyCode))
-        {
-            return (VirtualKey)keyCode;
-        }
-
         normalized = normalized.Equals("Esc", StringComparison.OrdinalIgnoreCase) ? "Escape" : normalized;
         normalized = normalized.Equals("Alt", StringComparison.OrdinalIgnoreCase) ? "Menu" : normalized;
 
         if (normalized.Length == 1 && char.IsDigit(normalized[0]))
         {
-            normalized = $"Number{normalized}";
+            return ParseDigitVirtualKey(normalized[0] - '0');
         }
-        else if (normalized.Length == 1 && char.IsLetter(normalized[0]))
+
+        if (int.TryParse(normalized, out int keyCode))
+        {
+            return ParseVirtualKeyCode(keyCode);
+        }
+
+        if (normalized.Length == 1 && char.IsLetter(normalized[0]))
         {
             normalized = normalized.ToUpperInvariant();
         }
@@ -774,7 +775,22 @@ public sealed class DeleteNewlineMcpToolService
             return key;
         }
 
-        throw new ArgumentException($"Unsupported hotkey key '{keyText}'. Use a Windows.System.VirtualKey name such as A, Q, F1, Enter, Escape, or Space.");
+        throw new ArgumentException($"Unsupported hotkey key '{keyText}'. Use a Windows.System.VirtualKey name such as A, Q, F1, Enter, Escape, Space, or Number1 for keyboard number-row keys.");
+    }
+
+    private static VirtualKey ParseVirtualKeyCode(int keyCode)
+    {
+        if (keyCode is >= 0 and <= 9)
+        {
+            return ParseDigitVirtualKey(keyCode);
+        }
+
+        return (VirtualKey)keyCode;
+    }
+
+    private static VirtualKey ParseDigitVirtualKey(int digit)
+    {
+        return (VirtualKey)((int)VirtualKey.Number0 + digit);
     }
 
     private static string[] SplitHotkeyTokens(string text)

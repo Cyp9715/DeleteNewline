@@ -14,6 +14,8 @@ public sealed class LocalMcpHttpServerService
 
         Encoding note: MCP HTTP JSON is UTF-8 end-to-end. Profile names, comments, sample input, regex patterns, replacements, OCR language tags, and app setting strings can contain Korean and other Unicode text directly. Prefer MCP tools over PowerShell/ANSI file-editing workarounds for settings changes; do not assume a Windows ANSI code page and do not expand readable Unicode into \uXXXX escapes unless the client strictly requires it.
 
+        Hotkey note: hotkeys use Windows.System.VirtualKey names plus modifiers. For keyboard number-row keys, use Number0..Number9 in object form (for example { "modifiers": "Alt", "key": "Number1" }) or use hotkey strings such as Alt+Number1 / Alt+1. Do not send JSON numbers for hotkey keys: raw Windows virtual-key value 1 means LeftButton, not the keyboard 1 key. Digit text 0..9 is accepted and normalized to Number0..Number9 for model convenience.
+
         Suggested workflow for small or local models: 1) call get_app_settings and get_regex_profiles before changing anything; 2) use test_regex_chain to verify complex regular-expression chains against sample text; 3) for one-rule edits prefer insert_regex_chain_item, update_regex_chain_item, or delete_regex_chain_item so existing rules shift automatically instead of being rebuilt from memory; 4) call upsert_regex_profile only when creating a new profile or replacing a full profile; 5) change McpPort only while McpEnabled is false; 6) setting McpEnabled to false immediately disables external MCP access. Use standard MCP tool descriptions, inputSchema descriptions, and tool annotations as the authoritative guide.
         """;
 
