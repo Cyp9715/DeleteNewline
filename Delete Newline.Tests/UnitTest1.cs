@@ -632,61 +632,6 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public async Task LocalHttpServer_SendsUnicodeJsonAsUtf8WithoutEscaping()
-    {
-        var profile = new RegexPageStructure
-        {
-            HotkeyName = "한글 프로필",
-            HotkeyComment = "줄바꿈 정리",
-            InputText = "안녕하세요\n세계"
-        };
-        profile.RegexChain.ChainItems.Add(new ChainItem
-        {
-            RegexExpression = "안녕",
-            Replace = "Hello"
-        });
-
-        var regexRepository = new InMemoryRegexConfigurationRepository(profile);
-        var settingsRepository = new InMemoryMcpSettingsRepository();
-        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
-        var toolService = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
-        var server = new LocalMcpHttpServerService(toolService);
-        int port = GetFreeTcpPort();
-
-        await server.StartAsync(port);
-        try
-        {
-            using HttpClient client = new()
-            {
-                Timeout = TimeSpan.FromSeconds(5)
-            };
-
-            (string body, string? contentType) = await PostJsonRpcRawAsync(client, port, """
-            {
-              "jsonrpc": "2.0",
-              "id": 10,
-              "method": "tools/call",
-              "params": {
-                "name": "get_regex_profiles",
-                "arguments": {}
-              }
-            }
-            """);
-
-            Assert.Contains("charset=utf-8", contentType, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("한글 프로필", body);
-            Assert.Contains("줄바꿈 정리", body);
-            Assert.Contains("안녕하세요", body);
-            Assert.DoesNotContain("\\uD55C", body, StringComparison.OrdinalIgnoreCase);
-            Assert.DoesNotContain("\\uC904", body, StringComparison.OrdinalIgnoreCase);
-        }
-        finally
-        {
-            await server.StopAsync();
-        }
-    }
-
-    [Fact]
     public async Task SettingsImportApplyService_RejectsInvalidMcpPortBeforeChangingRuntimeState()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();
@@ -780,18 +725,12 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
     private static async Task<JsonDocument> PostJsonRpcAsync(HttpClient client, int port, string json)
     {
-        (string body, _) = await PostJsonRpcRawAsync(client, port, json);
-        return JsonDocument.Parse(body);
-    }
-
-    private static async Task<(string Body, string? ContentType)> PostJsonRpcRawAsync(HttpClient client, int port, string json)
-    {
         using StringContent content = new(json, Encoding.UTF8, "application/json");
         using HttpResponseMessage response = await client.PostAsync($"http://127.0.0.1:{port}/mcp", content);
         string body = await response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        return (body, response.Content.Headers.ContentType?.ToString());
+        return JsonDocument.Parse(body);
     }
 
     private static string LocateSourceFile(params string[] relativePathSegments)

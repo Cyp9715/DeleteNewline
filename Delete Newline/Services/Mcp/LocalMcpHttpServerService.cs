@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -20,8 +19,7 @@ public sealed class LocalMcpHttpServerService
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
-        WriteIndented = false,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        WriteIndented = false
     };
 
     private readonly DeleteNewlineMcpToolService _toolService;

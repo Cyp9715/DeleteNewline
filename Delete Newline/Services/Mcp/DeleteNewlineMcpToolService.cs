@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Delete_Newline.Contracts.Structures;
@@ -12,8 +11,7 @@ public sealed class DeleteNewlineMcpToolService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
-        WriteIndented = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        WriteIndented = true
     };
 
     private readonly IMcpRegexConfigurationRepository _regexRepository;
