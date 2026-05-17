@@ -759,7 +759,20 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.DoesNotContain("CornerRadius=", searchOverlayBlock);
         Assert.DoesNotContain("Background=", searchOverlayBlock);
         Assert.Contains("Width=\"260\"", searchOverlayBlock);
-        Assert.Contains("PlaceholderText=\"Search by name\"", searchOverlayBlock);
+        Assert.Contains("PlaceholderText=\"Search by Name\"", searchOverlayBlock);
+    }
+
+    [Fact]
+    public void RegexCollectPage_SearchPlaceholderIsLocalizedForEnglishAndKorean()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+        string searchOverlayBlock = ExtractElementBlock(regexCollectPageXaml, "<Border x:Name=\"RegexSearchOverlay\"", "</Border>");
+        XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
+        XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
+
+        Assert.Contains("x:Uid=\"RegexCollect_SearchTextBox\"", searchOverlayBlock);
+        Assert.Equal("Search by Name", GetReswValue(englishResources, "RegexCollect_SearchTextBox.PlaceholderText"));
+        Assert.Equal("이름으로 검색", GetReswValue(koreanResources, "RegexCollect_SearchTextBox.PlaceholderText"));
     }
 
     [Fact]
@@ -975,18 +988,18 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void ProjectVersion_IsConsistentAt315()
+    public void ProjectVersion_IsConsistentAt316()
     {
         XDocument project = XDocument.Load(LocateSourceFile("Delete Newline", "Delete Newline.csproj"));
         XDocument manifest = XDocument.Load(LocateSourceFile("Delete Newline", "Package.appxmanifest"));
 
-        Assert.Equal("3.1.5", project.Descendants("Version").Single().Value);
-        Assert.Equal("3.1.5.0", project.Descendants("AssemblyVersion").Single().Value);
-        Assert.Equal("3.1.5.0", project.Descendants("FileVersion").Single().Value);
+        Assert.Equal("3.1.6", project.Descendants("Version").Single().Value);
+        Assert.Equal("3.1.6.0", project.Descendants("AssemblyVersion").Single().Value);
+        Assert.Equal("3.1.6.0", project.Descendants("FileVersion").Single().Value);
 
         XNamespace packageNamespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
         XElement identity = manifest.Root!.Element(packageNamespace + "Identity")!;
-        Assert.Equal("3.1.5.0", identity.Attribute("Version")!.Value);
+        Assert.Equal("3.1.6.0", identity.Attribute("Version")!.Value);
     }
 
     private static void AssertHotkeyKeySchemaGuidesModelsToNamedAndCommonKeys(McpToolDescriptor tool)
@@ -1050,6 +1063,15 @@ public sealed class DeleteNewlineMcpToolServiceTests
         }
 
         throw new FileNotFoundException($"Could not locate source file: {Path.Combine(relativePathSegments)}");
+    }
+
+    private static string GetReswValue(XDocument resources, string name)
+    {
+        XElement data = resources.Root!
+            .Elements("data")
+            .Single(element => (string?)element.Attribute("name") == name);
+
+        return data.Element("value")!.Value;
     }
 
     private static string ExtractElementBlock(string source, string startMarker, string endMarker)

@@ -464,4 +464,7 @@
   <data name="Notification_TextNotModified_Message" xml:space="preserve">
     <value>No matching rules found for the copied text. The text is copied to the clipboard unchanged.</value>
   </data>
+  <data name="RegexCollect_SearchTextBox.PlaceholderText" xml:space="preserve">
+    <value>Search by Name</value>
+  </data>
 </root>
