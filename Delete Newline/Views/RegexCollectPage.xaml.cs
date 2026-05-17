@@ -28,35 +28,20 @@ public sealed partial class RegexCollectPage : Page
 
     private void SearchKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
-        ShowRegexSearchBox();
-        args.Handled = true;
-    }
-
-    private void EscapeKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
-    {
-        if (!IsRegexSearchActive())
+        if (ViewModel.IsSearchVisible)
         {
+            HideRegexSearchBox(restoreFocus: true, clearSearchText: false);
+            args.Handled = true;
             return;
         }
 
-        HideRegexSearchBox(restoreFocus: false);
+        ShowRegexSearchBox();
         args.Handled = true;
     }
 
     private void RegexSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         ViewModel.SearchText = RegexSearchTextBox.Text;
-    }
-
-    private void RegexSearchTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key != VirtualKey.Escape)
-        {
-            return;
-        }
-
-        HideRegexSearchBox(restoreFocus: true);
-        e.Handled = true;
     }
 
     private void RegexSearchTextBox_LostFocus(object sender, RoutedEventArgs e)
@@ -82,10 +67,10 @@ public sealed partial class RegexCollectPage : Page
         RegexSearchTextBox.SelectAll();
     }
 
-    private void HideRegexSearchBox(bool restoreFocus)
+    private void HideRegexSearchBox(bool restoreFocus, bool clearSearchText = true)
     {
-        ViewModel.HideSearch();
-        if (RegexSearchTextBox.Text.Length > 0)
+        ViewModel.HideSearch(clearSearchText);
+        if (clearSearchText && RegexSearchTextBox.Text.Length > 0)
         {
             RegexSearchTextBox.Text = string.Empty;
         }
@@ -99,28 +84,14 @@ public sealed partial class RegexCollectPage : Page
 
     private void SynchronizeRegexSearchOverlayWithViewModel()
     {
-        if (!string.IsNullOrWhiteSpace(ViewModel.SearchText))
+        if (RegexSearchTextBox.Text != ViewModel.SearchText)
         {
-            if (RegexSearchTextBox.Text != ViewModel.SearchText)
-            {
-                RegexSearchTextBox.Text = ViewModel.SearchText;
-            }
-
-            ViewModel.ShowSearch();
-            RegexSearchOverlay.Visibility = Visibility.Visible;
-            return;
+            RegexSearchTextBox.Text = ViewModel.SearchText;
         }
 
         RegexSearchOverlay.Visibility = ViewModel.IsSearchVisible
             ? Visibility.Visible
             : Visibility.Collapsed;
-    }
-
-    private bool IsRegexSearchActive()
-    {
-        return RegexSearchOverlay.Visibility == Visibility.Visible
-            || ViewModel.IsSearchVisible
-            || !string.IsNullOrWhiteSpace(ViewModel.SearchText);
     }
 
     private void RegexConfigCard_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -143,13 +114,6 @@ public sealed partial class RegexCollectPage : Page
     {
         if (e.Key != VirtualKey.Escape)
         {
-            return;
-        }
-
-        if (IsRegexSearchActive())
-        {
-            HideRegexSearchBox(restoreFocus: false);
-            e.Handled = true;
             return;
         }
 

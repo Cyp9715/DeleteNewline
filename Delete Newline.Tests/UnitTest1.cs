@@ -492,9 +492,9 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("ItemsSource=\"{x:Bind ViewModel.FilteredRegexConfigs, Mode=OneWay}\"", regexCollectPageXaml);
         Assert.Contains("x:Name=\"RegexSearchOverlay\"", regexCollectPageXaml);
         Assert.Contains("HorizontalAlignment=\"Center\"", regexCollectPageXaml);
-        Assert.Contains("VerticalAlignment=\"Top\"", regexCollectPageXaml);
+        Assert.Contains("VerticalAlignment=\"Bottom\"", regexCollectPageXaml);
         Assert.Contains("TextChanged=\"RegexSearchTextBox_TextChanged\"", regexCollectPageXaml);
-        Assert.Contains("KeyDown=\"RegexSearchTextBox_KeyDown\"", regexCollectPageXaml);
+        Assert.DoesNotContain("KeyDown=\"RegexSearchTextBox_KeyDown\"", regexCollectPageXaml);
 
         Assert.Contains("<KeyboardAccelerator", regexCollectPageXaml);
         Assert.Contains("Key=\"F\"", regexCollectPageXaml);
@@ -519,15 +519,50 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void RegexCollectPage_SearchOverlayReservesTopLayoutSpace()
+    public void RegexCollectPage_CtrlFTogglesSearchAndPreservesPreviousQuery()
+    {
+        string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
+        string regexCollectViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "RegexCollectViewModel.cs"));
+
+        Assert.Contains("if (ViewModel.IsSearchVisible)", regexCollectPageCodeBehind);
+        Assert.Contains("HideRegexSearchBox(restoreFocus: true, clearSearchText: false)", regexCollectPageCodeBehind);
+        Assert.Contains("private void HideRegexSearchBox(bool restoreFocus, bool clearSearchText = true)", regexCollectPageCodeBehind);
+        Assert.Contains("ViewModel.HideSearch(clearSearchText)", regexCollectPageCodeBehind);
+        Assert.Contains("if (clearSearchText && RegexSearchTextBox.Text.Length > 0)", regexCollectPageCodeBehind);
+
+        Assert.Contains("public bool CanReorderRegexConfigs => !IsSearchVisible || string.IsNullOrWhiteSpace(SearchText);", regexCollectViewModel);
+        Assert.Contains("partial void OnIsSearchVisibleChanged(bool value)", regexCollectViewModel);
+        Assert.Contains("public void HideSearch(bool clearSearchText = true)", regexCollectViewModel);
+        Assert.Contains("if (clearSearchText)", regexCollectViewModel);
+        Assert.Contains("!IsSearchVisible || string.IsNullOrWhiteSpace(SearchText)", regexCollectViewModel);
+    }
+
+    [Fact]
+    public void RegexCollectPage_SearchOverlayFloatsAtBottomWithoutChangingTopScrollSpacing()
     {
         string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
         string normalizedRegexCollectPageXaml = regexCollectPageXaml.Replace("\r\n", "\n");
 
-        Assert.Contains("<Grid.RowDefinitions>\n            <RowDefinition Height=\"Auto\" />\n            <RowDefinition Height=\"*\" />\n        </Grid.RowDefinitions>", normalizedRegexCollectPageXaml);
-        Assert.Contains("<GridView x:Name=\"RegexConfigGridView\"\n                  Grid.Row=\"1\"", normalizedRegexCollectPageXaml);
-        Assert.Contains("<Border x:Name=\"RegexSearchOverlay\"\n                Grid.Row=\"0\"", normalizedRegexCollectPageXaml);
-        Assert.Contains("Margin=\"0,5,0,0\"", normalizedRegexCollectPageXaml);
+        Assert.DoesNotContain("\n        <Grid.RowDefinitions>", normalizedRegexCollectPageXaml);
+        Assert.Contains("<GridView x:Name=\"RegexConfigGridView\"\n                  ItemsSource=", normalizedRegexCollectPageXaml);
+        Assert.Contains("Padding=\"12,12,12,96\"", normalizedRegexCollectPageXaml);
+        Assert.Contains("<Border x:Name=\"RegexSearchOverlay\"\n                HorizontalAlignment=\"Center\"\n                VerticalAlignment=\"Bottom\"", normalizedRegexCollectPageXaml);
+        Assert.Contains("Margin=\"0,0,0,24\"", normalizedRegexCollectPageXaml);
+        Assert.Contains("Canvas.ZIndex=\"1\"", normalizedRegexCollectPageXaml);
+    }
+
+    [Fact]
+    public void RegexCollectPage_SearchOverlayUsesCompactSingleTextBoxChrome()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+        string searchOverlayBlock = ExtractElementBlock(regexCollectPageXaml, "<Border x:Name=\"RegexSearchOverlay\"", "</Border>");
+
+        Assert.Contains("Margin=\"0,0,0,24\"", searchOverlayBlock);
+        Assert.DoesNotContain("Padding=", searchOverlayBlock);
+        Assert.DoesNotContain("CornerRadius=", searchOverlayBlock);
+        Assert.DoesNotContain("Background=", searchOverlayBlock);
+        Assert.Contains("Width=\"260\"", searchOverlayBlock);
+        Assert.Contains("PlaceholderText=\"Search by name\"", searchOverlayBlock);
     }
 
     [Fact]
@@ -539,20 +574,24 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("Loaded=\"RegexCollectPage_Loaded\"", regexCollectPageXaml);
         Assert.Contains("RegexCollectPage_Loaded", regexCollectPageCodeBehind);
         Assert.Contains("SynchronizeRegexSearchOverlayWithViewModel", regexCollectPageCodeBehind);
-        Assert.Contains("!string.IsNullOrWhiteSpace(ViewModel.SearchText)", regexCollectPageCodeBehind);
+        Assert.Contains("RegexSearchTextBox.Text != ViewModel.SearchText", regexCollectPageCodeBehind);
         Assert.Contains("RegexSearchTextBox.Text = ViewModel.SearchText", regexCollectPageCodeBehind);
-        Assert.Contains("RegexSearchOverlay.Visibility = Visibility.Visible", regexCollectPageCodeBehind);
+        Assert.Contains("RegexSearchOverlay.Visibility = ViewModel.IsSearchVisible", regexCollectPageCodeBehind);
     }
 
     [Fact]
-    public void RegexCollectPage_DismissesSearchWithEscapeAndWhenEmptySearchLosesFocus()
+    public void RegexCollectPage_DoesNotDismissSearchWithEscapeAndStillHidesEmptySearchOnLostFocus()
     {
         string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
         string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
 
         Assert.Contains("LostFocus=\"RegexSearchTextBox_LostFocus\"", regexCollectPageXaml);
-        Assert.Contains("RegexSearchTextBox_KeyDown", regexCollectPageCodeBehind);
-        Assert.Contains("HideRegexSearchBox(restoreFocus: true)", regexCollectPageCodeBehind);
+        Assert.DoesNotContain("Key=\"Escape\"", regexCollectPageXaml);
+        Assert.DoesNotContain("Invoked=\"EscapeKeyboardAccelerator_Invoked\"", regexCollectPageXaml);
+        Assert.DoesNotContain("KeyDown=\"RegexSearchTextBox_KeyDown\"", regexCollectPageXaml);
+        Assert.DoesNotContain("EscapeKeyboardAccelerator_Invoked", regexCollectPageCodeBehind);
+        Assert.DoesNotContain("RegexSearchTextBox_KeyDown", regexCollectPageCodeBehind);
+        Assert.DoesNotContain("IsRegexSearchActive", regexCollectPageCodeBehind);
         Assert.Contains("RegexSearchTextBox_LostFocus", regexCollectPageCodeBehind);
         Assert.Contains("string.IsNullOrWhiteSpace(RegexSearchTextBox.Text)", regexCollectPageCodeBehind);
         Assert.Contains("HideRegexSearchBox(restoreFocus: false)", regexCollectPageCodeBehind);

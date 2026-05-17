@@ -27,7 +27,7 @@ public partial class RegexCollectViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _isSearchVisible;
 
-    public bool CanReorderRegexConfigs => string.IsNullOrWhiteSpace(SearchText);
+    public bool CanReorderRegexConfigs => !IsSearchVisible || string.IsNullOrWhiteSpace(SearchText);
 
     public RegexCollectViewModel(RegexCollectSaveService regexCollectSaveService,
         INavigationService navigationService)
@@ -78,21 +78,29 @@ public partial class RegexCollectViewModel : ObservableRecipient
         OnPropertyChanged(nameof(CanReorderRegexConfigs));
     }
 
+    partial void OnIsSearchVisibleChanged(bool value)
+    {
+        RefreshFilteredRegexConfigs();
+        OnPropertyChanged(nameof(CanReorderRegexConfigs));
+    }
+
     public void ShowSearch()
     {
         IsSearchVisible = true;
-        RefreshFilteredRegexConfigs();
     }
 
-    public void HideSearch()
+    public void HideSearch(bool clearSearchText = true)
     {
         IsSearchVisible = false;
-        SearchText = string.Empty;
+        if (clearSearchText)
+        {
+            SearchText = string.Empty;
+        }
     }
 
     private void RefreshFilteredRegexConfigs()
     {
-        FilteredRegexConfigs = string.IsNullOrWhiteSpace(SearchText)
+        FilteredRegexConfigs = !IsSearchVisible || string.IsNullOrWhiteSpace(SearchText)
             ? RegexConfigs
             : new ObservableCollection<RegexPageStructure>(RegexProfileFilter.FilterByName(RegexConfigs, SearchText));
     }
