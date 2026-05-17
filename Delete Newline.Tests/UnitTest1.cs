@@ -130,7 +130,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.False(result.IsError, result.Text);
         Assert.Equal(VirtualKeyModifiers.Menu, regexRepository.RegexConfigs[0].Hotkey.Modifiers);
         Assert.Equal(VirtualKey.Number1, regexRepository.RegexConfigs[0].Hotkey.Key);
-        Assert.Equal("Alt + Number1", regexRepository.RegexConfigs[0].Hotkey.DisplayText);
+        Assert.Equal("Alt + 1", regexRepository.RegexConfigs[0].Hotkey.DisplayText);
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.False(result.IsError, result.Text);
         Assert.Equal(VirtualKeyModifiers.Menu, ocrRepository.Hotkey.Modifiers);
         Assert.Equal(VirtualKey.Number1, ocrRepository.Hotkey.Key);
-        Assert.Equal("Alt + Number1", ocrRepository.Hotkey.DisplayText);
+        Assert.Equal("Alt + 1", ocrRepository.Hotkey.DisplayText);
     }
 
     [Theory]
@@ -462,9 +462,12 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Theory]
+    [InlineData(VirtualKey.Number1, "Ctrl + 1")]
     [InlineData(VirtualKey.Back, "Ctrl + Backspace")]
     [InlineData(VirtualKey.Left, "Ctrl + Left Arrow")]
+    [InlineData(VirtualKey.Up, "Ctrl + Up Arrow")]
     [InlineData(VirtualKey.Right, "Ctrl + Right Arrow")]
+    [InlineData(VirtualKey.Down, "Ctrl + Down Arrow")]
     [InlineData(VirtualKey.PageUp, "Ctrl + Page Up")]
     [InlineData(VirtualKey.PageDown, "Ctrl + Page Down")]
     [InlineData(VirtualKey.Space, "Ctrl + Space")]
@@ -472,6 +475,98 @@ public sealed class DeleteNewlineMcpToolServiceTests
     public void HotkeyFormatter_DisplaysCommonKeysIntuitively(VirtualKey key, string expectedDisplayText)
     {
         Assert.Equal(expectedDisplayText, HotkeyFormatter.GetDisplayText(VirtualKeyModifiers.Control, key));
+    }
+
+    [Theory]
+    [InlineData(0xBA, "Ctrl + ;", "Semicolon")]
+    [InlineData(0xBB, "Ctrl + =", "Equals")]
+    [InlineData(0xBC, "Ctrl + ,", "Comma")]
+    [InlineData(0xBD, "Ctrl + -", "Minus")]
+    [InlineData(0xBE, "Ctrl + .", "Period")]
+    [InlineData(0xBF, "Ctrl + /", "Slash")]
+    [InlineData(0xC0, "Ctrl + `", "Backtick")]
+    [InlineData(0xDB, "Ctrl + [", "LeftBracket")]
+    [InlineData(0xDC, "Ctrl + \\", "Backslash")]
+    [InlineData(0xDD, "Ctrl + ]", "RightBracket")]
+    [InlineData(0xDE, "Ctrl + '", "Quote")]
+    public void HotkeyFormatter_DisplaysOemKeysAsConciseSymbols(int keyValue, string expectedDisplayText, string expectedKeyText)
+    {
+        VirtualKey key = (VirtualKey)keyValue;
+
+        Assert.Equal(expectedDisplayText, HotkeyFormatter.GetDisplayText(VirtualKeyModifiers.Control, key));
+        Assert.Equal(expectedKeyText, HotkeyFormatter.GetKeyText(key));
+    }
+
+    [Theory]
+    [InlineData("Backtick", 0xC0, "Ctrl + `", "Backtick")]
+    [InlineData("`", 0xC0, "Ctrl + `", "Backtick")]
+    [InlineData("Semicolon", 0xBA, "Ctrl + ;", "Semicolon")]
+    [InlineData("LeftBracket", 0xDB, "Ctrl + [", "LeftBracket")]
+    [InlineData("Quote", 0xDE, "Ctrl + '", "Quote")]
+    public async Task SetOcrSettings_AcceptsSymbolKeyAliasesAndReturnsUnifiedKeyText(string keyAlias, int expectedKeyValue, string expectedDisplay, string expectedKeyText)
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+        string json = JsonSerializer.Serialize(new
+        {
+            hotkey = new
+            {
+                modifiers = "Control",
+                key = keyAlias
+            }
+        });
+        using var arguments = JsonDocument.Parse(json);
+
+        McpToolResult result = await service.ExecuteAsync("set_ocr_settings", arguments.RootElement, CancellationToken.None);
+
+        Assert.False(result.IsError, result.Text);
+        Assert.Equal(VirtualKeyModifiers.Control, ocrRepository.Hotkey.Modifiers);
+        Assert.Equal((VirtualKey)expectedKeyValue, ocrRepository.Hotkey.Key);
+        Assert.Equal(expectedDisplay, ocrRepository.Hotkey.DisplayText);
+        JsonElement hotkey = result.StructuredContent!.Value.GetProperty("hotkey");
+        Assert.Equal(expectedDisplay, hotkey.GetProperty("display").GetString());
+        Assert.Equal(expectedKeyText, hotkey.GetProperty("key").GetString());
+        Assert.Equal(expectedKeyValue, hotkey.GetProperty("keyValue").GetInt32());
+    }
+
+    [Fact]
+    public async Task McpHotkeyDtos_FormatRawVirtualKeyCodesThroughUnifiedKeyText()
+    {
+        var existing = new RegexPageStructure
+        {
+            HotkeyName = "Backtick profile",
+            Hotkey = new HotkeyStructure
+            {
+                Modifiers = VirtualKeyModifiers.Control,
+                Key = (VirtualKey)0xC0
+            }
+        };
+        var regexRepository = new InMemoryRegexConfigurationRepository(existing);
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        using var arguments = JsonDocument.Parse("{}");
+
+        McpToolResult result = await service.ExecuteAsync("get_regex_profiles", arguments.RootElement, CancellationToken.None);
+
+        Assert.False(result.IsError, result.Text);
+        JsonElement hotkey = result.StructuredContent!.Value[0].GetProperty("hotkey");
+        Assert.Equal("Ctrl + `", hotkey.GetProperty("display").GetString());
+        Assert.Equal("Backtick", hotkey.GetProperty("key").GetString());
+        Assert.Equal(0xC0, hotkey.GetProperty("keyValue").GetInt32());
+    }
+
+    [Fact]
+    public void McpHotkeyParsing_UsesTheSharedHotkeyFormatterSolution()
+    {
+        string mcpToolService = File.ReadAllText(LocateSourceFile("Delete Newline", "Services", "Mcp", "DeleteNewlineMcpToolService.cs"));
+
+        Assert.Contains("HotkeyFormatter.ParseHotkeyText", mcpToolService);
+        Assert.Contains("HotkeyFormatter.ParseKeyText", mcpToolService);
+        Assert.DoesNotContain("NormalizeVirtualKeyText", mcpToolService);
     }
 
     [Fact]
@@ -906,6 +1001,10 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("Backspace", hotkeyDescription);
         Assert.Contains("Left Arrow", hotkeyDescription);
         Assert.Contains("Page Up", hotkeyDescription);
+        Assert.Contains("Backtick", hotkeyDescription);
+        Assert.Contains("Semicolon", hotkeyDescription);
+        Assert.DoesNotContain("Backtick (`)", hotkeyDescription);
+        Assert.DoesNotContain("Bracket ([ ])", hotkeyDescription);
 
         JsonElement keySchema = hotkeySchema
             .GetProperty("oneOf")[1]
@@ -920,6 +1019,10 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("Backspace", keyDescription);
         Assert.Contains("Spacebar", keyDescription);
         Assert.Contains("Del", keyDescription);
+        Assert.Contains("Backtick", keyDescription);
+        Assert.Contains("Slash", keyDescription);
+        Assert.DoesNotContain("Backtick (`)", keyDescription);
+        Assert.DoesNotContain("Bracket ([ ])", keyDescription);
     }
 
     private static async Task<JsonDocument> PostJsonRpcAsync(HttpClient client, int port, string json)

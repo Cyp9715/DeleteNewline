@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Helpers;
 using Delete_Newline.Services;
 using Windows.System;
 
@@ -58,7 +59,7 @@ public sealed class DeleteNewlineMcpToolService
                     "inputText": { "type": "string", "description": "Saved test input text shown on the Regex page." },
                     "input": { "type": "string", "description": "Alias for inputText." },
                     "hotkey": {
-                      "description": "Hotkey string like 'Control+Shift+Q', 'Alt+Number1', 'Alt+1', 'Ctrl+Backspace', 'Ctrl+Left Arrow', or 'Ctrl+Page Up', or object with modifiers/key. For keyboard number-row keys use Number0..Number9 (digit text 0..9 is also accepted). Common aliases such as Backspace, Return, Del, Spacebar, Page Up/Page Down, and Left/Right/Up/Down Arrow are accepted. Do not send JSON numbers for hotkey keys; Windows virtual-key value 1 means LeftButton, not the keyboard 1 key.",
+                      "description": "Hotkey string like 'Control+Shift+Q', 'Alt+Number1', 'Alt+1', 'Ctrl+Backspace', 'Ctrl+Left Arrow', 'Ctrl+Page Up', or 'Ctrl+Backtick', or object with modifiers/key. For keyboard number-row keys use Number0..Number9 (digit text 0..9 is also accepted). Common aliases such as Backspace, Return, Del, Spacebar, Page Up/Page Down, Left/Right/Up/Down Arrow, Backtick, Semicolon, Slash, Backslash, Minus, Equals, Comma, Period, LeftBracket, RightBracket, and Quote are accepted; symbol aliases such as `, ;, /, \\, -, =, ,, ., [, ], and ' are also accepted. Do not send JSON numbers for hotkey keys; Windows virtual-key value 1 means LeftButton, not the keyboard 1 key.",
                       "oneOf": [
                         { "type": "string", "description": "Preferred concise form. Examples: Control+Shift+Q, Alt+Number1, Alt+1." },
                         {
@@ -71,7 +72,7 @@ public sealed class DeleteNewlineMcpToolService
                                 { "type": "array", "items": { "type": "string" } }
                               ]
                             },
-                            "key": { "type": "string", "description": "Windows.System.VirtualKey name such as Q, F1, Enter, Escape, Space, Number1, Backspace, Spacebar, Return, Del, Page Up, Page Down, or Left Arrow. For keyboard number-row keys use Number0..Number9; digit strings like '1' are accepted and normalized to Number1. Do not send JSON numbers for keys." }
+                            "key": { "type": "string", "description": "Human-friendly key name or Windows.System.VirtualKey name such as Q, F1, Enter, Escape, Space, Number1, Backspace, Spacebar, Return, Del, Page Up, Page Down, Left Arrow, Backtick, Semicolon, Slash, Backslash, Minus, Equals, Comma, Period, LeftBracket, RightBracket, or Quote. Symbol aliases like `, ;, /, \\, -, =, ,, ., [, ], and ' are accepted. For keyboard number-row keys use Number0..Number9; digit strings like '1' are accepted and normalized to Number1. Do not send JSON numbers for keys." }
                           },
                           "required": ["key"],
                           "additionalProperties": false
@@ -235,7 +236,7 @@ public sealed class DeleteNewlineMcpToolService
                     "languageTag": { "type": "string", "description": "OCR recognizer language tag, e.g. en-US or ko-KR." },
                     "language": { "type": "string", "description": "Alias for languageTag." },
                     "hotkey": {
-                      "description": "Hotkey string like 'Control+Menu+O', 'Alt+Number1', 'Alt+1', 'Ctrl+Backspace', 'Ctrl+Left Arrow', or 'Ctrl+Page Up', or object with modifiers/key. For keyboard number-row keys use Number0..Number9 (digit text 0..9 is also accepted). Common aliases such as Backspace, Return, Del, Spacebar, Page Up/Page Down, and Left/Right/Up/Down Arrow are accepted. Do not send JSON numbers for hotkey keys; Windows virtual-key value 1 means LeftButton, not the keyboard 1 key.",
+                      "description": "Hotkey string like 'Control+Menu+O', 'Alt+Number1', 'Alt+1', 'Ctrl+Backspace', 'Ctrl+Left Arrow', 'Ctrl+Page Up', or 'Ctrl+Backtick', or object with modifiers/key. For keyboard number-row keys use Number0..Number9 (digit text 0..9 is also accepted). Common aliases such as Backspace, Return, Del, Spacebar, Page Up/Page Down, Left/Right/Up/Down Arrow, Backtick, Semicolon, Slash, Backslash, Minus, Equals, Comma, Period, LeftBracket, RightBracket, and Quote are accepted; symbol aliases such as `, ;, /, \\, -, =, ,, ., [, ], and ' are also accepted. Do not send JSON numbers for hotkey keys; Windows virtual-key value 1 means LeftButton, not the keyboard 1 key.",
                       "oneOf": [
                         { "type": "string", "description": "Preferred concise form. Examples: Control+Menu+O, Alt+Number1, Alt+1." },
                         {
@@ -248,7 +249,7 @@ public sealed class DeleteNewlineMcpToolService
                                 { "type": "array", "items": { "type": "string" } }
                               ]
                             },
-                            "key": { "type": "string", "description": "Windows.System.VirtualKey name such as O, F1, Enter, Escape, Space, Number1, Backspace, Spacebar, Return, Del, Page Up, Page Down, or Left Arrow. For keyboard number-row keys use Number0..Number9; digit strings like '1' are accepted and normalized to Number1. Do not send JSON numbers for keys." }
+                            "key": { "type": "string", "description": "Human-friendly key name or Windows.System.VirtualKey name such as O, F1, Enter, Escape, Space, Number1, Backspace, Spacebar, Return, Del, Page Up, Page Down, Left Arrow, Backtick, Semicolon, Slash, Backslash, Minus, Equals, Comma, Period, LeftBracket, RightBracket, or Quote. Symbol aliases like `, ;, /, \\, -, =, ,, ., [, ], and ' are accepted. For keyboard number-row keys use Number0..Number9; digit strings like '1' are accepted and normalized to Number1. Do not send JSON numbers for keys." }
                           },
                           "required": ["key"],
                           "additionalProperties": false
@@ -645,7 +646,7 @@ public sealed class DeleteNewlineMcpToolService
     {
         if (hotkeyElement.ValueKind == JsonValueKind.String)
         {
-            return ParseHotkeyString(hotkeyElement.GetString() ?? string.Empty);
+            return HotkeyFormatter.ParseHotkeyText(hotkeyElement.GetString() ?? string.Empty);
         }
 
         if (hotkeyElement.ValueKind != JsonValueKind.Object)
@@ -671,61 +672,15 @@ public sealed class DeleteNewlineMcpToolService
         };
     }
 
-    private static HotkeyStructure ParseHotkeyString(string hotkeyText)
-    {
-        string[] tokens = SplitHotkeyTokens(hotkeyText);
-        if (tokens.Length == 0)
-        {
-            throw new ArgumentException("hotkey string cannot be empty.");
-        }
-
-        VirtualKeyModifiers modifiers = VirtualKeyModifiers.None;
-        for (int i = 0; i < tokens.Length - 1; i++)
-        {
-            modifiers |= ParseModifierToken(tokens[i]);
-        }
-
-        VirtualKey key = ParseVirtualKey(tokens[^1]);
-        return new HotkeyStructure
-        {
-            Modifiers = modifiers,
-            Key = key
-        };
-    }
-
     private static VirtualKeyModifiers ParseModifiers(JsonElement modifiersElement)
     {
         return modifiersElement.ValueKind switch
         {
             JsonValueKind.Number when modifiersElement.TryGetInt32(out int value) => (VirtualKeyModifiers)value,
-            JsonValueKind.String => ParseModifierString(modifiersElement.GetString() ?? string.Empty),
+            JsonValueKind.String => HotkeyFormatter.ParseModifiersText(modifiersElement.GetString() ?? string.Empty),
             JsonValueKind.Array => modifiersElement.EnumerateArray().Aggregate(VirtualKeyModifiers.None, (current, item) => current | ParseModifiers(item)),
             JsonValueKind.Null => VirtualKeyModifiers.None,
             _ => throw new ArgumentException("hotkey.modifiers must be a string, string array, integer, or null.")
-        };
-    }
-
-    private static VirtualKeyModifiers ParseModifierString(string modifiersText)
-    {
-        VirtualKeyModifiers modifiers = VirtualKeyModifiers.None;
-        foreach (string token in SplitHotkeyTokens(modifiersText))
-        {
-            modifiers |= ParseModifierToken(token);
-        }
-
-        return modifiers;
-    }
-
-    private static VirtualKeyModifiers ParseModifierToken(string token)
-    {
-        return token.Trim().ToLowerInvariant() switch
-        {
-            "" or "none" => VirtualKeyModifiers.None,
-            "ctrl" or "control" => VirtualKeyModifiers.Control,
-            "shift" => VirtualKeyModifiers.Shift,
-            "alt" or "menu" => VirtualKeyModifiers.Menu,
-            "win" or "windows" or "meta" => VirtualKeyModifiers.Windows,
-            _ => throw new ArgumentException($"Unsupported hotkey modifier '{token}'. Supported modifiers: Control, Shift, Menu/Alt, Windows.")
         };
     }
 
@@ -733,104 +688,15 @@ public sealed class DeleteNewlineMcpToolService
     {
         if (keyElement.ValueKind == JsonValueKind.Number && keyElement.TryGetInt32(out int keyCode))
         {
-            return ParseVirtualKeyCode(keyCode);
+            return HotkeyFormatter.ParseKeyCode(keyCode);
         }
 
         if (keyElement.ValueKind == JsonValueKind.String)
         {
-            return ParseVirtualKey(keyElement.GetString() ?? string.Empty);
+            return HotkeyFormatter.ParseKeyText(keyElement.GetString() ?? string.Empty);
         }
 
         throw new ArgumentException("hotkey.key must be a string or integer.");
-    }
-
-    private static VirtualKey ParseVirtualKey(string keyText)
-    {
-        string normalized = keyText.Trim();
-        if (string.IsNullOrWhiteSpace(normalized))
-        {
-            throw new ArgumentException("hotkey key cannot be empty.");
-        }
-
-        normalized = NormalizeVirtualKeyText(normalized);
-
-        if (normalized.Length == 1 && char.IsDigit(normalized[0]))
-        {
-            return ParseDigitVirtualKey(normalized[0] - '0');
-        }
-
-        if (int.TryParse(normalized, out int keyCode))
-        {
-            return ParseVirtualKeyCode(keyCode);
-        }
-
-        if (normalized.Length == 1 && char.IsLetter(normalized[0]))
-        {
-            normalized = normalized.ToUpperInvariant();
-        }
-
-        if (Enum.TryParse(normalized, ignoreCase: true, out VirtualKey key))
-        {
-            return key;
-        }
-
-        throw new ArgumentException($"Unsupported hotkey key '{keyText}'. Use a Windows.System.VirtualKey name such as A, Q, F1, Enter, Escape, Space, or Number1 for keyboard number-row keys.");
-    }
-
-    private static VirtualKey ParseVirtualKeyCode(int keyCode)
-    {
-        if (keyCode is >= 0 and <= 9)
-        {
-            return ParseDigitVirtualKey(keyCode);
-        }
-
-        return (VirtualKey)keyCode;
-    }
-
-    private static VirtualKey ParseDigitVirtualKey(int digit)
-    {
-        return (VirtualKey)((int)VirtualKey.Number0 + digit);
-    }
-
-    private static string NormalizeVirtualKeyText(string keyText)
-    {
-        string compact = Regex.Replace(keyText.Trim(), @"[\s_\-]+", string.Empty).ToLowerInvariant();
-
-        if (compact.StartsWith("numpad", StringComparison.Ordinal) &&
-            compact.Length == "numpad0".Length &&
-            char.IsDigit(compact[^1]))
-        {
-            return $"NumberPad{compact[^1]}";
-        }
-
-        return compact switch
-        {
-            "esc" => "Escape",
-            "alt" => "Menu",
-            "backspace" => "Back",
-            "spacebar" => "Space",
-            "return" => "Enter",
-            "del" => "Delete",
-            "ins" => "Insert",
-            "pgup" or "pageup" => "PageUp",
-            "pgdn" or "pagedown" => "PageDown",
-            "leftarrow" or "arrowleft" => "Left",
-            "rightarrow" or "arrowright" => "Right",
-            "uparrow" or "arrowup" => "Up",
-            "downarrow" or "arrowdown" => "Down",
-            "printscreen" or "prtsc" or "prtscr" => "Snapshot",
-            "capslock" => "CapitalLock",
-            "scrolllock" => "Scroll",
-            _ => keyText.Trim()
-        };
-    }
-
-    private static string[] SplitHotkeyTokens(string text)
-    {
-        char[] explicitSeparators = ['+', ',', '|'];
-        return text.IndexOfAny(explicitSeparators) >= 0
-            ? text.Split(explicitSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            : text.Split([' '], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
     private static object ParseSettingValue(JsonElement valueElement)
@@ -944,10 +810,10 @@ public sealed class DeleteNewlineMcpToolService
         HotkeyStructure safeHotkey = CloneHotkey(hotkey);
         return new
         {
-            display = safeHotkey.ToString(),
+            display = HotkeyFormatter.GetDisplayText(safeHotkey.Modifiers, safeHotkey.Key),
             modifiers = safeHotkey.Modifiers.ToString(),
             modifiersValue = (int)safeHotkey.Modifiers,
-            key = safeHotkey.Key.ToString(),
+            key = HotkeyFormatter.GetKeyText(safeHotkey.Key),
             keyValue = (int)safeHotkey.Key
         };
     }
