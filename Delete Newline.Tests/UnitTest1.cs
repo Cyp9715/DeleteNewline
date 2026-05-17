@@ -519,6 +519,18 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void RegexCollectPage_SearchOverlayReservesTopLayoutSpace()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+        string normalizedRegexCollectPageXaml = regexCollectPageXaml.Replace("\r\n", "\n");
+
+        Assert.Contains("<Grid.RowDefinitions>\n            <RowDefinition Height=\"Auto\" />\n            <RowDefinition Height=\"*\" />\n        </Grid.RowDefinitions>", normalizedRegexCollectPageXaml);
+        Assert.Contains("<GridView x:Name=\"RegexConfigGridView\"\n                  Grid.Row=\"1\"", normalizedRegexCollectPageXaml);
+        Assert.Contains("<Border x:Name=\"RegexSearchOverlay\"\n                Grid.Row=\"0\"", normalizedRegexCollectPageXaml);
+        Assert.Contains("Margin=\"0,5,0,5\"", normalizedRegexCollectPageXaml);
+    }
+
+    [Fact]
     public void RegexCollectPage_RestoresSearchOverlayWhenReturningToFilteredProfiles()
     {
         string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
