@@ -5,7 +5,8 @@
       xmlns:structures="using:Delete_Newline.Contracts.Structures"
       xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
-      xmlns:converters="using:Delete_Newline.Converters">
+      xmlns:converters="using:Delete_Newline.Converters"
+      Loaded="RegexCollectPage_Loaded">
 
     <Page.Resources>
         <converters:BooleanToFailedBrushConverter x:Key="BooleanToFailedBrushConverter" />
@@ -15,6 +16,8 @@
         <KeyboardAccelerator Key="F"
                              Modifiers="Control"
                              Invoked="SearchKeyboardAccelerator_Invoked" />
+        <KeyboardAccelerator Key="Escape"
+                             Invoked="EscapeKeyboardAccelerator_Invoked" />
     </Page.KeyboardAccelerators>
 
     <Grid>
@@ -114,7 +117,8 @@
                      Width="260"
                      PlaceholderText="Search by name"
                      TextChanged="RegexSearchTextBox_TextChanged"
-                     KeyDown="RegexSearchTextBox_KeyDown" />
+                     KeyDown="RegexSearchTextBox_KeyDown"
+                     LostFocus="RegexSearchTextBox_LostFocus" />
         </Border>
 
         <Button Grid.Row="1" 

@@ -511,6 +511,34 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void RegexCollectPage_RestoresSearchOverlayWhenReturningToFilteredProfiles()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+        string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
+
+        Assert.Contains("Loaded=\"RegexCollectPage_Loaded\"", regexCollectPageXaml);
+        Assert.Contains("RegexCollectPage_Loaded", regexCollectPageCodeBehind);
+        Assert.Contains("SynchronizeRegexSearchOverlayWithViewModel", regexCollectPageCodeBehind);
+        Assert.Contains("!string.IsNullOrWhiteSpace(ViewModel.SearchText)", regexCollectPageCodeBehind);
+        Assert.Contains("RegexSearchTextBox.Text = ViewModel.SearchText", regexCollectPageCodeBehind);
+        Assert.Contains("RegexSearchOverlay.Visibility = Visibility.Visible", regexCollectPageCodeBehind);
+    }
+
+    [Fact]
+    public void RegexCollectPage_DismissesSearchWithEscapeAndWhenEmptySearchLosesFocus()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+        string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
+
+        Assert.Contains("LostFocus=\"RegexSearchTextBox_LostFocus\"", regexCollectPageXaml);
+        Assert.Contains("RegexSearchTextBox_KeyDown", regexCollectPageCodeBehind);
+        Assert.Contains("HideRegexSearchBox(restoreFocus: true)", regexCollectPageCodeBehind);
+        Assert.Contains("RegexSearchTextBox_LostFocus", regexCollectPageCodeBehind);
+        Assert.Contains("string.IsNullOrWhiteSpace(RegexSearchTextBox.Text)", regexCollectPageCodeBehind);
+        Assert.Contains("HideRegexSearchBox(restoreFocus: false)", regexCollectPageCodeBehind);
+    }
+
+    [Fact]
     public async Task LocalHttpServer_HandlesInitializeAndToolsListOverMcpJsonRpc()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();

@@ -21,9 +21,25 @@ public sealed partial class RegexCollectPage : Page
         DataContext = ViewModel;
     }
 
+    private void RegexCollectPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        SynchronizeRegexSearchOverlayWithViewModel();
+    }
+
     private void SearchKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         ShowRegexSearchBox();
+        args.Handled = true;
+    }
+
+    private void EscapeKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (!IsRegexSearchActive())
+        {
+            return;
+        }
+
+        HideRegexSearchBox(restoreFocus: false);
         args.Handled = true;
     }
 
@@ -39,24 +55,72 @@ public sealed partial class RegexCollectPage : Page
             return;
         }
 
-        HideRegexSearchBox();
+        HideRegexSearchBox(restoreFocus: true);
         e.Handled = true;
+    }
+
+    private void RegexSearchTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (!string.IsNullOrWhiteSpace(RegexSearchTextBox.Text))
+        {
+            return;
+        }
+
+        HideRegexSearchBox(restoreFocus: false);
     }
 
     private void ShowRegexSearchBox()
     {
         ViewModel.ShowSearch();
         RegexSearchOverlay.Visibility = Visibility.Visible;
+        if (RegexSearchTextBox.Text != ViewModel.SearchText)
+        {
+            RegexSearchTextBox.Text = ViewModel.SearchText;
+        }
+
         RegexSearchTextBox.Focus(FocusState.Keyboard);
         RegexSearchTextBox.SelectAll();
     }
 
-    private void HideRegexSearchBox()
+    private void HideRegexSearchBox(bool restoreFocus)
     {
         ViewModel.HideSearch();
-        RegexSearchTextBox.Text = string.Empty;
+        if (RegexSearchTextBox.Text.Length > 0)
+        {
+            RegexSearchTextBox.Text = string.Empty;
+        }
+
         RegexSearchOverlay.Visibility = Visibility.Collapsed;
-        RegexConfigGridView.Focus(FocusState.Programmatic);
+        if (restoreFocus)
+        {
+            RegexConfigGridView.Focus(FocusState.Programmatic);
+        }
+    }
+
+    private void SynchronizeRegexSearchOverlayWithViewModel()
+    {
+        if (!string.IsNullOrWhiteSpace(ViewModel.SearchText))
+        {
+            if (RegexSearchTextBox.Text != ViewModel.SearchText)
+            {
+                RegexSearchTextBox.Text = ViewModel.SearchText;
+            }
+
+            ViewModel.ShowSearch();
+            RegexSearchOverlay.Visibility = Visibility.Visible;
+            return;
+        }
+
+        RegexSearchOverlay.Visibility = ViewModel.IsSearchVisible
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    private bool IsRegexSearchActive()
+    {
+        return RegexSearchOverlay.Visibility == Visibility.Visible
+            || ViewModel.IsSearchVisible
+            || !string.IsNullOrWhiteSpace(ViewModel.SearchText);
     }
 
     private void RegexConfigCard_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -79,6 +143,13 @@ public sealed partial class RegexCollectPage : Page
     {
         if (e.Key != VirtualKey.Escape)
         {
+            return;
+        }
+
+        if (IsRegexSearchActive())
+        {
+            HideRegexSearchBox(restoreFocus: false);
+            e.Handled = true;
             return;
         }
 
