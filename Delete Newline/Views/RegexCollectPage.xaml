@@ -6,7 +6,8 @@
       xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
       xmlns:converters="using:Delete_Newline.Converters"
-      Loaded="RegexCollectPage_Loaded">
+      Loaded="RegexCollectPage_Loaded"
+      KeyboardAcceleratorPlacementMode="Hidden">
 
     <Page.Resources>
         <converters:BooleanToFailedBrushConverter x:Key="BooleanToFailedBrushConverter" />

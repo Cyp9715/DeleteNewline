@@ -511,6 +511,14 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void RegexCollectPage_HidesKeyboardAcceleratorTooltipBox()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+
+        Assert.Contains("KeyboardAcceleratorPlacementMode=\"Hidden\"", regexCollectPageXaml);
+    }
+
+    [Fact]
     public void RegexCollectPage_RestoresSearchOverlayWhenReturningToFilteredProfiles()
     {
         string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
