@@ -893,6 +893,40 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void OcrPage_CanDownloadAndApplyWindowsOcrLanguages()
+    {
+        string ocrPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OCRPage.xaml"));
+        string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
+        string installerHelper = File.ReadAllText(LocateSourceFile("Delete Newline", "Helpers", "OcrLanguageInstallHelper.cs"));
+        XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
+        XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
+
+        Assert.Contains("x:Uid=\"OCRPage_Header_InstallLanguage\"", ocrPageXaml);
+        Assert.Contains("ItemsSource=\"{x:Bind ViewModel.InstallableLanguages}\"", ocrPageXaml);
+        Assert.Contains("SelectedItem=\"{x:Bind ViewModel.SelectedInstallLanguage, Mode=TwoWay}\"", ocrPageXaml);
+        Assert.Contains("Command=\"{x:Bind ViewModel.InstallOcrLanguageCommand}\"", ocrPageXaml);
+        Assert.Contains("x:Uid=\"OCRPage_Button_InstallLanguage\"", ocrPageXaml);
+
+        Assert.Contains("ObservableCollection<Language> _installableLanguages", ocrViewModel);
+        Assert.Contains("Language? _selectedInstallLanguage", ocrViewModel);
+        Assert.Contains("private async Task InstallOcrLanguageAsync()", ocrViewModel);
+        Assert.Contains("await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(SelectedInstallLanguage.LanguageTag)", ocrViewModel);
+        Assert.Contains("RefreshAvailableOcrLanguages()", ocrViewModel);
+        Assert.Contains("SelectedLanguage = installedLanguage", ocrViewModel);
+
+        Assert.Contains("public static string GetOcrCapabilityName(string languageTag)", installerHelper);
+        Assert.Contains("$\"Language.OCR~~~{languageTag}~0.0.1.0\"", installerHelper);
+        Assert.Contains("Add-WindowsCapability -Online -Name", installerHelper);
+        Assert.Contains("Verb = \"runas\"", installerHelper);
+        Assert.Contains("UseShellExecute = true", installerHelper);
+
+        Assert.Equal("Download OCR Language", GetReswValue(englishResources, "OCRPage_Header_InstallLanguage.Header"));
+        Assert.Equal("Download and Apply", GetReswValue(englishResources, "OCRPage_Button_InstallLanguage.Content"));
+        Assert.Equal("OCR 언어 다운로드", GetReswValue(koreanResources, "OCRPage_Header_InstallLanguage.Header"));
+        Assert.Equal("다운로드 후 적용", GetReswValue(koreanResources, "OCRPage_Button_InstallLanguage.Content"));
+    }
+
+    [Fact]
     public async Task LocalHttpServer_HandlesInitializeAndToolsListOverMcpJsonRpc()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();

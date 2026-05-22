@@ -95,21 +95,27 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
 
-                        <!-- Language Installation Help -->
-                        <StackPanel Orientation="Horizontal" Margin="5,8,0,0">
-                            <TextBlock x:Uid="OCRPage_Text_AddLanguagePrefix"
-                                       Style="{ThemeResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       VerticalAlignment="Center" />
-                            <HyperlinkButton x:Uid="OCRPage_Hyperlink_AddLanguage"
-                                             NavigateUri="https://learn.microsoft.com/en-us/windows/powertoys/text-extractor#how-to-install-an-ocr-language-pack"
-                                             FontSize="12"
-                                             Padding="0,0,0,0"
-                                             VerticalAlignment="Center" />
-                            <TextBlock x:Uid="OCRPage_Text_AddLanguageSuffix"
-                                       Style="{ThemeResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       VerticalAlignment="Center" />
+                        <!-- Language Auto Installation -->
+                        <TextBlock x:Uid="OCRPage_Text_AutoInstallLanguageHelp"
+                                   Style="{ThemeResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Margin="5,8,0,0"
+                                   TextWrapping="Wrap" />
+                        <StackPanel Orientation="Horizontal" Margin="5,8,0,0" Spacing="8">
+                            <ComboBox x:Name="InstallLanguageComboBox"
+                                      x:Uid="OCRPage_Header_InstallLanguage"
+                                      Width="300"
+                                      ItemsSource="{x:Bind ViewModel.InstallableLanguages}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedInstallLanguage, Mode=TwoWay}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <Button x:Uid="OCRPage_Button_InstallLanguage"
+                                    Command="{x:Bind ViewModel.InstallOcrLanguageCommand}"
+                                    VerticalAlignment="Bottom" />
                         </StackPanel>
                     </StackPanel>
                 </Border>

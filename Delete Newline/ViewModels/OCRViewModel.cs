@@ -33,6 +33,17 @@ public partial class OCRViewModel : ObservableRecipient
     [ObservableProperty]
     private ObservableCollection<Language> _availableLanguages;
 
+    [ObservableProperty]
+    private ObservableCollection<Language> _installableLanguages;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(InstallOcrLanguageCommand))]
+    private Language? _selectedInstallLanguage;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(InstallOcrLanguageCommand))]
+    private bool _isInstallingLanguage;
+
     // Allow only one OCR capture window/session at a time.
     private int _ocrSessionActive;
     private bool _suppressLanguageAutoSave;
@@ -131,7 +142,9 @@ public partial class OCRViewModel : ObservableRecipient
     {
         _inAppNotificationService = notificationService;
         _settingsService = settingsService;
-        _availableLanguages = new ObservableCollection<Language>(OcrEngine.AvailableRecognizerLanguages);
+        _availableLanguages = [];
+        _installableLanguages = [];
+        RefreshAvailableOcrLanguages();
     }
 
     public void Initialize()
@@ -155,6 +168,32 @@ public partial class OCRViewModel : ObservableRecipient
 
         // Update display hotkey
         UpdateDisplayHotkey();
+    }
+
+    private void RefreshAvailableOcrLanguages()
+    {
+        AvailableLanguages.Clear();
+        foreach (Language language in OcrEngine.AvailableRecognizerLanguages.OrderBy(language => language.DisplayName))
+        {
+            AvailableLanguages.Add(language);
+        }
+
+        RefreshInstallableOcrLanguages();
+    }
+
+    private void RefreshInstallableOcrLanguages()
+    {
+        string? previousSelection = SelectedInstallLanguage?.LanguageTag;
+        IReadOnlyList<Language> installableLanguages = OcrLanguageInstallHelper.GetInstallableLanguages(AvailableLanguages);
+
+        InstallableLanguages.Clear();
+        foreach (Language language in installableLanguages)
+        {
+            InstallableLanguages.Add(language);
+        }
+
+        SelectedInstallLanguage = InstallableLanguages.FirstOrDefault(language =>
+            language.LanguageTag.Equals(previousSelection, StringComparison.OrdinalIgnoreCase)) ?? InstallableLanguages.FirstOrDefault();
     }
 
     private void LoadSavedLanguage()
@@ -285,6 +324,61 @@ public partial class OCRViewModel : ObservableRecipient
     private void OnCaptureLanguageChanged(Language language)
     {
         SelectedLanguage = language;
+    }
+
+    private bool CanInstallOcrLanguage() => SelectedInstallLanguage != null && !IsInstallingLanguage;
+
+    [RelayCommand(CanExecute = nameof(CanInstallOcrLanguage))]
+    private async Task InstallOcrLanguageAsync()
+    {
+        if (SelectedInstallLanguage == null)
+        {
+            return;
+        }
+
+        Language languageToInstall = SelectedInstallLanguage;
+        IsInstallingLanguage = true;
+
+        try
+        {
+            int exitCode = await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(SelectedInstallLanguage.LanguageTag);
+            RefreshAvailableOcrLanguages();
+
+            Language? installedLanguage = AvailableLanguages.FirstOrDefault(language =>
+                language.LanguageTag.Equals(languageToInstall.LanguageTag, StringComparison.OrdinalIgnoreCase));
+
+            if (exitCode == 0 && installedLanguage != null)
+            {
+                SelectedLanguage = installedLanguage;
+                await SaveOcrLanguageAsync();
+                _inAppNotificationService.ShowInAppNotification(
+                    titleKey: "Notification_OcrLanguageInstallSuccess_Title",
+                    messageKey: "Notification_OcrLanguageInstallSuccess_Message",
+                    severity: InfoBarSeverity.Success,
+                    messageArgs: new object[] { installedLanguage.DisplayName });
+            }
+            else
+            {
+                _inAppNotificationService.ShowInAppNotification(
+                    titleKey: "Notification_OcrLanguageInstallFailed_Title",
+                    messageKey: "Notification_OcrLanguageInstallFailed_Message",
+                    severity: InfoBarSeverity.Error,
+                    messageArgs: new object[] { languageToInstall.DisplayName });
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to install OCR language '{languageToInstall.LanguageTag}': {ex.Message}");
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_OcrLanguageInstallFailed_Title",
+                messageKey: "Notification_OcrLanguageInstallFailed_Message",
+                severity: InfoBarSeverity.Error,
+                messageArgs: new object[] { languageToInstall.DisplayName });
+        }
+        finally
+        {
+            IsInstallingLanguage = false;
+        }
     }
 
     [RelayCommand]
