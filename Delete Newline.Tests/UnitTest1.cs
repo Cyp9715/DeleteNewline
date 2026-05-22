@@ -877,6 +877,22 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void OcrCaptureWindow_UsesBlurredScreenshotPreviewWithSofterDim()
+    {
+        string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
+        string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
+        string ocrHelper = File.ReadAllText(LocateSourceFile("Delete Newline", "Helpers", "OcrHelper.cs"));
+
+        Assert.DoesNotContain("Opacity=\"0.6\"", ocrCaptureWindowXaml);
+        Assert.Contains("Opacity=\"0.34\"", ocrCaptureWindowXaml);
+        Assert.Contains("GetFullDesktopScreenshotAsImageSource(blurForCaptureOverlay: true)", ocrViewModel);
+        Assert.Contains("private const double CapturePreviewBlurScale = 0.16", ocrHelper);
+        Assert.Contains("private static Bitmap CreateBlurredPreviewBitmap(Bitmap source)", ocrHelper);
+        Assert.Contains("CompositingQuality.HighSpeed", ocrHelper);
+        Assert.Contains("InterpolationMode.HighQualityBicubic", ocrHelper);
+    }
+
+    [Fact]
     public async Task LocalHttpServer_HandlesInitializeAndToolsListOverMcpJsonRpc()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();
