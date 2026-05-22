@@ -166,6 +166,8 @@ public static class ImageHelper
     private static extern bool GetWindowRect(IntPtr hwnd, ref RECT rectangle);
 
     // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetrics
+    private const int SM_CXSCREEN = 0;       // Width of the primary display monitor
+    private const int SM_CYSCREEN = 1;       // Height of the primary display monitor
     private const int SM_CXVIRTUALSCREEN = 78; // Width of the virtual screen
     private const int SM_CYVIRTUALSCREEN = 79; // Height of the virtual screen
     private const int SM_XVIRTUALSCREEN = 76;  // Left coordinate of the virtual screen
@@ -220,6 +222,14 @@ public static class ImageHelper
         int height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
         return new Rectangle(left, top, width, height);
+    }
+
+    public static Rectangle GetPrimaryScreenBounds()
+    {
+        int width = GetSystemMetrics(SM_CXSCREEN);
+        int height = GetSystemMetrics(SM_CYSCREEN);
+
+        return new Rectangle(0, 0, width, height);
     }
 
     public static Bitmap PadImage(Bitmap image, int minW = 64, int minH = 64)

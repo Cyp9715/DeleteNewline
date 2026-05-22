@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Windows.Globalization;
+using Windows.System;
 using WinUIEx;
 using WinRT.Interop;
 using System.Runtime.InteropServices;
@@ -55,6 +56,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private Windows.Foundation.Point currentPoint = new();
     private bool isSelecting = false;
     private Language currentLanguage = new Language("en"); // Default language setting
+    private Action<Language>? _languageChanged;
 
     public OcrCaptureWindow()
     {
@@ -90,10 +92,15 @@ public sealed partial class OcrCaptureWindow : WindowEx
         this.Activated -= OnWindowActivated_FirstTime;
     }
 
-    public void SetupFullscreen(Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground, Language? selectedLanguage = null)
+    public void SetupFullscreen(
+        Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground,
+        Language? selectedLanguage = null,
+        IReadOnlyList<Language>? availableLanguages = null,
+        Action<Language>? languageChanged = null)
     {
         var hwnd = WindowNative.GetWindowHandle(this);
         currentLanguage = selectedLanguage ?? new Language("en");
+        _languageChanged = languageChanged;
         backgroundImage = preloadedBackground;
         RemoveWindowFrames(hwnd);
         ApplyOverlayWindowExStyle(hwnd);
@@ -117,8 +124,46 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
         BackgroundImage.Source = backgroundImage;
         SetupOverlayRectangles();
+        SetupLanguageSelector(availableLanguages, currentLanguage);
+        PositionLanguageToolbar();
         SetupCanvasEvents();
         SetupKeyHandling();
+    }
+
+    private void SetupLanguageSelector(IReadOnlyList<Language>? availableLanguages, Language selectedLanguage)
+    {
+        IReadOnlyList<Language> languages = availableLanguages is { Count: > 0 }
+            ? availableLanguages
+            : [selectedLanguage];
+
+        CaptureLanguageComboBox.ItemsSource = languages;
+        CaptureLanguageComboBox.SelectedItem = languages.FirstOrDefault(language =>
+            language.LanguageTag.Equals(selectedLanguage.LanguageTag, StringComparison.OrdinalIgnoreCase)) ?? languages[0];
+    }
+
+    private void PositionLanguageToolbar()
+    {
+        const double topMargin = 16;
+        var virtualScreen = ImageHelper.GetVirtualScreenBounds();
+        var primaryScreen = ImageHelper.GetPrimaryScreenBounds();
+        double toolbarWidth = LanguageToolbar.Width;
+        double left = primaryScreen.Left - virtualScreen.Left + Math.Max(0, (primaryScreen.Width - toolbarWidth) / 2);
+        double top = primaryScreen.Top - virtualScreen.Top + topMargin;
+
+        Canvas.SetLeft(LanguageToolbar, left);
+        Canvas.SetTop(LanguageToolbar, top);
+    }
+
+    private void CaptureLanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (CaptureLanguageComboBox.SelectedItem is not Language selectedLanguage)
+        {
+            return;
+        }
+
+        currentLanguage = selectedLanguage;
+        _languageChanged?.Invoke(currentLanguage);
+        RegionClickCanvas.Focus(FocusState.Programmatic);
     }
 
     private void RemoveWindowFrames(IntPtr hwnd)
@@ -176,6 +221,11 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void OcrCaptureWindow_KeyDown(object sender, KeyRoutedEventArgs e)
     {
+        if (e.Key != VirtualKey.Escape)
+        {
+            return;
+        }
+
         this.Close();
         e.Handled = true;
     }

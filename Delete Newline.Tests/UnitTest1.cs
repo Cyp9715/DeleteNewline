@@ -844,6 +844,39 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void OcrCaptureWindow_AllowsLanguageChangeFromTopCenterOverlay()
+    {
+        string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
+        string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
+        XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
+        XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
+
+        Assert.Contains("x:Name=\"LanguageToolbarCanvas\"", ocrCaptureWindowXaml);
+        Assert.Contains("x:Name=\"LanguageToolbar\"", ocrCaptureWindowXaml);
+        Assert.Contains("x:Uid=\"OcrCapture_LanguageLabel\"", ocrCaptureWindowXaml);
+        Assert.Contains("x:Name=\"CaptureLanguageComboBox\"", ocrCaptureWindowXaml);
+        Assert.Contains("SelectionChanged=\"CaptureLanguageComboBox_SelectionChanged\"", ocrCaptureWindowXaml);
+        Assert.Contains("Canvas.ZIndex=\"2\"", ocrCaptureWindowXaml);
+
+        Assert.Contains("IReadOnlyList<Language>? availableLanguages = null", ocrCaptureWindowCodeBehind);
+        Assert.Contains("Action<Language>? languageChanged = null", ocrCaptureWindowCodeBehind);
+        Assert.Contains("SetupLanguageSelector", ocrCaptureWindowCodeBehind);
+        Assert.Contains("PositionLanguageToolbar", ocrCaptureWindowCodeBehind);
+        Assert.Contains("ImageHelper.GetPrimaryScreenBounds()", ocrCaptureWindowCodeBehind);
+        Assert.Contains("CaptureLanguageComboBox_SelectionChanged", ocrCaptureWindowCodeBehind);
+        Assert.Contains("currentLanguage = selectedLanguage", ocrCaptureWindowCodeBehind);
+        Assert.Contains("_languageChanged?.Invoke(currentLanguage)", ocrCaptureWindowCodeBehind);
+
+        Assert.Contains("SetupFullscreen(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged)", ocrViewModel);
+        Assert.Contains("private void OnCaptureLanguageChanged(Language language)", ocrViewModel);
+        Assert.Contains("SelectedLanguage = language", ocrViewModel);
+
+        Assert.Equal("OCR Language", GetReswValue(englishResources, "OcrCapture_LanguageLabel.Text"));
+        Assert.Equal("OCR 언어", GetReswValue(koreanResources, "OcrCapture_LanguageLabel.Text"));
+    }
+
+    [Fact]
     public async Task LocalHttpServer_HandlesInitializeAndToolsListOverMcpJsonRpc()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();

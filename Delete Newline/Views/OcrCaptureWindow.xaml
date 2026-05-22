@@ -20,7 +20,7 @@
         <Image x:Name="BackgroundImage" Stretch="Fill" />
         
         <!-- Semi-transparent overlay that covers the entire screen -->
-        <Canvas x:Name="OverlayCanvas" Background="Transparent">
+        <Canvas x:Name="OverlayCanvas" Background="Transparent" Canvas.ZIndex="0">
             <!-- Top overlay -->
             <Rectangle x:Name="TopOverlay" 
                        Fill="Black" 
@@ -49,6 +49,34 @@
         </Canvas>
         
         <!-- Interaction layer -->
-        <Canvas Name="RegionClickCanvas" Background="Transparent" />
+        <Canvas Name="RegionClickCanvas" Background="Transparent" Canvas.ZIndex="1" />
+
+        <!-- OCR language selector shown during capture, similar to Windows snipping overlays. -->
+        <Canvas x:Name="LanguageToolbarCanvas" Canvas.ZIndex="2">
+            <Border x:Name="LanguageToolbar"
+                    Width="360"
+                    Padding="12,8"
+                    CornerRadius="8"
+                    Background="#CC202020"
+                    BorderBrush="#55FFFFFF"
+                    BorderThickness="1">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock x:Uid="OcrCapture_LanguageLabel"
+                               Text="OCR Language"
+                               Foreground="White"
+                               VerticalAlignment="Center" />
+                    <ComboBox x:Name="CaptureLanguageComboBox"
+                              MinWidth="220"
+                              VerticalAlignment="Center"
+                              SelectionChanged="CaptureLanguageComboBox_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+        </Canvas>
     </Grid>
 </windowex:WindowEx> 

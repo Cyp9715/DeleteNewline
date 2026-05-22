@@ -374,6 +374,10 @@
     <value>The previously selected OCR language is no longer available. Defaulted to English.</value>
     <comment>Notification message when saved OCR language is not available</comment>
   </data>
+  <data name="OcrCapture_LanguageLabel.Text" xml:space="preserve">
+    <value>OCR Language</value>
+    <comment>Language selector label shown in the OCR capture overlay</comment>
+  </data>
   <data name="LanguageList/en-US" xml:space="preserve">
     <value>English</value>
   </data>

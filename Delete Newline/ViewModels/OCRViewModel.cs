@@ -250,7 +250,7 @@ public partial class OCRViewModel : ObservableRecipient
             ocrWindow.Closed += OcrWindow_Closed;
 
             // Setup fullscreen capture with preloaded background and selected language
-            ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage);
+            ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged);
             ocrWindow.Activate();
         }
         catch (Exception ex)
@@ -280,6 +280,11 @@ public partial class OCRViewModel : ObservableRecipient
 
         _activeOcrWindow = null;
         Interlocked.Exchange(ref _ocrSessionActive, 0);
+    }
+
+    private void OnCaptureLanguageChanged(Language language)
+    {
+        SelectedLanguage = language;
     }
 
     [RelayCommand]

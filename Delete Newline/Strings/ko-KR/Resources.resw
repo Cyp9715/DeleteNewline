@@ -375,6 +375,10 @@
     <value>이전에 선택한 OCR 언어가 더 이상 사용할 수 없습니다. 영어로 기본 설정되었습니다.</value>
     <comment>저장된 OCR 언어가 사용할 수 없을 때 표시하는 알림 메시지</comment>
   </data>
+  <data name="OcrCapture_LanguageLabel.Text" xml:space="preserve">
+    <value>OCR 언어</value>
+    <comment>OCR 캡처 오버레이에 표시되는 언어 선택 라벨</comment>
+  </data>
   <data name="LanguageList/en-US" xml:space="preserve">
     <value>English</value>
   </data>
