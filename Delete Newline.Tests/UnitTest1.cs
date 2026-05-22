@@ -722,8 +722,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
         string regexCollectViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "RegexCollectViewModel.cs"));
 
         Assert.Contains("if (ViewModel.IsSearchVisible)", regexCollectPageCodeBehind);
-        Assert.Contains("HideRegexSearchBox(restoreFocus: true, clearSearchText: false)", regexCollectPageCodeBehind);
-        Assert.Contains("private void HideRegexSearchBox(bool restoreFocus, bool clearSearchText = true)", regexCollectPageCodeBehind);
+        Assert.Contains("HideRegexSearchBox(clearSearchText: false)", regexCollectPageCodeBehind);
+        Assert.Contains("private void HideRegexSearchBox(bool clearSearchText = true)", regexCollectPageCodeBehind);
         Assert.Contains("ViewModel.HideSearch(clearSearchText)", regexCollectPageCodeBehind);
         Assert.Contains("if (clearSearchText && RegexSearchTextBox.Text.Length > 0)", regexCollectPageCodeBehind);
 
@@ -732,6 +732,37 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("public void HideSearch(bool clearSearchText = true)", regexCollectViewModel);
         Assert.Contains("if (clearSearchText)", regexCollectViewModel);
         Assert.Contains("!IsSearchVisible || string.IsNullOrWhiteSpace(SearchText)", regexCollectViewModel);
+    }
+
+    [Fact]
+    public void RegexCollectPage_DoesNotFocusGridViewWhenCtrlFToggleHidesSearch()
+    {
+        string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
+
+        Assert.DoesNotContain("RegexConfigGridView.Focus", regexCollectPageCodeBehind);
+        Assert.DoesNotContain("restoreFocus", regexCollectPageCodeBehind);
+    }
+
+    [Fact]
+    public void RegexCollectPage_DoesNotMoveVisibleFocusToNavigationMenuWhenCtrlFToggleHidesSearch()
+    {
+        string regexCollectPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml"));
+        string regexCollectPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "RegexCollectPage.xaml.cs"));
+
+        Assert.Contains("x:Name=\"RegexSearchFocusSink\"", regexCollectPageXaml);
+        Assert.Contains("Opacity=\"0\"", regexCollectPageXaml);
+        Assert.Contains("IsHitTestVisible=\"False\"", regexCollectPageXaml);
+        Assert.Contains("IsTabStop=\"True\"", regexCollectPageXaml);
+        Assert.Contains("UseSystemFocusVisuals=\"False\"", regexCollectPageXaml);
+        Assert.Contains("AutomationProperties.AccessibilityView=\"Raw\"", regexCollectPageXaml);
+        Assert.Contains("RegexSearchFocusSink.Focus(FocusState.Programmatic)", regexCollectPageCodeBehind);
+        Assert.Contains("if (_isHidingSearch)", regexCollectPageCodeBehind);
+
+        int focusSinkIndex = regexCollectPageCodeBehind.IndexOf("RegexSearchFocusSink.Focus(FocusState.Programmatic)", StringComparison.Ordinal);
+        int collapseIndex = regexCollectPageCodeBehind.IndexOf("RegexSearchOverlay.Visibility = Visibility.Collapsed", StringComparison.Ordinal);
+        Assert.True(focusSinkIndex >= 0, "Ctrl+F hide should move focus to the invisible sink before hiding the focused TextBox.");
+        Assert.True(collapseIndex >= 0, "Ctrl+F hide should still collapse the search overlay.");
+        Assert.True(focusSinkIndex < collapseIndex, "Focus must leave the search TextBox before its overlay is collapsed so WinUI does not fall back to the NavigationView menu button.");
     }
 
     [Fact]
@@ -802,9 +833,14 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.DoesNotContain("EscapeKeyboardAccelerator_Invoked", regexCollectPageCodeBehind);
         Assert.DoesNotContain("RegexSearchTextBox_KeyDown", regexCollectPageCodeBehind);
         Assert.DoesNotContain("IsRegexSearchActive", regexCollectPageCodeBehind);
+        string lostFocusHandler = ExtractElementBlock(
+            regexCollectPageCodeBehind,
+            "private void RegexSearchTextBox_LostFocus",
+            "    private void ShowRegexSearchBox()");
+
         Assert.Contains("RegexSearchTextBox_LostFocus", regexCollectPageCodeBehind);
-        Assert.Contains("string.IsNullOrWhiteSpace(RegexSearchTextBox.Text)", regexCollectPageCodeBehind);
-        Assert.Contains("HideRegexSearchBox(restoreFocus: false)", regexCollectPageCodeBehind);
+        Assert.Contains("string.IsNullOrWhiteSpace(RegexSearchTextBox.Text)", lostFocusHandler);
+        Assert.Contains("HideRegexSearchBox()", lostFocusHandler);
     }
 
     [Fact]
@@ -988,18 +1024,18 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void ProjectVersion_IsConsistentAt316()
+    public void ProjectVersion_IsConsistentAt317()
     {
         XDocument project = XDocument.Load(LocateSourceFile("Delete Newline", "Delete Newline.csproj"));
         XDocument manifest = XDocument.Load(LocateSourceFile("Delete Newline", "Package.appxmanifest"));
 
-        Assert.Equal("3.1.6", project.Descendants("Version").Single().Value);
-        Assert.Equal("3.1.6.0", project.Descendants("AssemblyVersion").Single().Value);
-        Assert.Equal("3.1.6.0", project.Descendants("FileVersion").Single().Value);
+        Assert.Equal("3.1.7", project.Descendants("Version").Single().Value);
+        Assert.Equal("3.1.7.0", project.Descendants("AssemblyVersion").Single().Value);
+        Assert.Equal("3.1.7.0", project.Descendants("FileVersion").Single().Value);
 
         XNamespace packageNamespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
         XElement identity = manifest.Root!.Element(packageNamespace + "Identity")!;
-        Assert.Equal("3.1.6.0", identity.Attribute("Version")!.Value);
+        Assert.Equal("3.1.7.0", identity.Attribute("Version")!.Value);
     }
 
     private static void AssertHotkeyKeySchemaGuidesModelsToNamedAndCommonKeys(McpToolDescriptor tool)

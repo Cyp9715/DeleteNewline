@@ -20,6 +20,17 @@
     </Page.KeyboardAccelerators>
 
     <Grid>
+        <Button x:Name="RegexSearchFocusSink"
+                Width="1"
+                Height="1"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Opacity="0"
+                IsHitTestVisible="False"
+                IsTabStop="True"
+                UseSystemFocusVisuals="False"
+                AutomationProperties.AccessibilityView="Raw" />
+
         <Border x:Name="RegexSearchOverlay"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom"

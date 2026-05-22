@@ -9,6 +9,8 @@ namespace Delete_Newline.Views;
 
 public sealed partial class RegexCollectPage : Page
 {
+    private bool _isHidingSearch;
+
     public RegexCollectViewModel ViewModel
     {
         get;
@@ -30,7 +32,7 @@ public sealed partial class RegexCollectPage : Page
     {
         if (ViewModel.IsSearchVisible)
         {
-            HideRegexSearchBox(restoreFocus: true, clearSearchText: false);
+            HideRegexSearchBox(clearSearchText: false);
             args.Handled = true;
             return;
         }
@@ -46,12 +48,17 @@ public sealed partial class RegexCollectPage : Page
 
     private void RegexSearchTextBox_LostFocus(object sender, RoutedEventArgs e)
     {
+        if (_isHidingSearch)
+        {
+            return;
+        }
+
         if (!string.IsNullOrWhiteSpace(RegexSearchTextBox.Text))
         {
             return;
         }
 
-        HideRegexSearchBox(restoreFocus: false);
+        HideRegexSearchBox();
     }
 
     private void ShowRegexSearchBox()
@@ -67,18 +74,23 @@ public sealed partial class RegexCollectPage : Page
         RegexSearchTextBox.SelectAll();
     }
 
-    private void HideRegexSearchBox(bool restoreFocus, bool clearSearchText = true)
+    private void HideRegexSearchBox(bool clearSearchText = true)
     {
-        ViewModel.HideSearch(clearSearchText);
-        if (clearSearchText && RegexSearchTextBox.Text.Length > 0)
+        _isHidingSearch = true;
+        try
         {
-            RegexSearchTextBox.Text = string.Empty;
-        }
+            ViewModel.HideSearch(clearSearchText);
+            if (clearSearchText && RegexSearchTextBox.Text.Length > 0)
+            {
+                RegexSearchTextBox.Text = string.Empty;
+            }
 
-        RegexSearchOverlay.Visibility = Visibility.Collapsed;
-        if (restoreFocus)
+            RegexSearchFocusSink.Focus(FocusState.Programmatic);
+            RegexSearchOverlay.Visibility = Visibility.Collapsed;
+        }
+        finally
         {
-            RegexConfigGridView.Focus(FocusState.Programmatic);
+            _isHidingSearch = false;
         }
     }
 
