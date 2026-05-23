@@ -997,8 +997,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         string installLanguageBlock = ExtractElementBlock(ocrPageXaml, "<Grid x:Name=\"InstallLanguageRow\"", "</Grid>");
 
         Assert.Contains("x:Uid=\"OCRPage_Description_LanguageSettings\"", languageSettingsBlock);
-        Assert.Contains("x:Uid=\"OCRPage_Text_AutoInstallLanguageHelp\"", languageSettingsBlock);
-        Assert.Contains("Margin=\"5,14,0,0\"", languageSettingsBlock);
+        Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp", languageSettingsBlock);
         Assert.Contains("Margin=\"5,10,0,0\"", installLanguageBlock);
         Assert.Contains("x:Uid=\"OCRPage_Header_InstallLanguage\"", installLanguageBlock);
         Assert.Contains("x:Name=\"InstallLanguageRow\"", installLanguageBlock);
@@ -1016,6 +1015,9 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(SelectedInstallLanguage.LanguageTag)", ocrViewModel);
         Assert.Contains("RefreshAvailableOcrLanguages()", ocrViewModel);
         Assert.Contains("SelectedLanguage = installedLanguage", ocrViewModel);
+        Assert.Contains("await SaveOcrLanguageAsync()", ocrViewModel);
+        Assert.DoesNotContain("Notification_OcrLanguageInstallSuccess", ocrViewModel);
+        Assert.Contains("Notification_OcrLanguageInstallFailed", ocrViewModel);
 
         Assert.Contains("public static string GetOcrCapabilityName(string languageTag)", installerHelper);
         Assert.Contains("$\"Language.OCR~~~{languageTag}~0.0.1.0\"", installerHelper);
@@ -1025,12 +1027,12 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         Assert.Equal("Download OCR Language", GetReswValue(englishResources, "OCRPage_Header_InstallLanguage.Header"));
         Assert.Equal("Download and Apply", GetReswValue(englishResources, "OCRPage_Button_InstallLanguage.Content"));
-        Assert.Contains("PowerShell", GetReswValue(englishResources, "OCRPage_Text_AutoInstallLanguageHelp.Text"));
-        Assert.Contains("normal", GetReswValue(englishResources, "OCRPage_Text_AutoInstallLanguageHelp.Text"), StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", englishResources.ToString());
+        Assert.DoesNotContain("Notification_OcrLanguageInstallSuccess", englishResources.ToString());
         Assert.Equal("OCR 언어 다운로드", GetReswValue(koreanResources, "OCRPage_Header_InstallLanguage.Header"));
         Assert.Equal("다운로드 후 적용", GetReswValue(koreanResources, "OCRPage_Button_InstallLanguage.Content"));
-        Assert.Contains("PowerShell", GetReswValue(koreanResources, "OCRPage_Text_AutoInstallLanguageHelp.Text"));
-        Assert.Contains("정상", GetReswValue(koreanResources, "OCRPage_Text_AutoInstallLanguageHelp.Text"));
+        Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", koreanResources.ToString());
+        Assert.DoesNotContain("Notification_OcrLanguageInstallSuccess", koreanResources.ToString());
     }
 
     [Fact]

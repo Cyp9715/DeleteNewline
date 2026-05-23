@@ -366,10 +366,6 @@
     <value>.</value>
     <comment>OCR page add language suffix text</comment>
   </data>
-  <data name="OCRPage_Text_AutoInstallLanguageHelp.Text" xml:space="preserve">
-    <value>Select a language to download and apply its Windows OCR capability automatically. Windows may ask for administrator permission. PowerShell may take a while to apply the language; this delay is normal.</value>
-    <comment>OCR page automatic language installation help text; mentions PowerShell can take a while and that the delay is normal</comment>
-  </data>
   <data name="OCRPage_Header_InstallLanguage.Header" xml:space="preserve">
     <value>Download OCR Language</value>
     <comment>OCR page installable language combobox header</comment>
@@ -377,14 +373,6 @@
   <data name="OCRPage_Button_InstallLanguage.Content" xml:space="preserve">
     <value>Download and Apply</value>
     <comment>OCR page install language button content</comment>
-  </data>
-  <data name="Notification_OcrLanguageInstallSuccess_Title" xml:space="preserve">
-    <value>OCR Language Installed</value>
-    <comment>Notification title when OCR language installation succeeds</comment>
-  </data>
-  <data name="Notification_OcrLanguageInstallSuccess_Message" xml:space="preserve">
-    <value>{0} is ready for OCR.</value>
-    <comment>Notification message when OCR language installation succeeds</comment>
   </data>
   <data name="Notification_OcrLanguageInstallFailed_Title" xml:space="preserve">
     <value>OCR Language Install Failed</value>
