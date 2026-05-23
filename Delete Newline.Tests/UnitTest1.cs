@@ -982,15 +982,30 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void OcrCaptureWindow_UsesSharpScreenshotPreviewWithDarkFilter()
+    public void OcrCaptureWindow_UsesFrozenScreenshotPreviewThenDarkensIt()
     {
         string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
         string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
         string ocrHelper = File.ReadAllText(LocateSourceFile("Delete Newline", "Helpers", "OcrHelper.cs"));
 
-        Assert.Contains("Opacity=\"0.6\"", ocrCaptureWindowXaml);
-        Assert.DoesNotContain("Opacity=\"0.34\"", ocrCaptureWindowXaml);
+        string topOverlayBlock = ExtractElementBlock(ocrCaptureWindowXaml, "<Rectangle x:Name=\"TopOverlay\"", "/>");
+        string leftOverlayBlock = ExtractElementBlock(ocrCaptureWindowXaml, "<Rectangle x:Name=\"LeftOverlay\"", "/>");
+        string rightOverlayBlock = ExtractElementBlock(ocrCaptureWindowXaml, "<Rectangle x:Name=\"RightOverlay\"", "/>");
+        string bottomOverlayBlock = ExtractElementBlock(ocrCaptureWindowXaml, "<Rectangle x:Name=\"BottomOverlay\"", "/>");
+
         Assert.Contains("GetFullDesktopScreenshotAsImageSource()", ocrViewModel);
+        Assert.Contains("BackgroundImage.Source = backgroundImage", ocrCaptureWindowCodeBehind);
+        Assert.Contains("Opacity=\"0\"", topOverlayBlock);
+        Assert.Contains("Opacity=\"0\"", leftOverlayBlock);
+        Assert.Contains("Opacity=\"0\"", rightOverlayBlock);
+        Assert.Contains("Opacity=\"0\"", bottomOverlayBlock);
+        Assert.Contains("private const double OverlayTargetOpacity = 0.6", ocrCaptureWindowCodeBehind);
+        Assert.Contains("BeginOverlayDarkenFade()", ocrCaptureWindowCodeBehind);
+        Assert.DoesNotContain("SetLayeredWindowAttributes", ocrCaptureWindowCodeBehind);
+        Assert.DoesNotContain("LWA_ALPHA", ocrCaptureWindowCodeBehind);
+        Assert.DoesNotContain("byte alpha", ocrCaptureWindowCodeBehind);
+        Assert.DoesNotContain("Opacity=\"0.34\"", ocrCaptureWindowXaml);
         Assert.DoesNotContain("blurForCaptureOverlay", ocrViewModel);
         Assert.DoesNotContain("CapturePreviewBlurScale", ocrHelper);
         Assert.DoesNotContain("CreateBlurredPreviewBitmap", ocrHelper);

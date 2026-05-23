@@ -30,22 +30,22 @@
             <!-- Top overlay -->
             <Rectangle x:Name="TopOverlay" 
                        Fill="Black" 
-                       Opacity="0.6" />
+                       Opacity="0" />
             
             <!-- Left overlay -->
             <Rectangle x:Name="LeftOverlay" 
                        Fill="Black" 
-                       Opacity="0.6" />
+                       Opacity="0" />
             
             <!-- Right overlay -->
             <Rectangle x:Name="RightOverlay" 
                        Fill="Black" 
-                       Opacity="0.6" />
+                       Opacity="0" />
             
             <!-- Bottom overlay -->
             <Rectangle x:Name="BottomOverlay" 
                        Fill="Black" 
-                       Opacity="0.6" />
+                       Opacity="0" />
 
             <!-- Windows-style white dashed outline for the selected capture region. -->
             <Rectangle x:Name="SelectionBorder"

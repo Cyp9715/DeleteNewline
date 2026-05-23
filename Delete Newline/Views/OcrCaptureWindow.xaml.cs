@@ -17,9 +17,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private static class NativeMethods
     {
         [DllImport("user32.dll", SetLastError = true)]
-        internal static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
-
-        [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         [DllImport("user32.dll")]
@@ -60,19 +57,19 @@ public sealed partial class OcrCaptureWindow : WindowEx
         internal const uint SWP_FRAMECHANGED = 0x0020;
         internal const uint SWP_NOMOVE = 0x0002;
         internal const uint SWP_NOSIZE = 0x0001;
-        internal const uint LWA_ALPHA = 0x00000002;
         internal const int GWL_EXSTYLE = -20;
         internal const int GWLP_WNDPROC = -4;
         internal const uint WM_KEYDOWN = 0x0100;
         internal const uint WM_SYSKEYDOWN = 0x0104;
         internal const int VK_ESCAPE = 0x1B;
-        internal const int WS_EX_LAYERED = 0x80000;
         internal const int WS_EX_TOOLWINDOW = 0x00000080;
         internal const int WS_EX_APPWINDOW = 0x00040000;
     }
 
+    private const double OverlayTargetOpacity = 0.6;
+    private const double OverlayFadeStep = 0.04;
     private readonly NotificationService? _notificationService;
-    private bool isFadeInStarted = false;
+    private bool isDarkenFadeStarted = false;
     private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
     private Windows.Foundation.Point startPoint = new();
     private Windows.Foundation.Point currentPoint = new();
@@ -95,29 +92,39 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void OnWindowActivated_FirstTime(object sender, WindowActivatedEventArgs args)
     {
-        if (isFadeInStarted) return;
-        isFadeInStarted = true;
+        if (isDarkenFadeStarted) return;
+        isDarkenFadeStarted = true;
         var hwnd = WindowNative.GetWindowHandle(this);
 
         ApplyOverlayWindowExStyle(hwnd);
-        NativeMethods.SetLayeredWindowAttributes(hwnd, 0, 0, NativeMethods.LWA_ALPHA);
+        BeginOverlayDarkenFade();
 
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(2) };
-        byte alpha = 0;
-        const byte MAX_ALPHA = 255;
+        this.Activated -= OnWindowActivated_FirstTime;
+    }
 
+    private void BeginOverlayDarkenFade()
+    {
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(8) };
         timer.Tick += (s, e) =>
         {
-            alpha = (byte)Math.Min(alpha + 10, MAX_ALPHA);
-            NativeMethods.SetLayeredWindowAttributes(hwnd, 0, alpha, NativeMethods.LWA_ALPHA);
-            if (alpha >= MAX_ALPHA)
+            double opacity = Math.Min(TopOverlay.Opacity + OverlayFadeStep, OverlayTargetOpacity);
+            SetOverlayOpacity(opacity);
+
+            if (opacity >= OverlayTargetOpacity)
             {
                 timer.Stop();
+                SetOverlayOpacity(OverlayTargetOpacity);
             }
         };
         timer.Start();
+    }
 
-        this.Activated -= OnWindowActivated_FirstTime;
+    private void SetOverlayOpacity(double opacity)
+    {
+        TopOverlay.Opacity = opacity;
+        LeftOverlay.Opacity = opacity;
+        RightOverlay.Opacity = opacity;
+        BottomOverlay.Opacity = opacity;
     }
 
     public void SetupFullscreen(
@@ -246,7 +253,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
         try
         {
             int exStyle = NativeMethods.GetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE);
-            exStyle |= (NativeMethods.WS_EX_LAYERED | NativeMethods.WS_EX_TOOLWINDOW);
+            exStyle |= NativeMethods.WS_EX_TOOLWINDOW;
             exStyle &= ~NativeMethods.WS_EX_APPWINDOW;
             NativeMethods.SetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE, exStyle);
 
