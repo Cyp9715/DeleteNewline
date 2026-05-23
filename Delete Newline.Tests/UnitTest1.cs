@@ -1016,7 +1016,9 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("RefreshAvailableOcrLanguages()", ocrViewModel);
         Assert.Contains("SelectedLanguage = installedLanguage", ocrViewModel);
         Assert.Contains("await SaveOcrLanguageAsync()", ocrViewModel);
-        Assert.DoesNotContain("Notification_OcrLanguageInstallSuccess", ocrViewModel);
+        Assert.Contains("Notification_OcrLanguageInstallSuccess_Title", ocrViewModel);
+        Assert.Contains("Notification_OcrLanguageInstallSuccess_Message", ocrViewModel);
+        Assert.Contains("InfoBarSeverity.Success", ocrViewModel);
         Assert.Contains("Notification_OcrLanguageInstallFailed", ocrViewModel);
 
         Assert.Contains("public static string GetOcrCapabilityName(string languageTag)", installerHelper);
@@ -1028,11 +1030,59 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Equal("Download OCR Language", GetReswValue(englishResources, "OCRPage_Header_InstallLanguage.Header"));
         Assert.Equal("Download and Apply", GetReswValue(englishResources, "OCRPage_Button_InstallLanguage.Content"));
         Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", englishResources.ToString());
-        Assert.DoesNotContain("Notification_OcrLanguageInstallSuccess", englishResources.ToString());
+        Assert.Equal("OCR Language Installed", GetReswValue(englishResources, "Notification_OcrLanguageInstallSuccess_Title"));
+        Assert.Equal("{0} is ready for OCR.", GetReswValue(englishResources, "Notification_OcrLanguageInstallSuccess_Message"));
         Assert.Equal("OCR 언어 다운로드", GetReswValue(koreanResources, "OCRPage_Header_InstallLanguage.Header"));
         Assert.Equal("다운로드 후 적용", GetReswValue(koreanResources, "OCRPage_Button_InstallLanguage.Content"));
         Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", koreanResources.ToString());
-        Assert.DoesNotContain("Notification_OcrLanguageInstallSuccess", koreanResources.ToString());
+        Assert.Equal("OCR 언어 설치됨", GetReswValue(koreanResources, "Notification_OcrLanguageInstallSuccess_Title"));
+        Assert.Equal("{0} OCR을 사용할 수 있습니다.", GetReswValue(koreanResources, "Notification_OcrLanguageInstallSuccess_Message"));
+    }
+
+    [Fact]
+    public void OcrPage_GroupsHotkeyLanguageAndLanguageDownloadIntoSeparateCards()
+    {
+        string ocrPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OCRPage.xaml"));
+        XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
+        XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
+
+        string hotkeySettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Hotkey Settings -->", "</Border>");
+        string languageSettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Settings -->", "<!-- OCR Language Download Label -->");
+        string languageDownloadBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Download -->", "</Border>");
+
+        Assert.Contains("x:Uid=\"OCRPage_Title_HotkeySettings\"", hotkeySettingsBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Title_LanguageSettings\"", languageSettingsBlock);
+        Assert.Contains("x:Name=\"LanguageComboBox\"", languageSettingsBlock);
+        Assert.DoesNotContain("InstallLanguageRow", languageSettingsBlock);
+
+        Assert.Contains("x:Uid=\"OCRPage_Title_LanguageDownload\"", languageDownloadBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Description_LanguageDownload\"", languageDownloadBlock);
+        Assert.Contains("x:Name=\"InstallLanguageRow\"", languageDownloadBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Header_InstallLanguage\"", languageDownloadBlock);
+        Assert.Contains("Command=\"{x:Bind ViewModel.InstallOcrLanguageCommand}\"", languageDownloadBlock);
+
+        Assert.Equal("Language Download", GetReswValue(englishResources, "OCRPage_Title_LanguageDownload.Text"));
+        Assert.Equal("Download missing Windows OCR languages and apply them immediately.", GetReswValue(englishResources, "OCRPage_Description_LanguageDownload.Text"));
+        Assert.Equal("언어 다운로드", GetReswValue(koreanResources, "OCRPage_Title_LanguageDownload.Text"));
+        Assert.Equal("필요한 Windows OCR 언어를 다운로드하고 바로 적용합니다.", GetReswValue(koreanResources, "OCRPage_Description_LanguageDownload.Text"));
+    }
+
+    [Fact]
+    public void SettingsPage_AppLanguageChangesWithoutBottomSuccessNotification()
+    {
+        string settingsViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "SettingsViewModel.cs"));
+        XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
+        XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
+
+        string switchLanguageBlock = ExtractElementBlock(settingsViewModel, "private async Task SwitchLanguageAsync(LanguageItem param)", "private async Task ToggleNotificationAsync(bool isChecked)");
+
+        Assert.Contains("await _localizationService.SetLanguage(param)", switchLanguageBlock);
+        Assert.Contains("RefreshCurrentUiLanguage()", switchLanguageBlock);
+        Assert.DoesNotContain("ShowInAppNotification", switchLanguageBlock);
+        Assert.DoesNotContain("Notification_LanguageChanged", switchLanguageBlock);
+
+        Assert.DoesNotContain("Notification_LanguageChanged", englishResources.ToString());
+        Assert.DoesNotContain("Notification_LanguageChanged", koreanResources.ToString());
     }
 
     [Fact]

@@ -14,14 +14,14 @@
     <ScrollViewer Margin="0">
         <Grid Padding="20,0,20,0">
             <StackPanel MaxWidth="800">
-                <!-- OCR Hotkey Settings Label -->
+                <!-- OCR Hotkey Settings -->
                 <TextBlock x:Uid="OCRPage_Title_HotkeySettings"
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            FontSize="16"
                            HorizontalAlignment="Left"
                            Margin="3,20,0,0"/>
                 
-                <!-- OCR Hotkey Configuration -->
+                <!-- OCR Hotkey Settings Card -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
@@ -61,14 +61,14 @@
                     </StackPanel>
                 </Border>
 
-                <!-- OCR Language Settings Label -->
+                <!-- OCR Language Settings -->
                 <TextBlock x:Uid="OCRPage_Title_LanguageSettings"
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            FontSize="16"
                            HorizontalAlignment="Left"
                            Margin="3,20,0,0"/>
 
-                <!-- OCR Language Settings -->
+                <!-- OCR Language Settings Card -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
@@ -94,8 +94,30 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
+                    </StackPanel>
+                </Border>
 
-                        <!-- Language Auto Installation -->
+                <!-- OCR Language Download -->
+                <!-- OCR Language Download Label -->
+                <TextBlock x:Uid="OCRPage_Title_LanguageDownload"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           FontSize="16"
+                           HorizontalAlignment="Left"
+                           Margin="3,20,0,0"/>
+
+                <!-- OCR Language Download Card -->
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="0,5,0,0"
+                        Padding="10">
+                    <StackPanel>
+                        <TextBlock x:Uid="OCRPage_Description_LanguageDownload"
+                                   Style="{ThemeResource BodyTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Margin="5,0,0,0" />
+
                         <Grid x:Name="InstallLanguageRow"
                               Margin="5,10,0,0"
                               ColumnSpacing="8"

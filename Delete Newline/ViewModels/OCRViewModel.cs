@@ -351,6 +351,11 @@ public partial class OCRViewModel : ObservableRecipient
             {
                 SelectedLanguage = installedLanguage;
                 await SaveOcrLanguageAsync();
+                _inAppNotificationService.ShowInAppNotification(
+                    titleKey: "Notification_OcrLanguageInstallSuccess_Title",
+                    messageKey: "Notification_OcrLanguageInstallSuccess_Message",
+                    severity: InfoBarSeverity.Success,
+                    messageArgs: new object[] { installedLanguage.DisplayName });
             }
             else
             {

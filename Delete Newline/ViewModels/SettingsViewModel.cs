@@ -179,11 +179,6 @@ public partial class SettingsViewModel : ObservableRecipient
         await _localizationService.SetLanguage(param);
         VersionDescription = GetVersionDescription();
         RefreshCurrentUiLanguage();
-
-        _inAppNotificationService.ShowInAppNotification(
-            "Notification_LanguageChanged_Title", 
-            "Notification_LanguageChanged_Message_Applied",
-            InfoBarSeverity.Success);
     }
 
     [RelayCommand]
