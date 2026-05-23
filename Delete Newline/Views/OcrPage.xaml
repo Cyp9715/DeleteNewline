@@ -101,10 +101,18 @@
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    Margin="5,8,0,0"
                                    TextWrapping="Wrap" />
-                        <StackPanel Orientation="Horizontal" Margin="5,8,0,0" Spacing="8">
+                        <Grid x:Name="InstallLanguageRow"
+                              Margin="5,8,0,0"
+                              ColumnSpacing="8"
+                              HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
                             <ComboBox x:Name="InstallLanguageComboBox"
                                       x:Uid="OCRPage_Header_InstallLanguage"
-                                      Width="300"
+                                      Grid.Column="0"
+                                      HorizontalAlignment="Stretch"
                                       ItemsSource="{x:Bind ViewModel.InstallableLanguages}"
                                       SelectedItem="{x:Bind ViewModel.SelectedInstallLanguage, Mode=TwoWay}">
                                 <ComboBox.ItemTemplate>
@@ -114,9 +122,10 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                             <Button x:Uid="OCRPage_Button_InstallLanguage"
+                                    Grid.Column="1"
                                     Command="{x:Bind ViewModel.InstallOcrLanguageCommand}"
                                     VerticalAlignment="Bottom" />
-                        </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
             </StackPanel>

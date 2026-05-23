@@ -878,6 +878,53 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void OcrCaptureWindow_EscapeClosesEvenWhenLanguageSelectorHasFocus()
+    {
+        string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
+
+        Assert.Contains("KeyboardAcceleratorPlacementMode=\"Hidden\"", ocrCaptureWindowXaml);
+        Assert.Contains("<KeyboardAccelerator Key=\"Escape\"", ocrCaptureWindowXaml);
+        Assert.Contains("Invoked=\"EscapeKeyboardAccelerator_Invoked\"", ocrCaptureWindowXaml);
+        Assert.Contains("private void EscapeKeyboardAccelerator_Invoked", ocrCaptureWindowCodeBehind);
+        Assert.Contains("RegisterEscapeMessageHook(hwnd)", ocrCaptureWindowCodeBehind);
+        Assert.Contains("WM_KEYDOWN", ocrCaptureWindowCodeBehind);
+        Assert.Contains("VK_ESCAPE", ocrCaptureWindowCodeBehind);
+        Assert.Contains("AddHandler(UIElement.KeyDownEvent", ocrCaptureWindowCodeBehind);
+        Assert.Contains("handledEventsToo: true", ocrCaptureWindowCodeBehind);
+        Assert.Contains("private void CloseCaptureOverlay()", ocrCaptureWindowCodeBehind);
+        Assert.Contains("CloseCaptureOverlay();", ocrCaptureWindowCodeBehind);
+    }
+
+    [Fact]
+    public void OcrCaptureWindow_DoesNotDrawColoredSelectionBorder()
+    {
+        string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
+
+        Assert.DoesNotContain("SelectionBorder", ocrCaptureWindowXaml);
+        Assert.DoesNotContain("SelectionBorder", ocrCaptureWindowCodeBehind);
+        Assert.DoesNotContain("BorderBrush=\"Teal\"", ocrCaptureWindowXaml);
+        Assert.Contains("HighlightSelectionOverlay(selectionRect)", ocrCaptureWindowCodeBehind);
+    }
+
+    [Fact]
+    public void OcrCaptureWindow_LanguageToolbarUsesBalancedStretchLayout()
+    {
+        string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
+
+        Assert.Contains("MinWidth=\"360\"", ocrCaptureWindowXaml);
+        Assert.DoesNotContain("                    Width=\"360\"", ocrCaptureWindowXaml);
+        Assert.Contains("x:Name=\"LanguageToolbarLayout\"", ocrCaptureWindowXaml);
+        Assert.Contains("<ColumnDefinition Width=\"Auto\" />", ocrCaptureWindowXaml);
+        Assert.Contains("<ColumnDefinition Width=\"*\" />", ocrCaptureWindowXaml);
+        Assert.Contains("HorizontalAlignment=\"Stretch\"", ocrCaptureWindowXaml);
+        Assert.DoesNotContain("<StackPanel Orientation=\"Horizontal\" Spacing=\"10\">", ocrCaptureWindowXaml);
+        Assert.Contains("LanguageToolbar.MinWidth", ocrCaptureWindowCodeBehind);
+    }
+
+    [Fact]
     public void OcrCaptureWindow_UsesSharpScreenshotPreviewWithDarkFilter()
     {
         string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
@@ -937,11 +984,17 @@ public sealed class DeleteNewlineMcpToolServiceTests
         XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
         XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
 
-        Assert.Contains("x:Uid=\"OCRPage_Header_InstallLanguage\"", ocrPageXaml);
-        Assert.Contains("ItemsSource=\"{x:Bind ViewModel.InstallableLanguages}\"", ocrPageXaml);
-        Assert.Contains("SelectedItem=\"{x:Bind ViewModel.SelectedInstallLanguage, Mode=TwoWay}\"", ocrPageXaml);
-        Assert.Contains("Command=\"{x:Bind ViewModel.InstallOcrLanguageCommand}\"", ocrPageXaml);
-        Assert.Contains("x:Uid=\"OCRPage_Button_InstallLanguage\"", ocrPageXaml);
+        string installLanguageBlock = ExtractElementBlock(ocrPageXaml, "<Grid x:Name=\"InstallLanguageRow\"", "</Grid>");
+
+        Assert.Contains("x:Uid=\"OCRPage_Header_InstallLanguage\"", installLanguageBlock);
+        Assert.Contains("x:Name=\"InstallLanguageRow\"", installLanguageBlock);
+        Assert.Contains("<ColumnDefinition Width=\"*\" />", installLanguageBlock);
+        Assert.Contains("ItemsSource=\"{x:Bind ViewModel.InstallableLanguages}\"", installLanguageBlock);
+        Assert.Contains("SelectedItem=\"{x:Bind ViewModel.SelectedInstallLanguage, Mode=TwoWay}\"", installLanguageBlock);
+        Assert.Contains("HorizontalAlignment=\"Stretch\"", installLanguageBlock);
+        Assert.DoesNotContain("Width=\"300\"", installLanguageBlock);
+        Assert.Contains("Command=\"{x:Bind ViewModel.InstallOcrLanguageCommand}\"", installLanguageBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Button_InstallLanguage\"", installLanguageBlock);
 
         Assert.Contains("ObservableCollection<Language> _installableLanguages", ocrViewModel);
         Assert.Contains("Language? _selectedInstallLanguage", ocrViewModel);
@@ -958,8 +1011,12 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         Assert.Equal("Download OCR Language", GetReswValue(englishResources, "OCRPage_Header_InstallLanguage.Header"));
         Assert.Equal("Download and Apply", GetReswValue(englishResources, "OCRPage_Button_InstallLanguage.Content"));
+        Assert.Contains("PowerShell", GetReswValue(englishResources, "OCRPage_Text_AutoInstallLanguageHelp.Text"));
+        Assert.Contains("normal", GetReswValue(englishResources, "OCRPage_Text_AutoInstallLanguageHelp.Text"), StringComparison.OrdinalIgnoreCase);
         Assert.Equal("OCR 언어 다운로드", GetReswValue(koreanResources, "OCRPage_Header_InstallLanguage.Header"));
         Assert.Equal("다운로드 후 적용", GetReswValue(koreanResources, "OCRPage_Button_InstallLanguage.Content"));
+        Assert.Contains("PowerShell", GetReswValue(koreanResources, "OCRPage_Text_AutoInstallLanguageHelp.Text"));
+        Assert.Contains("정상", GetReswValue(koreanResources, "OCRPage_Text_AutoInstallLanguageHelp.Text"));
     }
 
     [Fact]

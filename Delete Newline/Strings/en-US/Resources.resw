@@ -367,8 +367,8 @@
     <comment>OCR page add language suffix text</comment>
   </data>
   <data name="OCRPage_Text_AutoInstallLanguageHelp.Text" xml:space="preserve">
-    <value>Select a language to download its Windows OCR capability automatically. Windows may ask for administrator permission.</value>
-    <comment>OCR page automatic language installation help text</comment>
+    <value>Select a language to download and apply its Windows OCR capability automatically. Windows may ask for administrator permission. PowerShell may take a while to apply the language; this delay is normal.</value>
+    <comment>OCR page automatic language installation help text; mentions PowerShell can take a while and that the delay is normal</comment>
   </data>
   <data name="OCRPage_Header_InstallLanguage.Header" xml:space="preserve">
     <value>Download OCR Language</value>

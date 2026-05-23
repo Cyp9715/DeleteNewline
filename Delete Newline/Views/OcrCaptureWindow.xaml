@@ -15,7 +15,13 @@
         IsResizable="False"
         mc:Ignorable="d">
 
-    <Grid x:Name="MainGrid">
+    <Grid x:Name="MainGrid"
+          KeyboardAcceleratorPlacementMode="Hidden">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Escape"
+                                 Invoked="EscapeKeyboardAccelerator_Invoked" />
+        </Grid.KeyboardAccelerators>
+
         <!-- Desktop screenshot background - simple 1:1 match -->
         <Image x:Name="BackgroundImage" Stretch="Fill" />
         
@@ -40,12 +46,7 @@
             <Rectangle x:Name="BottomOverlay" 
                        Fill="Black" 
                        Opacity="0.6" />
-            
-            <!-- Selection border -->
-            <Border x:Name="SelectionBorder"
-                    BorderBrush="Teal"
-                    BorderThickness="2"
-                    Visibility="Collapsed" />
+
         </Canvas>
         
         <!-- Interaction layer -->
@@ -54,19 +55,25 @@
         <!-- OCR language selector shown during capture, similar to Windows snipping overlays. -->
         <Canvas x:Name="LanguageToolbarCanvas" Canvas.ZIndex="2">
             <Border x:Name="LanguageToolbar"
-                    Width="360"
+                    MinWidth="360"
                     Padding="12,8"
                     CornerRadius="8"
                     Background="#CC202020"
                     BorderBrush="#55FFFFFF"
                     BorderThickness="1">
-                <StackPanel Orientation="Horizontal" Spacing="10">
+                <Grid x:Name="LanguageToolbarLayout" ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
                     <TextBlock x:Uid="OcrCapture_LanguageLabel"
                                Text="OCR Language"
                                Foreground="White"
                                VerticalAlignment="Center" />
                     <ComboBox x:Name="CaptureLanguageComboBox"
+                              Grid.Column="1"
                               MinWidth="220"
+                              HorizontalAlignment="Stretch"
                               VerticalAlignment="Center"
                               SelectionChanged="CaptureLanguageComboBox_SelectionChanged">
                         <ComboBox.ItemTemplate>
@@ -75,7 +82,7 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                </StackPanel>
+                </Grid>
             </Border>
         </Canvas>
     </Grid>

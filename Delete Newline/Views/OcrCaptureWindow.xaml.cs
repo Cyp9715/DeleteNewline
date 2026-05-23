@@ -28,6 +28,24 @@ public sealed partial class OcrCaptureWindow : WindowEx
         [DllImport("user32.dll")]
         internal static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
+        private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
+        private static extern int SetWindowLongPtr32(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        internal delegate IntPtr WindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        internal static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
+        {
+            return IntPtr.Size == 8
+                ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
+                : new IntPtr(SetWindowLongPtr32(hWnd, nIndex, dwNewLong.ToInt32()));
+        }
+
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
@@ -44,6 +62,10 @@ public sealed partial class OcrCaptureWindow : WindowEx
         internal const uint SWP_NOSIZE = 0x0001;
         internal const uint LWA_ALPHA = 0x00000002;
         internal const int GWL_EXSTYLE = -20;
+        internal const int GWLP_WNDPROC = -4;
+        internal const uint WM_KEYDOWN = 0x0100;
+        internal const uint WM_SYSKEYDOWN = 0x0104;
+        internal const int VK_ESCAPE = 0x1B;
         internal const int WS_EX_LAYERED = 0x80000;
         internal const int WS_EX_TOOLWINDOW = 0x00000080;
         internal const int WS_EX_APPWINDOW = 0x00040000;
@@ -57,6 +79,10 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private bool isSelecting = false;
     private Language currentLanguage = new Language("en"); // Default language setting
     private Action<Language>? _languageChanged;
+    private NativeMethods.WindowProc? _escapeWindowProc;
+    private IntPtr _originalWindowProc;
+    private IntPtr _hookedHwnd;
+    private bool _isClosing;
 
     public OcrCaptureWindow()
     {
@@ -106,6 +132,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
         backgroundImage = preloadedBackground;
         RemoveWindowFrames(hwnd);
         ApplyOverlayWindowExStyle(hwnd);
+        RegisterEscapeMessageHook(hwnd);
 
         var virtualScreen = ImageHelper.GetVirtualScreenBounds();
 
@@ -154,6 +181,11 @@ public sealed partial class OcrCaptureWindow : WindowEx
             toolbarWidth = LanguageToolbar.ActualWidth;
         }
 
+        if (double.IsNaN(toolbarWidth) || toolbarWidth <= 0)
+        {
+            toolbarWidth = LanguageToolbar.MinWidth;
+        }
+
         (double left, double top) = OcrCaptureOverlayLayoutHelper.CalculateTopCenterToolbarPosition(
             virtualScreen,
             primaryScreen,
@@ -194,7 +226,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void SetupKeyHandling()
     {
-        MainGrid.KeyDown += OcrCaptureWindow_KeyDown;
+        var escapeKeyHandler = new KeyEventHandler(OcrCaptureWindow_KeyDown);
+        MainGrid.AddHandler(UIElement.KeyDownEvent, escapeKeyHandler, handledEventsToo: true);
+        CaptureLanguageComboBox.AddHandler(UIElement.KeyDownEvent, escapeKeyHandler, handledEventsToo: true);
         this.Activated += (s, e) =>
         {
             RegionClickCanvas.Focus(FocusState.Programmatic);
@@ -231,6 +265,52 @@ public sealed partial class OcrCaptureWindow : WindowEx
         }
     }
 
+    private void RegisterEscapeMessageHook(IntPtr hwnd)
+    {
+        if (_originalWindowProc != IntPtr.Zero)
+        {
+            return;
+        }
+
+        _escapeWindowProc = CaptureWindowProc;
+        IntPtr hookPointer = Marshal.GetFunctionPointerForDelegate(_escapeWindowProc);
+        IntPtr originalWindowProc = NativeMethods.SetWindowLongPtr(hwnd, NativeMethods.GWLP_WNDPROC, hookPointer);
+        if (originalWindowProc == IntPtr.Zero)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to install OCR capture escape hook: {Marshal.GetLastWin32Error()}");
+            _escapeWindowProc = null;
+            return;
+        }
+
+        _hookedHwnd = hwnd;
+        _originalWindowProc = originalWindowProc;
+    }
+
+    private void RestoreEscapeMessageHook()
+    {
+        if (_hookedHwnd == IntPtr.Zero || _originalWindowProc == IntPtr.Zero)
+        {
+            return;
+        }
+
+        NativeMethods.SetWindowLongPtr(_hookedHwnd, NativeMethods.GWLP_WNDPROC, _originalWindowProc);
+        _hookedHwnd = IntPtr.Zero;
+        _originalWindowProc = IntPtr.Zero;
+        _escapeWindowProc = null;
+    }
+
+    private IntPtr CaptureWindowProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
+    {
+        if ((msg == NativeMethods.WM_KEYDOWN || msg == NativeMethods.WM_SYSKEYDOWN)
+            && wParam.ToInt64() == NativeMethods.VK_ESCAPE)
+        {
+            CloseCaptureOverlay();
+            return IntPtr.Zero;
+        }
+
+        return NativeMethods.CallWindowProc(_originalWindowProc, hwnd, msg, wParam, lParam);
+    }
+
     private void OcrCaptureWindow_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key != VirtualKey.Escape)
@@ -238,8 +318,26 @@ public sealed partial class OcrCaptureWindow : WindowEx
             return;
         }
 
-        this.Close();
+        CloseCaptureOverlay();
         e.Handled = true;
+    }
+
+    private void EscapeKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        CloseCaptureOverlay();
+        args.Handled = true;
+    }
+
+    private void CloseCaptureOverlay()
+    {
+        if (_isClosing)
+        {
+            return;
+        }
+
+        _isClosing = true;
+        RestoreEscapeMessageHook();
+        this.Close();
     }
 
     private void SetupOverlayRectangles()
@@ -301,11 +399,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
         RegionClickCanvas.CapturePointer(e.Pointer);
         startPoint = e.GetCurrentPoint(RegionClickCanvas).Position;
         currentPoint = startPoint;
-        SelectionBorder.Visibility = Visibility.Visible;
-        Canvas.SetLeft(SelectionBorder, startPoint.X);
-        Canvas.SetTop(SelectionBorder, startPoint.Y);
-        SelectionBorder.Width = 0;
-        SelectionBorder.Height = 0;
     }
 
     private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -317,11 +410,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
         double top = Math.Min(startPoint.Y, currentPoint.Y);
         double width = Math.Abs(currentPoint.X - startPoint.X);
         double height = Math.Abs(currentPoint.Y - startPoint.Y);
-
-        Canvas.SetLeft(SelectionBorder, left);
-        Canvas.SetTop(SelectionBorder, top);
-        SelectionBorder.Width = width;
-        SelectionBorder.Height = height;
 
         var selectionRect = new Windows.Foundation.Rect(left, top, width, height);
         HighlightSelectionOverlay(selectionRect);
@@ -343,9 +431,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
         try
         {
-            SelectionBorder.Visibility = Visibility.Collapsed;
-
-            // Small delay to ensure the UI thread renders the change (hiding the border) before the screen is captured.
+            // Small delay to ensure the UI thread renders the latest selection overlay before the screen is captured.
             await Task.Delay(1);
 
             var virtualScreen = ImageHelper.GetVirtualScreenBounds();
@@ -372,7 +458,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
             var regionBitmap = ImageHelper.GetRegionOfScreenAsBitmap(screenRect);
             System.Diagnostics.Debug.WriteLine($"Captured bitmap: {regionBitmap.Width}x{regionBitmap.Height}");
 
-            this.Close();
+            CloseCaptureOverlay();
 
             _ = Task.Run(async () =>
             {
