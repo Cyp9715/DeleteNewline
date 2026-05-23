@@ -99,10 +99,10 @@
                         <TextBlock x:Uid="OCRPage_Text_AutoInstallLanguageHelp"
                                    Style="{ThemeResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Margin="5,8,0,0"
+                                   Margin="5,14,0,0"
                                    TextWrapping="Wrap" />
                         <Grid x:Name="InstallLanguageRow"
-                              Margin="5,8,0,0"
+                              Margin="5,10,0,0"
                               ColumnSpacing="8"
                               HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>

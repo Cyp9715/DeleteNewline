@@ -897,15 +897,24 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void OcrCaptureWindow_DoesNotDrawColoredSelectionBorder()
+    public void OcrCaptureWindow_DrawsWindowsStyleWhiteDashedSelectionBorder()
     {
         string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
         string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
 
-        Assert.DoesNotContain("SelectionBorder", ocrCaptureWindowXaml);
-        Assert.DoesNotContain("SelectionBorder", ocrCaptureWindowCodeBehind);
+        string selectionBorderBlock = ExtractElementBlock(ocrCaptureWindowXaml, "<Rectangle x:Name=\"SelectionBorder\"", "/>");
+        Assert.Contains("Stroke=\"White\"", selectionBorderBlock);
+        Assert.Contains("StrokeDashArray=\"2,2\"", selectionBorderBlock);
+        Assert.Contains("StrokeThickness=\"1\"", selectionBorderBlock);
+        Assert.Contains("Fill=\"Transparent\"", selectionBorderBlock);
+        Assert.Contains("Visibility=\"Collapsed\"", selectionBorderBlock);
         Assert.DoesNotContain("BorderBrush=\"Teal\"", ocrCaptureWindowXaml);
         Assert.Contains("HighlightSelectionOverlay(selectionRect)", ocrCaptureWindowCodeBehind);
+        Assert.Contains("SelectionBorder.Visibility = Visibility.Visible", ocrCaptureWindowCodeBehind);
+        Assert.Contains("Canvas.SetLeft(SelectionBorder, selectionRect.X)", ocrCaptureWindowCodeBehind);
+        Assert.Contains("Canvas.SetTop(SelectionBorder, selectionRect.Y)", ocrCaptureWindowCodeBehind);
+        Assert.Contains("SelectionBorder.Width = Math.Max(0, selectionRect.Width)", ocrCaptureWindowCodeBehind);
+        Assert.Contains("SelectionBorder.Height = Math.Max(0, selectionRect.Height)", ocrCaptureWindowCodeBehind);
     }
 
     [Fact]
@@ -984,8 +993,13 @@ public sealed class DeleteNewlineMcpToolServiceTests
         XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
         XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
 
+        string languageSettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Settings -->", "</Border>");
         string installLanguageBlock = ExtractElementBlock(ocrPageXaml, "<Grid x:Name=\"InstallLanguageRow\"", "</Grid>");
 
+        Assert.Contains("x:Uid=\"OCRPage_Description_LanguageSettings\"", languageSettingsBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Text_AutoInstallLanguageHelp\"", languageSettingsBlock);
+        Assert.Contains("Margin=\"5,14,0,0\"", languageSettingsBlock);
+        Assert.Contains("Margin=\"5,10,0,0\"", installLanguageBlock);
         Assert.Contains("x:Uid=\"OCRPage_Header_InstallLanguage\"", installLanguageBlock);
         Assert.Contains("x:Name=\"InstallLanguageRow\"", installLanguageBlock);
         Assert.Contains("<ColumnDefinition Width=\"*\" />", installLanguageBlock);

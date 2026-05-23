@@ -350,6 +350,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
         LeftOverlay.Visibility = Visibility.Collapsed;
         RightOverlay.Visibility = Visibility.Collapsed;
         BottomOverlay.Visibility = Visibility.Collapsed;
+        SelectionBorder.Visibility = Visibility.Collapsed;
+        SelectionBorder.Width = 0;
+        SelectionBorder.Height = 0;
     }
 
     private void HighlightSelectionOverlay(Windows.Foundation.Rect selectionRect)
@@ -382,6 +385,12 @@ public sealed partial class OcrCaptureWindow : WindowEx
         BottomOverlay.Height = Math.Max(0, windowHeight - (selectionRect.Y + selectionRect.Height));
         Canvas.SetLeft(BottomOverlay, 0);
         Canvas.SetTop(BottomOverlay, selectionRect.Y + selectionRect.Height);
+
+        SelectionBorder.Visibility = Visibility.Visible;
+        SelectionBorder.Width = Math.Max(0, selectionRect.Width);
+        SelectionBorder.Height = Math.Max(0, selectionRect.Height);
+        Canvas.SetLeft(SelectionBorder, selectionRect.X);
+        Canvas.SetTop(SelectionBorder, selectionRect.Y);
     }
 
     private void SetupCanvasEvents()
@@ -399,6 +408,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
         RegionClickCanvas.CapturePointer(e.Pointer);
         startPoint = e.GetCurrentPoint(RegionClickCanvas).Position;
         currentPoint = startPoint;
+        SelectionBorder.Visibility = Visibility.Collapsed;
+        SelectionBorder.Width = 0;
+        SelectionBorder.Height = 0;
     }
 
     private void Canvas_PointerMoved(object sender, PointerRoutedEventArgs e)

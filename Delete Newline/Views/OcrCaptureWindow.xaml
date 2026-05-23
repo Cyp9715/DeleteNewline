@@ -47,6 +47,16 @@
                        Fill="Black" 
                        Opacity="0.6" />
 
+            <!-- Windows-style white dashed outline for the selected capture region. -->
+            <Rectangle x:Name="SelectionBorder"
+                       Fill="Transparent"
+                       Stroke="White"
+                       StrokeThickness="1"
+                       StrokeDashArray="2,2"
+                       Visibility="Collapsed"
+                       IsHitTestVisible="False"
+                       Canvas.ZIndex="1" />
+
         </Canvas>
         
         <!-- Interaction layer -->
