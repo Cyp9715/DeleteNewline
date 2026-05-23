@@ -1002,13 +1002,48 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("Opacity=\"0\"", bottomOverlayBlock);
         Assert.Contains("private const double OverlayTargetOpacity = 0.6", ocrCaptureWindowCodeBehind);
         Assert.Contains("BeginOverlayDarkenFade()", ocrCaptureWindowCodeBehind);
-        Assert.DoesNotContain("SetLayeredWindowAttributes", ocrCaptureWindowCodeBehind);
-        Assert.DoesNotContain("LWA_ALPHA", ocrCaptureWindowCodeBehind);
+        string dimFadeBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private void BeginOverlayDarkenFade()",
+            "    private void SetOverlayOpacity");
+        Assert.DoesNotContain("SetLayeredWindowAttributes", dimFadeBlock);
         Assert.DoesNotContain("byte alpha", ocrCaptureWindowCodeBehind);
         Assert.DoesNotContain("Opacity=\"0.34\"", ocrCaptureWindowXaml);
         Assert.DoesNotContain("blurForCaptureOverlay", ocrViewModel);
         Assert.DoesNotContain("CapturePreviewBlurScale", ocrHelper);
         Assert.DoesNotContain("CreateBlurredPreviewBitmap", ocrHelper);
+    }
+
+    [Fact]
+    public void OcrCaptureWindow_HidesOverlayUntilFrozenPreviewIsReadyToAvoidStartupFlash()
+    {
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
+
+        string setupFullscreenBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    public void SetupFullscreen(",
+            "    private void SetupLanguageSelector");
+        string revealBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private void TryRevealPreparedOverlay()",
+            "    private void BeginOverlayDarkenFade()");
+        string dimFadeBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private void BeginOverlayDarkenFade()",
+            "    private void SetOverlayOpacity");
+
+        Assert.Contains("HideOverlayWindowUntilPrepared(hwnd)", setupFullscreenBlock);
+        Assert.Contains("BackgroundImage.ImageOpened += BackgroundImage_ImageOpened", setupFullscreenBlock);
+        Assert.Contains("NativeMethods.SetLayeredWindowAttributes(hwnd, 0, 0, NativeMethods.LWA_ALPHA)", ocrCaptureWindowCodeBehind);
+        Assert.Contains("NativeMethods.SetLayeredWindowAttributes(_overlayHwnd, 0, 255, NativeMethods.LWA_ALPHA)", revealBlock);
+        Assert.Contains("BeginOverlayDarkenFade()", revealBlock);
+        Assert.DoesNotContain("SetLayeredWindowAttributes", dimFadeBlock);
+        Assert.DoesNotContain("byte alpha", ocrCaptureWindowCodeBehind);
+
+        int hideBeforeShowIndex = setupFullscreenBlock.IndexOf("HideOverlayWindowUntilPrepared(hwnd)", StringComparison.Ordinal);
+        int showWindowIndex = setupFullscreenBlock.IndexOf("NativeMethods.SetWindowPos", StringComparison.Ordinal);
+        Assert.True(hideBeforeShowIndex >= 0 && showWindowIndex >= 0 && hideBeforeShowIndex < showWindowIndex,
+            "The capture overlay must be fully transparent before SWP_SHOWWINDOW can expose an unrendered WinUI frame.");
     }
 
     [Fact]
