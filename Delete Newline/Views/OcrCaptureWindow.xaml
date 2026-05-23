@@ -24,22 +24,22 @@
             <!-- Top overlay -->
             <Rectangle x:Name="TopOverlay" 
                        Fill="Black" 
-                       Opacity="0.34" />
+                       Opacity="0.6" />
             
             <!-- Left overlay -->
             <Rectangle x:Name="LeftOverlay" 
                        Fill="Black" 
-                       Opacity="0.34" />
+                       Opacity="0.6" />
             
             <!-- Right overlay -->
             <Rectangle x:Name="RightOverlay" 
                        Fill="Black" 
-                       Opacity="0.34" />
+                       Opacity="0.6" />
             
             <!-- Bottom overlay -->
             <Rectangle x:Name="BottomOverlay" 
                        Fill="Black" 
-                       Opacity="0.34" />
+                       Opacity="0.6" />
             
             <!-- Selection border -->
             <Border x:Name="SelectionBorder"

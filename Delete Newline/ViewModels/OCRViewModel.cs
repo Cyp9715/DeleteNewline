@@ -280,8 +280,8 @@ public partial class OCRViewModel : ObservableRecipient
 
         try
         {
-            // Pre-capture desktop screenshot for background
-            var backgroundImage = ImageHelper.GetFullDesktopScreenshotAsImageSource(blurForCaptureOverlay: true);
+            // Pre-capture desktop screenshot for background. Keep the preview sharp; the capture UI adds only a dark filter.
+            var backgroundImage = ImageHelper.GetFullDesktopScreenshotAsImageSource();
 
             // Create OCR window
             var ocrWindow = new OcrCaptureWindow();

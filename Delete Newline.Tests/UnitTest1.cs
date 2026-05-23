@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -877,19 +878,54 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void OcrCaptureWindow_UsesBlurredScreenshotPreviewWithSofterDim()
+    public void OcrCaptureWindow_UsesSharpScreenshotPreviewWithDarkFilter()
     {
         string ocrCaptureWindowXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml"));
         string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
         string ocrHelper = File.ReadAllText(LocateSourceFile("Delete Newline", "Helpers", "OcrHelper.cs"));
 
-        Assert.DoesNotContain("Opacity=\"0.6\"", ocrCaptureWindowXaml);
-        Assert.Contains("Opacity=\"0.34\"", ocrCaptureWindowXaml);
-        Assert.Contains("GetFullDesktopScreenshotAsImageSource(blurForCaptureOverlay: true)", ocrViewModel);
-        Assert.Contains("private const double CapturePreviewBlurScale = 0.16", ocrHelper);
-        Assert.Contains("private static Bitmap CreateBlurredPreviewBitmap(Bitmap source)", ocrHelper);
-        Assert.Contains("CompositingQuality.HighSpeed", ocrHelper);
-        Assert.Contains("InterpolationMode.HighQualityBicubic", ocrHelper);
+        Assert.Contains("Opacity=\"0.6\"", ocrCaptureWindowXaml);
+        Assert.DoesNotContain("Opacity=\"0.34\"", ocrCaptureWindowXaml);
+        Assert.Contains("GetFullDesktopScreenshotAsImageSource()", ocrViewModel);
+        Assert.DoesNotContain("blurForCaptureOverlay", ocrViewModel);
+        Assert.DoesNotContain("CapturePreviewBlurScale", ocrHelper);
+        Assert.DoesNotContain("CreateBlurredPreviewBitmap", ocrHelper);
+    }
+
+    [Fact]
+    public void OcrCaptureOverlayLayout_CentersToolbarInPrimaryMonitorUsingWindowViewPixels()
+    {
+        Rectangle virtualScreen = new(0, 0, 3840, 2160);
+        Rectangle primaryScreen = new(0, 0, 3840, 2160);
+
+        (double left, double top) = OcrCaptureOverlayLayoutHelper.CalculateTopCenterToolbarPosition(
+            virtualScreen,
+            primaryScreen,
+            windowWidth: 2560,
+            windowHeight: 1440,
+            toolbarWidth: 360,
+            topMargin: 16);
+
+        Assert.Equal(1100, left, precision: 3);
+        Assert.Equal(16, top, precision: 3);
+    }
+
+    [Fact]
+    public void OcrCaptureOverlayLayout_CentersToolbarOnPrimaryMonitorWhenVirtualScreenStartsLeftOfIt()
+    {
+        Rectangle virtualScreen = new(-1920, 0, 5760, 2160);
+        Rectangle primaryScreen = new(0, 0, 3840, 2160);
+
+        (double left, double top) = OcrCaptureOverlayLayoutHelper.CalculateTopCenterToolbarPosition(
+            virtualScreen,
+            primaryScreen,
+            windowWidth: 3840,
+            windowHeight: 1440,
+            toolbarWidth: 360,
+            topMargin: 16);
+
+        Assert.Equal(2380, left, precision: 3);
+        Assert.Equal(16, top, precision: 3);
     }
 
     [Fact]

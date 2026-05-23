@@ -62,6 +62,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
     {
         InitializeComponent();
         _notificationService = App.GetService<NotificationService>();
+        MainGrid.Loaded += (_, _) => PositionLanguageToolbar();
+        MainGrid.SizeChanged += (_, _) => PositionLanguageToolbar();
         this.Activated += OnWindowActivated_FirstTime;
     }
 
@@ -147,8 +149,18 @@ public sealed partial class OcrCaptureWindow : WindowEx
         var virtualScreen = ImageHelper.GetVirtualScreenBounds();
         var primaryScreen = ImageHelper.GetPrimaryScreenBounds();
         double toolbarWidth = LanguageToolbar.Width;
-        double left = primaryScreen.Left - virtualScreen.Left + Math.Max(0, (primaryScreen.Width - toolbarWidth) / 2);
-        double top = primaryScreen.Top - virtualScreen.Top + topMargin;
+        if (double.IsNaN(toolbarWidth) || toolbarWidth <= 0)
+        {
+            toolbarWidth = LanguageToolbar.ActualWidth;
+        }
+
+        (double left, double top) = OcrCaptureOverlayLayoutHelper.CalculateTopCenterToolbarPosition(
+            virtualScreen,
+            primaryScreen,
+            Bounds.Width,
+            Bounds.Height,
+            toolbarWidth,
+            topMargin);
 
         Canvas.SetLeft(LanguageToolbar, left);
         Canvas.SetTop(LanguageToolbar, top);

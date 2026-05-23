@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -167,7 +166,6 @@ public static class ImageHelper
     private static extern bool GetWindowRect(IntPtr hwnd, ref RECT rectangle);
 
     // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetrics
-    private const double CapturePreviewBlurScale = 0.16;
     private const int SM_CXSCREEN = 0;       // Width of the primary display monitor
     private const int SM_CYSCREEN = 1;       // Height of the primary display monitor
     private const int SM_CXVIRTUALSCREEN = 78; // Width of the virtual screen
@@ -210,45 +208,10 @@ public static class ImageHelper
         return screenshot;
     }
 
-    public static BitmapImage GetFullDesktopScreenshotAsImageSource(bool blurForCaptureOverlay = false)
+    public static BitmapImage GetFullDesktopScreenshotAsImageSource()
     {
         using var bitmap = GetFullDesktopScreenshot();
-
-        if (!blurForCaptureOverlay)
-        {
-            return BitmapToImageSource(bitmap);
-        }
-
-        using var blurredBitmap = CreateBlurredPreviewBitmap(bitmap);
-        return BitmapToImageSource(blurredBitmap);
-    }
-
-    private static Bitmap CreateBlurredPreviewBitmap(Bitmap source)
-    {
-        int previewWidth = Math.Max(1, (int)Math.Round(source.Width * CapturePreviewBlurScale));
-        int previewHeight = Math.Max(1, (int)Math.Round(source.Height * CapturePreviewBlurScale));
-        using Bitmap downscaled = new(previewWidth, previewHeight, PixelFormat.Format32bppArgb);
-
-        using (Graphics graphics = Graphics.FromImage(downscaled))
-        {
-            graphics.CompositingQuality = CompositingQuality.HighSpeed;
-            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            graphics.SmoothingMode = SmoothingMode.HighSpeed;
-            graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-            graphics.DrawImage(source, 0, 0, previewWidth, previewHeight);
-        }
-
-        Bitmap blurred = new(source.Width, source.Height, PixelFormat.Format32bppArgb);
-        using (Graphics graphics = Graphics.FromImage(blurred))
-        {
-            graphics.CompositingQuality = CompositingQuality.HighSpeed;
-            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            graphics.SmoothingMode = SmoothingMode.HighSpeed;
-            graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-            graphics.DrawImage(downscaled, 0, 0, source.Width, source.Height);
-        }
-
-        return blurred;
+        return BitmapToImageSource(bitmap);
     }
 
     public static Rectangle GetVirtualScreenBounds()
