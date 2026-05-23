@@ -233,7 +233,7 @@ public sealed class DeleteNewlineMcpToolService
                 {
                   "type": "object",
                   "properties": {
-                    "languageTag": { "type": "string", "description": "OCR recognizer language tag, e.g. en-US or ko-KR." },
+                    "languageTag": { "type": "string", "description": "OCR recognizer language tag, e.g. en-US or ko-KR. If the desired language is not installed yet, call get_ocr_languages first and then install_ocr_language with a tag from installableLanguageTags." },
                     "language": { "type": "string", "description": "Alias for languageTag." },
                     "hotkey": {
                       "description": "Hotkey string like 'Control+Menu+O', 'Alt+Number1', 'Alt+1', 'Ctrl+Backspace', 'Ctrl+Left Arrow', 'Ctrl+Page Up', or 'Ctrl+Backtick', or object with modifiers/key. For keyboard number-row keys use Number0..Number9 (digit text 0..9 is also accepted). Common aliases such as Backspace, Return, Del, Spacebar, Page Up/Page Down, Left/Right/Up/Down Arrow, Backtick, Semicolon, Slash, Backslash, Minus, Equals, Comma, Period, LeftBracket, RightBracket, and Quote are accepted; symbol aliases such as `, ;, /, \\, -, =, ,, ., [, ], and ' are also accepted. Do not send JSON numbers for hotkey keys; Windows virtual-key value 1 means LeftButton, not the keyboard 1 key.",
@@ -257,6 +257,41 @@ public sealed class DeleteNewlineMcpToolService
                       ]
                     }
                   },
+                  "additionalProperties": false
+                }
+                """),
+                ReadOnly = false,
+                Destructive = true
+            },
+            new McpToolDescriptor
+            {
+                Name = "get_ocr_languages",
+                Title = "Get OCR languages",
+                Description = "Return current OCR language plus availableLanguageTags that can be selected now and installableLanguageTags that can be downloaded with install_ocr_language. Small/local models should call this before changing OCR language and copy one exact languageTag from the returned lists.",
+                InputSchema = Schema("""
+                { "type": "object", "properties": {}, "additionalProperties": false }
+                """),
+                ReadOnly = true,
+                Destructive = false
+            },
+            new McpToolDescriptor
+            {
+                Name = "install_ocr_language",
+                Title = "Download and apply an OCR language",
+                Description = "Download/install one missing Windows OCR language, refresh Delete Newline OCR languages, select that language, and save it immediately. Simple workflow for small/local models: call get_ocr_languages, copy a tag from installableLanguageTags such as ko-KR or ja-JP, then call this tool with exactly { \"languageTag\": \"ko-KR\" }. If the tag is already in availableLanguageTags, use set_ocr_settings instead. This may show a Windows elevation prompt.",
+                InputSchema = Schema("""
+                {
+                  "type": "object",
+                  "properties": {
+                    "languageTag": { "type": "string", "description": "Exact Windows OCR language tag to install and apply, for example ko-KR, ja-JP, en-US, zh-CN, fr-FR, or de-DE. Prefer copying a tag from get_ocr_languages.installableLanguageTags." },
+                    "language": { "type": "string", "description": "Alias for languageTag." },
+                    "tag": { "type": "string", "description": "Alias for languageTag." }
+                  },
+                  "anyOf": [
+                    { "required": ["languageTag"] },
+                    { "required": ["language"] },
+                    { "required": ["tag"] }
+                  ],
                   "additionalProperties": false
                 }
                 """),
@@ -311,6 +346,8 @@ public sealed class DeleteNewlineMcpToolService
                 "test_regex_chain" => TestRegexChain(arguments),
                 "get_ocr_settings" => GetOcrSettings(),
                 "set_ocr_settings" => await SetOcrSettingsAsync(arguments, cancellationToken),
+                "get_ocr_languages" => GetOcrLanguages(),
+                "install_ocr_language" => await InstallOcrLanguageAsync(arguments, cancellationToken),
                 "get_app_settings" => GetAppSettings(),
                 "set_app_setting" => await SetAppSettingAsync(arguments, cancellationToken),
                 _ => McpToolResult.Error($"Unknown tool: {toolName}")
@@ -536,8 +573,31 @@ public sealed class DeleteNewlineMcpToolService
         {
             languageTag = _ocrRepository.LanguageTag,
             availableLanguageTags = _ocrRepository.AvailableLanguageTags,
+            installableLanguageTags = _ocrRepository.InstallableLanguages.Select(language => language.LanguageTag).ToArray(),
             hotkey = ToHotkeyDto(_ocrRepository.Hotkey)
         });
+    }
+
+    private McpToolResult GetOcrLanguages()
+    {
+        return JsonSuccess(new
+        {
+            languageTag = _ocrRepository.LanguageTag,
+            availableLanguageTags = _ocrRepository.AvailableLanguageTags,
+            availableLanguages = _ocrRepository.AvailableLanguages.Select(ToOcrLanguageDto).ToArray(),
+            installableLanguageTags = _ocrRepository.InstallableLanguages.Select(language => language.LanguageTag).ToArray(),
+            installableLanguages = _ocrRepository.InstallableLanguages.Select(ToOcrLanguageDto).ToArray()
+        });
+    }
+
+    private async Task<McpToolResult> InstallOcrLanguageAsync(JsonElement arguments, CancellationToken cancellationToken)
+    {
+        string languageTag = GetString(arguments, "languageTag") ?? GetString(arguments, "language") ?? GetString(arguments, "tag") ?? throw new ArgumentException("languageTag is required. Call get_ocr_languages and copy a tag from installableLanguageTags.");
+
+        McpOcrLanguageInstallResult result = await _ocrRepository.InstallAndApplyLanguageAsync(languageTag, cancellationToken);
+        return result.Success
+            ? JsonSuccess(result)
+            : McpToolResult.Error(result.Message);
     }
 
     private async Task<McpToolResult> SetOcrSettingsAsync(JsonElement arguments, CancellationToken cancellationToken)
@@ -802,6 +862,15 @@ public sealed class DeleteNewlineMcpToolService
                 regex = item.RegexExpression ?? string.Empty,
                 replace = item.Replace ?? string.Empty
             }).ToArray()
+        };
+    }
+
+    private static object ToOcrLanguageDto(McpOcrLanguageInfo language)
+    {
+        return new
+        {
+            languageTag = language.LanguageTag,
+            displayName = language.DisplayName
         };
     }
 

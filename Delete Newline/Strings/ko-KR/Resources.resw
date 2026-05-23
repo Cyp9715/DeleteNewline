@@ -366,10 +366,6 @@
     <value>를 참조하세요.</value>
     <comment>OCR page add language suffix text</comment>
   </data>
-  <data name="OCRPage_Header_InstallLanguage.Header" xml:space="preserve">
-    <value>OCR 언어 다운로드</value>
-    <comment>OCR 페이지 설치 가능 언어 콤보박스 헤더</comment>
-  </data>
   <data name="OCRPage_Button_InstallLanguage.Content" xml:space="preserve">
     <value>다운로드 후 적용</value>
     <comment>OCR 페이지 언어 설치 버튼 문구</comment>

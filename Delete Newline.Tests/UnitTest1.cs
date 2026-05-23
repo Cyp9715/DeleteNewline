@@ -35,6 +35,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("set_app_setting", toolNames);
         Assert.Contains("get_ocr_settings", toolNames);
         Assert.Contains("set_ocr_settings", toolNames);
+        Assert.Contains("get_ocr_languages", toolNames);
+        Assert.Contains("install_ocr_language", toolNames);
         Assert.All(toolNames, name => Assert.Matches("^[a-z0-9_]+$", name));
     }
 
@@ -180,6 +182,52 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.False(result.IsError, result.Text);
         Assert.Equal(expectedModifiers, ocrRepository.Hotkey.Modifiers);
         Assert.Equal(expectedKey, ocrRepository.Hotkey.Key);
+    }
+
+    [Fact]
+    public async Task OcrLanguageMcpTools_ListInstallAndApplyLanguagesForSmallModels()
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var service = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+
+        McpToolDescriptor getLanguagesTool = service.ListTools().Single(tool => tool.Name == "get_ocr_languages");
+        McpToolDescriptor installLanguageTool = service.ListTools().Single(tool => tool.Name == "install_ocr_language");
+
+        Assert.True(getLanguagesTool.ReadOnly);
+        Assert.False(installLanguageTool.ReadOnly);
+        Assert.Contains("installableLanguageTags", getLanguagesTool.Description);
+        Assert.Contains("small", installLanguageTool.Description, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("get_ocr_languages", installLanguageTool.Description);
+        Assert.Contains("languageTag", installLanguageTool.InputSchema.GetRawText());
+        Assert.Contains("ko-KR", installLanguageTool.InputSchema.GetRawText());
+
+        using JsonDocument emptyArguments = JsonDocument.Parse("{}");
+        McpToolResult listResult = await service.ExecuteAsync("get_ocr_languages", emptyArguments.RootElement, CancellationToken.None);
+
+        Assert.False(listResult.IsError, listResult.Text);
+        JsonElement listContent = listResult.StructuredContent!.Value;
+        Assert.Equal("en-US", listContent.GetProperty("languageTag").GetString());
+        Assert.Contains("en-US", listContent.GetProperty("availableLanguageTags").EnumerateArray().Select(item => item.GetString()));
+        Assert.Contains("ja-JP", listContent.GetProperty("installableLanguageTags").EnumerateArray().Select(item => item.GetString()));
+
+        using JsonDocument installArguments = JsonDocument.Parse("""
+        {
+          "languageTag": "ja-JP"
+        }
+        """);
+
+        McpToolResult installResult = await service.ExecuteAsync("install_ocr_language", installArguments.RootElement, CancellationToken.None);
+
+        Assert.False(installResult.IsError, installResult.Text);
+        JsonElement installContent = installResult.StructuredContent!.Value;
+        Assert.True(installContent.GetProperty("installed").GetBoolean());
+        Assert.True(installContent.GetProperty("applied").GetBoolean());
+        Assert.Equal("ja-JP", installContent.GetProperty("languageTag").GetString());
+        Assert.Equal("ja-JP", ocrRepository.LanguageTag);
+        Assert.Contains("ja-JP", ocrRepository.AvailableLanguageTags);
+        Assert.Equal(1, ocrRepository.SaveCount);
     }
 
     [Fact]
@@ -999,7 +1047,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("x:Uid=\"OCRPage_Description_LanguageSettings\"", languageSettingsBlock);
         Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp", languageSettingsBlock);
         Assert.Contains("Margin=\"5,10,0,0\"", installLanguageBlock);
-        Assert.Contains("x:Uid=\"OCRPage_Header_InstallLanguage\"", installLanguageBlock);
+        Assert.DoesNotContain("x:Uid=\"OCRPage_Header_InstallLanguage\"", installLanguageBlock);
         Assert.Contains("x:Name=\"InstallLanguageRow\"", installLanguageBlock);
         Assert.Contains("<ColumnDefinition Width=\"*\" />", installLanguageBlock);
         Assert.Contains("ItemsSource=\"{x:Bind ViewModel.InstallableLanguages}\"", installLanguageBlock);
@@ -1011,8 +1059,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         Assert.Contains("ObservableCollection<Language> _installableLanguages", ocrViewModel);
         Assert.Contains("Language? _selectedInstallLanguage", ocrViewModel);
-        Assert.Contains("private async Task InstallOcrLanguageAsync()", ocrViewModel);
-        Assert.Contains("await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(SelectedInstallLanguage.LanguageTag)", ocrViewModel);
+        Assert.Contains("public async Task<McpOcrLanguageInstallResult> InstallAndApplyOcrLanguageAsync(string languageTag", ocrViewModel);
+        Assert.Contains("await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(languageToInstall.LanguageTag)", ocrViewModel);
         Assert.Contains("RefreshAvailableOcrLanguages()", ocrViewModel);
         Assert.Contains("SelectedLanguage = installedLanguage", ocrViewModel);
         Assert.Contains("await SaveOcrLanguageAsync()", ocrViewModel);
@@ -1027,13 +1075,13 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("Verb = \"runas\"", installerHelper);
         Assert.Contains("UseShellExecute = true", installerHelper);
 
-        Assert.Equal("Download OCR Language", GetReswValue(englishResources, "OCRPage_Header_InstallLanguage.Header"));
         Assert.Equal("Download and Apply", GetReswValue(englishResources, "OCRPage_Button_InstallLanguage.Content"));
+        Assert.DoesNotContain("OCRPage_Header_InstallLanguage.Header", englishResources.ToString());
         Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", englishResources.ToString());
         Assert.Equal("OCR Language Installed", GetReswValue(englishResources, "Notification_OcrLanguageInstallSuccess_Title"));
         Assert.Equal("{0} is ready for OCR.", GetReswValue(englishResources, "Notification_OcrLanguageInstallSuccess_Message"));
-        Assert.Equal("OCR 언어 다운로드", GetReswValue(koreanResources, "OCRPage_Header_InstallLanguage.Header"));
         Assert.Equal("다운로드 후 적용", GetReswValue(koreanResources, "OCRPage_Button_InstallLanguage.Content"));
+        Assert.DoesNotContain("OCRPage_Header_InstallLanguage.Header", koreanResources.ToString());
         Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", koreanResources.ToString());
         Assert.Equal("OCR 언어 설치됨", GetReswValue(koreanResources, "Notification_OcrLanguageInstallSuccess_Title"));
         Assert.Equal("{0} OCR을 사용할 수 있습니다.", GetReswValue(koreanResources, "Notification_OcrLanguageInstallSuccess_Message"));
@@ -1058,7 +1106,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("x:Uid=\"OCRPage_Title_LanguageDownload\"", languageDownloadBlock);
         Assert.Contains("x:Uid=\"OCRPage_Description_LanguageDownload\"", languageDownloadBlock);
         Assert.Contains("x:Name=\"InstallLanguageRow\"", languageDownloadBlock);
-        Assert.Contains("x:Uid=\"OCRPage_Header_InstallLanguage\"", languageDownloadBlock);
+        Assert.DoesNotContain("x:Uid=\"OCRPage_Header_InstallLanguage\"", languageDownloadBlock);
         Assert.Contains("Command=\"{x:Bind ViewModel.InstallOcrLanguageCommand}\"", languageDownloadBlock);
 
         Assert.Equal("Language Download", GetReswValue(englishResources, "OCRPage_Title_LanguageDownload.Text"));
@@ -1130,6 +1178,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
             Assert.Contains("get_regex_profiles", instructions);
             Assert.Contains("test_regex_chain", instructions);
             Assert.Contains("insert_regex_chain_item", instructions);
+            Assert.Contains("get_ocr_languages", instructions);
+            Assert.Contains("install_ocr_language", instructions);
             Assert.Contains("McpPort", instructions);
             Assert.Contains("UTF-8", instructions);
             Assert.Contains("PowerShell", instructions);
@@ -1156,6 +1206,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
             Assert.Contains("get_regex_profiles", toolNames);
             Assert.Contains("set_app_setting", toolNames);
+            Assert.Contains("get_ocr_languages", toolNames);
+            Assert.Contains("install_ocr_language", toolNames);
 
             JsonElement getProfilesAnnotations = listedTools.Single(tool => tool.GetProperty("name").GetString() == "get_regex_profiles").GetProperty("annotations");
             Assert.True(getProfilesAnnotations.GetProperty("readOnlyHint").GetBoolean());

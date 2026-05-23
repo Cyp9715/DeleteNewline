@@ -365,10 +365,6 @@
     <value>.</value>
     <comment>OCR page add language suffix text</comment>
   </data>
-  <data name="OCRPage_Header_InstallLanguage.Header" xml:space="preserve">
-    <value>Download OCR Language</value>
-    <comment>OCR page installable language combobox header</comment>
-  </data>
   <data name="OCRPage_Button_InstallLanguage.Content" xml:space="preserve">
     <value>Download and Apply</value>
     <comment>OCR page install language button content</comment>

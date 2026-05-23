@@ -127,7 +127,6 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ComboBox x:Name="InstallLanguageComboBox"
-                                      x:Uid="OCRPage_Header_InstallLanguage"
                                       Grid.Column="0"
                                       HorizontalAlignment="Stretch"
                                       ItemsSource="{x:Bind ViewModel.InstallableLanguages}"

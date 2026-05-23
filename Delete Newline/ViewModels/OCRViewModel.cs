@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using Delete_Newline.Views;
 using Delete_Newline.Helpers.Hotkeys;
+using Delete_Newline.Services.Mcp;
 
 namespace Delete_Newline.ViewModels;
 
@@ -53,6 +54,14 @@ public partial class OCRViewModel : ObservableRecipient
     private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
 
     public IReadOnlyList<string> AvailableLanguageTags => AvailableLanguages.Select(language => language.LanguageTag).ToArray();
+
+    public IReadOnlyList<McpOcrLanguageInfo> AvailableLanguageInfos => AvailableLanguages
+        .Select(ToMcpOcrLanguageInfo)
+        .ToArray();
+
+    public IReadOnlyList<McpOcrLanguageInfo> InstallableLanguageInfos => InstallableLanguages
+        .Select(ToMcpOcrLanguageInfo)
+        .ToArray();
 
     public string? CurrentLanguageTag => SelectedLanguage?.LanguageTag;
 
@@ -328,6 +337,102 @@ public partial class OCRViewModel : ObservableRecipient
 
     private bool CanInstallOcrLanguage() => SelectedInstallLanguage != null && !IsInstallingLanguage;
 
+    public async Task<McpOcrLanguageInstallResult> InstallAndApplyOcrLanguageAsync(string languageTag, bool showNotification = true)
+    {
+        if (string.IsNullOrWhiteSpace(languageTag))
+        {
+            throw new ArgumentException("languageTag is required.", nameof(languageTag));
+        }
+
+        Language? availableLanguage = FindLanguageByTag(AvailableLanguages, languageTag);
+        if (availableLanguage != null)
+        {
+            SelectedLanguage = availableLanguage;
+            await SaveOcrLanguageAsync();
+            return CreateOcrLanguageInstallResult(
+                success: true,
+                installed: false,
+                applied: true,
+                availableLanguage,
+                exitCode: null,
+                message: $"{availableLanguage.LanguageTag} was already available and is now selected for OCR.");
+        }
+
+        Language? languageToInstall = FindLanguageByTag(InstallableLanguages, languageTag);
+        if (languageToInstall == null)
+        {
+            string installableTags = string.Join(", ", InstallableLanguages.Select(language => language.LanguageTag));
+            throw new ArgumentException($"OCR language '{languageTag}' is not available to install. Call get_ocr_languages and copy a tag from installableLanguageTags. Installable language tags: {installableTags}.");
+        }
+
+        try
+        {
+            int exitCode = await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(languageToInstall.LanguageTag);
+            RefreshAvailableOcrLanguages();
+
+            Language? installedLanguage = FindLanguageByTag(AvailableLanguages, languageToInstall.LanguageTag);
+            if (exitCode == 0 && installedLanguage != null)
+            {
+                SelectedLanguage = installedLanguage;
+                await SaveOcrLanguageAsync();
+                if (showNotification)
+                {
+                    _inAppNotificationService.ShowInAppNotification(
+                        titleKey: "Notification_OcrLanguageInstallSuccess_Title",
+                        messageKey: "Notification_OcrLanguageInstallSuccess_Message",
+                        severity: InfoBarSeverity.Success,
+                        messageArgs: new object[] { installedLanguage.DisplayName });
+                }
+
+                return CreateOcrLanguageInstallResult(
+                    success: true,
+                    installed: true,
+                    applied: true,
+                    installedLanguage,
+                    exitCode,
+                    message: $"{installedLanguage.LanguageTag} was installed and selected for OCR.");
+            }
+
+            string failureMessage = $"OCR language '{languageToInstall.LanguageTag}' did not become available after installation. Exit code: {exitCode}.";
+            if (showNotification)
+            {
+                _inAppNotificationService.ShowInAppNotification(
+                    titleKey: "Notification_OcrLanguageInstallFailed_Title",
+                    messageKey: "Notification_OcrLanguageInstallFailed_Message",
+                    severity: InfoBarSeverity.Error,
+                    messageArgs: new object[] { languageToInstall.DisplayName });
+            }
+
+            return CreateOcrLanguageInstallResult(
+                success: false,
+                installed: false,
+                applied: false,
+                languageToInstall,
+                exitCode,
+                failureMessage);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to install OCR language '{languageToInstall.LanguageTag}': {ex.Message}");
+            if (showNotification)
+            {
+                _inAppNotificationService.ShowInAppNotification(
+                    titleKey: "Notification_OcrLanguageInstallFailed_Title",
+                    messageKey: "Notification_OcrLanguageInstallFailed_Message",
+                    severity: InfoBarSeverity.Error,
+                    messageArgs: new object[] { languageToInstall.DisplayName });
+            }
+
+            return CreateOcrLanguageInstallResult(
+                success: false,
+                installed: false,
+                applied: false,
+                languageToInstall,
+                exitCode: null,
+                message: ex.Message);
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanInstallOcrLanguage))]
     private async Task InstallOcrLanguageAsync()
     {
@@ -336,49 +441,47 @@ public partial class OCRViewModel : ObservableRecipient
             return;
         }
 
-        Language languageToInstall = SelectedInstallLanguage;
+        string languageTag = SelectedInstallLanguage.LanguageTag;
         IsInstallingLanguage = true;
 
         try
         {
-            int exitCode = await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(SelectedInstallLanguage.LanguageTag);
-            RefreshAvailableOcrLanguages();
-
-            Language? installedLanguage = AvailableLanguages.FirstOrDefault(language =>
-                language.LanguageTag.Equals(languageToInstall.LanguageTag, StringComparison.OrdinalIgnoreCase));
-
-            if (exitCode == 0 && installedLanguage != null)
-            {
-                SelectedLanguage = installedLanguage;
-                await SaveOcrLanguageAsync();
-                _inAppNotificationService.ShowInAppNotification(
-                    titleKey: "Notification_OcrLanguageInstallSuccess_Title",
-                    messageKey: "Notification_OcrLanguageInstallSuccess_Message",
-                    severity: InfoBarSeverity.Success,
-                    messageArgs: new object[] { installedLanguage.DisplayName });
-            }
-            else
-            {
-                _inAppNotificationService.ShowInAppNotification(
-                    titleKey: "Notification_OcrLanguageInstallFailed_Title",
-                    messageKey: "Notification_OcrLanguageInstallFailed_Message",
-                    severity: InfoBarSeverity.Error,
-                    messageArgs: new object[] { languageToInstall.DisplayName });
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Failed to install OCR language '{languageToInstall.LanguageTag}': {ex.Message}");
-            _inAppNotificationService.ShowInAppNotification(
-                titleKey: "Notification_OcrLanguageInstallFailed_Title",
-                messageKey: "Notification_OcrLanguageInstallFailed_Message",
-                severity: InfoBarSeverity.Error,
-                messageArgs: new object[] { languageToInstall.DisplayName });
+            await InstallAndApplyOcrLanguageAsync(languageTag);
         }
         finally
         {
             IsInstallingLanguage = false;
         }
+    }
+
+    private McpOcrLanguageInstallResult CreateOcrLanguageInstallResult(
+        bool success,
+        bool installed,
+        bool applied,
+        Language language,
+        int? exitCode,
+        string message)
+    {
+        return new McpOcrLanguageInstallResult(
+            success,
+            installed,
+            applied,
+            language.LanguageTag,
+            language.DisplayName,
+            exitCode,
+            AvailableLanguageTags,
+            InstallableLanguages.Select(item => item.LanguageTag).ToArray(),
+            message);
+    }
+
+    private static McpOcrLanguageInfo ToMcpOcrLanguageInfo(Language language)
+    {
+        return new McpOcrLanguageInfo(language.LanguageTag, language.DisplayName);
+    }
+
+    private static Language? FindLanguageByTag(IEnumerable<Language> languages, string languageTag)
+    {
+        return languages.FirstOrDefault(language => language.LanguageTag.Equals(languageTag.Trim(), StringComparison.OrdinalIgnoreCase));
     }
 
     [RelayCommand]
