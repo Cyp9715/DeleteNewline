@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Delete_Newline.Contracts.Services;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Services;
 using Microsoft.UI.Xaml.Controls;
@@ -12,6 +13,8 @@ namespace Delete_Newline.ViewModels;
 public partial class RegexViewModel : ObservableRecipient
 {
     private readonly InAppNotificationService _inAppNotificationService;
+    private readonly RegexCollectSaveService _regexCollectSaveService;
+    private readonly INavigationService _navigationService;
 
     [ObservableProperty]
     private RegexPageStructure? _currentRegexConfig;
@@ -22,9 +25,35 @@ public partial class RegexViewModel : ObservableRecipient
     [ObservableProperty]
     private string? _regexOutputText;
 
-    public RegexViewModel(InAppNotificationService inAppNotificationService)
+    public RegexViewModel(
+        InAppNotificationService inAppNotificationService,
+        RegexCollectSaveService regexCollectSaveService,
+        INavigationService navigationService)
     {
         _inAppNotificationService = inAppNotificationService;
+        _regexCollectSaveService = regexCollectSaveService;
+        _navigationService = navigationService;
+        _regexCollectSaveService.RegexConfigs.CollectionChanged += RegexConfigs_CollectionChanged;
+    }
+
+    private void RegexConfigs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        InvalidateCurrentRegexConfigIfMissing();
+    }
+
+    private void InvalidateCurrentRegexConfigIfMissing()
+    {
+        if (CurrentRegexConfig == null || _regexCollectSaveService.RegexConfigs.Contains(CurrentRegexConfig))
+        {
+            return;
+        }
+
+        CurrentRegexConfig = null;
+        _navigationService.RemoveHistoryEntries(typeof(RegexViewModel).FullName!);
+        if (_navigationService.IsCurrentPage(typeof(RegexViewModel).FullName!))
+        {
+            _navigationService.NavigateTo(typeof(RegexCollectViewModel).FullName!, clearNavigation: true);
+        }
     }
 
     partial void OnCurrentRegexConfigChanged(RegexPageStructure? oldValue, RegexPageStructure? newValue)

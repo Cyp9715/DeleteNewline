@@ -152,6 +152,11 @@ public partial class RegexCollectViewModel : ObservableRecipient
     [RelayCommand]
     private void NavigateToRegexPage(RegexPageStructure regexConfig)
     {
+        if (!RegexConfigs.Contains(regexConfig))
+        {
+            return;
+        }
+
         App.GetService<RegexViewModel>().CurrentRegexConfig = regexConfig;
         NavigationService.NavigateTo(typeof(RegexViewModel).FullName!);
     }

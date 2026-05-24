@@ -14,6 +14,10 @@ public interface INavigationService
     bool NavigateTo(string pageKey, object? parameter = null, bool clearNavigation = false);
 
     bool GoBack();
+
+    bool IsCurrentPage(string pageKey);
+
+    void RemoveHistoryEntries(string pageKey);
     
     void InitializeNavigationView(NavigationView navigationView);
     

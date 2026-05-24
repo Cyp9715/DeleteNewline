@@ -179,6 +179,35 @@ public sealed class NavigationService : INavigationService
         return false;
     }
 
+    public bool IsCurrentPage(string pageKey)
+    {
+        var pageType = _pageService.GetPageType(pageKey);
+        return Frame?.Content?.GetType() == pageType;
+    }
+
+    public void RemoveHistoryEntries(string pageKey)
+    {
+        var pageType = _pageService.GetPageType(pageKey);
+        if (Frame == null)
+        {
+            return;
+        }
+
+        RemoveHistoryEntries(Frame.BackStack, pageType);
+        RemoveHistoryEntries(Frame.ForwardStack, pageType);
+    }
+
+    private static void RemoveHistoryEntries(IList<PageStackEntry> history, Type pageType)
+    {
+        for (int index = history.Count - 1; index >= 0; index--)
+        {
+            if (history[index].SourcePageType == pageType)
+            {
+                history.RemoveAt(index);
+            }
+        }
+    }
+
     public bool NavigateTo(string pageKey, object? parameter = null, bool clearNavigation = false)
     {
         var pageType = _pageService.GetPageType(pageKey);

@@ -768,6 +768,34 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void DeletedRegexProfilesInvalidateDetailSelectionAndNavigationHistory()
+    {
+        string regexCollectViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "RegexCollectViewModel.cs"));
+        string regexViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "RegexViewModel.cs"));
+        string navigationServiceInterface = File.ReadAllText(LocateSourceFile("Delete Newline", "Contracts", "Services", "INavigationService.cs"));
+        string navigationService = File.ReadAllText(LocateSourceFile("Delete Newline", "Services", "NavigationService.cs"));
+
+        Assert.Contains("if (!RegexConfigs.Contains(regexConfig))", regexCollectViewModel);
+        Assert.Contains("RegexCollectSaveService regexCollectSaveService", regexViewModel);
+        Assert.Contains("INavigationService navigationService", regexViewModel);
+        Assert.Contains("_regexCollectSaveService.RegexConfigs.CollectionChanged += RegexConfigs_CollectionChanged", regexViewModel);
+        Assert.Contains("InvalidateCurrentRegexConfigIfMissing", regexViewModel);
+        Assert.Contains("if (CurrentRegexConfig == null || _regexCollectSaveService.RegexConfigs.Contains(CurrentRegexConfig))", regexViewModel);
+        Assert.Contains("CurrentRegexConfig = null", regexViewModel);
+        Assert.Contains("_navigationService.RemoveHistoryEntries(typeof(RegexViewModel).FullName!)", regexViewModel);
+        Assert.Contains("_navigationService.IsCurrentPage(typeof(RegexViewModel).FullName!)", regexViewModel);
+        Assert.Contains("_navigationService.NavigateTo(typeof(RegexCollectViewModel).FullName!, clearNavigation: true)", regexViewModel);
+
+        Assert.Contains("bool IsCurrentPage(string pageKey);", navigationServiceInterface);
+        Assert.Contains("void RemoveHistoryEntries(string pageKey);", navigationServiceInterface);
+        Assert.Contains("public bool IsCurrentPage(string pageKey)", navigationService);
+        Assert.Contains("public void RemoveHistoryEntries(string pageKey)", navigationService);
+        Assert.Contains("RemoveHistoryEntries(Frame.BackStack", navigationService);
+        Assert.Contains("RemoveHistoryEntries(Frame.ForwardStack", navigationService);
+        Assert.Contains("SourcePageType == pageType", navigationService);
+    }
+
+    [Fact]
     public void RegexProfileFilter_FiltersByHotkeyNameCaseInsensitivelyAndRestoresAllForEmptySearch()
     {
         RegexPageStructure[] profiles =
