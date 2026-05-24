@@ -42,8 +42,16 @@ public partial class OCRViewModel : ObservableRecipient
     private Language? _selectedInstallLanguage;
 
     [ObservableProperty]
+    private ObservableCollection<OcrLanguageManagementItem> _manageableLanguages;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(InstallManagedOcrLanguageCommand))]
+    private OcrLanguageManagementItem? _selectedManageLanguage;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(InstallOcrLanguageCommand))]
-    private bool _isInstallingLanguage;
+    [NotifyCanExecuteChangedFor(nameof(InstallManagedOcrLanguageCommand))]
+    private bool _isManagingLanguage;
 
     // Allow only one OCR capture window/session at a time.
     private int _ocrSessionActive;
@@ -59,11 +67,26 @@ public partial class OCRViewModel : ObservableRecipient
         .Select(ToMcpOcrLanguageInfo)
         .ToArray();
 
-    public IReadOnlyList<McpOcrLanguageInfo> InstallableLanguageInfos => InstallableLanguages
-        .Select(ToMcpOcrLanguageInfo)
+    public IReadOnlyList<McpOcrLanguageInfo> InstallableLanguageInfos => ManageableLanguages
+        .Where(language => !language.IsInstalled)
+        .Select(language => new McpOcrLanguageInfo(language.LanguageTag, language.DisplayName))
         .ToArray();
 
     public string? CurrentLanguageTag => SelectedLanguage?.LanguageTag;
+
+    public Visibility InstallManagedLanguageButtonVisibility => SelectedManageLanguage is { IsInstalled: false }
+        ? Visibility.Visible
+        : Visibility.Collapsed;
+
+    public Visibility DeleteManagedLanguageButtonVisibility => SelectedManageLanguage is { IsInstalled: true, IsCurrent: false }
+        ? Visibility.Visible
+        : Visibility.Collapsed;
+
+    public Visibility CurrentManagedLanguageButtonVisibility => SelectedManageLanguage is { IsInstalled: true, IsCurrent: true }
+        ? Visibility.Visible
+        : Visibility.Collapsed;
+
+    public bool CanDeleteManagedLanguage => SelectedManageLanguage is { IsInstalled: true, IsCurrent: false } && !IsManagingLanguage;
 
     public HotkeyStructure CurrentHotkey => new()
     {
@@ -153,6 +176,7 @@ public partial class OCRViewModel : ObservableRecipient
         _settingsService = settingsService;
         _availableLanguages = [];
         _installableLanguages = [];
+        _manageableLanguages = [];
         RefreshAvailableOcrLanguages();
     }
 
@@ -188,6 +212,7 @@ public partial class OCRViewModel : ObservableRecipient
         }
 
         RefreshInstallableOcrLanguages();
+        RefreshManageableOcrLanguages();
     }
 
     private void RefreshInstallableOcrLanguages()
@@ -203,6 +228,27 @@ public partial class OCRViewModel : ObservableRecipient
 
         SelectedInstallLanguage = InstallableLanguages.FirstOrDefault(language =>
             language.LanguageTag.Equals(previousSelection, StringComparison.OrdinalIgnoreCase)) ?? InstallableLanguages.FirstOrDefault();
+    }
+
+    private void RefreshManageableOcrLanguages()
+    {
+        string? previousSelection = SelectedManageLanguage?.LanguageTag;
+        string installedStatusText = GetLocalizedResourceString("OCRPage_Text_LanguageInstalledSuffix.Text", "(installed)");
+        IReadOnlyList<OcrLanguageManagementItem> manageableLanguages = OcrLanguageInstallHelper.GetManageableLanguages(
+            AvailableLanguages,
+            SelectedLanguage?.LanguageTag,
+            installedStatusText);
+
+        ManageableLanguages.Clear();
+        foreach (OcrLanguageManagementItem language in manageableLanguages)
+        {
+            ManageableLanguages.Add(language);
+        }
+
+        SelectedManageLanguage = ManageableLanguages.FirstOrDefault(language =>
+                language.LanguageTag.Equals(previousSelection, StringComparison.OrdinalIgnoreCase))
+            ?? ManageableLanguages.FirstOrDefault(language => !language.IsInstalled)
+            ?? ManageableLanguages.FirstOrDefault();
     }
 
     private void LoadSavedLanguage()
@@ -272,10 +318,33 @@ public partial class OCRViewModel : ObservableRecipient
     // Handle OCR Language changes
     partial void OnSelectedLanguageChanged(Language? value)
     {
-        if (value != null && !_suppressLanguageAutoSave)
+        if (value != null)
         {
-            _ = SaveOcrLanguageAsync();
+            if (!_suppressLanguageAutoSave)
+            {
+                _ = SaveOcrLanguageAsync();
+            }
+
+            RefreshManageableOcrLanguages();
         }
+    }
+
+    partial void OnSelectedManageLanguageChanged(OcrLanguageManagementItem? value)
+    {
+        NotifyManagedLanguageActionStateChanged();
+    }
+
+    partial void OnIsManagingLanguageChanged(bool value)
+    {
+        NotifyManagedLanguageActionStateChanged();
+    }
+
+    private void NotifyManagedLanguageActionStateChanged()
+    {
+        OnPropertyChanged(nameof(InstallManagedLanguageButtonVisibility));
+        OnPropertyChanged(nameof(DeleteManagedLanguageButtonVisibility));
+        OnPropertyChanged(nameof(CurrentManagedLanguageButtonVisibility));
+        OnPropertyChanged(nameof(CanDeleteManagedLanguage));
     }
 
     [RelayCommand]
@@ -335,7 +404,9 @@ public partial class OCRViewModel : ObservableRecipient
         SelectedLanguage = language;
     }
 
-    private bool CanInstallOcrLanguage() => SelectedInstallLanguage != null && !IsInstallingLanguage;
+    private bool CanInstallOcrLanguage() => SelectedInstallLanguage != null && !IsManagingLanguage;
+
+    private bool CanInstallManagedOcrLanguage() => SelectedManageLanguage is { IsInstalled: false } && !IsManagingLanguage;
 
     public async Task<McpOcrLanguageInstallResult> InstallAndApplyOcrLanguageAsync(string languageTag, bool showNotification = true)
     {
@@ -358,19 +429,23 @@ public partial class OCRViewModel : ObservableRecipient
                 message: $"{availableLanguage.LanguageTag} was already available and is now selected for OCR.");
         }
 
-        Language? languageToInstall = FindLanguageByTag(InstallableLanguages, languageTag);
+        OcrLanguageManagementItem? managedLanguageToInstall = ManageableLanguages.FirstOrDefault(language =>
+            !language.IsInstalled && LanguageTagsMatch(language.LanguageTag, languageTag));
+        Language? languageToInstall = managedLanguageToInstall?.Language ?? FindLanguageByTag(InstallableLanguages, languageTag);
+        string capabilityLanguageTag = managedLanguageToInstall?.LanguageTag ?? languageTag.Trim();
         if (languageToInstall == null)
         {
-            string installableTags = string.Join(", ", InstallableLanguages.Select(language => language.LanguageTag));
+            string installableTags = string.Join(", ", InstallableLanguageInfos.Select(language => language.LanguageTag));
             throw new ArgumentException($"OCR language '{languageTag}' is not available to install. Call get_ocr_languages and copy a tag from installableLanguageTags. Installable language tags: {installableTags}.");
         }
 
         try
         {
-            int exitCode = await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(languageToInstall.LanguageTag);
+            int exitCode = await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(capabilityLanguageTag);
             RefreshAvailableOcrLanguages();
 
-            Language? installedLanguage = FindLanguageByTag(AvailableLanguages, languageToInstall.LanguageTag);
+            Language? installedLanguage = FindLanguageByTag(AvailableLanguages, capabilityLanguageTag)
+                ?? FindLanguageByTag(AvailableLanguages, languageToInstall.LanguageTag);
             if (exitCode == 0 && installedLanguage != null)
             {
                 SelectedLanguage = installedLanguage;
@@ -442,7 +517,7 @@ public partial class OCRViewModel : ObservableRecipient
         }
 
         string languageTag = SelectedInstallLanguage.LanguageTag;
-        IsInstallingLanguage = true;
+        IsManagingLanguage = true;
 
         try
         {
@@ -450,7 +525,99 @@ public partial class OCRViewModel : ObservableRecipient
         }
         finally
         {
-            IsInstallingLanguage = false;
+            IsManagingLanguage = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanInstallManagedOcrLanguage))]
+    private async Task InstallManagedOcrLanguageAsync()
+    {
+        if (SelectedManageLanguage is not { IsInstalled: false } languageToInstall)
+        {
+            return;
+        }
+
+        string languageTag = languageToInstall.LanguageTag;
+        IsManagingLanguage = true;
+
+        try
+        {
+            await InstallAndApplyOcrLanguageAsync(languageTag);
+        }
+        finally
+        {
+            IsManagingLanguage = false;
+        }
+    }
+
+    public async Task DeleteManagedOcrLanguageAsync(string languageTag, bool showNotification = true)
+    {
+        if (string.IsNullOrWhiteSpace(languageTag))
+        {
+            throw new ArgumentException("languageTag is required.", nameof(languageTag));
+        }
+
+        string requestedLanguageTag = languageTag.Trim();
+        if (SelectedLanguage != null && LanguageTagsMatch(SelectedLanguage.LanguageTag, requestedLanguageTag))
+        {
+            throw new InvalidOperationException("The current OCR language cannot be deleted. Select another OCR language first.");
+        }
+
+        OcrLanguageManagementItem? managedLanguageToDelete = ManageableLanguages.FirstOrDefault(language =>
+            language.IsInstalled && LanguageTagsMatch(language.LanguageTag, requestedLanguageTag));
+        Language? languageToDelete = managedLanguageToDelete?.Language ?? FindLanguageByTag(AvailableLanguages, requestedLanguageTag);
+        string capabilityLanguageTag = managedLanguageToDelete?.LanguageTag ?? requestedLanguageTag;
+        if (languageToDelete == null)
+        {
+            RefreshAvailableOcrLanguages();
+            return;
+        }
+
+        IsManagingLanguage = true;
+        try
+        {
+            int exitCode = await OcrLanguageInstallHelper.RemoveOcrLanguageCapabilityAsync(capabilityLanguageTag);
+            RefreshAvailableOcrLanguages();
+
+            bool deleted = exitCode == 0 && FindLanguageByTag(AvailableLanguages, capabilityLanguageTag) == null;
+            if (deleted)
+            {
+                if (showNotification)
+                {
+                    _inAppNotificationService.ShowInAppNotification(
+                        titleKey: "Notification_OcrLanguageDeleteSuccess_Title",
+                        messageKey: "Notification_OcrLanguageDeleteSuccess_Message",
+                        severity: InfoBarSeverity.Success,
+                        messageArgs: new object[] { languageToDelete.DisplayName });
+                }
+
+                return;
+            }
+
+            if (showNotification)
+            {
+                _inAppNotificationService.ShowInAppNotification(
+                    titleKey: "Notification_OcrLanguageDeleteFailed_Title",
+                    messageKey: "Notification_OcrLanguageDeleteFailed_Message",
+                    severity: InfoBarSeverity.Error,
+                    messageArgs: new object[] { languageToDelete.DisplayName });
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to delete OCR language '{languageToDelete.LanguageTag}': {ex.Message}");
+            if (showNotification)
+            {
+                _inAppNotificationService.ShowInAppNotification(
+                    titleKey: "Notification_OcrLanguageDeleteFailed_Title",
+                    messageKey: "Notification_OcrLanguageDeleteFailed_Message",
+                    severity: InfoBarSeverity.Error,
+                    messageArgs: new object[] { languageToDelete.DisplayName });
+            }
+        }
+        finally
+        {
+            IsManagingLanguage = false;
         }
     }
 
@@ -470,7 +637,7 @@ public partial class OCRViewModel : ObservableRecipient
             language.DisplayName,
             exitCode,
             AvailableLanguageTags,
-            InstallableLanguages.Select(item => item.LanguageTag).ToArray(),
+            InstallableLanguageInfos.Select(item => item.LanguageTag).ToArray(),
             message);
     }
 
@@ -481,7 +648,55 @@ public partial class OCRViewModel : ObservableRecipient
 
     private static Language? FindLanguageByTag(IEnumerable<Language> languages, string languageTag)
     {
-        return languages.FirstOrDefault(language => language.LanguageTag.Equals(languageTag.Trim(), StringComparison.OrdinalIgnoreCase));
+        return languages.FirstOrDefault(language => LanguageTagsMatch(language.LanguageTag, languageTag));
+    }
+
+    private static bool LanguageTagsMatch(string first, string? second)
+    {
+        if (string.IsNullOrWhiteSpace(first) || string.IsNullOrWhiteSpace(second))
+        {
+            return false;
+        }
+
+        string trimmedSecond = second.Trim();
+        if (first.Equals(trimmedSecond, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        try
+        {
+            return new Language(first).LanguageTag.Equals(trimmedSecond, StringComparison.OrdinalIgnoreCase)
+                || first.Equals(new Language(trimmedSecond).LanguageTag, StringComparison.OrdinalIgnoreCase)
+                || new Language(first).LanguageTag.Equals(new Language(trimmedSecond).LanguageTag, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static string GetLocalizedResourceString(string resourceKey, string fallback)
+    {
+        try
+        {
+            Microsoft.Windows.ApplicationModel.Resources.ResourceManager resourceManager = new();
+            Microsoft.Windows.ApplicationModel.Resources.ResourceContext resourceContext = resourceManager.CreateResourceContext();
+            string languageOverride = Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride;
+            if (!string.IsNullOrWhiteSpace(languageOverride))
+            {
+                resourceContext.QualifierValues["Language"] = languageOverride;
+            }
+
+            return resourceManager.MainResourceMap
+                .GetSubtree("Resources")
+                .GetValue(resourceKey, resourceContext)
+                .ValueAsString ?? fallback;
+        }
+        catch
+        {
+            return fallback;
+        }
     }
 
     [RelayCommand]

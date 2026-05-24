@@ -341,13 +341,13 @@
     <value>Choose the language for text recognition.</value>
     <comment>OCR page language settings description</comment>
   </data>
-  <data name="OCRPage_Title_LanguageDownload.Text" xml:space="preserve">
-    <value>Language Download</value>
-    <comment>OCR page language download section title</comment>
+  <data name="OCRPage_Title_LanguageManagement.Text" xml:space="preserve">
+    <value>OCR Language Management</value>
+    <comment>OCR page language management section title</comment>
   </data>
-  <data name="OCRPage_Description_LanguageDownload.Text" xml:space="preserve">
-    <value>Download missing Windows OCR languages and apply them immediately.</value>
-    <comment>OCR page language download section description</comment>
+  <data name="OCRPage_Description_LanguageManagement.Text" xml:space="preserve">
+    <value>Download missing Windows OCR languages or delete installed languages that are not in use.</value>
+    <comment>OCR page language management section description</comment>
   </data>
   <data name="OCRPage_Header_RecognitionLanguage.Header" xml:space="preserve">
     <value>Recognition Language</value>
@@ -369,6 +369,34 @@
     <value>Download and Apply</value>
     <comment>OCR page install language button content</comment>
   </data>
+  <data name="OCRPage_Button_DeleteLanguage.Content" xml:space="preserve">
+    <value>Delete</value>
+    <comment>OCR page delete language button content</comment>
+  </data>
+  <data name="OCRPage_Button_CurrentLanguage.Content" xml:space="preserve">
+    <value>Currently in Use</value>
+    <comment>OCR page current language disabled button content</comment>
+  </data>
+  <data name="OCRPage_Text_LanguageInstalledSuffix.Text" xml:space="preserve">
+    <value>(installed)</value>
+    <comment>Suffix shown next to installed OCR languages in the management list</comment>
+  </data>
+  <data name="OCRPage_DeleteLanguageDialog.Title" xml:space="preserve">
+    <value>Delete OCR Language</value>
+    <comment>Delete OCR language confirmation dialog title</comment>
+  </data>
+  <data name="OCRPage_DeleteLanguageDialog.Message" xml:space="preserve">
+    <value>Remove {0} from Windows OCR languages? You can download it again later.</value>
+    <comment>Delete OCR language confirmation dialog message</comment>
+  </data>
+  <data name="OCRPage_DeleteLanguageDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Delete</value>
+    <comment>Delete OCR language confirmation dialog primary button</comment>
+  </data>
+  <data name="OCRPage_DeleteLanguageDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>Delete OCR language confirmation dialog cancel button</comment>
+  </data>
   <data name="Notification_OcrLanguageInstallSuccess_Title" xml:space="preserve">
     <value>OCR Language Installed</value>
     <comment>Notification title when OCR language installation succeeds</comment>
@@ -384,6 +412,22 @@
   <data name="Notification_OcrLanguageInstallFailed_Message" xml:space="preserve">
     <value>Could not install {0}. Please approve the Windows administrator prompt and try again.</value>
     <comment>Notification message when OCR language installation fails</comment>
+  </data>
+  <data name="Notification_OcrLanguageDeleteSuccess_Title" xml:space="preserve">
+    <value>OCR Language Deleted</value>
+    <comment>Notification title when OCR language deletion succeeds</comment>
+  </data>
+  <data name="Notification_OcrLanguageDeleteSuccess_Message" xml:space="preserve">
+    <value>{0} was removed from Windows OCR languages.</value>
+    <comment>Notification message when OCR language deletion succeeds</comment>
+  </data>
+  <data name="Notification_OcrLanguageDeleteFailed_Title" xml:space="preserve">
+    <value>OCR Language Delete Failed</value>
+    <comment>Notification title when OCR language deletion fails</comment>
+  </data>
+  <data name="Notification_OcrLanguageDeleteFailed_Message" xml:space="preserve">
+    <value>Could not delete {0}. Please approve the Windows administrator prompt and try again.</value>
+    <comment>Notification message when OCR language deletion fails</comment>
   </data>
   <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">
     <value>OCR Language Not Found</value>

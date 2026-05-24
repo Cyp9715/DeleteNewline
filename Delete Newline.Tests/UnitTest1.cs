@@ -8,6 +8,7 @@ using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Helpers;
 using Delete_Newline.Services;
 using Delete_Newline.Services.Mcp;
+using Windows.Globalization;
 using Windows.System;
 
 namespace Delete_Newline.Tests;
@@ -1109,86 +1110,155 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void OcrPage_CanDownloadAndApplyWindowsOcrLanguages()
+    public void OcrLanguageInstallHelper_ListsManageableLanguagesWithInstalledAndCurrentStatus()
+    {
+        Language[] installedLanguages = [new("en-US"), new("ko-KR")];
+
+        OcrLanguageManagementItem[] items = OcrLanguageInstallHelper
+            .GetManageableLanguages(installedLanguages, currentLanguageTag: "ko-KR", installedStatusText: "(installed)")
+            .Where(item => item.LanguageTag is "en-US" or "ko-KR" or "ja-JP")
+            .ToArray();
+
+        OcrLanguageManagementItem english = Assert.Single(items, item => item.LanguageTag == "en-US");
+        Assert.True(english.IsInstalled);
+        Assert.False(english.IsCurrent);
+        Assert.EndsWith(" (installed)", english.DisplayText, StringComparison.Ordinal);
+
+        OcrLanguageManagementItem korean = Assert.Single(items, item => item.LanguageTag == "ko-KR");
+        Assert.True(korean.IsInstalled);
+        Assert.True(korean.IsCurrent);
+        Assert.EndsWith(" (installed)", korean.DisplayText, StringComparison.Ordinal);
+
+        OcrLanguageManagementItem japanese = Assert.Single(items, item => item.LanguageTag == "ja-JP");
+        Assert.False(japanese.IsInstalled);
+        Assert.False(japanese.IsCurrent);
+        Assert.Equal(japanese.DisplayName, japanese.DisplayText);
+    }
+
+    [Fact]
+    public void OcrPage_ManagesInstalledAndMissingOcrLanguagesInOneSection()
     {
         string ocrPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OCRPage.xaml"));
+        string ocrPageCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrPage.xaml.cs"));
         string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
         string installerHelper = File.ReadAllText(LocateSourceFile("Delete Newline", "Helpers", "OcrLanguageInstallHelper.cs"));
         XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
         XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
 
         string languageSettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Settings -->", "</Border>");
-        string installLanguageBlock = ExtractElementBlock(ocrPageXaml, "<Grid x:Name=\"InstallLanguageRow\"", "</Grid>");
+        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Border>");
 
         Assert.Contains("x:Uid=\"OCRPage_Description_LanguageSettings\"", languageSettingsBlock);
         Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp", languageSettingsBlock);
-        Assert.Contains("Margin=\"5,10,0,0\"", installLanguageBlock);
-        Assert.DoesNotContain("x:Uid=\"OCRPage_Header_InstallLanguage\"", installLanguageBlock);
-        Assert.Contains("x:Name=\"InstallLanguageRow\"", installLanguageBlock);
-        Assert.Contains("<ColumnDefinition Width=\"*\" />", installLanguageBlock);
-        Assert.Contains("ItemsSource=\"{x:Bind ViewModel.InstallableLanguages}\"", installLanguageBlock);
-        Assert.Contains("SelectedItem=\"{x:Bind ViewModel.SelectedInstallLanguage, Mode=TwoWay}\"", installLanguageBlock);
-        Assert.Contains("HorizontalAlignment=\"Stretch\"", installLanguageBlock);
-        Assert.DoesNotContain("Width=\"300\"", installLanguageBlock);
-        Assert.Contains("Command=\"{x:Bind ViewModel.InstallOcrLanguageCommand}\"", installLanguageBlock);
-        Assert.Contains("x:Uid=\"OCRPage_Button_InstallLanguage\"", installLanguageBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Title_LanguageManagement\"", languageManagementBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Description_LanguageManagement\"", languageManagementBlock);
+        Assert.Contains("x:Name=\"ManageLanguageRow\"", languageManagementBlock);
+        Assert.Contains("<ColumnDefinition Width=\"*\" />", languageManagementBlock);
+        Assert.Contains("ItemsSource=\"{x:Bind ViewModel.ManageableLanguages}\"", languageManagementBlock);
+        Assert.Contains("SelectedItem=\"{x:Bind ViewModel.SelectedManageLanguage, Mode=TwoWay}\"", languageManagementBlock);
+        Assert.Contains("Text=\"{Binding DisplayText}\"", languageManagementBlock);
+        Assert.Contains("HorizontalAlignment=\"Stretch\"", languageManagementBlock);
+        Assert.DoesNotContain("Width=\"300\"", languageManagementBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Button_InstallLanguage\"", languageManagementBlock);
+        Assert.Contains("Command=\"{x:Bind ViewModel.InstallManagedOcrLanguageCommand}\"", languageManagementBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Button_DeleteLanguage\"", languageManagementBlock);
+        Assert.Contains("Click=\"DeleteManagedLanguageButton_Click\"", languageManagementBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Button_CurrentLanguage\"", languageManagementBlock);
+        Assert.Contains("IsEnabled=\"False\"", languageManagementBlock);
 
-        Assert.Contains("ObservableCollection<Language> _installableLanguages", ocrViewModel);
-        Assert.Contains("Language? _selectedInstallLanguage", ocrViewModel);
-        Assert.Contains("public async Task<McpOcrLanguageInstallResult> InstallAndApplyOcrLanguageAsync(string languageTag", ocrViewModel);
-        Assert.Contains("await OcrLanguageInstallHelper.InstallOcrLanguageCapabilityAsync(languageToInstall.LanguageTag)", ocrViewModel);
+        Assert.Contains("ContentDialog", ocrPageCodeBehind);
+        Assert.Contains("DeleteManagedLanguageButton_Click", ocrPageCodeBehind);
+        Assert.Contains("OCRPage_DeleteLanguageDialog.Message", ocrPageCodeBehind);
+        Assert.Contains("await ViewModel.DeleteManagedOcrLanguageAsync", ocrPageCodeBehind);
+
+        Assert.Contains("ObservableCollection<OcrLanguageManagementItem> _manageableLanguages", ocrViewModel);
+        Assert.Contains("OcrLanguageManagementItem? _selectedManageLanguage", ocrViewModel);
+        Assert.Contains("InstallManagedOcrLanguageCommand", ocrViewModel);
+        Assert.Contains("public async Task DeleteManagedOcrLanguageAsync(string languageTag", ocrViewModel);
+        Assert.Contains("string requestedLanguageTag = languageTag.Trim()", ocrViewModel);
+        Assert.Contains("LanguageTagsMatch(SelectedLanguage.LanguageTag, requestedLanguageTag)", ocrViewModel);
+        Assert.Contains("string capabilityLanguageTag = managedLanguageToDelete?.LanguageTag ?? requestedLanguageTag", ocrViewModel);
+        Assert.Contains("await OcrLanguageInstallHelper.RemoveOcrLanguageCapabilityAsync(capabilityLanguageTag)", ocrViewModel);
         Assert.Contains("RefreshAvailableOcrLanguages()", ocrViewModel);
         Assert.Contains("SelectedLanguage = installedLanguage", ocrViewModel);
         Assert.Contains("await SaveOcrLanguageAsync()", ocrViewModel);
         Assert.Contains("Notification_OcrLanguageInstallSuccess_Title", ocrViewModel);
-        Assert.Contains("Notification_OcrLanguageInstallSuccess_Message", ocrViewModel);
+        Assert.Contains("Notification_OcrLanguageDeleteSuccess_Title", ocrViewModel);
+        Assert.Contains("Notification_OcrLanguageDeleteFailed_Title", ocrViewModel);
         Assert.Contains("InfoBarSeverity.Success", ocrViewModel);
         Assert.Contains("Notification_OcrLanguageInstallFailed", ocrViewModel);
 
         Assert.Contains("public static string GetOcrCapabilityName(string languageTag)", installerHelper);
+        Assert.Contains("public sealed class OcrLanguageManagementItem", installerHelper);
+        Assert.Contains("public static IReadOnlyList<OcrLanguageManagementItem> GetManageableLanguages", installerHelper);
         Assert.Contains("$\"Language.OCR~~~{languageTag}~0.0.1.0\"", installerHelper);
         Assert.Contains("Add-WindowsCapability -Online -Name", installerHelper);
+        Assert.Contains("Remove-WindowsCapability -Online -Name", installerHelper);
+        Assert.Contains("public static async Task<int> RemoveOcrLanguageCapabilityAsync", installerHelper);
         Assert.Contains("Verb = \"runas\"", installerHelper);
         Assert.Contains("UseShellExecute = true", installerHelper);
 
+        Assert.Equal("OCR Language Management", GetReswValue(englishResources, "OCRPage_Title_LanguageManagement.Text"));
+        Assert.Equal("Download missing Windows OCR languages or delete installed languages that are not in use.", GetReswValue(englishResources, "OCRPage_Description_LanguageManagement.Text"));
         Assert.Equal("Download and Apply", GetReswValue(englishResources, "OCRPage_Button_InstallLanguage.Content"));
-        Assert.DoesNotContain("OCRPage_Header_InstallLanguage.Header", englishResources.ToString());
-        Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", englishResources.ToString());
+        Assert.Equal("Delete", GetReswValue(englishResources, "OCRPage_Button_DeleteLanguage.Content"));
+        Assert.Equal("Currently in Use", GetReswValue(englishResources, "OCRPage_Button_CurrentLanguage.Content"));
+        Assert.Equal("(installed)", GetReswValue(englishResources, "OCRPage_Text_LanguageInstalledSuffix.Text"));
+        Assert.Equal("Delete OCR Language", GetReswValue(englishResources, "OCRPage_DeleteLanguageDialog.Title"));
+        Assert.Equal("Delete", GetReswValue(englishResources, "OCRPage_DeleteLanguageDialog.PrimaryButtonText"));
+        Assert.Equal("Cancel", GetReswValue(englishResources, "OCRPage_DeleteLanguageDialog.CloseButtonText"));
         Assert.Equal("OCR Language Installed", GetReswValue(englishResources, "Notification_OcrLanguageInstallSuccess_Title"));
         Assert.Equal("{0} is ready for OCR.", GetReswValue(englishResources, "Notification_OcrLanguageInstallSuccess_Message"));
+        Assert.Equal("OCR Language Deleted", GetReswValue(englishResources, "Notification_OcrLanguageDeleteSuccess_Title"));
+
+        Assert.Equal("OCR 언어 관리", GetReswValue(koreanResources, "OCRPage_Title_LanguageManagement.Text"));
+        Assert.Equal("필요한 Windows OCR 언어를 다운로드하거나 사용 중이 아닌 설치된 언어를 삭제합니다.", GetReswValue(koreanResources, "OCRPage_Description_LanguageManagement.Text"));
         Assert.Equal("다운로드 후 적용", GetReswValue(koreanResources, "OCRPage_Button_InstallLanguage.Content"));
-        Assert.DoesNotContain("OCRPage_Header_InstallLanguage.Header", koreanResources.ToString());
-        Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", koreanResources.ToString());
+        Assert.Equal("삭제", GetReswValue(koreanResources, "OCRPage_Button_DeleteLanguage.Content"));
+        Assert.Equal("현재 사용 중", GetReswValue(koreanResources, "OCRPage_Button_CurrentLanguage.Content"));
+        Assert.Equal("(설치됨)", GetReswValue(koreanResources, "OCRPage_Text_LanguageInstalledSuffix.Text"));
+        Assert.Equal("OCR 언어 삭제", GetReswValue(koreanResources, "OCRPage_DeleteLanguageDialog.Title"));
+        Assert.Equal("삭제", GetReswValue(koreanResources, "OCRPage_DeleteLanguageDialog.PrimaryButtonText"));
+        Assert.Equal("취소", GetReswValue(koreanResources, "OCRPage_DeleteLanguageDialog.CloseButtonText"));
         Assert.Equal("OCR 언어 설치됨", GetReswValue(koreanResources, "Notification_OcrLanguageInstallSuccess_Title"));
         Assert.Equal("{0} OCR을 사용할 수 있습니다.", GetReswValue(koreanResources, "Notification_OcrLanguageInstallSuccess_Message"));
+        Assert.Equal("OCR 언어 삭제됨", GetReswValue(koreanResources, "Notification_OcrLanguageDeleteSuccess_Title"));
+
+        Assert.DoesNotContain("OCRPage_Title_LanguageDownload.Text", englishResources.ToString());
+        Assert.DoesNotContain("OCRPage_Title_LanguageDownload.Text", koreanResources.ToString());
+        Assert.DoesNotContain("OCRPage_Header_InstallLanguage.Header", englishResources.ToString());
+        Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", englishResources.ToString());
+        Assert.DoesNotContain("OCRPage_Header_InstallLanguage.Header", koreanResources.ToString());
+        Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp.Text", koreanResources.ToString());
     }
 
     [Fact]
-    public void OcrPage_GroupsHotkeyLanguageAndLanguageDownloadIntoSeparateCards()
+    public void OcrPage_GroupsHotkeyLanguageAndLanguageManagementIntoSeparateCards()
     {
         string ocrPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OCRPage.xaml"));
         XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
         XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
 
         string hotkeySettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Hotkey Settings -->", "</Border>");
-        string languageSettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Settings -->", "<!-- OCR Language Download Label -->");
-        string languageDownloadBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Download -->", "</Border>");
+        string languageSettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Settings -->", "<!-- OCR Language Management -->");
+        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Border>");
 
         Assert.Contains("x:Uid=\"OCRPage_Title_HotkeySettings\"", hotkeySettingsBlock);
         Assert.Contains("x:Uid=\"OCRPage_Title_LanguageSettings\"", languageSettingsBlock);
         Assert.Contains("x:Name=\"LanguageComboBox\"", languageSettingsBlock);
-        Assert.DoesNotContain("InstallLanguageRow", languageSettingsBlock);
+        Assert.DoesNotContain("ManageLanguageRow", languageSettingsBlock);
 
-        Assert.Contains("x:Uid=\"OCRPage_Title_LanguageDownload\"", languageDownloadBlock);
-        Assert.Contains("x:Uid=\"OCRPage_Description_LanguageDownload\"", languageDownloadBlock);
-        Assert.Contains("x:Name=\"InstallLanguageRow\"", languageDownloadBlock);
-        Assert.DoesNotContain("x:Uid=\"OCRPage_Header_InstallLanguage\"", languageDownloadBlock);
-        Assert.Contains("Command=\"{x:Bind ViewModel.InstallOcrLanguageCommand}\"", languageDownloadBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Title_LanguageManagement\"", languageManagementBlock);
+        Assert.Contains("x:Uid=\"OCRPage_Description_LanguageManagement\"", languageManagementBlock);
+        Assert.Contains("x:Name=\"ManageLanguageRow\"", languageManagementBlock);
+        Assert.DoesNotContain("x:Uid=\"OCRPage_Header_InstallLanguage\"", languageManagementBlock);
+        Assert.Contains("Command=\"{x:Bind ViewModel.InstallManagedOcrLanguageCommand}\"", languageManagementBlock);
+        Assert.Contains("Click=\"DeleteManagedLanguageButton_Click\"", languageManagementBlock);
 
-        Assert.Equal("Language Download", GetReswValue(englishResources, "OCRPage_Title_LanguageDownload.Text"));
-        Assert.Equal("Download missing Windows OCR languages and apply them immediately.", GetReswValue(englishResources, "OCRPage_Description_LanguageDownload.Text"));
-        Assert.Equal("언어 다운로드", GetReswValue(koreanResources, "OCRPage_Title_LanguageDownload.Text"));
-        Assert.Equal("필요한 Windows OCR 언어를 다운로드하고 바로 적용합니다.", GetReswValue(koreanResources, "OCRPage_Description_LanguageDownload.Text"));
+        Assert.Equal("OCR Language Management", GetReswValue(englishResources, "OCRPage_Title_LanguageManagement.Text"));
+        Assert.Equal("Download missing Windows OCR languages or delete installed languages that are not in use.", GetReswValue(englishResources, "OCRPage_Description_LanguageManagement.Text"));
+        Assert.Equal("OCR 언어 관리", GetReswValue(koreanResources, "OCRPage_Title_LanguageManagement.Text"));
+        Assert.Equal("필요한 Windows OCR 언어를 다운로드하거나 사용 중이 아닌 설치된 언어를 삭제합니다.", GetReswValue(koreanResources, "OCRPage_Description_LanguageManagement.Text"));
     }
 
     [Fact]

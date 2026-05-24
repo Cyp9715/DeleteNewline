@@ -29,6 +29,7 @@
     <Compile Include="..\Delete Newline\Contracts\Structures\RegexPageStructure.cs" Link="Linked\Contracts\Structures\RegexPageStructure.cs" />
     <Compile Include="..\Delete Newline\Helpers\Hotkeys\HotkeyFomatter.cs" Link="Linked\Helpers\HotkeyFomatter.cs" />
     <Compile Include="..\Delete Newline\Helpers\OcrCaptureOverlayLayoutHelper.cs" Link="Linked\Helpers\OcrCaptureOverlayLayoutHelper.cs" />
+    <Compile Include="..\Delete Newline\Helpers\OcrLanguageInstallHelper.cs" Link="Linked\Helpers\OcrLanguageInstallHelper.cs" />
     <Compile Include="..\Delete Newline\Services\Mcp\DeleteNewlineMcpToolService.cs" Link="Linked\Services\Mcp\DeleteNewlineMcpToolService.cs" />
     <Compile Include="..\Delete Newline\Services\Mcp\IMcpOcrConfigurationRepository.cs" Link="Linked\Services\Mcp\IMcpOcrConfigurationRepository.cs" />
     <Compile Include="..\Delete Newline\Services\Mcp\IMcpRegexConfigurationRepository.cs" Link="Linked\Services\Mcp\IMcpRegexConfigurationRepository.cs" />

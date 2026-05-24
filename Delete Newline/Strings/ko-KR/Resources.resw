@@ -342,13 +342,13 @@
     <value>텍스트 인식에 사용할 언어를 선택하세요.</value>
     <comment>OCR 페이지 언어 설정 설명</comment>
   </data>
-  <data name="OCRPage_Title_LanguageDownload.Text" xml:space="preserve">
-    <value>언어 다운로드</value>
-    <comment>OCR 페이지 언어 다운로드 섹션 제목</comment>
+  <data name="OCRPage_Title_LanguageManagement.Text" xml:space="preserve">
+    <value>OCR 언어 관리</value>
+    <comment>OCR 페이지 언어 관리 섹션 제목</comment>
   </data>
-  <data name="OCRPage_Description_LanguageDownload.Text" xml:space="preserve">
-    <value>필요한 Windows OCR 언어를 다운로드하고 바로 적용합니다.</value>
-    <comment>OCR 페이지 언어 다운로드 섹션 설명</comment>
+  <data name="OCRPage_Description_LanguageManagement.Text" xml:space="preserve">
+    <value>필요한 Windows OCR 언어를 다운로드하거나 사용 중이 아닌 설치된 언어를 삭제합니다.</value>
+    <comment>OCR 페이지 언어 관리 섹션 설명</comment>
   </data>
   <data name="OCRPage_Header_RecognitionLanguage.Header" xml:space="preserve">
     <value>인식 언어</value>
@@ -370,6 +370,34 @@
     <value>다운로드 후 적용</value>
     <comment>OCR 페이지 언어 설치 버튼 문구</comment>
   </data>
+  <data name="OCRPage_Button_DeleteLanguage.Content" xml:space="preserve">
+    <value>삭제</value>
+    <comment>OCR 페이지 언어 삭제 버튼 문구</comment>
+  </data>
+  <data name="OCRPage_Button_CurrentLanguage.Content" xml:space="preserve">
+    <value>현재 사용 중</value>
+    <comment>OCR 페이지 현재 사용 중 언어 버튼 문구</comment>
+  </data>
+  <data name="OCRPage_Text_LanguageInstalledSuffix.Text" xml:space="preserve">
+    <value>(설치됨)</value>
+    <comment>OCR 언어 관리 목록에서 설치된 언어 옆에 표시되는 접미사</comment>
+  </data>
+  <data name="OCRPage_DeleteLanguageDialog.Title" xml:space="preserve">
+    <value>OCR 언어 삭제</value>
+    <comment>OCR 언어 삭제 확인 대화 상자 제목</comment>
+  </data>
+  <data name="OCRPage_DeleteLanguageDialog.Message" xml:space="preserve">
+    <value>Windows OCR 언어에서 {0}을(를) 제거할까요? 나중에 다시 다운로드할 수 있습니다.</value>
+    <comment>OCR 언어 삭제 확인 대화 상자 메시지</comment>
+  </data>
+  <data name="OCRPage_DeleteLanguageDialog.PrimaryButtonText" xml:space="preserve">
+    <value>삭제</value>
+    <comment>OCR 언어 삭제 확인 대화 상자 기본 버튼</comment>
+  </data>
+  <data name="OCRPage_DeleteLanguageDialog.CloseButtonText" xml:space="preserve">
+    <value>취소</value>
+    <comment>OCR 언어 삭제 확인 대화 상자 취소 버튼</comment>
+  </data>
   <data name="Notification_OcrLanguageInstallSuccess_Title" xml:space="preserve">
     <value>OCR 언어 설치됨</value>
     <comment>OCR 언어 설치 성공 알림 제목</comment>
@@ -385,6 +413,22 @@
   <data name="Notification_OcrLanguageInstallFailed_Message" xml:space="preserve">
     <value>{0} 설치에 실패했습니다. Windows 관리자 권한 확인을 승인한 뒤 다시 시도하세요.</value>
     <comment>OCR 언어 설치 실패 알림 메시지</comment>
+  </data>
+  <data name="Notification_OcrLanguageDeleteSuccess_Title" xml:space="preserve">
+    <value>OCR 언어 삭제됨</value>
+    <comment>OCR 언어 삭제 성공 알림 제목</comment>
+  </data>
+  <data name="Notification_OcrLanguageDeleteSuccess_Message" xml:space="preserve">
+    <value>{0}이(가) Windows OCR 언어에서 제거되었습니다.</value>
+    <comment>OCR 언어 삭제 성공 알림 메시지</comment>
+  </data>
+  <data name="Notification_OcrLanguageDeleteFailed_Title" xml:space="preserve">
+    <value>OCR 언어 삭제 실패</value>
+    <comment>OCR 언어 삭제 실패 알림 제목</comment>
+  </data>
+  <data name="Notification_OcrLanguageDeleteFailed_Message" xml:space="preserve">
+    <value>{0} 삭제에 실패했습니다. Windows 관리자 권한 확인을 승인한 뒤 다시 시도하세요.</value>
+    <comment>OCR 언어 삭제 실패 알림 메시지</comment>
   </data>
   <data name="Notification_OcrLanguageNotFound_Title" xml:space="preserve">
     <value>OCR 언어를 찾을 수 없음</value>

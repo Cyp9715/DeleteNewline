@@ -97,15 +97,14 @@
                     </StackPanel>
                 </Border>
 
-                <!-- OCR Language Download -->
-                <!-- OCR Language Download Label -->
-                <TextBlock x:Uid="OCRPage_Title_LanguageDownload"
+                <!-- OCR Language Management -->
+                <TextBlock x:Uid="OCRPage_Title_LanguageManagement"
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            FontSize="16"
                            HorizontalAlignment="Left"
                            Margin="3,20,0,0"/>
 
-                <!-- OCR Language Download Card -->
+                <!-- OCR Language Management Card -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
@@ -113,12 +112,12 @@
                         Margin="0,5,0,0"
                         Padding="10">
                     <StackPanel>
-                        <TextBlock x:Uid="OCRPage_Description_LanguageDownload"
+                        <TextBlock x:Uid="OCRPage_Description_LanguageManagement"
                                    Style="{ThemeResource BodyTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    Margin="5,0,0,0" />
 
-                        <Grid x:Name="InstallLanguageRow"
+                        <Grid x:Name="ManageLanguageRow"
                               Margin="5,10,0,0"
                               ColumnSpacing="8"
                               HorizontalAlignment="Stretch">
@@ -126,20 +125,32 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <ComboBox x:Name="InstallLanguageComboBox"
+                            <ComboBox x:Name="ManageLanguageComboBox"
                                       Grid.Column="0"
                                       HorizontalAlignment="Stretch"
-                                      ItemsSource="{x:Bind ViewModel.InstallableLanguages}"
-                                      SelectedItem="{x:Bind ViewModel.SelectedInstallLanguage, Mode=TwoWay}">
+                                      ItemsSource="{x:Bind ViewModel.ManageableLanguages}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedManageLanguage, Mode=TwoWay}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding DisplayName}" />
+                                        <TextBlock Text="{Binding DisplayText}" />
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                             <Button x:Uid="OCRPage_Button_InstallLanguage"
                                     Grid.Column="1"
-                                    Command="{x:Bind ViewModel.InstallOcrLanguageCommand}"
+                                    Command="{x:Bind ViewModel.InstallManagedOcrLanguageCommand}"
+                                    Visibility="{x:Bind ViewModel.InstallManagedLanguageButtonVisibility, Mode=OneWay}"
+                                    VerticalAlignment="Bottom" />
+                            <Button x:Uid="OCRPage_Button_DeleteLanguage"
+                                    Grid.Column="1"
+                                    Click="DeleteManagedLanguageButton_Click"
+                                    IsEnabled="{x:Bind ViewModel.CanDeleteManagedLanguage, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.DeleteManagedLanguageButtonVisibility, Mode=OneWay}"
+                                    VerticalAlignment="Bottom" />
+                            <Button x:Uid="OCRPage_Button_CurrentLanguage"
+                                    Grid.Column="1"
+                                    IsEnabled="False"
+                                    Visibility="{x:Bind ViewModel.CurrentManagedLanguageButtonVisibility, Mode=OneWay}"
                                     VerticalAlignment="Bottom" />
                         </Grid>
                     </StackPanel>

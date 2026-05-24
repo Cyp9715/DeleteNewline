@@ -4,6 +4,34 @@ using Windows.Globalization;
 
 namespace Delete_Newline.Helpers;
 
+public sealed class OcrLanguageManagementItem
+{
+    public OcrLanguageManagementItem(string languageTag, Language language, bool isInstalled, bool isCurrent, string installedStatusText)
+    {
+        LanguageTag = languageTag;
+        Language = language;
+        IsInstalled = isInstalled;
+        IsCurrent = isCurrent;
+        InstalledStatusText = installedStatusText;
+    }
+
+    public string LanguageTag { get; }
+
+    public Language Language { get; }
+
+    public string DisplayName => Language.DisplayName;
+
+    public bool IsInstalled { get; }
+
+    public bool IsCurrent { get; }
+
+    public string InstalledStatusText { get; }
+
+    public string DisplayText => IsInstalled && !string.IsNullOrWhiteSpace(InstalledStatusText)
+        ? $"{DisplayName} {InstalledStatusText}"
+        : DisplayName;
+}
+
 public static class OcrLanguageInstallHelper
 {
     private static readonly Regex LanguageTagPattern = new("^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8}){1,3}$", RegexOptions.Compiled);
@@ -64,6 +92,49 @@ public static class OcrLanguageInstallHelper
             .ToArray();
     }
 
+    public static IReadOnlyList<OcrLanguageManagementItem> GetManageableLanguages(
+        IEnumerable<Language> installedLanguages,
+        string? currentLanguageTag,
+        string installedStatusText)
+    {
+        Language[] installedLanguageArray = installedLanguages.ToArray();
+        Dictionary<string, Language> installedLanguagesByTag = installedLanguageArray
+            .GroupBy(language => language.LanguageTag, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+
+        static bool TagsMatch(string first, string? second)
+        {
+            if (string.IsNullOrWhiteSpace(second))
+            {
+                return false;
+            }
+
+            return first.Equals(second, StringComparison.OrdinalIgnoreCase)
+                || new Language(first).LanguageTag.Equals(second, StringComparison.OrdinalIgnoreCase);
+        }
+
+        IEnumerable<string> unsupportedInstalledTags = installedLanguageArray
+            .Select(language => language.LanguageTag)
+            .Where(installedTag => !SupportedOcrLanguageTags.Any(supportedTag => TagsMatch(supportedTag, installedTag)));
+
+        return SupportedOcrLanguageTags
+            .Concat(unsupportedInstalledTags)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(languageTag =>
+            {
+                Language displayLanguage = new(languageTag);
+                bool isInstalled = installedLanguagesByTag.TryGetValue(languageTag, out Language? installedLanguage)
+                    || installedLanguagesByTag.TryGetValue(displayLanguage.LanguageTag, out installedLanguage);
+                Language language = installedLanguage ?? displayLanguage;
+                bool isCurrent = isInstalled
+                    && (TagsMatch(languageTag, currentLanguageTag) || TagsMatch(language.LanguageTag, currentLanguageTag));
+
+                return new OcrLanguageManagementItem(languageTag, language, isInstalled, isCurrent, installedStatusText);
+            })
+            .OrderBy(item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+    }
+
     public static string GetOcrCapabilityName(string languageTag)
     {
         if (string.IsNullOrWhiteSpace(languageTag) || !LanguageTagPattern.IsMatch(languageTag))
@@ -77,25 +148,36 @@ public static class OcrLanguageInstallHelper
     public static async Task<int> InstallOcrLanguageCapabilityAsync(string languageTag)
     {
         string capabilityName = GetOcrCapabilityName(languageTag);
-        using Process process = StartElevatedPowerShell(capabilityName);
+        using Process process = StartElevatedPowerShell($"Add-WindowsCapability -Online -Name '{EscapePowerShellSingleQuotedString(capabilityName)}'");
         await process.WaitForExitAsync();
         return process.ExitCode;
     }
 
-    private static Process StartElevatedPowerShell(string capabilityName)
+    public static async Task<int> RemoveOcrLanguageCapabilityAsync(string languageTag)
     {
-        string escapedCapabilityName = capabilityName.Replace("'", "''", StringComparison.Ordinal);
-        string installCommand = $"Add-WindowsCapability -Online -Name '{escapedCapabilityName}'";
+        string capabilityName = GetOcrCapabilityName(languageTag);
+        using Process process = StartElevatedPowerShell($"Remove-WindowsCapability -Online -Name '{EscapePowerShellSingleQuotedString(capabilityName)}'");
+        await process.WaitForExitAsync();
+        return process.ExitCode;
+    }
+
+    private static string EscapePowerShellSingleQuotedString(string value)
+    {
+        return value.Replace("'", "''", StringComparison.Ordinal);
+    }
+
+    private static Process StartElevatedPowerShell(string command)
+    {
         ProcessStartInfo startInfo = new()
         {
             FileName = "powershell.exe",
-            Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{installCommand}\"",
+            Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"",
             Verb = "runas",
             UseShellExecute = true,
             CreateNoWindow = false
         };
 
         return Process.Start(startInfo)
-            ?? throw new InvalidOperationException("Failed to start elevated PowerShell for OCR language installation.");
+            ?? throw new InvalidOperationException("Failed to start elevated PowerShell for OCR language management.");
     }
 }
