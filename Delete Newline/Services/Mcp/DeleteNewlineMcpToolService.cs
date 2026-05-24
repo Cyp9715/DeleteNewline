@@ -4,12 +4,22 @@ using System.Text.RegularExpressions;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Helpers;
 using Delete_Newline.Services;
+using Windows.Globalization;
 using Windows.System;
 
 namespace Delete_Newline.Services.Mcp;
 
 public sealed class DeleteNewlineMcpToolService
 {
+    private sealed record OcrLanguageActionDto(
+        string LanguageTag,
+        string DisplayName,
+        bool IsInstalled,
+        bool IsCurrent,
+        bool CanSelect,
+        string Action,
+        string RecommendedTool);
+
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
         WriteIndented = true
@@ -267,7 +277,7 @@ public sealed class DeleteNewlineMcpToolService
             {
                 Name = "get_ocr_languages",
                 Title = "Get OCR languages",
-                Description = "Return current OCR language plus availableLanguageTags that can be selected now and installableLanguageTags that can be downloaded with install_ocr_language. Small/local models should call this before changing OCR language and copy one exact languageTag from the returned lists.",
+                Description = "Return the current OCR language and a simple language action table for small/local models. Read manageableLanguages, copy one exact languageTag, then call the recommendedTool. availableLanguageTags are installed and selectable now. installableLanguageTags can be downloaded with install_ocr_language. deletableLanguageTags are installed, not current, and safe to delete with delete_ocr_language. Do not delete the current OCR language.",
                 InputSchema = Schema("""
                 { "type": "object", "properties": {}, "additionalProperties": false }
                 """),
@@ -278,12 +288,36 @@ public sealed class DeleteNewlineMcpToolService
             {
                 Name = "install_ocr_language",
                 Title = "Download and apply an OCR language",
-                Description = "Download/install one missing Windows OCR language, refresh Delete Newline OCR languages, select that language, and save it immediately. Simple workflow for small/local models: call get_ocr_languages, copy a tag from installableLanguageTags such as ko-KR or ja-JP, then call this tool with exactly { \"languageTag\": \"ko-KR\" }. If the tag is already in availableLanguageTags, use set_ocr_settings instead. This may show a Windows elevation prompt.",
+                Description = "Download/install one missing Windows OCR language, refresh Delete Newline OCR languages, select that language, and save it immediately. Step 1: call get_ocr_languages. Step 2: choose an item where action is 'install' or copy an exact languageTag from installableLanguageTags. Step 3: call this tool with exactly { \"languageTag\": \"ko-KR\" }. If the language action is 'set', call set_ocr_settings instead. This may show a Windows elevation prompt.",
                 InputSchema = Schema("""
                 {
                   "type": "object",
                   "properties": {
-                    "languageTag": { "type": "string", "description": "Exact Windows OCR language tag to install and apply, for example ko-KR, ja-JP, en-US, zh-CN, fr-FR, or de-DE. Prefer copying a tag from get_ocr_languages.installableLanguageTags." },
+                    "languageTag": { "type": "string", "description": "Exact Windows OCR language tag to install and apply, for example ko-KR, ja-JP, en-US, zh-CN, fr-FR, or de-DE. Prefer copying a tag from get_ocr_languages.installableLanguageTags or from manageableLanguages where action is 'install'." },
+                    "language": { "type": "string", "description": "Alias for languageTag." },
+                    "tag": { "type": "string", "description": "Alias for languageTag." }
+                  },
+                  "anyOf": [
+                    { "required": ["languageTag"] },
+                    { "required": ["language"] },
+                    { "required": ["tag"] }
+                  ],
+                  "additionalProperties": false
+                }
+                """),
+                ReadOnly = false,
+                Destructive = true
+            },
+            new McpToolDescriptor
+            {
+                Name = "delete_ocr_language",
+                Title = "Delete an OCR language",
+                Description = "Delete one installed Windows OCR language that is not the current OCR language. Step 1: call get_ocr_languages. Step 2: copy an exact languageTag from deletableLanguageTags or from manageableLanguages where action is 'delete'. Step 3: call this tool with exactly { \"languageTag\": \"ko-KR\" }. Do not delete the current OCR language; select another OCR language first with set_ocr_settings. This may show a Windows elevation prompt.",
+                InputSchema = Schema("""
+                {
+                  "type": "object",
+                  "properties": {
+                    "languageTag": { "type": "string", "description": "Exact installed Windows OCR language tag to delete, for example ko-KR, ja-JP, en-US, zh-CN, fr-FR, or de-DE. Copy a tag from get_ocr_languages.deletableLanguageTags or from manageableLanguages where action is 'delete'. Do not use the current OCR language tag." },
                     "language": { "type": "string", "description": "Alias for languageTag." },
                     "tag": { "type": "string", "description": "Alias for languageTag." }
                   },
@@ -348,6 +382,7 @@ public sealed class DeleteNewlineMcpToolService
                 "set_ocr_settings" => await SetOcrSettingsAsync(arguments, cancellationToken),
                 "get_ocr_languages" => GetOcrLanguages(),
                 "install_ocr_language" => await InstallOcrLanguageAsync(arguments, cancellationToken),
+                "delete_ocr_language" => await DeleteOcrLanguageAsync(arguments, cancellationToken),
                 "get_app_settings" => GetAppSettings(),
                 "set_app_setting" => await SetAppSettingAsync(arguments, cancellationToken),
                 _ => McpToolResult.Error($"Unknown tool: {toolName}")
@@ -580,13 +615,22 @@ public sealed class DeleteNewlineMcpToolService
 
     private McpToolResult GetOcrLanguages()
     {
+        OcrLanguageActionDto[] manageableLanguages = BuildManageableLanguageDtos();
+        string[] deletableLanguageTags = manageableLanguages
+            .Where(item => item.Action == "delete")
+            .Select(item => item.LanguageTag)
+            .ToArray();
+
         return JsonSuccess(new
         {
             languageTag = _ocrRepository.LanguageTag,
             availableLanguageTags = _ocrRepository.AvailableLanguageTags,
             availableLanguages = _ocrRepository.AvailableLanguages.Select(ToOcrLanguageDto).ToArray(),
             installableLanguageTags = _ocrRepository.InstallableLanguages.Select(language => language.LanguageTag).ToArray(),
-            installableLanguages = _ocrRepository.InstallableLanguages.Select(ToOcrLanguageDto).ToArray()
+            installableLanguages = _ocrRepository.InstallableLanguages.Select(ToOcrLanguageDto).ToArray(),
+            deletableLanguageTags,
+            manageableLanguages,
+            recommendedWorkflow = "Call get_ocr_languages first. To download and apply a missing OCR language, copy an exact languageTag from installableLanguageTags and call install_ocr_language. To delete an installed OCR language that is not current, copy an exact languageTag from deletableLanguageTags and call delete_ocr_language. Do not delete the current OCR language. To switch to an installed language, copy an exact languageTag from availableLanguageTags and call set_ocr_settings."
         });
     }
 
@@ -595,6 +639,16 @@ public sealed class DeleteNewlineMcpToolService
         string languageTag = GetString(arguments, "languageTag") ?? GetString(arguments, "language") ?? GetString(arguments, "tag") ?? throw new ArgumentException("languageTag is required. Call get_ocr_languages and copy a tag from installableLanguageTags.");
 
         McpOcrLanguageInstallResult result = await _ocrRepository.InstallAndApplyLanguageAsync(languageTag, cancellationToken);
+        return result.Success
+            ? JsonSuccess(result)
+            : McpToolResult.Error(result.Message);
+    }
+
+    private async Task<McpToolResult> DeleteOcrLanguageAsync(JsonElement arguments, CancellationToken cancellationToken)
+    {
+        string languageTag = GetString(arguments, "languageTag") ?? GetString(arguments, "language") ?? GetString(arguments, "tag") ?? throw new ArgumentException("languageTag is required. Call get_ocr_languages and copy a tag from deletableLanguageTags.");
+
+        McpOcrLanguageDeleteResult result = await _ocrRepository.DeleteLanguageAsync(languageTag, cancellationToken);
         return result.Success
             ? JsonSuccess(result)
             : McpToolResult.Error(result.Message);
@@ -863,6 +917,69 @@ public sealed class DeleteNewlineMcpToolService
                 replace = item.Replace ?? string.Empty
             }).ToArray()
         };
+    }
+
+    private static bool LanguageTagsMatch(string? first, string? second)
+    {
+        if (string.IsNullOrWhiteSpace(first) || string.IsNullOrWhiteSpace(second))
+        {
+            return false;
+        }
+
+        string trimmedFirst = first.Trim();
+        string trimmedSecond = second.Trim();
+        if (trimmedFirst.Equals(trimmedSecond, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        try
+        {
+            string canonicalFirst = new Language(trimmedFirst).LanguageTag;
+            string canonicalSecond = new Language(trimmedSecond).LanguageTag;
+            return canonicalFirst.Equals(trimmedSecond, StringComparison.OrdinalIgnoreCase)
+                || trimmedFirst.Equals(canonicalSecond, StringComparison.OrdinalIgnoreCase)
+                || canonicalFirst.Equals(canonicalSecond, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private OcrLanguageActionDto[] BuildManageableLanguageDtos()
+    {
+        string? currentLanguageTag = _ocrRepository.LanguageTag;
+        IEnumerable<OcrLanguageActionDto> installedLanguages = _ocrRepository.AvailableLanguages.Select(language =>
+        {
+            bool isCurrent = LanguageTagsMatch(language.LanguageTag, currentLanguageTag);
+            return new OcrLanguageActionDto(
+                language.LanguageTag,
+                language.DisplayName,
+                IsInstalled: true,
+                IsCurrent: isCurrent,
+                CanSelect: true,
+                Action: isCurrent ? "current" : "delete",
+                RecommendedTool: isCurrent ? "none" : "delete_ocr_language");
+        });
+
+        IEnumerable<OcrLanguageActionDto> installableLanguages = _ocrRepository.InstallableLanguages
+            .Where(language => !_ocrRepository.AvailableLanguageTags.Any(installedTag => LanguageTagsMatch(installedTag, language.LanguageTag)))
+            .Select(language => new OcrLanguageActionDto(
+                language.LanguageTag,
+                language.DisplayName,
+                IsInstalled: false,
+                IsCurrent: false,
+                CanSelect: false,
+                Action: "install",
+                RecommendedTool: "install_ocr_language"));
+
+        return installedLanguages
+            .Concat(installableLanguages)
+            .GroupBy(language => language.LanguageTag, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .OrderBy(language => language.DisplayName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
     }
 
     private static object ToOcrLanguageDto(McpOcrLanguageInfo language)

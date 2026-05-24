@@ -38,6 +38,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("set_ocr_settings", toolNames);
         Assert.Contains("get_ocr_languages", toolNames);
         Assert.Contains("install_ocr_language", toolNames);
+        Assert.Contains("delete_ocr_language", toolNames);
         Assert.All(toolNames, name => Assert.Matches("^[a-z0-9_]+$", name));
     }
 
@@ -186,7 +187,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public async Task OcrLanguageMcpTools_ListInstallAndApplyLanguagesForSmallModels()
+    public async Task OcrLanguageMcpTools_ListInstallDeleteAndApplyLanguagesForSmallModels()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();
         var settingsRepository = new InMemoryMcpSettingsRepository();
@@ -195,14 +196,22 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         McpToolDescriptor getLanguagesTool = service.ListTools().Single(tool => tool.Name == "get_ocr_languages");
         McpToolDescriptor installLanguageTool = service.ListTools().Single(tool => tool.Name == "install_ocr_language");
+        McpToolDescriptor deleteLanguageTool = service.ListTools().Single(tool => tool.Name == "delete_ocr_language");
 
         Assert.True(getLanguagesTool.ReadOnly);
         Assert.False(installLanguageTool.ReadOnly);
-        Assert.Contains("installableLanguageTags", getLanguagesTool.Description);
-        Assert.Contains("small", installLanguageTool.Description, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("get_ocr_languages", installLanguageTool.Description);
-        Assert.Contains("languageTag", installLanguageTool.InputSchema.GetRawText());
-        Assert.Contains("ko-KR", installLanguageTool.InputSchema.GetRawText());
+        Assert.False(deleteLanguageTool.ReadOnly);
+        Assert.True(deleteLanguageTool.Destructive);
+        Assert.Contains("manageableLanguages", getLanguagesTool.Description);
+        Assert.Contains("deletableLanguageTags", getLanguagesTool.Description);
+        Assert.Contains("Step 1", installLanguageTool.Description);
+        Assert.Contains("copy", installLanguageTool.Description, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("exact languageTag", installLanguageTool.Description);
+        Assert.Contains("Step 1", deleteLanguageTool.Description);
+        Assert.Contains("Do not delete the current OCR language", deleteLanguageTool.Description);
+        Assert.Contains("get_ocr_languages", deleteLanguageTool.Description);
+        Assert.Contains("languageTag", deleteLanguageTool.InputSchema.GetRawText());
+        Assert.Contains("ko-KR", deleteLanguageTool.InputSchema.GetRawText());
 
         using JsonDocument emptyArguments = JsonDocument.Parse("{}");
         McpToolResult listResult = await service.ExecuteAsync("get_ocr_languages", emptyArguments.RootElement, CancellationToken.None);
@@ -211,7 +220,54 @@ public sealed class DeleteNewlineMcpToolServiceTests
         JsonElement listContent = listResult.StructuredContent!.Value;
         Assert.Equal("en-US", listContent.GetProperty("languageTag").GetString());
         Assert.Contains("en-US", listContent.GetProperty("availableLanguageTags").EnumerateArray().Select(item => item.GetString()));
+        Assert.Contains("ko-KR", listContent.GetProperty("deletableLanguageTags").EnumerateArray().Select(item => item.GetString()));
         Assert.Contains("ja-JP", listContent.GetProperty("installableLanguageTags").EnumerateArray().Select(item => item.GetString()));
+        Assert.Contains("delete_ocr_language", listContent.GetProperty("recommendedWorkflow").GetString());
+
+        JsonElement[] manageableLanguages = listContent.GetProperty("manageableLanguages").EnumerateArray().ToArray();
+        JsonElement english = manageableLanguages.Single(item => item.GetProperty("languageTag").GetString() == "en-US");
+        Assert.True(english.GetProperty("isInstalled").GetBoolean());
+        Assert.True(english.GetProperty("isCurrent").GetBoolean());
+        Assert.Equal("current", english.GetProperty("action").GetString());
+        Assert.Equal("none", english.GetProperty("recommendedTool").GetString());
+
+        JsonElement korean = manageableLanguages.Single(item => item.GetProperty("languageTag").GetString() == "ko-KR");
+        Assert.True(korean.GetProperty("isInstalled").GetBoolean());
+        Assert.False(korean.GetProperty("isCurrent").GetBoolean());
+        Assert.Equal("delete", korean.GetProperty("action").GetString());
+        Assert.Equal("delete_ocr_language", korean.GetProperty("recommendedTool").GetString());
+
+        JsonElement japanese = manageableLanguages.Single(item => item.GetProperty("languageTag").GetString() == "ja-JP");
+        Assert.False(japanese.GetProperty("isInstalled").GetBoolean());
+        Assert.False(japanese.GetProperty("isCurrent").GetBoolean());
+        Assert.Equal("install", japanese.GetProperty("action").GetString());
+        Assert.Equal("install_ocr_language", japanese.GetProperty("recommendedTool").GetString());
+
+        using JsonDocument deleteCurrentArguments = JsonDocument.Parse("""
+        {
+          "languageTag": "en-US"
+        }
+        """);
+
+        McpToolResult deleteCurrentResult = await service.ExecuteAsync("delete_ocr_language", deleteCurrentArguments.RootElement, CancellationToken.None);
+        Assert.True(deleteCurrentResult.IsError);
+        Assert.Contains("current OCR language", deleteCurrentResult.Text);
+
+        using JsonDocument deleteArguments = JsonDocument.Parse("""
+        {
+          "languageTag": "ko-KR"
+        }
+        """);
+
+        McpToolResult deleteResult = await service.ExecuteAsync("delete_ocr_language", deleteArguments.RootElement, CancellationToken.None);
+
+        Assert.False(deleteResult.IsError, deleteResult.Text);
+        JsonElement deleteContent = deleteResult.StructuredContent!.Value;
+        Assert.True(deleteContent.GetProperty("deleted").GetBoolean());
+        Assert.Equal("ko-KR", deleteContent.GetProperty("languageTag").GetString());
+        Assert.DoesNotContain("ko-KR", ocrRepository.AvailableLanguageTags);
+        Assert.Contains("ko-KR", ocrRepository.InstallableLanguages.Select(language => language.LanguageTag));
+        Assert.Equal(1, ocrRepository.DeleteCount);
 
         using JsonDocument installArguments = JsonDocument.Parse("""
         {
@@ -1174,7 +1230,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("ObservableCollection<OcrLanguageManagementItem> _manageableLanguages", ocrViewModel);
         Assert.Contains("OcrLanguageManagementItem? _selectedManageLanguage", ocrViewModel);
         Assert.Contains("InstallManagedOcrLanguageCommand", ocrViewModel);
-        Assert.Contains("public async Task DeleteManagedOcrLanguageAsync(string languageTag", ocrViewModel);
+        Assert.Contains("public async Task<McpOcrLanguageDeleteResult> DeleteManagedOcrLanguageAsync(string languageTag", ocrViewModel);
         Assert.Contains("string requestedLanguageTag = languageTag.Trim()", ocrViewModel);
         Assert.Contains("LanguageTagsMatch(SelectedLanguage.LanguageTag, requestedLanguageTag)", ocrViewModel);
         Assert.Contains("string capabilityLanguageTag = managedLanguageToDelete?.LanguageTag ?? requestedLanguageTag", ocrViewModel);
@@ -1262,6 +1318,24 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void OcrPage_UsesEqualLanguageManagementActionButtonWidths()
+    {
+        string ocrPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OCRPage.xaml"));
+        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Border>");
+
+        string installButton = ExtractElementBlock(languageManagementBlock, "<Button x:Name=\"InstallManagedLanguageButton\"", "/>" );
+        string deleteButton = ExtractElementBlock(languageManagementBlock, "<Button x:Name=\"DeleteManagedLanguageButton\"", "/>" );
+        string currentButton = ExtractElementBlock(languageManagementBlock, "<Button x:Name=\"CurrentManagedLanguageButton\"", "/>" );
+
+        Assert.Contains("Width=\"160\"", installButton);
+        Assert.Contains("Width=\"160\"", deleteButton);
+        Assert.Contains("Width=\"160\"", currentButton);
+        Assert.Contains("HorizontalAlignment=\"Right\"", installButton);
+        Assert.Contains("HorizontalAlignment=\"Right\"", deleteButton);
+        Assert.Contains("HorizontalAlignment=\"Right\"", currentButton);
+    }
+
+    [Fact]
     public void SettingsPage_AppLanguageChangesWithoutBottomSuccessNotification()
     {
         string settingsViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "SettingsViewModel.cs"));
@@ -1326,6 +1400,8 @@ public sealed class DeleteNewlineMcpToolServiceTests
             Assert.Contains("insert_regex_chain_item", instructions);
             Assert.Contains("get_ocr_languages", instructions);
             Assert.Contains("install_ocr_language", instructions);
+            Assert.Contains("delete_ocr_language", instructions);
+            Assert.Contains("current OCR language", instructions);
             Assert.Contains("McpPort", instructions);
             Assert.Contains("UTF-8", instructions);
             Assert.Contains("PowerShell", instructions);
@@ -1354,6 +1430,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
             Assert.Contains("set_app_setting", toolNames);
             Assert.Contains("get_ocr_languages", toolNames);
             Assert.Contains("install_ocr_language", toolNames);
+            Assert.Contains("delete_ocr_language", toolNames);
 
             JsonElement getProfilesAnnotations = listedTools.Single(tool => tool.GetProperty("name").GetString() == "get_regex_profiles").GetProperty("annotations");
             Assert.True(getProfilesAnnotations.GetProperty("readOnlyHint").GetBoolean());

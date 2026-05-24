@@ -61,10 +61,13 @@ public partial class OCRViewModel : ObservableRecipient
     // OCR dedicated hotkey settings
     private HotkeyStructure _ocrHotkey = new HotkeyStructure { Modifiers = VirtualKeyModifiers.None, Key = VirtualKey.None };
 
-    public IReadOnlyList<string> AvailableLanguageTags => AvailableLanguages.Select(language => language.LanguageTag).ToArray();
+    public IReadOnlyList<McpOcrLanguageInfo> AvailableLanguageInfos => ManageableLanguages
+        .Where(language => language.IsInstalled)
+        .Select(language => new McpOcrLanguageInfo(language.LanguageTag, language.DisplayName))
+        .ToArray();
 
-    public IReadOnlyList<McpOcrLanguageInfo> AvailableLanguageInfos => AvailableLanguages
-        .Select(ToMcpOcrLanguageInfo)
+    public IReadOnlyList<string> AvailableLanguageTags => AvailableLanguageInfos
+        .Select(language => language.LanguageTag)
         .ToArray();
 
     public IReadOnlyList<McpOcrLanguageInfo> InstallableLanguageInfos => ManageableLanguages
@@ -72,7 +75,9 @@ public partial class OCRViewModel : ObservableRecipient
         .Select(language => new McpOcrLanguageInfo(language.LanguageTag, language.DisplayName))
         .ToArray();
 
-    public string? CurrentLanguageTag => SelectedLanguage?.LanguageTag;
+    public string? CurrentLanguageTag => SelectedLanguage == null
+        ? null
+        : ManageableLanguages.FirstOrDefault(language => language.IsInstalled && language.IsCurrent)?.LanguageTag ?? SelectedLanguage.LanguageTag;
 
     public Visibility InstallManagedLanguageButtonVisibility => SelectedManageLanguage is { IsInstalled: false }
         ? Visibility.Visible
@@ -98,10 +103,10 @@ public partial class OCRViewModel : ObservableRecipient
     {
         if (!string.IsNullOrWhiteSpace(languageTag))
         {
-            Language? language = AvailableLanguages.FirstOrDefault(item => item.LanguageTag.Equals(languageTag, StringComparison.OrdinalIgnoreCase));
+            Language? language = FindLanguageByTag(AvailableLanguages, languageTag);
             if (language == null)
             {
-                string supported = string.Join(", ", AvailableLanguages.Select(item => item.LanguageTag));
+                string supported = string.Join(", ", AvailableLanguageTags);
                 throw new ArgumentException($"Unsupported OCR language '{languageTag}'. Supported language tags: {supported}.");
             }
 
@@ -550,7 +555,7 @@ public partial class OCRViewModel : ObservableRecipient
         }
     }
 
-    public async Task DeleteManagedOcrLanguageAsync(string languageTag, bool showNotification = true)
+    public async Task<McpOcrLanguageDeleteResult> DeleteManagedOcrLanguageAsync(string languageTag, bool showNotification = true)
     {
         if (string.IsNullOrWhiteSpace(languageTag))
         {
@@ -560,7 +565,7 @@ public partial class OCRViewModel : ObservableRecipient
         string requestedLanguageTag = languageTag.Trim();
         if (SelectedLanguage != null && LanguageTagsMatch(SelectedLanguage.LanguageTag, requestedLanguageTag))
         {
-            throw new InvalidOperationException("The current OCR language cannot be deleted. Select another OCR language first.");
+            throw new InvalidOperationException("Do not delete the current OCR language. Select another OCR language first with set_ocr_settings.");
         }
 
         OcrLanguageManagementItem? managedLanguageToDelete = ManageableLanguages.FirstOrDefault(language =>
@@ -570,7 +575,13 @@ public partial class OCRViewModel : ObservableRecipient
         if (languageToDelete == null)
         {
             RefreshAvailableOcrLanguages();
-            return;
+            return CreateOcrLanguageDeleteResult(
+                success: true,
+                deleted: false,
+                languageTag: capabilityLanguageTag,
+                displayName: capabilityLanguageTag,
+                exitCode: null,
+                message: $"OCR language '{capabilityLanguageTag}' was not installed.");
         }
 
         IsManagingLanguage = true;
@@ -591,7 +602,13 @@ public partial class OCRViewModel : ObservableRecipient
                         messageArgs: new object[] { languageToDelete.DisplayName });
                 }
 
-                return;
+                return CreateOcrLanguageDeleteResult(
+                    success: true,
+                    deleted: true,
+                    languageTag: capabilityLanguageTag,
+                    displayName: languageToDelete.DisplayName,
+                    exitCode,
+                    message: $"{capabilityLanguageTag} was deleted from Windows OCR languages.");
             }
 
             if (showNotification)
@@ -602,6 +619,14 @@ public partial class OCRViewModel : ObservableRecipient
                     severity: InfoBarSeverity.Error,
                     messageArgs: new object[] { languageToDelete.DisplayName });
             }
+
+            return CreateOcrLanguageDeleteResult(
+                success: false,
+                deleted: false,
+                languageTag: capabilityLanguageTag,
+                displayName: languageToDelete.DisplayName,
+                exitCode,
+                message: $"OCR language '{capabilityLanguageTag}' did not disappear after deletion. Exit code: {exitCode}.");
         }
         catch (Exception ex)
         {
@@ -614,6 +639,14 @@ public partial class OCRViewModel : ObservableRecipient
                     severity: InfoBarSeverity.Error,
                     messageArgs: new object[] { languageToDelete.DisplayName });
             }
+
+            return CreateOcrLanguageDeleteResult(
+                success: false,
+                deleted: false,
+                languageTag: capabilityLanguageTag,
+                displayName: languageToDelete.DisplayName,
+                exitCode: null,
+                message: ex.Message);
         }
         finally
         {
@@ -635,6 +668,25 @@ public partial class OCRViewModel : ObservableRecipient
             applied,
             language.LanguageTag,
             language.DisplayName,
+            exitCode,
+            AvailableLanguageTags,
+            InstallableLanguageInfos.Select(item => item.LanguageTag).ToArray(),
+            message);
+    }
+
+    private McpOcrLanguageDeleteResult CreateOcrLanguageDeleteResult(
+        bool success,
+        bool deleted,
+        string languageTag,
+        string displayName,
+        int? exitCode,
+        string message)
+    {
+        return new McpOcrLanguageDeleteResult(
+            success,
+            deleted,
+            languageTag,
+            displayName,
             exitCode,
             AvailableLanguageTags,
             InstallableLanguageInfos.Select(item => item.LanguageTag).ToArray(),

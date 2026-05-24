@@ -35,6 +35,8 @@ public sealed class InMemoryMcpOcrConfigurationRepository : IMcpOcrConfiguration
 
     public int InstallCount { get; private set; }
 
+    public int DeleteCount { get; private set; }
+
     public Task SetAsync(string? languageTag, HotkeyStructure? hotkey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -102,6 +104,39 @@ public sealed class InMemoryMcpOcrConfigurationRepository : IMcpOcrConfiguration
             message: $"{installableLanguage.LanguageTag} was installed and selected for OCR."));
     }
 
+    public Task<McpOcrLanguageDeleteResult> DeleteLanguageAsync(string languageTag, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (string.IsNullOrWhiteSpace(languageTag))
+        {
+            throw new ArgumentException("languageTag is required.", nameof(languageTag));
+        }
+
+        McpOcrLanguageInfo? availableLanguage = FindLanguage(_availableLanguages, languageTag);
+        if (availableLanguage == null)
+        {
+            throw new ArgumentException($"OCR language '{languageTag}' is not installed. Call get_ocr_languages and copy a tag from deletableLanguageTags.");
+        }
+
+        if (availableLanguage.LanguageTag.Equals(LanguageTag, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Do not delete the current OCR language. Select another OCR language first with set_ocr_settings.");
+        }
+
+        _availableLanguages.Remove(availableLanguage);
+        _installableLanguages.Add(availableLanguage);
+        _installableLanguages.Sort((left, right) => string.Compare(left.DisplayName, right.DisplayName, StringComparison.CurrentCultureIgnoreCase));
+        DeleteCount++;
+
+        return Task.FromResult(CreateDeleteResult(
+            success: true,
+            deleted: true,
+            availableLanguage,
+            exitCode: 0,
+            message: $"{availableLanguage.LanguageTag} was deleted from Windows OCR languages."));
+    }
+
     private string NormalizeAvailableLanguageTag(string languageTag)
     {
         McpOcrLanguageInfo? language = FindLanguage(_availableLanguages, languageTag);
@@ -126,6 +161,24 @@ public sealed class InMemoryMcpOcrConfigurationRepository : IMcpOcrConfiguration
             success,
             installed,
             applied,
+            language.LanguageTag,
+            language.DisplayName,
+            exitCode,
+            AvailableLanguageTags,
+            InstallableLanguages.Select(item => item.LanguageTag).ToArray(),
+            message);
+    }
+
+    private McpOcrLanguageDeleteResult CreateDeleteResult(
+        bool success,
+        bool deleted,
+        McpOcrLanguageInfo language,
+        int? exitCode,
+        string message)
+    {
+        return new McpOcrLanguageDeleteResult(
+            success,
+            deleted,
             language.LanguageTag,
             language.DisplayName,
             exitCode,

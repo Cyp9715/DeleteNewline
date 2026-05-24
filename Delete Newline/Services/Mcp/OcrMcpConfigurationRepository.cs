@@ -33,6 +33,11 @@ public sealed class OcrMcpConfigurationRepository : IMcpOcrConfigurationReposito
         return RunOnUiThreadAsync(() => _ocrViewModel.InstallAndApplyOcrLanguageAsync(languageTag, showNotification: false), cancellationToken);
     }
 
+    public Task<McpOcrLanguageDeleteResult> DeleteLanguageAsync(string languageTag, CancellationToken cancellationToken)
+    {
+        return RunOnUiThreadAsync(() => _ocrViewModel.DeleteManagedOcrLanguageAsync(languageTag, showNotification: false), cancellationToken);
+    }
+
     private static Task RunOnUiThreadAsync(Func<Task> action, CancellationToken cancellationToken)
     {
         return RunOnUiThreadAsync(async () =>

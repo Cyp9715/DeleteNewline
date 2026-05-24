@@ -136,21 +136,30 @@
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-                            <Button x:Uid="OCRPage_Button_InstallLanguage"
+                            <Button x:Name="InstallManagedLanguageButton"
+                                    x:Uid="OCRPage_Button_InstallLanguage"
                                     Grid.Column="1"
                                     Command="{x:Bind ViewModel.InstallManagedOcrLanguageCommand}"
                                     Visibility="{x:Bind ViewModel.InstallManagedLanguageButtonVisibility, Mode=OneWay}"
+                                    Width="160"
+                                    HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom" />
-                            <Button x:Uid="OCRPage_Button_DeleteLanguage"
+                            <Button x:Name="DeleteManagedLanguageButton"
+                                    x:Uid="OCRPage_Button_DeleteLanguage"
                                     Grid.Column="1"
                                     Click="DeleteManagedLanguageButton_Click"
                                     IsEnabled="{x:Bind ViewModel.CanDeleteManagedLanguage, Mode=OneWay}"
                                     Visibility="{x:Bind ViewModel.DeleteManagedLanguageButtonVisibility, Mode=OneWay}"
+                                    Width="160"
+                                    HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom" />
-                            <Button x:Uid="OCRPage_Button_CurrentLanguage"
+                            <Button x:Name="CurrentManagedLanguageButton"
+                                    x:Uid="OCRPage_Button_CurrentLanguage"
                                     Grid.Column="1"
                                     IsEnabled="False"
                                     Visibility="{x:Bind ViewModel.CurrentManagedLanguageButtonVisibility, Mode=OneWay}"
+                                    Width="160"
+                                    HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom" />
                         </Grid>
                     </StackPanel>

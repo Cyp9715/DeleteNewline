@@ -15,6 +15,16 @@ public sealed record McpOcrLanguageInstallResult(
     IReadOnlyList<string> InstallableLanguageTags,
     string Message);
 
+public sealed record McpOcrLanguageDeleteResult(
+    bool Success,
+    bool Deleted,
+    string LanguageTag,
+    string DisplayName,
+    int? ExitCode,
+    IReadOnlyList<string> AvailableLanguageTags,
+    IReadOnlyList<string> InstallableLanguageTags,
+    string Message);
+
 public interface IMcpOcrConfigurationRepository
 {
     string? LanguageTag { get; }
@@ -30,4 +40,6 @@ public interface IMcpOcrConfigurationRepository
     Task SetAsync(string? languageTag, HotkeyStructure? hotkey, CancellationToken cancellationToken);
 
     Task<McpOcrLanguageInstallResult> InstallAndApplyLanguageAsync(string languageTag, CancellationToken cancellationToken);
+
+    Task<McpOcrLanguageDeleteResult> DeleteLanguageAsync(string languageTag, CancellationToken cancellationToken);
 }
