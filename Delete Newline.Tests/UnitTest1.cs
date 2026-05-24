@@ -1012,6 +1012,28 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void OcrCaptureWindow_PreparesFrozenPreviewBeforeActivationCanExposeIt()
+    {
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
+        string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
+
+        string setupFullscreenBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    public void SetupFullscreen(",
+            "    private void SetupLanguageSelector");
+
+        int setupIndex = ocrViewModel.IndexOf("ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged);", StringComparison.Ordinal);
+        int activateIndex = ocrViewModel.IndexOf("ocrWindow.Activate();", StringComparison.Ordinal);
+        Assert.True(setupIndex >= 0 && activateIndex >= 0 && setupIndex < activateIndex,
+            "The capture window must be fully prepared before Activate can display the first frame.");
+
+        Assert.Contains("BackgroundImage.Source = backgroundImage", setupFullscreenBlock);
+        Assert.Contains("NativeMethods.SWP_NOACTIVATE", setupFullscreenBlock);
+        Assert.DoesNotContain("NativeMethods.SWP_SHOWWINDOW", setupFullscreenBlock);
+        Assert.DoesNotContain("SetForegroundWindow(hwnd)", setupFullscreenBlock);
+    }
+
+    [Fact]
     public void OcrCaptureOverlayLayout_CentersToolbarInPrimaryMonitorUsingWindowViewPixels()
     {
         Rectangle virtualScreen = new(0, 0, 3840, 2160);

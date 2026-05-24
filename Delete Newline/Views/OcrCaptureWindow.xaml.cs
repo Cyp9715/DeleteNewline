@@ -43,10 +43,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
                 : new IntPtr(SetWindowLongPtr32(hWnd, nIndex, dwNewLong.ToInt32()));
         }
 
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern bool SetForegroundWindow(IntPtr hWnd);
-
         internal const uint SWP_NOZORDER = 0x0004;
+        internal const uint SWP_NOACTIVATE = 0x0010;
         internal const uint SWP_SHOWWINDOW = 0x0040;
         internal const int GWL_STYLE = -16;
         internal const int WS_CAPTION = 0x00C00000;
@@ -149,10 +147,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
             virtualScreen.Y,
             virtualScreen.Width,
             virtualScreen.Height,
-            NativeMethods.SWP_SHOWWINDOW);
-
-        // TopMost
-        NativeMethods.SetForegroundWindow(hwnd);
+            NativeMethods.SWP_NOACTIVATE);
         
         System.Diagnostics.Debug.WriteLine($"Window positioned: {virtualScreen}");
         System.Diagnostics.Debug.WriteLine($"Background image size: {backgroundImage?.PixelWidth}x{backgroundImage?.PixelHeight}");
