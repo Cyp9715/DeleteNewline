@@ -1000,10 +1000,14 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("Opacity=\"0\"", leftOverlayBlock);
         Assert.Contains("Opacity=\"0\"", rightOverlayBlock);
         Assert.Contains("Opacity=\"0\"", bottomOverlayBlock);
+        string dimFadeBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private void BeginOverlayDarkenFade()",
+            "    private void SetOverlayOpacity");
+
         Assert.Contains("private const double OverlayTargetOpacity = 0.6", ocrCaptureWindowCodeBehind);
         Assert.Contains("BeginOverlayDarkenFade()", ocrCaptureWindowCodeBehind);
-        Assert.DoesNotContain("SetLayeredWindowAttributes", ocrCaptureWindowCodeBehind);
-        Assert.DoesNotContain("LWA_ALPHA", ocrCaptureWindowCodeBehind);
+        Assert.DoesNotContain("SetLayeredWindowAttributes", dimFadeBlock);
         Assert.DoesNotContain("byte alpha", ocrCaptureWindowCodeBehind);
         Assert.DoesNotContain("Opacity=\"0.34\"", ocrCaptureWindowXaml);
         Assert.DoesNotContain("blurForCaptureOverlay", ocrViewModel);
@@ -1031,6 +1035,41 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("NativeMethods.SWP_NOACTIVATE", setupFullscreenBlock);
         Assert.DoesNotContain("NativeMethods.SWP_SHOWWINDOW", setupFullscreenBlock);
         Assert.DoesNotContain("SetForegroundWindow(hwnd)", setupFullscreenBlock);
+    }
+
+    [Fact]
+    public void OcrCaptureWindow_HidesNativeWindowUntilFirstRenderedFrameThenRevealsImmediately()
+    {
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
+
+        string setupFullscreenBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    public void SetupFullscreen(",
+            "    private void SetupLanguageSelector");
+        string revealBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private async void RevealOverlayAfterFirstRender()",
+            "    private void RevealOverlayWindow()");
+        string revealWindowBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private void RevealOverlayWindow()",
+            "    private void BeginOverlayDarkenFade()");
+        string dimFadeBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private void BeginOverlayDarkenFade()",
+            "    private void SetOverlayOpacity");
+
+        Assert.Contains("WS_EX_LAYERED", ocrCaptureWindowCodeBehind);
+        Assert.Contains("NativeMethods.SetLayeredWindowAttributes(hwnd, 0, 0, NativeMethods.LWA_ALPHA)", setupFullscreenBlock);
+        Assert.Contains("MainGrid.Loaded += OnOverlayContentLoaded", ocrCaptureWindowCodeBehind);
+        Assert.Contains("RevealOverlayAfterFirstRender()", ocrCaptureWindowCodeBehind);
+        Assert.Contains("StartOverlayRevealFallbackTimer()", ocrCaptureWindowCodeBehind);
+        Assert.Contains("Task.Delay(OverlayRevealDelay)", revealBlock);
+        Assert.Contains("NativeMethods.SetLayeredWindowAttributes(_overlayHwnd, 0, 255, NativeMethods.LWA_ALPHA)", revealWindowBlock);
+        Assert.Contains("BeginOverlayDarkenFade()", revealWindowBlock);
+        Assert.DoesNotContain("ImageOpened", ocrCaptureWindowCodeBehind);
+        Assert.DoesNotContain("SetLayeredWindowAttributes", dimFadeBlock);
+        Assert.DoesNotContain("byte alpha", ocrCaptureWindowCodeBehind);
     }
 
     [Fact]

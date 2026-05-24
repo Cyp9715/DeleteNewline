@@ -17,6 +17,9 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private static class NativeMethods
     {
         [DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+
+        [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         [DllImport("user32.dll")]
@@ -55,19 +58,26 @@ public sealed partial class OcrCaptureWindow : WindowEx
         internal const uint SWP_FRAMECHANGED = 0x0020;
         internal const uint SWP_NOMOVE = 0x0002;
         internal const uint SWP_NOSIZE = 0x0001;
+        internal const uint LWA_ALPHA = 0x00000002;
         internal const int GWL_EXSTYLE = -20;
         internal const int GWLP_WNDPROC = -4;
         internal const uint WM_KEYDOWN = 0x0100;
         internal const uint WM_SYSKEYDOWN = 0x0104;
         internal const int VK_ESCAPE = 0x1B;
+        internal const int WS_EX_LAYERED = 0x00080000;
         internal const int WS_EX_TOOLWINDOW = 0x00000080;
         internal const int WS_EX_APPWINDOW = 0x00040000;
     }
 
     private const double OverlayTargetOpacity = 0.6;
     private const double OverlayFadeStep = 0.04;
+    private static readonly TimeSpan OverlayRevealDelay = TimeSpan.FromMilliseconds(50);
+    private static readonly TimeSpan OverlayRevealFallbackDelay = TimeSpan.FromMilliseconds(300);
     private readonly NotificationService? _notificationService;
-    private bool isDarkenFadeStarted = false;
+    private bool _isActivated;
+    private bool _isOverlayContentLoaded;
+    private bool _isOverlayRevealQueued;
+    private bool _isOverlayRevealed;
     private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
     private Windows.Foundation.Point startPoint = new();
     private Windows.Foundation.Point currentPoint = new();
@@ -77,12 +87,14 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private NativeMethods.WindowProc? _escapeWindowProc;
     private IntPtr _originalWindowProc;
     private IntPtr _hookedHwnd;
+    private IntPtr _overlayHwnd;
     private bool _isClosing;
 
     public OcrCaptureWindow()
     {
         InitializeComponent();
         _notificationService = App.GetService<NotificationService>();
+        MainGrid.Loaded += OnOverlayContentLoaded;
         MainGrid.Loaded += (_, _) => PositionLanguageToolbar();
         MainGrid.SizeChanged += (_, _) => PositionLanguageToolbar();
         this.Activated += OnWindowActivated_FirstTime;
@@ -90,14 +102,58 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void OnWindowActivated_FirstTime(object sender, WindowActivatedEventArgs args)
     {
-        if (isDarkenFadeStarted) return;
-        isDarkenFadeStarted = true;
-        var hwnd = WindowNative.GetWindowHandle(this);
-
-        ApplyOverlayWindowExStyle(hwnd);
-        BeginOverlayDarkenFade();
+        _isActivated = true;
+        RevealOverlayAfterFirstRender();
+        StartOverlayRevealFallbackTimer();
 
         this.Activated -= OnWindowActivated_FirstTime;
+    }
+
+    private void OnOverlayContentLoaded(object sender, RoutedEventArgs args)
+    {
+        _isOverlayContentLoaded = true;
+        RevealOverlayAfterFirstRender();
+    }
+
+    private async void RevealOverlayAfterFirstRender()
+    {
+        if (_isOverlayRevealQueued || _isOverlayRevealed || !_isActivated || !_isOverlayContentLoaded || _overlayHwnd == IntPtr.Zero)
+        {
+            return;
+        }
+
+        _isOverlayRevealQueued = true;
+        await Task.Delay(OverlayRevealDelay);
+        RevealOverlayWindow();
+    }
+
+    private void RevealOverlayWindow()
+    {
+        if (_isOverlayRevealed || _isClosing || _overlayHwnd == IntPtr.Zero)
+        {
+            return;
+        }
+
+        _isOverlayRevealed = true;
+        NativeMethods.SetLayeredWindowAttributes(_overlayHwnd, 0, 255, NativeMethods.LWA_ALPHA);
+        BeginOverlayDarkenFade();
+    }
+
+    private void StartOverlayRevealFallbackTimer()
+    {
+        var timer = new DispatcherTimer { Interval = OverlayRevealFallbackDelay };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            if (_isOverlayRevealed || _isClosing)
+            {
+                return;
+            }
+
+            _isOverlayContentLoaded = true;
+            RevealOverlayAfterFirstRender();
+        };
+        timer.Start();
     }
 
     private void BeginOverlayDarkenFade()
@@ -135,8 +191,11 @@ public sealed partial class OcrCaptureWindow : WindowEx
         currentLanguage = selectedLanguage ?? new Language("en");
         _languageChanged = languageChanged;
         backgroundImage = preloadedBackground;
+        _overlayHwnd = hwnd;
         RemoveWindowFrames(hwnd);
         ApplyOverlayWindowExStyle(hwnd);
+        SetOverlayOpacity(0);
+        NativeMethods.SetLayeredWindowAttributes(hwnd, 0, 0, NativeMethods.LWA_ALPHA);
         RegisterEscapeMessageHook(hwnd);
 
         var virtualScreen = ImageHelper.GetVirtualScreenBounds();
@@ -248,7 +307,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
         try
         {
             int exStyle = NativeMethods.GetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE);
-            exStyle |= NativeMethods.WS_EX_TOOLWINDOW;
+            exStyle |= (NativeMethods.WS_EX_LAYERED | NativeMethods.WS_EX_TOOLWINDOW);
             exStyle &= ~NativeMethods.WS_EX_APPWINDOW;
             NativeMethods.SetWindowLong(hwnd, NativeMethods.GWL_EXSTYLE, exStyle);
 
