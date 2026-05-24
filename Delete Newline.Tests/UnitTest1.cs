@@ -1223,6 +1223,29 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void OcrLanguageRefreshPreservesCurrentSelectionWhenInstallIsCancelled()
+    {
+        string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
+        string refreshMethod = ExtractElementBlock(
+            ocrViewModel,
+            "    private void RefreshAvailableOcrLanguages()",
+            "    private void RefreshInstallableOcrLanguages()");
+
+        Assert.Contains("string? selectedLanguageTag = SelectedLanguage?.LanguageTag", refreshMethod);
+        Assert.Contains("RestoreSelectedLanguageAfterRefresh(selectedLanguageTag)", refreshMethod);
+        Assert.Contains("private void RestoreSelectedLanguageAfterRefresh(string? selectedLanguageTag)", ocrViewModel);
+        Assert.Contains("Language? restoredLanguage = FindLanguageByTag(AvailableLanguages, selectedLanguageTag)", ocrViewModel);
+        Assert.Contains("_suppressLanguageAutoSave = true", ocrViewModel);
+        Assert.Contains("SelectedLanguage = restoredLanguage", ocrViewModel);
+        Assert.Contains("_suppressLanguageAutoSave = false", ocrViewModel);
+
+        int restoreIndex = refreshMethod.IndexOf("RestoreSelectedLanguageAfterRefresh(selectedLanguageTag)", StringComparison.Ordinal);
+        int refreshManageableIndex = refreshMethod.IndexOf("RefreshManageableOcrLanguages();", StringComparison.Ordinal);
+        Assert.True(restoreIndex >= 0 && restoreIndex < refreshManageableIndex,
+            "The OCR selection must be restored before rebuilding manageable languages so the current item remains marked after a cancelled install.");
+    }
+
+    [Fact]
     public void OcrPage_ManagesInstalledAndMissingOcrLanguagesInOneSection()
     {
         string ocrPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OCRPage.xaml"));

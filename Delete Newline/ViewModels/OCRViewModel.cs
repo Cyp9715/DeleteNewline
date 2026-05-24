@@ -210,14 +210,41 @@ public partial class OCRViewModel : ObservableRecipient
 
     private void RefreshAvailableOcrLanguages()
     {
+        string? selectedLanguageTag = SelectedLanguage?.LanguageTag;
+
         AvailableLanguages.Clear();
         foreach (Language language in OcrEngine.AvailableRecognizerLanguages.OrderBy(language => language.DisplayName))
         {
             AvailableLanguages.Add(language);
         }
 
+        RestoreSelectedLanguageAfterRefresh(selectedLanguageTag);
         RefreshInstallableOcrLanguages();
         RefreshManageableOcrLanguages();
+    }
+
+    private void RestoreSelectedLanguageAfterRefresh(string? selectedLanguageTag)
+    {
+        if (string.IsNullOrWhiteSpace(selectedLanguageTag))
+        {
+            return;
+        }
+
+        Language? restoredLanguage = FindLanguageByTag(AvailableLanguages, selectedLanguageTag);
+        if (restoredLanguage == null || ReferenceEquals(SelectedLanguage, restoredLanguage))
+        {
+            return;
+        }
+
+        _suppressLanguageAutoSave = true;
+        try
+        {
+            SelectedLanguage = restoredLanguage;
+        }
+        finally
+        {
+            _suppressLanguageAutoSave = false;
+        }
     }
 
     private void RefreshInstallableOcrLanguages()
