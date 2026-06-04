@@ -1161,6 +1161,97 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void OcrHelper_DisposesNativeBitmapAndStreamWrappersDuringRepeatedOcr()
+    {
+        string ocrHelper = File.ReadAllText(LocateSourceFile("Delete Newline", "Helpers", "OcrHelper.cs"));
+
+        string getRegionsTextBlock = ExtractElementBlock(
+            ocrHelper,
+            "    public static async Task<string> GetRegionsTextAsync(",
+            "    public static async Task<string> GetTextFromBitmapAsync");
+        string getOcrResultBlock = ExtractElementBlock(
+            ocrHelper,
+            "    public static async Task<OcrResult> GetOcrResultFromBitmapAsync(",
+            "    private static string GetTextFromOcrResult");
+        string getClickedWordBlock = ExtractElementBlock(
+            ocrHelper,
+            "    public static async Task<string> GetClickedWordAsync(",
+            "public static class ImageHelper");
+        string getRegionBitmapBlock = ExtractElementBlock(
+            ocrHelper,
+            "    public static Bitmap GetRegionOfScreenAsBitmap(",
+            "    public static Bitmap GetFullDesktopScreenshot()");
+        string padImageBlock = ExtractElementBlock(
+            ocrHelper,
+            "    public static Bitmap PadImage(",
+            "    public static Bitmap GetWindowsBoundsBitmap");
+        string bitmapToImageSourceBlock = ExtractElementBlock(
+            ocrHelper,
+            "    public static BitmapImage BitmapToImageSource(",
+            "    public static Bitmap ScaleBitmapUniform");
+        string bitmapToSoftwareBitmapBlock = ExtractElementBlock(
+            ocrHelper,
+            "    public static async Task<SoftwareBitmap> BitmapToSoftwareBitmapAsync(",
+            "    public static BitmapImage GetWindowBoundsImage");
+
+        Assert.Contains("using Bitmap bmp = ImageHelper.GetRegionOfScreenAsBitmap(correctedRegion)", getRegionsTextBlock);
+        Assert.Contains("using Bitmap bmp = ImageHelper.GetWindowsBoundsBitmap(window)", getClickedWordBlock);
+        Assert.Contains("using Bitmap bmp = new(region.Width, region.Height, PixelFormat.Format32bppArgb)", getRegionBitmapBlock);
+        Assert.Contains("return PadImage(bmp)", getRegionBitmapBlock);
+        Assert.Contains("return new Bitmap(image)", padImageBlock);
+        Assert.DoesNotContain("return image;", padImageBlock);
+        Assert.Contains("using var randomAccessStream = stream.AsRandomAccessStream()", getOcrResultBlock);
+        Assert.Contains("BitmapDecoder.CreateAsync(randomAccessStream)", getOcrResultBlock);
+        Assert.Contains("using var randomAccessStream = memory.AsRandomAccessStream()", bitmapToImageSourceBlock);
+        Assert.Contains("bitmapImage.SetSource(randomAccessStream)", bitmapToImageSourceBlock);
+        Assert.Contains("using var randomAccessStream = stream.AsRandomAccessStream()", bitmapToSoftwareBitmapBlock);
+        Assert.Contains("BitmapDecoder.CreateAsync(randomAccessStream)", bitmapToSoftwareBitmapBlock);
+    }
+
+    [Fact]
+    public void OcrCaptureWindow_ReleasesPreviewHandlersAndSessionAfterBackgroundOcrCompletes()
+    {
+        string ocrCaptureWindowCodeBehind = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OcrCaptureWindow.xaml.cs"));
+        string ocrViewModel = File.ReadAllText(LocateSourceFile("Delete Newline", "ViewModels", "OCRViewModel.cs"));
+
+        string constructorBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    public OcrCaptureWindow()",
+            "    private void OnWindowActivated_FirstTime");
+        string cleanupBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private void CleanupWindowResources()",
+            "    private void OnWindowActivated_FirstTime");
+        string pointerReleasedBlock = ExtractElementBlock(
+            ocrCaptureWindowCodeBehind,
+            "    private async void Canvas_PointerReleased(",
+            "    private async Task ProcessOcrAsync");
+        string viewModelClosedBlock = ExtractElementBlock(
+            ocrViewModel,
+            "    private void OcrWindow_Closed(",
+            "    private void OnCaptureLanguageChanged");
+
+        Assert.Contains("this.Closed += OcrCaptureWindow_Closed", constructorBlock);
+        Assert.Contains("_overlayFadeTimer", ocrCaptureWindowCodeBehind);
+        Assert.Contains("_overlayRevealFallbackTimer", ocrCaptureWindowCodeBehind);
+        Assert.Contains("StopOverlayFadeTimer()", cleanupBlock);
+        Assert.Contains("StopOverlayRevealFallbackTimer()", cleanupBlock);
+        Assert.Contains("BackgroundImage.Source = null", cleanupBlock);
+        Assert.Contains("backgroundImage = null", cleanupBlock);
+        Assert.Contains("CaptureLanguageComboBox.ItemsSource = null", cleanupBlock);
+        Assert.Contains("_languageChanged = null", cleanupBlock);
+        Assert.Contains("RegionClickCanvas.PointerPressed -= Canvas_PointerPressed", cleanupBlock);
+        Assert.Contains("RegionClickCanvas.PointerMoved -= Canvas_PointerMoved", cleanupBlock);
+        Assert.Contains("RegionClickCanvas.PointerReleased -= Canvas_PointerReleased", cleanupBlock);
+        Assert.Contains("IsOcrProcessing = true", pointerReleasedBlock);
+        Assert.Contains("NotifyOcrProcessingCompleted()", pointerReleasedBlock);
+        Assert.Contains("public event EventHandler? OcrProcessingCompleted", ocrCaptureWindowCodeBehind);
+        Assert.Contains("OcrProcessingCompleted += OcrWindow_OcrProcessingCompleted", ocrViewModel);
+        Assert.Contains("if (!closedWindow.IsOcrProcessing)", viewModelClosedBlock);
+        Assert.Contains("ReleaseOcrSession()", viewModelClosedBlock);
+    }
+
+    [Fact]
     public void OcrCaptureOverlayLayout_CentersToolbarInPrimaryMonitorUsingWindowViewPixels()
     {
         Rectangle virtualScreen = new(0, 0, 3840, 2160);

@@ -9,6 +9,7 @@ using Windows.System;
 using WinUIEx;
 using WinRT.Interop;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Delete_Newline.Views;
 
@@ -85,19 +86,83 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private Language currentLanguage = new Language("en"); // Default language setting
     private Action<Language>? _languageChanged;
     private NativeMethods.WindowProc? _escapeWindowProc;
+    private DispatcherTimer? _overlayRevealFallbackTimer;
+    private DispatcherTimer? _overlayFadeTimer;
+    private KeyEventHandler? _escapeKeyHandler;
     private IntPtr _originalWindowProc;
     private IntPtr _hookedHwnd;
     private IntPtr _overlayHwnd;
+    private int _ocrProcessingCompleted;
     private bool _isClosing;
+    private bool _canvasEventsRegistered;
+    private bool _keyHandlersRegistered;
+
+    public event EventHandler? OcrProcessingCompleted;
+
+    public bool IsOcrProcessing { get; private set; }
 
     public OcrCaptureWindow()
     {
         InitializeComponent();
         _notificationService = App.GetService<NotificationService>();
         MainGrid.Loaded += OnOverlayContentLoaded;
-        MainGrid.Loaded += (_, _) => PositionLanguageToolbar();
-        MainGrid.SizeChanged += (_, _) => PositionLanguageToolbar();
+        MainGrid.Loaded += OnMainGridLoaded;
+        MainGrid.SizeChanged += OnMainGridSizeChanged;
         this.Activated += OnWindowActivated_FirstTime;
+        this.Closed += OcrCaptureWindow_Closed;
+    }
+
+    private void OcrCaptureWindow_Closed(object sender, WindowEventArgs args)
+    {
+        CleanupWindowResources();
+    }
+
+    private void CleanupWindowResources()
+    {
+        _isClosing = true;
+        RestoreEscapeMessageHook();
+        _overlayHwnd = IntPtr.Zero;
+        StopOverlayFadeTimer();
+        StopOverlayRevealFallbackTimer();
+
+        MainGrid.Loaded -= OnOverlayContentLoaded;
+        MainGrid.Loaded -= OnMainGridLoaded;
+        MainGrid.SizeChanged -= OnMainGridSizeChanged;
+        this.Activated -= OnWindowActivated_FirstTime;
+        this.Activated -= OnWindowActivated_FocusCaptureSurface;
+        this.Closed -= OcrCaptureWindow_Closed;
+
+        if (_keyHandlersRegistered && _escapeKeyHandler != null)
+        {
+            MainGrid.RemoveHandler(UIElement.KeyDownEvent, _escapeKeyHandler);
+            CaptureLanguageComboBox.RemoveHandler(UIElement.KeyDownEvent, _escapeKeyHandler);
+            RegionClickCanvas.Loaded -= OnRegionClickCanvasLoaded;
+            _escapeKeyHandler = null;
+            _keyHandlersRegistered = false;
+        }
+
+        if (_canvasEventsRegistered)
+        {
+            RegionClickCanvas.PointerPressed -= Canvas_PointerPressed;
+            RegionClickCanvas.PointerMoved -= Canvas_PointerMoved;
+            RegionClickCanvas.PointerReleased -= Canvas_PointerReleased;
+            _canvasEventsRegistered = false;
+        }
+
+        BackgroundImage.Source = null;
+        backgroundImage = null;
+        CaptureLanguageComboBox.ItemsSource = null;
+        _languageChanged = null;
+    }
+
+    private void OnMainGridLoaded(object sender, RoutedEventArgs args)
+    {
+        PositionLanguageToolbar();
+    }
+
+    private void OnMainGridSizeChanged(object sender, SizeChangedEventArgs args)
+    {
+        PositionLanguageToolbar();
     }
 
     private void OnWindowActivated_FirstTime(object sender, WindowActivatedEventArgs args)
@@ -141,36 +206,66 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void StartOverlayRevealFallbackTimer()
     {
-        var timer = new DispatcherTimer { Interval = OverlayRevealFallbackDelay };
-        timer.Tick += (_, _) =>
-        {
-            timer.Stop();
-            if (_isOverlayRevealed || _isClosing)
-            {
-                return;
-            }
+        StopOverlayRevealFallbackTimer();
+        _overlayRevealFallbackTimer = new DispatcherTimer { Interval = OverlayRevealFallbackDelay };
+        _overlayRevealFallbackTimer.Tick += OverlayRevealFallbackTimer_Tick;
+        _overlayRevealFallbackTimer.Start();
+    }
 
-            _isOverlayContentLoaded = true;
-            RevealOverlayAfterFirstRender();
-        };
-        timer.Start();
+    private void OverlayRevealFallbackTimer_Tick(object? sender, object e)
+    {
+        StopOverlayRevealFallbackTimer();
+        if (_isOverlayRevealed || _isClosing)
+        {
+            return;
+        }
+
+        _isOverlayContentLoaded = true;
+        RevealOverlayAfterFirstRender();
+    }
+
+    private void StopOverlayRevealFallbackTimer()
+    {
+        if (_overlayRevealFallbackTimer == null)
+        {
+            return;
+        }
+
+        _overlayRevealFallbackTimer.Stop();
+        _overlayRevealFallbackTimer.Tick -= OverlayRevealFallbackTimer_Tick;
+        _overlayRevealFallbackTimer = null;
     }
 
     private void BeginOverlayDarkenFade()
     {
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(8) };
-        timer.Tick += (s, e) =>
-        {
-            double opacity = Math.Min(TopOverlay.Opacity + OverlayFadeStep, OverlayTargetOpacity);
-            SetOverlayOpacity(opacity);
+        StopOverlayFadeTimer();
+        _overlayFadeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(8) };
+        _overlayFadeTimer.Tick += OverlayFadeTimer_Tick;
+        _overlayFadeTimer.Start();
+    }
 
-            if (opacity >= OverlayTargetOpacity)
-            {
-                timer.Stop();
-                SetOverlayOpacity(OverlayTargetOpacity);
-            }
-        };
-        timer.Start();
+    private void OverlayFadeTimer_Tick(object? sender, object e)
+    {
+        double opacity = Math.Min(TopOverlay.Opacity + OverlayFadeStep, OverlayTargetOpacity);
+        SetOverlayOpacity(opacity);
+
+        if (opacity >= OverlayTargetOpacity)
+        {
+            StopOverlayFadeTimer();
+            SetOverlayOpacity(OverlayTargetOpacity);
+        }
+    }
+
+    private void StopOverlayFadeTimer()
+    {
+        if (_overlayFadeTimer == null)
+        {
+            return;
+        }
+
+        _overlayFadeTimer.Stop();
+        _overlayFadeTimer.Tick -= OverlayFadeTimer_Tick;
+        _overlayFadeTimer = null;
     }
 
     private void SetOverlayOpacity(double opacity)
@@ -287,19 +382,33 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void SetupKeyHandling()
     {
-        var escapeKeyHandler = new KeyEventHandler(OcrCaptureWindow_KeyDown);
-        MainGrid.AddHandler(UIElement.KeyDownEvent, escapeKeyHandler, handledEventsToo: true);
-        CaptureLanguageComboBox.AddHandler(UIElement.KeyDownEvent, escapeKeyHandler, handledEventsToo: true);
-        this.Activated += (s, e) =>
+        if (_keyHandlersRegistered)
         {
-            RegionClickCanvas.Focus(FocusState.Programmatic);
-            MainGrid.Focus(FocusState.Programmatic);
-        };
-        RegionClickCanvas.Loaded += (s, e) =>
-        {
-            RegionClickCanvas.Focus(FocusState.Programmatic);
-            MainGrid.Focus(FocusState.Programmatic);
-        };
+            return;
+        }
+
+        _escapeKeyHandler = new KeyEventHandler(OcrCaptureWindow_KeyDown);
+        MainGrid.AddHandler(UIElement.KeyDownEvent, _escapeKeyHandler, handledEventsToo: true);
+        CaptureLanguageComboBox.AddHandler(UIElement.KeyDownEvent, _escapeKeyHandler, handledEventsToo: true);
+        this.Activated += OnWindowActivated_FocusCaptureSurface;
+        RegionClickCanvas.Loaded += OnRegionClickCanvasLoaded;
+        _keyHandlersRegistered = true;
+    }
+
+    private void OnWindowActivated_FocusCaptureSurface(object sender, WindowActivatedEventArgs args)
+    {
+        FocusCaptureSurface();
+    }
+
+    private void OnRegionClickCanvasLoaded(object sender, RoutedEventArgs args)
+    {
+        FocusCaptureSurface();
+    }
+
+    private void FocusCaptureSurface()
+    {
+        RegionClickCanvas.Focus(FocusState.Programmatic);
+        MainGrid.Focus(FocusState.Programmatic);
     }
 
     private void ApplyOverlayWindowExStyle(IntPtr hwnd)
@@ -456,9 +565,14 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void SetupCanvasEvents()
     {
-        RegionClickCanvas.PointerPressed += Canvas_PointerPressed;
-        RegionClickCanvas.PointerMoved += Canvas_PointerMoved;
-        RegionClickCanvas.PointerReleased += Canvas_PointerReleased;
+        if (!_canvasEventsRegistered)
+        {
+            RegionClickCanvas.PointerPressed += Canvas_PointerPressed;
+            RegionClickCanvas.PointerMoved += Canvas_PointerMoved;
+            RegionClickCanvas.PointerReleased += Canvas_PointerReleased;
+            _canvasEventsRegistered = true;
+        }
+
         RegionClickCanvas.IsTabStop = true;
         RegionClickCanvas.Focus(FocusState.Programmatic);
     }
@@ -506,6 +620,10 @@ public sealed partial class OcrCaptureWindow : WindowEx
         {
             // Small delay to ensure the UI thread renders the latest selection overlay before the screen is captured.
             await Task.Delay(1);
+            if (_isClosing)
+            {
+                return;
+            }
 
             var virtualScreen = ImageHelper.GetVirtualScreenBounds();
             double windowActualWidth = this.Bounds.Width;
@@ -531,28 +649,41 @@ public sealed partial class OcrCaptureWindow : WindowEx
             var regionBitmap = ImageHelper.GetRegionOfScreenAsBitmap(screenRect);
             System.Diagnostics.Debug.WriteLine($"Captured bitmap: {regionBitmap.Width}x{regionBitmap.Height}");
 
+            IsOcrProcessing = true;
             CloseCaptureOverlay();
 
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await ProcessOcrAsync(regionBitmap);
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Background OCR processing error: {ex.Message}");
-                }
-                finally
-                {
-                    regionBitmap?.Dispose();
-                }
-            });
+            _ = Task.Run(() => ProcessAndDisposeRegionBitmapAsync(regionBitmap));
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error during OCR: {ex.Message}");
             System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
+    }
+
+    private async Task ProcessAndDisposeRegionBitmapAsync(Bitmap regionBitmap)
+    {
+        try
+        {
+            await ProcessOcrAsync(regionBitmap);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Background OCR processing error: {ex.Message}");
+        }
+        finally
+        {
+            regionBitmap.Dispose();
+            NotifyOcrProcessingCompleted();
+        }
+    }
+
+    private void NotifyOcrProcessingCompleted()
+    {
+        IsOcrProcessing = false;
+        if (Interlocked.Exchange(ref _ocrProcessingCompleted, 1) == 0)
+        {
+            OcrProcessingCompleted?.Invoke(this, EventArgs.Empty);
         }
     }
 

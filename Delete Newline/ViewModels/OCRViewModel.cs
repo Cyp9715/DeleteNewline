@@ -397,6 +397,7 @@ public partial class OCRViewModel : ObservableRecipient
             var ocrWindow = new OcrCaptureWindow();
             _activeOcrWindow = ocrWindow;
             ocrWindow.Closed += OcrWindow_Closed;
+            ocrWindow.OcrProcessingCompleted += OcrWindow_OcrProcessingCompleted;
 
             // Setup fullscreen capture with preloaded background and selected language
             ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged);
@@ -406,10 +407,21 @@ public partial class OCRViewModel : ObservableRecipient
         {
             if (_activeOcrWindow != null)
             {
-                _activeOcrWindow.Closed -= OcrWindow_Closed;
+                OcrCaptureWindow failedWindow = _activeOcrWindow;
+                failedWindow.Closed -= OcrWindow_Closed;
+                failedWindow.OcrProcessingCompleted -= OcrWindow_OcrProcessingCompleted;
                 _activeOcrWindow = null;
+
+                try
+                {
+                    failedWindow.Close();
+                }
+                catch (Exception closeEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to close OCR window after launch error: {closeEx.Message}");
+                }
             }
-            Interlocked.Exchange(ref _ocrSessionActive, 0);
+            ReleaseOcrSession();
 
             System.Diagnostics.Debug.WriteLine($"Error creating OCR window: {ex.Message}");
             _inAppNotificationService.ShowInAppNotification(
@@ -425,8 +437,30 @@ public partial class OCRViewModel : ObservableRecipient
         if (sender is OcrCaptureWindow closedWindow)
         {
             closedWindow.Closed -= OcrWindow_Closed;
+            if (!closedWindow.IsOcrProcessing)
+            {
+                closedWindow.OcrProcessingCompleted -= OcrWindow_OcrProcessingCompleted;
+                ReleaseOcrSession();
+                return;
+            }
         }
 
+        _activeOcrWindow = null;
+    }
+
+    private void OcrWindow_OcrProcessingCompleted(object? sender, EventArgs args)
+    {
+        if (sender is OcrCaptureWindow completedWindow)
+        {
+            completedWindow.OcrProcessingCompleted -= OcrWindow_OcrProcessingCompleted;
+            completedWindow.Closed -= OcrWindow_Closed;
+        }
+
+        ReleaseOcrSession();
+    }
+
+    private void ReleaseOcrSession()
+    {
         _activeOcrWindow = null;
         Interlocked.Exchange(ref _ocrSessionActive, 0);
     }

@@ -20,7 +20,7 @@ public static class OcrHelper
         int correctedTop = windowRect.Top + selectedRegion.Top;
 
         Rectangle correctedRegion = new(correctedLeft, correctedTop, selectedRegion.Width, selectedRegion.Height);
-        Bitmap bmp = ImageHelper.GetRegionOfScreenAsBitmap(correctedRegion);
+        using Bitmap bmp = ImageHelper.GetRegionOfScreenAsBitmap(correctedRegion);
 
         return await GetTextFromBitmapAsync(bmp, language);
     }
@@ -40,7 +40,8 @@ public static class OcrHelper
         bitmap.Save(stream, ImageFormat.Bmp);
         stream.Position = 0;
 
-        var decoder = await BitmapDecoder.CreateAsync(stream.AsRandomAccessStream());
+        using var randomAccessStream = stream.AsRandomAccessStream();
+        var decoder = await BitmapDecoder.CreateAsync(randomAccessStream);
         using var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
 
         OcrEngine ocrEngine = OcrEngine.TryCreateFromLanguage(language);
@@ -144,7 +145,7 @@ public static class OcrHelper
 
     public static async Task<string> GetClickedWordAsync(WindowEx window, Windows.Foundation.Point clickedPoint, Language language)
     {
-        Bitmap bmp = ImageHelper.GetWindowsBoundsBitmap(window);
+        using Bitmap bmp = ImageHelper.GetWindowsBoundsBitmap(window);
         OcrResult ocrResult = await GetOcrResultFromBitmapAsync(bmp, language);
         
         foreach (OcrLine ocrLine in ocrResult.Lines)
@@ -184,7 +185,7 @@ public static class ImageHelper
 
     public static Bitmap GetRegionOfScreenAsBitmap(Rectangle region)
     {
-        Bitmap bmp = new(region.Width, region.Height, PixelFormat.Format32bppArgb);
+        using Bitmap bmp = new(region.Width, region.Height, PixelFormat.Format32bppArgb);
         using Graphics g = Graphics.FromImage(bmp);
 
         g.CopyFromScreen(region.Left, region.Top, 0, 0, bmp.Size, CopyPixelOperation.SourceCopy);
@@ -235,7 +236,7 @@ public static class ImageHelper
     public static Bitmap PadImage(Bitmap image, int minW = 64, int minH = 64)
     {
         if (image.Height >= minH && image.Width >= minW)
-            return image;
+            return new Bitmap(image);
 
         int width = Math.Max(image.Width + 16, minW + 16);
         int height = Math.Max(image.Height + 16, minH + 16);
@@ -278,8 +279,9 @@ public static class ImageHelper
         bitmap.Save(memory, ImageFormat.Bmp);
         memory.Position = 0;
 
+        using var randomAccessStream = memory.AsRandomAccessStream();
         var bitmapImage = new BitmapImage();
-        bitmapImage.SetSource(memory.AsRandomAccessStream());
+        bitmapImage.SetSource(randomAccessStream);
 
         return bitmapImage;
     }
@@ -303,7 +305,8 @@ public static class ImageHelper
         bitmap.Save(stream, ImageFormat.Bmp);
         stream.Position = 0;
 
-        var decoder = await BitmapDecoder.CreateAsync(stream.AsRandomAccessStream());
+        using var randomAccessStream = stream.AsRandomAccessStream();
+        var decoder = await BitmapDecoder.CreateAsync(randomAccessStream);
         return await decoder.GetSoftwareBitmapAsync();
     }
 
