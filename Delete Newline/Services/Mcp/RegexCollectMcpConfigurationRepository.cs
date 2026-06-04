@@ -156,6 +156,14 @@ public sealed class RegexCollectMcpConfigurationRepository : IMcpRegexConfigurat
         }
 
         TaskCompletionSource completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        CancellationTokenRegistration cancellationRegistration = default;
+        cancellationRegistration = cancellationToken.Register(() => completion.TrySetCanceled(cancellationToken));
+        _ = completion.Task.ContinueWith(
+            _ => cancellationRegistration.Dispose(),
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
+
         bool queued = dispatcherQueue.TryEnqueue(() =>
         {
             try
@@ -174,7 +182,6 @@ public sealed class RegexCollectMcpConfigurationRepository : IMcpRegexConfigurat
             completion.TrySetException(new InvalidOperationException("Failed to queue MCP regex update on the UI thread."));
         }
 
-        cancellationToken.Register(() => completion.TrySetCanceled(cancellationToken));
         return completion.Task;
     }
 }

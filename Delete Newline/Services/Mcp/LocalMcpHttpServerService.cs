@@ -48,11 +48,24 @@ public sealed class LocalMcpHttpServerService
                 return;
             }
 
-            _cancellationTokenSource = new CancellationTokenSource();
-            _listener = new TcpListener(IPAddress.Loopback, port);
-            _listener.Start(backlog: 10);
-            IsRunning = true;
-            _acceptLoopTask = AcceptLoopAsync(_cancellationTokenSource.Token);
+            try
+            {
+                _cancellationTokenSource = new CancellationTokenSource();
+                _listener = new TcpListener(IPAddress.Loopback, port);
+                _listener.Start(backlog: 10);
+                IsRunning = true;
+                _acceptLoopTask = AcceptLoopAsync(_cancellationTokenSource.Token);
+            }
+            catch
+            {
+                _listener?.Stop();
+                _listener = null;
+                _acceptLoopTask = null;
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = null;
+                IsRunning = false;
+                throw;
+            }
         }
         finally
         {
@@ -338,9 +351,16 @@ public sealed class LocalMcpHttpServerService
         }
 
         string toolName = nameElement.GetString()!;
-        JsonElement arguments = parameters.TryGetProperty("arguments", out JsonElement argumentsElement)
-            ? argumentsElement
-            : JsonDocument.Parse("{}").RootElement.Clone();
+        JsonElement arguments;
+        if (parameters.TryGetProperty("arguments", out JsonElement argumentsElement))
+        {
+            arguments = argumentsElement;
+        }
+        else
+        {
+            using JsonDocument emptyArguments = JsonDocument.Parse("{}");
+            arguments = emptyArguments.RootElement.Clone();
+        }
 
         McpToolResult result = await _toolService.ExecuteAsync(toolName, arguments, CancellationToken.None);
         return CreateCallToolResult(result);

@@ -1597,6 +1597,34 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public async Task LocalHttpServer_CleansResourcesWhenStartFails()
+    {
+        var regexRepository = new InMemoryRegexConfigurationRepository();
+        var settingsRepository = new InMemoryMcpSettingsRepository();
+        var ocrRepository = new InMemoryMcpOcrConfigurationRepository();
+        var toolService = new DeleteNewlineMcpToolService(regexRepository, settingsRepository, ocrRepository);
+        var server = new LocalMcpHttpServerService(toolService);
+
+        TcpListener blocker = new(IPAddress.Loopback, 0);
+        blocker.Start();
+        int port = ((IPEndPoint)blocker.LocalEndpoint).Port;
+
+        await Assert.ThrowsAsync<SocketException>(() => server.StartAsync(port));
+        Assert.False(server.IsRunning);
+
+        blocker.Stop();
+        await server.StartAsync(port);
+        try
+        {
+            Assert.True(server.IsRunning);
+        }
+        finally
+        {
+            await server.StopAsync();
+        }
+    }
+
+    [Fact]
     public async Task SettingsImportApplyService_RejectsInvalidMcpPortBeforeChangingRuntimeState()
     {
         var regexRepository = new InMemoryRegexConfigurationRepository();
@@ -1686,6 +1714,29 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Equal(VirtualKey.O, ocrRepository.Hotkey.Key);
         Assert.Equal(1, ocrRepository.SaveCount);
         Assert.Equal(1, regexRepository.SaveCount);
+    }
+
+    [Fact]
+    public void McpResourcePaths_DisposeTransientDocumentsAndCancellationRegistrations()
+    {
+        string localHttpServer = File.ReadAllText(LocateSourceFile("Delete Newline", "Services", "Mcp", "LocalMcpHttpServerService.cs"));
+        string regexRepository = File.ReadAllText(LocateSourceFile("Delete Newline", "Services", "Mcp", "RegexCollectMcpConfigurationRepository.cs"));
+        string ocrRepository = File.ReadAllText(LocateSourceFile("Delete Newline", "Services", "Mcp", "OcrMcpConfigurationRepository.cs"));
+
+        Assert.Contains("using JsonDocument emptyArguments = JsonDocument.Parse(\"{}\")", localHttpServer);
+        Assert.DoesNotContain("JsonDocument.Parse(\"{}\").RootElement.Clone()", localHttpServer);
+
+        Assert.Contains("CancellationTokenRegistration cancellationRegistration = default", regexRepository);
+        Assert.Contains("cancellationRegistration = cancellationToken.Register", regexRepository);
+        Assert.Contains("TaskContinuationOptions.ExecuteSynchronously", regexRepository);
+        Assert.Contains("cancellationRegistration.Dispose()", regexRepository);
+        string normalizedRegexRepository = regexRepository.Replace(((char)13).ToString() + (char)10, ((char)10).ToString());
+        Assert.DoesNotContain("cancellationToken.Register(() => completion.TrySetCanceled(cancellationToken));\n        return completion.Task;", normalizedRegexRepository);
+
+        Assert.Contains("TaskContinuationOptions.ExecuteSynchronously", ocrRepository);
+        Assert.Contains("cancellationRegistration.Dispose()", ocrRepository);
+        string normalizedOcrRepository = ocrRepository.Replace(((char)13).ToString() + (char)10, ((char)10).ToString());
+        Assert.DoesNotContain("finally\n            {\n                cancellationRegistration.Dispose();", normalizedOcrRepository);
     }
 
     [Fact]

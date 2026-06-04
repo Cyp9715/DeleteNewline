@@ -60,6 +60,11 @@ public sealed class OcrMcpConfigurationRepository : IMcpOcrConfigurationReposito
         TaskCompletionSource<T> completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
         CancellationTokenRegistration cancellationRegistration = default;
         cancellationRegistration = cancellationToken.Register(() => completion.TrySetCanceled(cancellationToken));
+        _ = completion.Task.ContinueWith(
+            _ => cancellationRegistration.Dispose(),
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
 
         bool queued = dispatcherQueue.TryEnqueue(async () =>
         {
@@ -72,15 +77,10 @@ public sealed class OcrMcpConfigurationRepository : IMcpOcrConfigurationReposito
             {
                 completion.TrySetException(ex);
             }
-            finally
-            {
-                cancellationRegistration.Dispose();
-            }
         });
 
         if (!queued)
         {
-            cancellationRegistration.Dispose();
             completion.TrySetException(new InvalidOperationException("Failed to queue MCP OCR update on the UI thread."));
         }
 
