@@ -87,7 +87,7 @@ Swap date formats.
 
 ## 🤖 AI control via MCP
 
-Specifying complex regular expressions is incredibly tricky - and asking an AI to write one, then copy-pasting it back, is an exhausting cycle. To address this pain point, Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Code, GPT Codex, local agents, …) and let it manage your settings profiles through conversation:
+Specifying complex regular expressions is incredibly tricky - and asking an AI to write one, then copy-pasting it back, is an exhausting cycle. To address this pain point, Delete Newline ships with a built-in **[Model Context Protocol](https://modelcontextprotocol.io/) server**. Connect any MCP-aware AI assistant (Claude Code, GPT Codex, Hermes Agent, local agents, …) and let it manage your settings profiles through conversation:
 
 > "There's an MCP server on 127.0.0.1:39333/mcp (streamable HTTP). Probe it, then make a hotkey that strips Markdown bold/italic and bind it to Ctrl+Shift+M."
 
