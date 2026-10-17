@@ -22,6 +22,7 @@ public sealed class DeleteNewlineMcpToolService
     {
         WriteIndented = true
     };
+    private static readonly IReadOnlyList<McpToolDescriptor> ToolDescriptors = Array.AsReadOnly(CreateToolDescriptors());
 
     private readonly IMcpRegexConfigurationRepository _regexRepository;
     private readonly IMcpSettingsRepository _settingsRepository;
@@ -37,7 +38,9 @@ public sealed class DeleteNewlineMcpToolService
         _ocrRepository = ocrRepository;
     }
 
-    public IReadOnlyList<McpToolDescriptor> ListTools()
+    public IReadOnlyList<McpToolDescriptor> ListTools() => ToolDescriptors;
+
+    private static McpToolDescriptor[] CreateToolDescriptors()
     {
         return
         [
@@ -285,6 +288,7 @@ public sealed class DeleteNewlineMcpToolService
             new McpToolDescriptor
             {
                 Name = "install_ocr_language",
+                OpenWorld = true,
                 Title = "Download and apply an OCR language",
                 Description = "Use only for status=missing and useTool=install_ocr_language. Input the exact languageTag copied from get_ocr_languages. Installs the OCR language, selects it, and saves it. May prompt Windows elevation.",
                 InputSchema = Schema("""
@@ -367,6 +371,11 @@ public sealed class DeleteNewlineMcpToolService
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (arguments.ValueKind != JsonValueKind.Object)
+            {
+                throw new ArgumentException("Tool arguments must be a JSON object.");
+            }
             return toolName switch
             {
                 "get_regex_profiles" => GetRegexProfiles(),
@@ -375,7 +384,7 @@ public sealed class DeleteNewlineMcpToolService
                 "update_regex_chain_item" => await UpdateRegexChainItemAsync(arguments, cancellationToken),
                 "delete_regex_chain_item" => await DeleteRegexChainItemAsync(arguments, cancellationToken),
                 "delete_regex_profile" => await DeleteRegexProfileAsync(arguments, cancellationToken),
-                "test_regex_chain" => TestRegexChain(arguments),
+                "test_regex_chain" => await TestRegexChainAsync(arguments, cancellationToken),
                 "get_ocr_settings" => GetOcrSettings(),
                 "set_ocr_settings" => await SetOcrSettingsAsync(arguments, cancellationToken),
                 "get_ocr_languages" => GetOcrLanguages(),
@@ -385,6 +394,10 @@ public sealed class DeleteNewlineMcpToolService
                 "set_app_setting" => await SetAppSettingAsync(arguments, cancellationToken),
                 _ => McpToolResult.Error($"Unknown tool: {toolName}")
             };
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (JsonException ex)
         {
@@ -416,7 +429,11 @@ public sealed class DeleteNewlineMcpToolService
 
     private async Task<McpToolResult> UpsertRegexProfileAsync(JsonElement arguments, CancellationToken cancellationToken)
     {
-        int? index = TryGetInt32(arguments, "index", out int parsedIndex) ? parsedIndex : null;
+        int? index = GetProperty(arguments, "index").HasValue ? GetRequiredInt32(arguments, "index") : null;
+        if (index.HasValue && (index.Value < 0 || index.Value >= _regexRepository.RegexConfigs.Count))
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "The profile index does not exist. Omit index to create a profile.");
+        }
         RegexPageStructure? existing = index.HasValue && index.Value >= 0 && index.Value < _regexRepository.RegexConfigs.Count
             ? _regexRepository.RegexConfigs[index.Value]
             : null;
@@ -451,6 +468,7 @@ public sealed class DeleteNewlineMcpToolService
             throw new ArgumentException("chain is required for new regex profiles.");
         }
 
+        RegexTextProcessor.ValidateRules(config.RegexChain.ChainItems);
         await _regexRepository.UpsertAsync(index, config, cancellationToken);
         int savedIndex = index.HasValue && index.Value >= 0 && index.Value < _regexRepository.RegexConfigs.Count
             ? index.Value
@@ -489,6 +507,7 @@ public sealed class DeleteNewlineMcpToolService
         };
         chainItems.Insert(chainIndex, insertedItem);
 
+        RegexTextProcessor.ValidateRules(config.RegexChain.ChainItems);
         await _regexRepository.UpsertAsync(profileIndex, config, cancellationToken);
         RegexPageStructure savedProfile = GetSavedRegexProfileOrFallback(profileIndex, config);
         return JsonSuccess(new
@@ -524,6 +543,7 @@ public sealed class DeleteNewlineMcpToolService
         };
         chainItems[chainIndex] = updatedItem;
 
+        RegexTextProcessor.ValidateRules(config.RegexChain.ChainItems);
         await _regexRepository.UpsertAsync(profileIndex, config, cancellationToken);
         RegexPageStructure savedProfile = GetSavedRegexProfileOrFallback(profileIndex, config);
         return JsonSuccess(new
@@ -573,7 +593,7 @@ public sealed class DeleteNewlineMcpToolService
             : McpToolResult.Error($"Regex profile index {index} does not exist.");
     }
 
-    private McpToolResult TestRegexChain(JsonElement arguments)
+    private async Task<McpToolResult> TestRegexChainAsync(JsonElement arguments, CancellationToken cancellationToken)
     {
         string input = GetString(arguments, "input") ?? string.Empty;
         IReadOnlyList<ChainItem> chain;
@@ -596,7 +616,8 @@ public sealed class DeleteNewlineMcpToolService
             throw new ArgumentException("Provide either chain or a valid profileIndex.");
         }
 
-        string output = RegexTextProcessor.ApplyRegexChain(input, chain, "Invalid regex");
+        ChainItem[] rules = chain.Select(CloneChainItem).ToArray();
+        string output = await Task.Run(() => RegexTextProcessor.Transform(input, rules, cancellationToken), cancellationToken);
         return JsonSuccess(new { input, output });
     }
 
@@ -1018,8 +1039,13 @@ public sealed class DeleteNewlineMcpToolService
 
     private static McpToolResult JsonSuccess<T>(T value)
     {
+        // MCP structuredContent must be an object, including for list results.
         JsonElement structuredContent = JsonSerializer.SerializeToElement(value, JsonOptions);
-        string text = JsonSerializer.Serialize(value, JsonOptions);
+        if (structuredContent.ValueKind != JsonValueKind.Object)
+        {
+            structuredContent = JsonSerializer.SerializeToElement(new { profiles = value }, JsonOptions);
+        }
+        string text = structuredContent.GetRawText();
         return McpToolResult.Success(text, structuredContent);
     }
 

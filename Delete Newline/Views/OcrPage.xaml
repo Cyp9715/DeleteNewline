@@ -14,6 +14,10 @@
     <ScrollViewer Margin="0">
         <Grid Padding="20,0,20,0">
             <StackPanel MaxWidth="800">
+                <TextBlock x:Uid="OCRPage_Description_Capture"
+                           TextWrapping="Wrap" Margin="3,16,0,12" />
+                <Button x:Uid="OCRPage_Button_Capture"
+                        Command="{x:Bind ViewModel.LaunchOcrCommand}" />
                 <!-- OCR Hotkey Settings -->
                 <TextBlock x:Uid="OCRPage_Title_HotkeySettings"
                            Style="{StaticResource SubtitleTextBlockStyle}"
@@ -31,7 +35,7 @@
                     <StackPanel>
                         <!-- Description -->
                         <TextBlock x:Uid="OCRPage_Description_HotkeySettings"
-                                   Style="{ThemeResource BodyTextBlockStyle}"
+                                   Style="{ThemeResource BodyTextBlockStyle}" TextWrapping="Wrap"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    Margin="5,0,0,0" />
 
@@ -78,7 +82,7 @@
                     <StackPanel>
                         <!-- Description -->
                         <TextBlock x:Uid="OCRPage_Description_LanguageSettings"
-                                   Style="{ThemeResource BodyTextBlockStyle}"
+                                   Style="{ThemeResource BodyTextBlockStyle}" TextWrapping="Wrap"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    Margin="5,0,0,0" />
 
@@ -98,11 +102,11 @@
                 </Border>
 
                 <!-- OCR Language Management -->
-                <TextBlock x:Uid="OCRPage_Title_LanguageManagement"
-                           Style="{StaticResource SubtitleTextBlockStyle}"
-                           FontSize="16"
-                           HorizontalAlignment="Left"
-                           Margin="3,20,0,0"/>
+                <Expander IsExpanded="False" HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch" Margin="0,20,0,20">
+                    <Expander.Header>
+                        <TextBlock x:Uid="OCRPage_Title_LanguageManagement" />
+                    </Expander.Header>
 
                 <!-- OCR Language Management Card -->
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -113,7 +117,7 @@
                         Padding="10">
                     <StackPanel>
                         <TextBlock x:Uid="OCRPage_Description_LanguageManagement"
-                                   Style="{ThemeResource BodyTextBlockStyle}"
+                                   Style="{ThemeResource BodyTextBlockStyle}" TextWrapping="Wrap"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    Margin="5,0,0,0" />
 
@@ -164,6 +168,7 @@
                         </Grid>
                     </StackPanel>
                 </Border>
+                </Expander>
             </StackPanel>
             
             <!-- Dummy button for focus removal during hotkey registration -->

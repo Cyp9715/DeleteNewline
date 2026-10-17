@@ -127,7 +127,17 @@ public partial class RegexCollectViewModel : ObservableRecipient
         IReadOnlyList<RegexPageStructure> targets = GetRemovalTargets(parameter);
         if (targets.Count > 0)
         {
-            await _regexCollectSaveService.RemoveRegexConfigsAsync(targets);
+            try
+            {
+                await _regexCollectSaveService.RemoveRegexConfigsAsync(targets);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to save profile removal: {ex.Message}");
+                App.GetService<InAppNotificationService>().ShowInAppNotification(
+                    "Notification_SettingsSaveFailed_Title", "Notification_SettingsSaveFailed_Message",
+                    Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error);
+            }
         }
     }
 

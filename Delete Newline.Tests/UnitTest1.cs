@@ -662,7 +662,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         McpToolResult result = await service.ExecuteAsync("get_regex_profiles", arguments.RootElement, CancellationToken.None);
 
         Assert.False(result.IsError, result.Text);
-        JsonElement hotkey = result.StructuredContent!.Value[0].GetProperty("hotkey");
+        JsonElement hotkey = result.StructuredContent!.Value.GetProperty("profiles")[0].GetProperty("hotkey");
         Assert.Equal("Ctrl + `", hotkey.GetProperty("display").GetString());
         Assert.Equal("Backtick", hotkey.GetProperty("key").GetString());
         Assert.Equal(0xC0, hotkey.GetProperty("keyValue").GetInt32());
@@ -1082,7 +1082,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         string rightOverlayBlock = ExtractElementBlock(ocrCaptureWindowXaml, "<Rectangle x:Name=\"RightOverlay\"", "/>");
         string bottomOverlayBlock = ExtractElementBlock(ocrCaptureWindowXaml, "<Rectangle x:Name=\"BottomOverlay\"", "/>");
 
-        Assert.Contains("GetFullDesktopScreenshotAsImageSource()", ocrViewModel);
+        Assert.Contains("GetFullDesktopScreenshot()", ocrViewModel);
         Assert.Contains("BackgroundImage.Source = backgroundImage", ocrCaptureWindowCodeBehind);
         Assert.Contains("Opacity=\"0\"", topOverlayBlock);
         Assert.Contains("Opacity=\"0\"", leftOverlayBlock);
@@ -1224,7 +1224,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
             "    private void OnWindowActivated_FirstTime");
         string pointerReleasedBlock = ExtractElementBlock(
             ocrCaptureWindowCodeBehind,
-            "    private async void Canvas_PointerReleased(",
+            "    private void Canvas_PointerReleased(",
             "    private async Task ProcessOcrAsync");
         string viewModelClosedBlock = ExtractElementBlock(
             ocrViewModel,
@@ -1740,18 +1740,21 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void ProjectVersion_IsConsistentAt317()
+    public void ProjectVersion_MatchesPackageIdentity()
     {
         XDocument project = XDocument.Load(LocateSourceFile("Delete Newline", "Delete Newline.csproj"));
         XDocument manifest = XDocument.Load(LocateSourceFile("Delete Newline", "Package.appxmanifest"));
 
-        Assert.Equal("3.1.7", project.Descendants("Version").Single().Value);
-        Assert.Equal("3.1.7.0", project.Descendants("AssemblyVersion").Single().Value);
-        Assert.Equal("3.1.7.0", project.Descendants("FileVersion").Single().Value);
+        string version = project.Descendants("Version").Single().Value;
+        Assert.True(Version.TryParse(version, out _));
+        Assert.Equal(version + ".0", project.Descendants("AssemblyVersion").Single().Value);
+        Assert.Equal(version + ".0", project.Descendants("FileVersion").Single().Value);
 
         XNamespace packageNamespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
         XElement identity = manifest.Root!.Element(packageNamespace + "Identity")!;
-        Assert.Equal("3.1.7.0", identity.Attribute("Version")!.Value);
+        Assert.Equal(version + ".0", identity.Attribute("Version")!.Value);
+        Assert.Equal("62164CypSoft.DeleteNewline", identity.Attribute("Name")!.Value);
+        Assert.Equal("CN=0EB9F685-7CC3-4B9F-8F3E-BA45BA39030A", identity.Attribute("Publisher")!.Value);
     }
 
     private static void AssertHotkeyKeySchemaGuidesModelsToNamedAndCommonKeys(McpToolDescriptor tool)

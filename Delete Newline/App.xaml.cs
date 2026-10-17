@@ -22,8 +22,7 @@ public partial class App : Application
     private const string MutexName = "Cyp:DeleteNewlineMutex";
     private const string WindowTitle = "Delete Newline";
 
-    private const int NoPendingHotkeyId = -1;
-    private static int _pendingHotkeyIdForCopy = NoPendingHotkeyId;
+    private static readonly PendingHotkeyCopy PendingCopy = new();
 
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -65,25 +64,17 @@ public partial class App : Application
 
     public static void SetActiveHotkeyIdForCopy(int hotkeyId)
     {
-        Interlocked.Exchange(ref _pendingHotkeyIdForCopy, hotkeyId);
+        PendingCopy.Set(hotkeyId);
     }
 
     public static bool TryConsumeActiveHotkeyIdForCopy(out int hotkeyId)
     {
-        int consumedHotkeyId = Interlocked.Exchange(ref _pendingHotkeyIdForCopy, NoPendingHotkeyId);
-        if (consumedHotkeyId == NoPendingHotkeyId)
-        {
-            hotkeyId = NoPendingHotkeyId;
-            return false;
-        }
-
-        hotkeyId = consumedHotkeyId;
-        return true;
+        return PendingCopy.TryConsume(out hotkeyId);
     }
 
     public static void ClearActiveHotkeyIdForCopy()
     {
-        Interlocked.Exchange(ref _pendingHotkeyIdForCopy, NoPendingHotkeyId);
+        PendingCopy.Clear();
     }
 
     public App()
@@ -151,7 +142,13 @@ public partial class App : Application
 
                 // MCP Services
                 services.AddSingleton<McpAccessService>();
-                services.AddSingleton<LocalMcpHttpServerService>();
+                services.AddSingleton(provider =>
+                {
+                    var toolService = provider.GetRequiredService<DeleteNewlineMcpToolService>();
+                    return new LocalMcpHttpServerService(toolService,
+                        (name, arguments, token) => McpUiDispatcher.RunAsync(
+                            () => toolService.ExecuteAsync(name, arguments, token), token));
+                });
                 services.AddSingleton<IMcpRegexConfigurationRepository, RegexCollectMcpConfigurationRepository>();
                 services.AddSingleton<IMcpSettingsRepository, AppMcpSettingsRepository>();
                 services.AddSingleton<IMcpOcrConfigurationRepository, OcrMcpConfigurationRepository>();

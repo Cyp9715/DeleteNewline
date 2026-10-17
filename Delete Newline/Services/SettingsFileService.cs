@@ -11,13 +11,21 @@ public sealed class SettingsFileService
 {
     private readonly IFileService _fileService;
     private IDictionary<string, JToken> _settings;
+    private readonly SemaphoreSlim _writeLock = new(1, 1);
+    private readonly object _settingsLock = new();
 
-    private readonly string _applicationDataDirectory = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+    private readonly string _applicationDataDirectory;
     private const string _settingsFileName = "Settings.json";
 
     public SettingsFileService(IFileService fileService)
+        : this(fileService, Windows.Storage.ApplicationData.Current.LocalFolder.Path)
+    {
+    }
+
+    internal SettingsFileService(IFileService fileService, string applicationDataDirectory)
     {
         _fileService = fileService;
+        _applicationDataDirectory = applicationDataDirectory;
         _settings = new Dictionary<string, JToken>();
     }
 
@@ -54,7 +62,12 @@ public sealed class SettingsFileService
 
     public T? ReadSetting<T>(string key)
     {
-        if (_settings.TryGetValue(key, out JToken? token))
+        JToken? token;
+        lock (_settingsLock)
+        {
+            _settings.TryGetValue(key, out token);
+        }
+        if (token != null)
         {
             var settings = new JsonSerializerSettings
             {
@@ -70,38 +83,63 @@ public sealed class SettingsFileService
         if (value is null)
             throw new ArgumentNullException(nameof(value));
 
-        //await InitializeAsync();
-        Debug.WriteLine($"SaveSettingAsync : {key} |a| {value}");
-
         var settings = new JsonSerializerSettings
         {
             ContractResolver = new PublicPropertiesOnlyContractResolver(),
             Formatting = Formatting.Indented
         };
 
-        _settings[key] = JToken.FromObject(value, JsonSerializer.Create(settings));
-
-        var json = JsonConvert.SerializeObject(_settings, Formatting.Indented);
-        await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json).ConfigureAwait(false);
+        // Snapshot observable models on the caller's thread before yielding.
+        JToken snapshot = JToken.FromObject(value, JsonSerializer.Create(settings));
+        await _writeLock.WaitAsync();
+        try
+        {
+            var next = new Dictionary<string, JToken>(GetAllSettingsSnapshot()) { [key] = snapshot };
+            await PersistSettingsAsync(next).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
     }
 
     public IReadOnlyDictionary<string, JToken> GetAllSettingsSnapshot()
     {
-        return new Dictionary<string, JToken>(_settings);
+        lock (_settingsLock)
+        {
+            return _settings.ToDictionary(item => item.Key, item => item.Value.DeepClone());
+        }
     }
 
     public async Task ReplaceSettingsAsync(IReadOnlyDictionary<string, JToken> settings)
     {
-        _settings = new Dictionary<string, JToken>(settings);
-        var json = JsonConvert.SerializeObject(_settings, Formatting.Indented);
+        var snapshot = settings.ToDictionary(item => item.Key, item => item.Value.DeepClone());
+        await _writeLock.WaitAsync();
+        try
+        {
+            await PersistSettingsAsync(snapshot).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    private async Task PersistSettingsAsync(Dictionary<string, JToken> settings)
+    {
+        var json = JsonConvert.SerializeObject(settings, Formatting.Indented);
         await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, json).ConfigureAwait(false);
+        lock (_settingsLock)
+        {
+            _settings = settings;
+        }
     }
 
     public async Task<bool> ExportSettingsAsync(string exportFilePath)
     {
         try
         {
-            string jsonContent = await _fileService.ReadAsStringAsync(_applicationDataDirectory, _settingsFileName).ConfigureAwait(false);
+            string jsonContent = JsonConvert.SerializeObject(GetAllSettingsSnapshot(), Formatting.Indented);
             var exportDirectory = Path.GetDirectoryName(exportFilePath)!;
             var exportFileName = Path.GetFileName(exportFilePath);
             await _fileService.SaveAsync(exportDirectory, exportFileName, jsonContent).ConfigureAwait(false);
@@ -130,24 +168,23 @@ public sealed class SettingsFileService
             return false; // Failed to read the file
         }
 
-        var backupSettings = new Dictionary<string, JToken>(_settings);
-
         try
         {
             var tempSettings = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(jsonContent);
-            _settings = tempSettings ?? new Dictionary<string, JToken>();
-            await _fileService.SaveAsync(_applicationDataDirectory, _settingsFileName, jsonContent).ConfigureAwait(false);
+            if (tempSettings == null)
+            {
+                return false;
+            }
+            await ReplaceSettingsAsync(tempSettings).ConfigureAwait(false);
             return true;
         }
         catch (Newtonsoft.Json.JsonReaderException ex)
         {
-            _settings = backupSettings;
             Debug.WriteLine($"Error deserializing settings on import: {ex.Message}");
             return false;
         }
         catch (Exception ex)
         {
-            _settings = backupSettings;
             Debug.WriteLine($"Generic error during import process: {ex.Message}");
             return false;
         }

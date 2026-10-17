@@ -14,8 +14,22 @@ public class FileService : IFileService
 
     public async Task SaveAsync(string directory, string fileName, string content)
     {
+        Directory.CreateDirectory(directory);
         var filePath = Path.Combine(directory, fileName);
-        await File.WriteAllTextAsync(filePath, content).ConfigureAwait(false);
+        string temporaryPath = Path.Combine(directory, $".{fileName}.{Guid.NewGuid():N}.tmp");
+        try
+        {
+            await File.WriteAllTextAsync(temporaryPath, content).ConfigureAwait(false);
+            // Replace only after a complete write; an interrupted write leaves the old settings intact.
+            File.Move(temporaryPath, filePath, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath))
+            {
+                File.Delete(temporaryPath);
+            }
+        }
     }
 
     public void Delete(string folderPath, string fileName)

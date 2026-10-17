@@ -18,9 +18,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>13.0</LangVersion>
     <Nullable>enable</Nullable>
-    <Version>3.1.7</Version>
-    <AssemblyVersion>3.1.7.0</AssemblyVersion>
-    <FileVersion>3.1.7.0</FileVersion>
+    <Version>3.2.0</Version>
+    <AssemblyVersion>3.2.0.0</AssemblyVersion>
+    <FileVersion>3.2.0.0</FileVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Label="MultilingualAppToolkit">
@@ -89,12 +89,6 @@
     <Page Update="Styles\ToggleSwitch.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <EditorConfigFiles Remove="C:\Users\Cyphe\Filen\Project\Source Code\DeleteNewline\Delete Newline\.editorconfig" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="C:\Users\Cyphe\Filen\Project\Source Code\DeleteNewline\Delete Newline\.editorconfig" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Styles\TextBox.xaml">

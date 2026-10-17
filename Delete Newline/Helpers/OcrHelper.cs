@@ -27,14 +27,34 @@ public static class OcrHelper
 
     public static async Task<string> GetTextFromBitmapAsync(Bitmap bitmap, Language language)
     {
-        double scale = await GetIdealScaleFactorForOcrAsync(bitmap, language);
-        using Bitmap scaledBitmap = ImageHelper.ScaleBitmapUniform(bitmap, scale);
-        
-        OcrResult ocrResult = await GetOcrResultFromBitmapAsync(scaledBitmap, language);
-        return GetTextFromOcrResult(ocrResult, language);
+        OcrEngine engine = CreateEngine(language);
+        Size initialSize = OcrImageSizing.Fit(bitmap.Width, bitmap.Height, 1, (int)OcrEngine.MaxImageDimension);
+        using Bitmap initial = ImageHelper.ScaleBitmap(bitmap, initialSize);
+        OcrResult result = await RecognizeAsync(initial, engine);
+        double scale = GetIdealScaleFactorForOcrResult(result, initial.Height, initial.Width);
+        Size scaledSize = OcrImageSizing.Fit(initial.Width, initial.Height, scale, (int)OcrEngine.MaxImageDimension);
+        // A second recognition pass is only useful when the text size changes materially.
+        if (scaledSize != initial.Size && Math.Abs((double)scaledSize.Width / initial.Width - 1) > 0.15)
+        {
+            using Bitmap scaled = ImageHelper.ScaleBitmap(initial, scaledSize);
+            result = await RecognizeAsync(scaled, engine);
+        }
+        return GetTextFromOcrResult(result, language);
     }
 
     public static async Task<OcrResult> GetOcrResultFromBitmapAsync(Bitmap bitmap, Language language)
+    {
+        OcrEngine engine = CreateEngine(language);
+        Size size = OcrImageSizing.Fit(bitmap.Width, bitmap.Height, 1, (int)OcrEngine.MaxImageDimension);
+        using Bitmap fitted = ImageHelper.ScaleBitmap(bitmap, size);
+        return await RecognizeAsync(fitted, engine);
+    }
+
+    private static OcrEngine CreateEngine(Language language) =>
+        OcrEngine.TryCreateFromLanguage(language)
+        ?? throw new InvalidOperationException($"The Windows OCR language '{language.LanguageTag}' is not installed.");
+
+    private static async Task<OcrResult> RecognizeAsync(Bitmap bitmap, OcrEngine engine)
     {
         using var stream = new MemoryStream();
         bitmap.Save(stream, ImageFormat.Bmp);
@@ -44,50 +64,19 @@ public static class OcrHelper
         var decoder = await BitmapDecoder.CreateAsync(randomAccessStream);
         using var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
 
-        OcrEngine ocrEngine = OcrEngine.TryCreateFromLanguage(language);
-        if (ocrEngine == null)
-        {
-            // Fallback to English if the requested language is not available
-            ocrEngine = OcrEngine.TryCreateFromLanguage(new Language("en"));
-        }
-
-        return await ocrEngine.RecognizeAsync(softwareBitmap);
+        return await engine.RecognizeAsync(softwareBitmap);
     }
 
     private static string GetTextFromOcrResult(OcrResult ocrResult, Language language)
     {
         StringBuilder text = new();
-        bool isSpaceJoiningLanguage = IsSpaceJoiningLanguage(language);
-
         foreach (OcrLine ocrLine in ocrResult.Lines)
         {
-            if (isSpaceJoiningLanguage)
-            {
-                text.AppendLine(ocrLine.Text);
-            }
-            else
-            {
-                bool isFirstWord = true;
-                foreach (OcrWord ocrWord in ocrLine.Words)
-                {
-                    if (!isFirstWord)
-                        text.Append(' ');
-                    text.Append(ocrWord.Text);
-                    isFirstWord = false;
-                }
-                text.AppendLine();
-            }
+            // Windows provides language-aware spacing, including Japanese and Chinese.
+            text.AppendLine(ocrLine.Text);
         }
 
         return text.ToString();
-    }
-
-    private static bool IsSpaceJoiningLanguage(Language language)
-    {
-        // Most languages use spaces between words
-        // Languages like Chinese, Japanese don't typically use spaces
-        var nonSpaceJoiningLanguages = new[] { "zh", "ja", "ko" };
-        return !nonSpaceJoiningLanguages.Any(lang => language.LanguageTag.StartsWith(lang));
     }
 
     public static async Task<double> GetIdealScaleFactorForOcrAsync(Bitmap bitmap, Language language)
@@ -117,10 +106,10 @@ public static class OcrHelper
         if (width * scaleFactor > OcrEngine.MaxImageDimension || height * scaleFactor > OcrEngine.MaxImageDimension)
         {
             int largerDim = Math.Max(width, height);
-            scaleFactor = OcrEngine.MaxImageDimension / largerDim;
+            scaleFactor = (double)OcrEngine.MaxImageDimension / largerDim;
         }
 
-        return Math.Max(0.1, Math.Min(scaleFactor, 10.0)); // Clamp between 0.1 and 10
+        return Math.Min(scaleFactor, 10.0);
     }
 
     private static Rectangle GetWindowRect(WindowEx window)
@@ -288,13 +277,16 @@ public static class ImageHelper
 
     public static Bitmap ScaleBitmapUniform(Bitmap passedBitmap, double scale)
     {
-        int newWidth = (int)(passedBitmap.Width * scale);
-        int newHeight = (int)(passedBitmap.Height * scale);
+        Size size = OcrImageSizing.Fit(passedBitmap.Width, passedBitmap.Height, scale, (int)OcrEngine.MaxImageDimension);
+        return ScaleBitmap(passedBitmap, size);
+    }
 
-        Bitmap scaledBitmap = new(newWidth, newHeight, passedBitmap.PixelFormat);
+    public static Bitmap ScaleBitmap(Bitmap passedBitmap, Size size)
+    {
+        Bitmap scaledBitmap = new(size.Width, size.Height, PixelFormat.Format32bppArgb);
         using Graphics g = Graphics.FromImage(scaledBitmap);
         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-        g.DrawImage(passedBitmap, 0, 0, newWidth, newHeight);
+        g.DrawImage(passedBitmap, 0, 0, size.Width, size.Height);
 
         return scaledBitmap;
     }

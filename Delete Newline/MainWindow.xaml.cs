@@ -22,6 +22,7 @@ public sealed partial class MainWindow : WindowEx
     private WindowMessageMonitor _messageMonitor;
     private UIElement? _currentContentForPointerHandler;
     private bool _pointerPressedHandlerAttached = false;
+    private bool _isExiting;
 
     private const int WM_LBUTTONDBLCLK = 0x0203;
     private const int WM_RBUTTONDOWN = 0x0204;
@@ -126,8 +127,25 @@ public sealed partial class MainWindow : WindowEx
                 switch (commandId)
                 {
                     case TrayIconService.ID_EXIT:
-                        trayIconService.RemoveTrayIcon();
-                        this.Close();
+                        if (_isExiting) break;
+                        _isExiting = true;
+                        try
+                        {
+                            await App.GetService<RegexCollectSaveService>().SaveSettingsAsync();
+                            await App.GetService<McpAccessService>().StopServerAsync();
+                            trayIconService.RemoveTrayIcon();
+                            this.Close();
+                        }
+                        catch (Exception ex)
+                        {
+                            _isExiting = false;
+                            System.Diagnostics.Debug.WriteLine($"Failed to save settings before exit: {ex}");
+                            App.GetService<InAppNotificationService>().ShowInAppNotification(
+                                "Notification_SettingsSaveFailed_Title", "Notification_SettingsSaveFailed_Message",
+                                Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error);
+                            this.Show();
+                            this.Activate();
+                        }
                         break;
 
                     case TrayIconService.ID_NOTIFICATION:

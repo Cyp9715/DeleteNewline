@@ -454,7 +454,17 @@ public partial class SettingsViewModel : ObservableRecipient
         string? exportFilePath = await _filePickerService.PickSaveFileAsync();
         if (!string.IsNullOrEmpty(exportFilePath))
         {
-            var success = await _localSettingsService.ExportSettingsAsync(exportFilePath);
+            bool success;
+            try
+            {
+                await App.GetService<RegexCollectSaveService>().SaveSettingsAsync();
+                success = await _localSettingsService.ExportSettingsAsync(exportFilePath);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to export current settings: {ex.Message}");
+                success = false;
+            }
             if (success)
             {
                 _inAppNotificationService.ShowInAppNotification("Notification_SettingsExported_Success_Title", "Notification_SettingsExported_Success_Message", InfoBarSeverity.Success);

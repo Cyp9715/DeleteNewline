@@ -26,14 +26,21 @@ public sealed class LocalMcpHttpServerService
 
     private readonly DeleteNewlineMcpToolService _toolService;
     private readonly SemaphoreSlim _lifetimeLock = new(1, 1);
+    private readonly SemaphoreSlim _toolLock = new(1, 1);
+    private readonly object _clientsLock = new();
+    private readonly Dictionary<TcpClient, Task> _clients = [];
+    private readonly Func<string, JsonElement, CancellationToken, Task<McpToolResult>> _executeTool;
+    private static readonly HashSet<string> SupportedVersions = ["2025-03-26", "2025-06-18", "2025-11-25"];
 
     private TcpListener? _listener;
     private CancellationTokenSource? _cancellationTokenSource;
     private Task? _acceptLoopTask;
 
-    public LocalMcpHttpServerService(DeleteNewlineMcpToolService toolService)
+    public LocalMcpHttpServerService(DeleteNewlineMcpToolService toolService,
+        Func<string, JsonElement, CancellationToken, Task<McpToolResult>>? executeTool = null)
     {
         _toolService = toolService;
+        _executeTool = executeTool ?? toolService.ExecuteAsync;
     }
 
     public bool IsRunning { get; private set; }
@@ -51,6 +58,7 @@ public sealed class LocalMcpHttpServerService
             try
             {
                 _cancellationTokenSource = new CancellationTokenSource();
+                McpPortPolicy.ValidatePort(port);
                 _listener = new TcpListener(IPAddress.Loopback, port);
                 _listener.Start(backlog: 10);
                 IsRunning = true;
@@ -103,6 +111,14 @@ public sealed class LocalMcpHttpServerService
                 }
             }
 
+            Task[] pending;
+            lock (_clientsLock)
+            {
+                foreach (TcpClient client in _clients.Keys) client.Dispose();
+                pending = _clients.Values.ToArray();
+            }
+            await Task.WhenAll(pending);
+
             _listener = null;
             _acceptLoopTask = null;
             _cancellationTokenSource?.Dispose();
@@ -139,20 +155,48 @@ public sealed class LocalMcpHttpServerService
                 break;
             }
 
-            _ = Task.Run(() => ProcessClientAsync(client), CancellationToken.None);
+            lock (_clientsLock)
+            {
+                if (_clients.Count >= 32)
+                {
+                    client.Dispose();
+                    continue;
+                }
+                _clients[client] = Task.Run(async () =>
+                {
+                    try { await ProcessClientAsync(client, cancellationToken); }
+                    finally { lock (_clientsLock) _clients.Remove(client); }
+                });
+            }
         }
     }
 
-    private async Task ProcessClientAsync(TcpClient client)
+    private async Task ProcessClientAsync(TcpClient client, CancellationToken cancellationToken)
     {
-        await using NetworkStream stream = client.GetStream();
         using (client)
         {
+            Stream? stream = null;
             try
             {
-                HttpRequest? request = await ReadHttpRequestAsync(stream);
+                stream = client.GetStream();
+                using CancellationTokenSource readTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                readTimeout.CancelAfter(TimeSpan.FromSeconds(10));
+                McpHttpRequest? request = await new McpHttpRequestReader(stream, readTimeout.Token).ReadAsync();
                 if (request == null)
                 {
+                    return;
+                }
+
+                if (!IsLoopbackHost(request.Headers.GetValueOrDefault("Host"), requireScheme: false) ||
+                    request.Headers.TryGetValue("Origin", out string? origin) && !IsLoopbackHost(origin, requireScheme: true))
+                {
+                    await WritePlainTextResponseAsync(stream, HttpStatusCode.Forbidden, "Only loopback hosts and origins are allowed.");
+                    return;
+                }
+
+                if (request.Headers.TryGetValue("MCP-Protocol-Version", out string? version) && !SupportedVersions.Contains(version))
+                {
+                    await WritePlainTextResponseAsync(stream, HttpStatusCode.BadRequest, "Unsupported MCP protocol version.");
                     return;
                 }
 
@@ -163,32 +207,34 @@ public sealed class LocalMcpHttpServerService
                     return;
                 }
 
-                if (string.Equals(request.Method, "OPTIONS", StringComparison.OrdinalIgnoreCase))
-                {
-                    await WriteNoContentResponseAsync(stream, HttpStatusCode.NoContent);
-                    return;
-                }
-
-                if (string.Equals(request.Method, "GET", StringComparison.OrdinalIgnoreCase))
-                {
-                    await WriteSseReadyResponseAsync(stream);
-                    return;
-                }
-
                 if (!string.Equals(request.Method, "POST", StringComparison.OrdinalIgnoreCase))
                 {
                     await WritePlainTextResponseAsync(stream, HttpStatusCode.MethodNotAllowed, "Only POST /mcp is supported for MCP JSON-RPC requests.");
                     return;
                 }
 
-                await HandleMcpPostAsync(stream, request.Body);
+                if (!request.Headers.TryGetValue("Content-Type", out string? contentType) ||
+                    !contentType.Split(';', 2)[0].Trim().Equals("application/json", StringComparison.OrdinalIgnoreCase))
+                {
+                    await WritePlainTextResponseAsync(stream, HttpStatusCode.UnsupportedMediaType, "Use application/json.");
+                    return;
+                }
+                await HandleMcpPostAsync(stream, request.Body, cancellationToken);
+            }
+            catch (Exception ex) when (ex is OperationCanceledException or IOException or ObjectDisposedException)
+            {
+                // Idle, disconnected and stopped clients do not outlive the server.
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"MCP HTTP request failed: {ex}");
                 try
                 {
-                    await WritePlainTextResponseAsync(stream, HttpStatusCode.InternalServerError, "MCP server error.");
+                    if (stream != null)
+                    {
+                        HttpStatusCode status = ex is McpHttpException httpError ? httpError.StatusCode : HttpStatusCode.InternalServerError;
+                        await WritePlainTextResponseAsync(stream, status, ex is McpHttpException ? ex.Message : "MCP server error.");
+                    }
                 }
                 catch
                 {
@@ -198,7 +244,18 @@ public sealed class LocalMcpHttpServerService
         }
     }
 
-    private async Task HandleMcpPostAsync(Stream stream, string body)
+    private static bool IsLoopbackHost(string? value, bool requireScheme)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        string address = requireScheme ? value : $"http://{value}";
+        return Uri.TryCreate(address, UriKind.Absolute, out Uri? uri)
+            && uri.Scheme is "http" or "https" && uri.UserInfo.Length == 0
+            && uri.AbsolutePath == "/" && uri.Query.Length == 0 && uri.Fragment.Length == 0
+            && (uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+                || IPAddress.TryParse(uri.Host.Trim('[', ']'), out IPAddress? ip) && IPAddress.IsLoopback(ip));
+    }
+
+    private async Task HandleMcpPostAsync(Stream stream, string body, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(body))
         {
@@ -206,42 +263,31 @@ public sealed class LocalMcpHttpServerService
             return;
         }
 
-        using JsonDocument document = JsonDocument.Parse(body);
-        JsonElement root = document.RootElement;
-
-        if (root.ValueKind == JsonValueKind.Array)
+        JsonDocument document;
+        try
         {
-            JsonArray responses = [];
-            foreach (JsonElement message in root.EnumerateArray())
-            {
-                JsonNode? response = await ProcessJsonRpcMessageAsync(message);
-                if (response != null)
-                {
-                    responses.Add(response);
-                }
-            }
-
-            if (responses.Count == 0)
+            document = JsonDocument.Parse(body);
+        }
+        catch (JsonException)
+        {
+            await WriteJsonResponseAsync(stream, HttpStatusCode.BadRequest, CreateErrorResponse(null, -32700, "Invalid JSON."));
+            return;
+        }
+        using (document)
+        {
+            JsonNode? response = await ProcessJsonRpcMessageAsync(document.RootElement, cancellationToken);
+            if (response == null)
             {
                 await WriteNoContentResponseAsync(stream, HttpStatusCode.Accepted);
-                return;
             }
-
-            await WriteJsonResponseAsync(stream, HttpStatusCode.OK, responses);
-            return;
+            else
+            {
+                await WriteJsonResponseAsync(stream, HttpStatusCode.OK, response);
+            }
         }
-
-        JsonNode? singleResponse = await ProcessJsonRpcMessageAsync(root);
-        if (singleResponse == null)
-        {
-            await WriteNoContentResponseAsync(stream, HttpStatusCode.Accepted);
-            return;
-        }
-
-        await WriteJsonResponseAsync(stream, HttpStatusCode.OK, singleResponse);
     }
 
-    private async Task<JsonNode?> ProcessJsonRpcMessageAsync(JsonElement message)
+    private async Task<JsonNode?> ProcessJsonRpcMessageAsync(JsonElement message, CancellationToken cancellationToken)
     {
         if (message.ValueKind != JsonValueKind.Object)
         {
@@ -249,20 +295,29 @@ public sealed class LocalMcpHttpServerService
         }
 
         bool hasId = message.TryGetProperty("id", out JsonElement idElement);
+        if (!message.TryGetProperty("jsonrpc", out JsonElement jsonrpc) || jsonrpc.ValueKind != JsonValueKind.String ||
+            jsonrpc.GetString() != "2.0" || hasId && idElement.ValueKind is not (JsonValueKind.String or JsonValueKind.Number))
+        {
+            return CreateErrorResponse(null, -32600, "Invalid JSON-RPC 2.0 message.");
+        }
         string? method = message.TryGetProperty("method", out JsonElement methodElement) && methodElement.ValueKind == JsonValueKind.String
             ? methodElement.GetString()
             : null;
 
         if (string.IsNullOrWhiteSpace(method))
         {
-            return hasId
-                ? CreateErrorResponse(idElement, -32600, "JSON-RPC request method is required.")
-                : null;
+            // Responses to server messages are accepted without a response of their own.
+            if (hasId && (message.TryGetProperty("result", out _) ^ message.TryGetProperty("error", out _))) return null;
+            return CreateErrorResponse(hasId ? idElement : null, -32600, "JSON-RPC request method is required.");
         }
 
         JsonElement parameters = message.TryGetProperty("params", out JsonElement paramsElement)
             ? paramsElement
             : default;
+        if (parameters.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+        {
+            return CreateErrorResponse(hasId ? idElement : null, -32602, "MCP params must be an object.");
+        }
 
         if (!hasId)
         {
@@ -270,26 +325,34 @@ public sealed class LocalMcpHttpServerService
             return null;
         }
 
-        return method switch
+        try
         {
-            "initialize" => CreateSuccessResponse(idElement, CreateInitializeResult(parameters)),
-            "ping" => CreateSuccessResponse(idElement, new JsonObject()),
-            "tools/list" => CreateSuccessResponse(idElement, CreateToolsListResult()),
-            "tools/call" => CreateSuccessResponse(idElement, await CreateToolCallResultAsync(parameters)),
-            _ => CreateErrorResponse(idElement, -32601, $"Method not found: {method}")
-        };
+            return method switch
+            {
+                "initialize" => CreateSuccessResponse(idElement, CreateInitializeResult(parameters)),
+                "ping" => CreateSuccessResponse(idElement, new JsonObject()),
+                "tools/list" => CreateSuccessResponse(idElement, CreateToolsListResult()),
+                "tools/call" => CreateSuccessResponse(idElement, await CreateToolCallResultAsync(parameters, cancellationToken)),
+                _ => CreateErrorResponse(idElement, -32601, $"Method not found: {method}")
+            };
+        }
+        catch (ArgumentException ex)
+        {
+            return CreateErrorResponse(idElement, -32602, ex.Message);
+        }
     }
 
     private static JsonNode CreateInitializeResult(JsonElement parameters)
     {
-        string protocolVersion = "2025-06-18";
+        string protocolVersion = "2025-11-25";
         if (parameters.ValueKind == JsonValueKind.Object &&
             parameters.TryGetProperty("protocolVersion", out JsonElement requestedVersion) &&
             requestedVersion.ValueKind == JsonValueKind.String &&
             !string.IsNullOrWhiteSpace(requestedVersion.GetString()))
         {
-            protocolVersion = requestedVersion.GetString()!;
+            if (SupportedVersions.Contains(requestedVersion.GetString()!)) protocolVersion = requestedVersion.GetString()!;
         }
+        else throw new ArgumentException("initialize requires protocolVersion.");
 
         Version? assemblyVersion = typeof(LocalMcpHttpServerService).Assembly.GetName().Version;
 
@@ -330,7 +393,7 @@ public sealed class LocalMcpHttpServerService
                     ["readOnlyHint"] = tool.ReadOnly,
                     ["destructiveHint"] = tool.Destructive,
                     ["idempotentHint"] = tool.ReadOnly,
-                    ["openWorldHint"] = false
+                    ["openWorldHint"] = tool.OpenWorld
                 }
             });
         }
@@ -341,16 +404,20 @@ public sealed class LocalMcpHttpServerService
         };
     }
 
-    private async Task<JsonNode> CreateToolCallResultAsync(JsonElement parameters)
+    private async Task<JsonNode> CreateToolCallResultAsync(JsonElement parameters, CancellationToken cancellationToken)
     {
         if (parameters.ValueKind != JsonValueKind.Object ||
             !parameters.TryGetProperty("name", out JsonElement nameElement) ||
             nameElement.ValueKind != JsonValueKind.String)
         {
-            return CreateCallToolResult(McpToolResult.Error("tools/call requires params.name."));
+            throw new ArgumentException("tools/call requires params.name.");
         }
 
         string toolName = nameElement.GetString()!;
+        if (!_toolService.ListTools().Any(tool => tool.Name == toolName))
+        {
+            throw new ArgumentException($"Unknown tool: {toolName}");
+        }
         JsonElement arguments;
         if (parameters.TryGetProperty("arguments", out JsonElement argumentsElement))
         {
@@ -361,9 +428,14 @@ public sealed class LocalMcpHttpServerService
             using JsonDocument emptyArguments = JsonDocument.Parse("{}");
             arguments = emptyArguments.RootElement.Clone();
         }
-
-        McpToolResult result = await _toolService.ExecuteAsync(toolName, arguments, CancellationToken.None);
-        return CreateCallToolResult(result);
+        if (arguments.ValueKind != JsonValueKind.Object) throw new ArgumentException("Tool arguments must be an object.");
+        await _toolLock.WaitAsync(cancellationToken);
+        try
+        {
+            McpToolResult result = await _executeTool(toolName, arguments, cancellationToken);
+            return CreateCallToolResult(result);
+        }
+        finally { _toolLock.Release(); }
     }
 
     private static JsonNode CreateCallToolResult(McpToolResult result)
@@ -418,95 +490,6 @@ public sealed class LocalMcpHttpServerService
         return JsonNode.Parse(element.GetRawText());
     }
 
-    private static async Task<HttpRequest?> ReadHttpRequestAsync(NetworkStream stream)
-    {
-        byte[]? headerBytes = await ReadHeaderBytesAsync(stream);
-        if (headerBytes == null)
-        {
-            return null;
-        }
-
-        string headerText = Encoding.ASCII.GetString(headerBytes);
-        string[] lines = headerText.Split("\r\n", StringSplitOptions.None);
-        string[] requestLine = lines[0].Split(' ', 3, StringSplitOptions.RemoveEmptyEntries);
-        if (requestLine.Length < 2)
-        {
-            return null;
-        }
-
-        Dictionary<string, string> headers = new(StringComparer.OrdinalIgnoreCase);
-        for (int i = 1; i < lines.Length; i++)
-        {
-            string line = lines[i];
-            if (string.IsNullOrEmpty(line))
-            {
-                continue;
-            }
-
-            int colonIndex = line.IndexOf(':');
-            if (colonIndex <= 0)
-            {
-                continue;
-            }
-
-            headers[line[..colonIndex].Trim()] = line[(colonIndex + 1)..].Trim();
-        }
-
-        int contentLength = headers.TryGetValue("Content-Length", out string? contentLengthText) && int.TryParse(contentLengthText, out int parsedLength)
-            ? parsedLength
-            : 0;
-
-        if (contentLength < 0 || contentLength > 1_048_576)
-        {
-            throw new InvalidOperationException("MCP HTTP request body is too large.");
-        }
-
-        byte[] bodyBytes = new byte[contentLength];
-        int totalRead = 0;
-        while (totalRead < contentLength)
-        {
-            int read = await stream.ReadAsync(bodyBytes.AsMemory(totalRead, contentLength - totalRead));
-            if (read == 0)
-            {
-                break;
-            }
-
-            totalRead += read;
-        }
-
-        string body = Encoding.UTF8.GetString(bodyBytes, 0, totalRead);
-        return new HttpRequest(requestLine[0], requestLine[1], headers, body);
-    }
-
-    private static async Task<byte[]?> ReadHeaderBytesAsync(NetworkStream stream)
-    {
-        MemoryStream header = new();
-        byte[] buffer = new byte[1];
-        int matched = 0;
-        byte[] delimiter = "\r\n\r\n"u8.ToArray();
-
-        while (header.Length < 16_384)
-        {
-            int read = await stream.ReadAsync(buffer.AsMemory(0, 1));
-            if (read == 0)
-            {
-                return header.Length == 0 ? null : header.ToArray();
-            }
-
-            byte current = buffer[0];
-            header.WriteByte(current);
-
-            matched = current == delimiter[matched] ? matched + 1 : current == delimiter[0] ? 1 : 0;
-            if (matched == delimiter.Length)
-            {
-                byte[] bytes = header.ToArray();
-                return bytes[..^delimiter.Length];
-            }
-        }
-
-        throw new InvalidOperationException("MCP HTTP request headers are too large.");
-    }
-
     private static async Task WriteJsonResponseAsync(Stream stream, HttpStatusCode statusCode, JsonNode payload)
     {
         byte[] body = Encoding.UTF8.GetBytes(payload.ToJsonString(JsonOptions));
@@ -524,12 +507,6 @@ public sealed class LocalMcpHttpServerService
         return WriteResponseAsync(stream, statusCode, "text/plain; charset=utf-8", []);
     }
 
-    private static Task WriteSseReadyResponseAsync(Stream stream)
-    {
-        byte[] body = Encoding.UTF8.GetBytes(": Delete Newline MCP server is enabled. Send JSON-RPC requests with POST /mcp.\n\n");
-        return WriteResponseAsync(stream, HttpStatusCode.OK, "text/event-stream; charset=utf-8", body);
-    }
-
     private static async Task WriteResponseAsync(Stream stream, HttpStatusCode statusCode, string contentType, byte[] body)
     {
         string reasonPhrase = ReasonPhrases.GetValueOrDefault(statusCode, statusCode.ToString());
@@ -538,17 +515,15 @@ public sealed class LocalMcpHttpServerService
                         $"Content-Length: {body.Length}\r\n" +
                         "Cache-Control: no-cache\r\n" +
                         "Connection: close\r\n" +
-                        "Access-Control-Allow-Origin: http://localhost\r\n" +
-                        "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" +
-                        "Access-Control-Allow-Headers: content-type, mcp-session-id, mcp-protocol-version\r\n" +
-                        "Mcp-Session-Id: delete-newline\r\n" +
+                        (statusCode == HttpStatusCode.MethodNotAllowed ? "Allow: POST\r\n" : "") +
                         "\r\n";
 
         byte[] headerBytes = Encoding.ASCII.GetBytes(header);
-        await stream.WriteAsync(headerBytes);
+        using CancellationTokenSource timeout = new(TimeSpan.FromSeconds(10));
+        await stream.WriteAsync(headerBytes, timeout.Token);
         if (body.Length > 0)
         {
-            await stream.WriteAsync(body);
+            await stream.WriteAsync(body, timeout.Token);
         }
     }
 
@@ -560,8 +535,11 @@ public sealed class LocalMcpHttpServerService
         [HttpStatusCode.BadRequest] = "Bad Request",
         [HttpStatusCode.NotFound] = "Not Found",
         [HttpStatusCode.MethodNotAllowed] = "Method Not Allowed",
+        [HttpStatusCode.Forbidden] = "Forbidden",
+        [HttpStatusCode.RequestEntityTooLarge] = "Payload Too Large",
+        [HttpStatusCode.RequestHeaderFieldsTooLarge] = "Request Header Fields Too Large",
+        [HttpStatusCode.UnsupportedMediaType] = "Unsupported Media Type",
         [HttpStatusCode.InternalServerError] = "Internal Server Error"
     };
 
-    private sealed record HttpRequest(string Method, string Path, IReadOnlyDictionary<string, string> Headers, string Body);
 }

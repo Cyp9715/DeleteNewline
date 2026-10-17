@@ -534,4 +534,11 @@
   <data name="RegexCollect_SearchTextBox.PlaceholderText" xml:space="preserve">
     <value>Search by Name</value>
   </data>
+  <data name="Notification_RegexFailed_Title" xml:space="preserve"><value>Text transformation failed</value></data>
+  <data name="Notification_RegexFailed_Message" xml:space="preserve"><value>A rule is invalid or took too long. Your copied text has been kept unchanged.</value></data>
+  <data name="OCRPage_Description_Capture.Text" xml:space="preserve"><value>Capture text that cannot be selected. Drag over an area of your screen, then paste the recognized text. Press Esc to cancel.</value></data>
+  <data name="OCRPage_Button_Capture.Content" xml:space="preserve"><value>Capture text</value></data>
+  <data name="OCRPage_Button_Capture.AutomationProperties.Name" xml:space="preserve"><value>Capture text from the screen</value></data>
+  <data name="Notification_SettingsSaveFailed_Title" xml:space="preserve"><value>Settings could not be saved</value></data>
+  <data name="Notification_SettingsSaveFailed_Message" xml:space="preserve"><value>Your changes could not be saved. Check available disk space and try exiting again.</value></data>
 </root>

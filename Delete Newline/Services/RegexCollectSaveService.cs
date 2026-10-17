@@ -20,6 +20,8 @@ public sealed class RegexCollectSaveService
     private const string RegexCollectionSettingsKey = "RegexCollection";
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
     private bool _suppressAutoSave;
+    private CancellationTokenSource? _pendingSave;
+    private readonly HashSet<ChainItem> _subscribedItems = [];
 
     public RegexCollectSaveService(SettingsFileService localSettingsService, 
                                     InAppNotificationService inAppNotificationService)
@@ -192,7 +194,7 @@ public sealed class RegexCollectSaveService
         }
     }
 
-    private async void OnRegexConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnRegexConfigsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (_suppressAutoSave)
         {
@@ -216,7 +218,7 @@ public sealed class RegexCollectSaveService
         }
         
 
-        await SaveSettingsAsync();
+        ScheduleSave();
     }
 
     private void Subscribe(RegexPageStructure config)
@@ -234,7 +236,10 @@ public sealed class RegexCollectSaveService
 
             foreach (var item in config.RegexChain.ChainItems)
             {
-                item.PropertyChanged += OnConfigPropertyChanged;
+                if (_subscribedItems.Add(item))
+                {
+                    item.PropertyChanged += OnConfigPropertyChanged;
+                }
             }
         }
     }
@@ -255,17 +260,36 @@ public sealed class RegexCollectSaveService
             foreach (var item in config.RegexChain.ChainItems)
             {
                 item.PropertyChanged -= OnConfigPropertyChanged;
+                _subscribedItems.Remove(item);
             }
         }
     }
 
-    private async void OnChainItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnChainItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        if (e.Action == NotifyCollectionChangedAction.Reset)
+        {
+            foreach (ChainItem item in _subscribedItems)
+            {
+                item.PropertyChanged -= OnConfigPropertyChanged;
+            }
+            _subscribedItems.Clear();
+            foreach (ChainItem item in RegexConfigs.SelectMany(config => config.RegexChain.ChainItems))
+            {
+                if (_subscribedItems.Add(item))
+                {
+                    item.PropertyChanged += OnConfigPropertyChanged;
+                }
+            }
+        }
         if (e.NewItems != null)
         {
             foreach (ChainItem item in e.NewItems)
             {
-                item.PropertyChanged += OnConfigPropertyChanged;
+                if (_subscribedItems.Add(item))
+                {
+                    item.PropertyChanged += OnConfigPropertyChanged;
+                }
             }
         }
 
@@ -274,28 +298,58 @@ public sealed class RegexCollectSaveService
             foreach (ChainItem item in e.OldItems)
             {
                 item.PropertyChanged -= OnConfigPropertyChanged;
+                _subscribedItems.Remove(item);
             }
         }
 
-        await SaveSettingsAsync();
+        ScheduleSave();
     }
 
-    private async void OnConfigPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnConfigPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        await SaveSettingsAsync();
+        ScheduleSave();
+    }
+
+    private void ScheduleSave()
+    {
+        if (_suppressAutoSave)
+        {
+            return;
+        }
+        _pendingSave?.Cancel();
+        _pendingSave?.Dispose();
+        _pendingSave = new CancellationTokenSource();
+        _ = SaveAfterEditAsync(_pendingSave.Token);
+    }
+
+    private async Task SaveAfterEditAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(200, cancellationToken);
+            await SaveSettingsAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error saving profiles: {ex.Message}");
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_SettingsSaveFailed_Title", "Notification_SettingsSaveFailed_Message", InfoBarSeverity.Error);
+        }
     }
 
     public async Task SaveSettingsAsync()
     {
+        _pendingSave?.Cancel();
+        _pendingSave?.Dispose();
+        _pendingSave = null;
         await _saveLock.WaitAsync();
         try
         {
             var configsList = RegexConfigs.ToList();
             await _localSettingsService.SaveSettingAsync(RegexCollectionSettingsKey, configsList);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Error saving Hotkeys: {ex.Message}");
         }
         finally
         {

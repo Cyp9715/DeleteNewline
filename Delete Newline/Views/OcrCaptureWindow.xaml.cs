@@ -80,6 +80,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private bool _isOverlayRevealQueued;
     private bool _isOverlayRevealed;
     private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
+    private Bitmap? _desktopScreenshot;
     private Windows.Foundation.Point startPoint = new();
     private Windows.Foundation.Point currentPoint = new();
     private bool isSelecting = false;
@@ -151,6 +152,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
         BackgroundImage.Source = null;
         backgroundImage = null;
+        _desktopScreenshot?.Dispose();
+        _desktopScreenshot = null;
         CaptureLanguageComboBox.ItemsSource = null;
         _languageChanged = null;
     }
@@ -277,7 +280,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
     }
 
     public void SetupFullscreen(
-        Microsoft.UI.Xaml.Media.Imaging.BitmapImage preloadedBackground,
+        Bitmap preloadedBackground,
         Language? selectedLanguage = null,
         IReadOnlyList<Language>? availableLanguages = null,
         Action<Language>? languageChanged = null)
@@ -285,7 +288,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
         var hwnd = WindowNative.GetWindowHandle(this);
         currentLanguage = selectedLanguage ?? new Language("en");
         _languageChanged = languageChanged;
-        backgroundImage = preloadedBackground;
+        _desktopScreenshot = preloadedBackground;
+        backgroundImage = ImageHelper.BitmapToImageSource(preloadedBackground);
         _overlayHwnd = hwnd;
         RemoveWindowFrames(hwnd);
         ApplyOverlayWindowExStyle(hwnd);
@@ -527,9 +531,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void HighlightSelectionOverlay(Windows.Foundation.Rect selectionRect)
     {
-        var virtualScreen = ImageHelper.GetVirtualScreenBounds();
-        double windowWidth = virtualScreen.Width;
-        double windowHeight = virtualScreen.Height;
+        double windowWidth = RegionClickCanvas.ActualWidth;
+        double windowHeight = RegionClickCanvas.ActualHeight;
 
         TopOverlay.Visibility = Visibility.Visible;
         LeftOverlay.Visibility = Visibility.Visible;
@@ -579,6 +582,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
     private void Canvas_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
+        if (!e.GetCurrentPoint(RegionClickCanvas).Properties.IsLeftButtonPressed || IsOcrProcessing) return;
         isSelecting = true;
         RegionClickCanvas.CapturePointer(e.Pointer);
         startPoint = e.GetCurrentPoint(RegionClickCanvas).Position;
@@ -602,11 +606,12 @@ public sealed partial class OcrCaptureWindow : WindowEx
         HighlightSelectionOverlay(selectionRect);
     }
 
-    private async void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
+    private void Canvas_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
         if (!isSelecting) return;
 
         isSelecting = false;
+        currentPoint = e.GetCurrentPoint(RegionClickCanvas).Position;
         RegionClickCanvas.ReleasePointerCapture(e.Pointer);
 
         double canvasLeft = Math.Min(startPoint.X, currentPoint.X);
@@ -618,35 +623,18 @@ public sealed partial class OcrCaptureWindow : WindowEx
 
         try
         {
-            // Small delay to ensure the UI thread renders the latest selection overlay before the screen is captured.
-            await Task.Delay(1);
-            if (_isClosing)
+            if (_isClosing || _desktopScreenshot == null || canvasWidth < 2 || canvasHeight < 2)
             {
                 return;
             }
 
-            var virtualScreen = ImageHelper.GetVirtualScreenBounds();
-            double windowActualWidth = this.Bounds.Width;
-            double windowActualHeight = this.Bounds.Height;
-
-            double scaleX = virtualScreen.Width / windowActualWidth;
-            double scaleY = virtualScreen.Height / windowActualHeight;
-
-            System.Diagnostics.Debug.WriteLine($"=== OCR Coordinate Debug ===");
-            System.Diagnostics.Debug.WriteLine($"Virtual screen: {virtualScreen}");
-            System.Diagnostics.Debug.WriteLine($"Window actual size: {windowActualWidth}x{windowActualHeight}");
-            System.Diagnostics.Debug.WriteLine($"Scale factors: X={scaleX:F3}, Y={scaleY:F3}");
-            System.Diagnostics.Debug.WriteLine($"Canvas selection (raw): {canvasLeft}, {canvasTop}, {canvasWidth}, {canvasHeight}");
-
-            int screenLeft = virtualScreen.X + (int)(canvasLeft * scaleX);
-            int screenTop = virtualScreen.Y + (int)(canvasTop * scaleY);
-            int screenWidth = (int)(canvasWidth * scaleX);
-            int screenHeight = (int)(canvasHeight * scaleY);
-
-            var screenRect = new System.Drawing.Rectangle(screenLeft, screenTop, screenWidth, screenHeight);
-            System.Diagnostics.Debug.WriteLine($"Screen capture rect (corrected): {screenRect}");
-
-            var regionBitmap = ImageHelper.GetRegionOfScreenAsBitmap(screenRect);
+            Rectangle screenRect = OcrImageSizing.SelectionToPixels(
+                new RectangleF((float)canvasLeft, (float)canvasTop, (float)canvasWidth, (float)canvasHeight),
+                new SizeF((float)RegionClickCanvas.ActualWidth, (float)RegionClickCanvas.ActualHeight),
+                _desktopScreenshot.Size);
+            if (screenRect.Width < 1 || screenRect.Height < 1) return;
+            using Bitmap cropped = _desktopScreenshot.Clone(screenRect, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var regionBitmap = ImageHelper.PadImage(cropped);
             System.Diagnostics.Debug.WriteLine($"Captured bitmap: {regionBitmap.Width}x{regionBitmap.Height}");
 
             IsOcrProcessing = true;
@@ -670,6 +658,8 @@ public sealed partial class OcrCaptureWindow : WindowEx
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Background OCR processing error: {ex.Message}");
+            App.MainWindow.DispatcherQueue.TryEnqueue(() => _notificationService?.ShowSystemNotification(
+                "Notification_OCR_Error_Title", "Notification_OcrLaunchFailed_Message", force: false, addTag: true));
         }
         finally
         {
@@ -705,7 +695,6 @@ public sealed partial class OcrCaptureWindow : WindowEx
                         Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
 
                         System.Diagnostics.Debug.WriteLine("✅ Text copied to clipboard successfully!");
-                        System.Diagnostics.Debug.WriteLine($"Copied text: '{ocrText.Trim()}'");
 
                         _notificationService?.ShowSystemNotification(
                             "Notification_OCR_Success_Title",

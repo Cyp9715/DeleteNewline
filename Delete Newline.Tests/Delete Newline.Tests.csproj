@@ -47,6 +47,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Delete Newline\Services\Mcp\McpHttpRequestReader.cs" Link="Linked\Services\Mcp\McpHttpRequestReader.cs" />
+    <Compile Include="..\Delete Newline\Services\PendingHotkeyCopy.cs" Link="Linked\Services\PendingHotkeyCopy.cs" />
+    <Compile Include="..\Delete Newline\Helpers\OcrImageSizing.cs" Link="Linked\Helpers\OcrImageSizing.cs" />
+    <Compile Include="..\Delete Newline\Services\FileService.cs" Link="Linked\Services\FileService.cs" />
+    <Compile Include="..\Delete Newline\Contracts\Services\IFileService.cs" Link="Linked\Contracts\Services\IFileService.cs" />
+    <Compile Include="..\Delete Newline\Services\SettingsFileService.cs" Link="Linked\Services\SettingsFileService.cs" />
+    <Compile Include="..\Delete Newline\Helpers\ContractResolver.cs" Link="Linked\Helpers\ContractResolver.cs" />
     <Using Include="Xunit" />
   </ItemGroup>
 

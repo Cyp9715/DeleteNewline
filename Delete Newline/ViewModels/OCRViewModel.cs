@@ -350,6 +350,7 @@ public partial class OCRViewModel : ObservableRecipient
     // Handle OCR Language changes
     partial void OnSelectedLanguageChanged(Language? value)
     {
+        LaunchOcrCommand.NotifyCanExecuteChanged();
         if (value != null)
         {
             if (!_suppressLanguageAutoSave)
@@ -379,19 +380,30 @@ public partial class OCRViewModel : ObservableRecipient
         OnPropertyChanged(nameof(CanDeleteManagedLanguage));
     }
 
-    [RelayCommand]
+    private bool CanLaunchOcr() => SelectedLanguage != null && Volatile.Read(ref _ocrSessionActive) == 0;
+
+    [RelayCommand(CanExecute = nameof(CanLaunchOcr))]
     public void LaunchOcr()
     {
+        if (SelectedLanguage == null || AvailableLanguages.Count == 0)
+        {
+            _inAppNotificationService.ShowInAppNotification(
+                titleKey: "Notification_OcrLanguageNotFound_Title",
+                messageKey: "Notification_OcrLanguageNotFound_Message", severity: InfoBarSeverity.Warning);
+            return;
+        }
         if (Interlocked.CompareExchange(ref _ocrSessionActive, 1, 0) == 1)
         {
             System.Diagnostics.Debug.WriteLine("OCR launch skipped: capture session already active.");
             return;
         }
+        LaunchOcrCommand.NotifyCanExecuteChanged();
 
+        System.Drawing.Bitmap? backgroundImage = null;
         try
         {
             // Pre-capture desktop screenshot for background. Keep the preview sharp; the capture UI adds only a dark filter.
-            var backgroundImage = ImageHelper.GetFullDesktopScreenshotAsImageSource();
+            backgroundImage = ImageHelper.GetFullDesktopScreenshot();
 
             // Create OCR window
             var ocrWindow = new OcrCaptureWindow();
@@ -401,6 +413,7 @@ public partial class OCRViewModel : ObservableRecipient
 
             // Setup fullscreen capture with preloaded background and selected language
             ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged);
+            backgroundImage = null; // The capture window owns and disposes the snapshot.
             ocrWindow.Activate();
         }
         catch (Exception ex)
@@ -430,6 +443,10 @@ public partial class OCRViewModel : ObservableRecipient
                 severity: InfoBarSeverity.Error
             );
         }
+        finally
+        {
+            backgroundImage?.Dispose();
+        }
     }
 
     private void OcrWindow_Closed(object sender, WindowEventArgs args)
@@ -450,6 +467,11 @@ public partial class OCRViewModel : ObservableRecipient
 
     private void OcrWindow_OcrProcessingCompleted(object? sender, EventArgs args)
     {
+        if (!App.MainWindow.DispatcherQueue.HasThreadAccess)
+        {
+            App.MainWindow.DispatcherQueue.TryEnqueue(() => OcrWindow_OcrProcessingCompleted(sender, args));
+            return;
+        }
         if (sender is OcrCaptureWindow completedWindow)
         {
             completedWindow.OcrProcessingCompleted -= OcrWindow_OcrProcessingCompleted;
@@ -463,6 +485,7 @@ public partial class OCRViewModel : ObservableRecipient
     {
         _activeOcrWindow = null;
         Interlocked.Exchange(ref _ocrSessionActive, 0);
+        LaunchOcrCommand.NotifyCanExecuteChanged();
     }
 
     private void OnCaptureLanguageChanged(Language language)

@@ -22,42 +22,24 @@ public class RegexService
             LocalizationHelper.GetLocalizedString("RegexService_InvalidRegex_Message"));
     }
 
-    public string ApplyRegexRules(string inputText, int hotkeyId)
+    public Task<string> ApplyRegexRulesAsync(string inputText, int hotkeyId)
     {
         Debug.WriteLine($"[RegexService] Attempting to apply rules for Hotkey ID: {hotkeyId}");
         RegexPageStructure? regexStructure = _regexCollectSaveService.GetRegexStructureByHotkeyId(hotkeyId);
         RegexChainStructure? regexChain = regexStructure?.RegexChain;
 
-        if (regexChain != null && regexChain.ChainItems != null && regexChain.ChainItems.Any())
+        if (regexChain?.ChainItems is { Count: > 0 })
         {
-            string processedText = inputText;
-            bool rulesApplied = false;
-
-            foreach (var chainItem in regexChain.ChainItems)
+            // Snapshot on the UI thread before processing so editing a profile cannot change an active operation.
+            ChainItem[] rules = regexChain.ChainItems.Select(item => new ChainItem
             {
-                processedText = ProcessRegex(processedText, chainItem.RegexExpression, chainItem.Replace);
-
-                if (processedText != inputText || (chainItem.RegexExpression != null && chainItem.RegexExpression != string.Empty) )
-                {
-                    if(!rulesApplied && chainItem.RegexExpression != null && chainItem.RegexExpression != string.Empty)
-                    {
-                        Debug.WriteLine($"[RegexService] Applying rule: '{chainItem.RegexExpression}' → '{chainItem.Replace ?? string.Empty}' for Hotkey ID: {hotkeyId}");
-                        rulesApplied = true;
-                    } else if (rulesApplied && chainItem.RegexExpression != null && chainItem.RegexExpression != string.Empty)
-                    {
-                         Debug.WriteLine($"[RegexService] Applying next rule: '{chainItem.RegexExpression}' → '{chainItem.Replace ?? string.Empty}' for Hotkey ID: {hotkeyId}");
-                    }
-                }
-            }
-
-            if (rulesApplied)
-            {
-                Debug.WriteLine($"[RegexService] Successfully applied rules for Hotkey ID: {hotkeyId}.");
-                return processedText;
-            }
+                RegexExpression = item.RegexExpression,
+                Replace = item.Replace
+            }).ToArray();
+            return Task.Run(() => RegexTextProcessor.Transform(inputText, rules));
         }
         
         Debug.WriteLine($"[RegexService] No valid rules found or applied for Hotkey ID: {hotkeyId}. Using original text.");
-        return inputText;
+        return Task.FromResult(inputText);
     }
 }

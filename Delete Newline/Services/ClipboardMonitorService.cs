@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Delete_Newline.Contracts.Structures;
 using Delete_Newline.Helpers;
 using Windows.ApplicationModel.DataTransfer;
@@ -75,6 +77,7 @@ public class ClipboardMonitorService
         {
             await _processingLock.WaitAsync();
             lockAcquired = true;
+            uint clipboardVersion = GetClipboardSequenceNumber();
             beforeText = await TryReadClipboardTextAsync();
             if (beforeText == null)
             {
@@ -83,9 +86,11 @@ public class ClipboardMonitorService
             }
 
             Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId}. Applying regex rules.");
-            string afterText = _regexService.ApplyRegexRules(beforeText, triggeredHotkeyId);
+            if (GetClipboardSequenceNumber() != clipboardVersion) return;
+            string afterText = await _regexService.ApplyRegexRulesAsync(beforeText, triggeredHotkeyId);
 
-            if (string.IsNullOrEmpty(afterText) == false)
+            // Do not overwrite a newer copy while a long-running rule was executing.
+            if (GetClipboardSequenceNumber() == clipboardVersion)
             {
                 if (beforeText != afterText)
                 {
@@ -99,10 +104,15 @@ public class ClipboardMonitorService
                 }
             }
         }
+        catch (Exception ex) when (ex is ArgumentException or RegexMatchTimeoutException or TimeoutException)
+        {
+            Debug.WriteLine($"[ClipboardMonitorService] Regex failed: {ex.Message}");
+            _notificationService.ShowSystemNotification(
+                "Notification_RegexFailed_Title", "Notification_RegexFailed_Message", force: false, addTag: true);
+        }
         catch (Exception ex)
         {
-            string snippet = beforeText == null ? string.Empty : beforeText.Substring(0, Math.Min(beforeText.Length, 50));
-            Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content. Raw text snippet was '{snippet}...': {ex.Message}");
+            Debug.WriteLine($"[ClipboardMonitorService] Error processing clipboard content: {ex.Message}");
         }
         finally
         {
@@ -112,6 +122,9 @@ public class ClipboardMonitorService
             }
         }
     }
+
+    [DllImport("user32.dll")]
+    private static extern uint GetClipboardSequenceNumber();
 
     private async Task<string?> TryReadClipboardTextAsync()
     {
@@ -151,7 +164,10 @@ public class ClipboardMonitorService
         
         try
         {
-            Clipboard.SetContent(dataPackage);
+            if (wasModified)
+            {
+                Clipboard.SetContent(dataPackage);
+            }
 
             if (_notificationService.GetEnableNotification())
             {
@@ -172,7 +188,7 @@ public class ClipboardMonitorService
         }
         catch (Exception exSetContent)
         {
-            Debug.WriteLine($"[ClipboardMonitorService] Error setting clipboard content: {exSetContent.Message}. Text was: {text.Substring(0, Math.Min(text.Length,50))}...");
+            Debug.WriteLine($"[ClipboardMonitorService] Error setting clipboard content: {exSetContent.Message}");
         }
     }
 

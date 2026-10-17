@@ -15,6 +15,8 @@ public partial class RegexViewModel : ObservableRecipient
     private readonly InAppNotificationService _inAppNotificationService;
     private readonly RegexCollectSaveService _regexCollectSaveService;
     private readonly INavigationService _navigationService;
+    private CancellationTokenSource? _previewCancellation;
+    private readonly HashSet<ChainItem> _subscribedItems = [];
 
     [ObservableProperty]
     private RegexPageStructure? _currentRegexConfig;
@@ -73,6 +75,11 @@ public partial class RegexViewModel : ObservableRecipient
                     item.PropertyChanged -= ChainItem_PropertyChanged;
                 }
             }
+            foreach (ChainItem item in _subscribedItems)
+            {
+                item.PropertyChanged -= ChainItem_PropertyChanged;
+            }
+            _subscribedItems.Clear();
         }
 
         if (newValue != null)
@@ -87,6 +94,7 @@ public partial class RegexViewModel : ObservableRecipient
                 foreach (var item in newValue.RegexChain.ChainItems)
                 {
                     item.PropertyChanged += ChainItem_PropertyChanged;
+                    _subscribedItems.Add(item);
                 }
                 newValue.RegexChain.ChainItems.CollectionChanged += RegexChain_CollectionChanged;
             }
@@ -105,18 +113,18 @@ public partial class RegexViewModel : ObservableRecipient
 
     private void RegexChain_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.OldItems != null)
+        // Clear() raises Reset without OldItems; reconcile subscriptions to avoid retaining deleted rules.
+        foreach (ChainItem item in _subscribedItems)
         {
-            foreach (ChainItem item in e.OldItems)
-            {
-                item.PropertyChanged -= ChainItem_PropertyChanged;
-            }
+            item.PropertyChanged -= ChainItem_PropertyChanged;
         }
-        if (e.NewItems != null)
+        _subscribedItems.Clear();
+        if (CurrentRegexConfig?.RegexChain != null)
         {
-            foreach (ChainItem item in e.NewItems)
+            foreach (ChainItem item in CurrentRegexConfig.RegexChain.ChainItems)
             {
                 item.PropertyChanged += ChainItem_PropertyChanged;
+                _subscribedItems.Add(item);
             }
         }
         UpdateRegexOutput();
@@ -149,19 +157,41 @@ public partial class RegexViewModel : ObservableRecipient
     // https://github.com/microsoft/microsoft-ui-xaml/issues/1826
     private void UpdateRegexOutput()
     {
+        _previewCancellation?.Cancel();
+        _previewCancellation?.Dispose();
+        _previewCancellation = null;
         if (CurrentRegexConfig == null || CurrentRegexConfig.RegexChain == null)
         {
             RegexOutputText = string.Empty;
             return;
         }
 
-        string currentText = CurrentRegexConfig.InputText ?? string.Empty;
-
-        foreach (var chainItem in CurrentRegexConfig.RegexChain.ChainItems)
+        string input = CurrentRegexConfig.InputText ?? string.Empty;
+        ChainItem[] rules = CurrentRegexConfig.RegexChain.ChainItems.Select(item => new ChainItem
         {
-            currentText = RegexService.ProcessRegex(currentText, chainItem.RegexExpression, chainItem.Replace);
+            RegexExpression = item.RegexExpression,
+            Replace = item.Replace
+        }).ToArray();
+        _previewCancellation = new CancellationTokenSource();
+        _ = UpdateRegexOutputAsync(input, rules, _previewCancellation.Token);
+    }
+
+    private async Task UpdateRegexOutputAsync(string input, ChainItem[] rules, CancellationToken cancellationToken)
+    {
+        string invalidMessage = LocalizationHelper.GetLocalizedString("RegexService_InvalidRegex_Message");
+        try
+        {
+            await Task.Delay(150, cancellationToken);
+            string result = await Task.Run(() => RegexTextProcessor.ApplyRegexChain(input, rules, invalidMessage, cancellationToken), cancellationToken);
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                RegexOutputText = result;
+            }
         }
-        RegexOutputText = currentText;
+        catch (OperationCanceledException)
+        {
+            // A newer edit owns the preview.
+        }
     }
 
     [RelayCommand]
