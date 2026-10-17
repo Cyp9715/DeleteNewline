@@ -52,7 +52,26 @@
                   CanReorderItems="{x:Bind ViewModel.CanReorderRegexConfigs, Mode=OneWay}"
                   CanDragItems="{x:Bind ViewModel.CanReorderRegexConfigs, Mode=OneWay}"
                   AllowDrop="True"
+                  ScrollViewer.HorizontalScrollMode="Disabled"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   KeyDown="RegexConfigGridView_KeyDown">
+
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal"
+                                   ItemWidth="320"
+                                   SizeChanged="RegexConfigItemsPanel_SizeChanged" />
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="2" />
+                </Style>
+            </GridView.ItemContainerStyle>
 
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="structures:RegexPageStructure">
@@ -60,8 +79,7 @@
                             BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1"
                             Margin="2"
                             Background="{ThemeResource AppCardBackgroundBrush}">
-                        <Grid Width="310"
-                              Height="90"
+                        <Grid Height="90"
                               Padding="12,8,12,8"
                               RightTapped="RegexConfigCard_RightTapped"
                               Background="{ThemeResource AppCardBackgroundBrush}">
@@ -85,6 +103,8 @@
 
                                     <TextBlock Grid.Column="0"
                                        Text="{Binding HotkeyName}"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTipService.ToolTip="{Binding HotkeyName}"
                                        FontWeight="SemiBold"
                                        FontSize="16"
                                        VerticalAlignment="Center" />
