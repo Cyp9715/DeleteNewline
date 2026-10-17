@@ -9,17 +9,16 @@
     <ScrollViewer HorizontalContentAlignment="Stretch"
                   HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
                   VerticalScrollBarVisibility="Auto">
-        <Grid Padding="12" HorizontalAlignment="Stretch">
-            <StackPanel MaxWidth="800" HorizontalAlignment="Stretch">
-                <StackPanel Spacing="4" Margin="0,8,0,15">
-                    <TextBlock x:Uid="OCRPage_Title_Capture" Style="{ThemeResource TitleTextBlockStyle}" />
-                    <TextBlock x:Uid="OCRPage_Description_Capture" TextWrapping="Wrap"
-                               Foreground="{ThemeResource AppSecondaryTextBrush}" />
-                </StackPanel>
+        <Grid Style="{StaticResource FormPageLayoutStyle}">
+            <StackPanel Style="{StaticResource FormPageContentStyle}">
+                <TextBlock x:Name="CapturePageTitle" x:Uid="OCRPage_Title_Capture"
+                           Style="{StaticResource FormSectionTitleStyle}" />
 
                 <!-- Primary capture action and the language used for this capture. -->
-                <Border x:Name="CaptureCard" Style="{StaticResource SettingsCardStyle}">
+                <Border x:Name="CaptureCard" Style="{StaticResource SettingsCardStyle}" Margin="0,5,0,5">
                     <StackPanel Spacing="15">
+                        <TextBlock x:Uid="OCRPage_Description_Capture"
+                                   Style="{StaticResource SettingsDescriptionStyle}" Margin="0" />
                         <Grid ColumnSpacing="20">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -27,16 +26,16 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock x:Uid="OCRPage_Title_SelectRegion"
-                                           FontWeight="SemiBold" TextWrapping="Wrap" />
+                                           TextWrapping="Wrap" />
                                 <TextBlock x:Uid="OCRPage_Description_SelectRegion" Style="{StaticResource SettingsDescriptionStyle}" />
                             </StackPanel>
                             <Button x:Name="CaptureTextButton" x:Uid="OCRPage_Button_Capture" Grid.Column="1"
-                                    MinWidth="152" Height="44" VerticalAlignment="Center"
+                                    MinWidth="152" Height="32" VerticalAlignment="Center"
                                     Style="{StaticResource AccentButtonStyle}"
                                     Command="{x:Bind ViewModel.LaunchOcrCommand}">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE7C5;" FontSize="18" IsHitTestVisible="False" />
-                                    <TextBlock x:Uid="OCRPage_Action_StartCapture" FontWeight="SemiBold" />
+                                    <FontIcon Glyph="&#xE7C5;" FontSize="16" IsHitTestVisible="False" />
+                                    <TextBlock x:Uid="OCRPage_Action_StartCapture" />
                                 </StackPanel>
                             </Button>
                         </Grid>
@@ -49,7 +48,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock x:Uid="OCRPage_Title_LanguageSettings" FontWeight="SemiBold" />
+                                <TextBlock x:Uid="OCRPage_Title_LanguageSettings" />
                                 <TextBlock x:Uid="OCRPage_Description_LanguageSettings" Style="{StaticResource SettingsDescriptionStyle}" />
                             </StackPanel>
                             <ComboBox x:Name="LanguageComboBox" x:Uid="OCRPage_Input_Language" Grid.Column="1"

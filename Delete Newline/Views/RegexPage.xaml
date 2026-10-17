@@ -15,14 +15,11 @@
 
     <ScrollViewer Margin="0" HorizontalContentAlignment="Stretch"
                   HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
-        <Grid Padding="20,0,20,0">
-            <StackPanel MaxWidth="900">
+        <Grid Style="{StaticResource FormPageLayoutStyle}">
+            <StackPanel Style="{StaticResource FormPageContentStyle}">
                 <!-- Hotkey Settings Label -->
                 <TextBlock x:Uid="RegexPage_Title_HotkeySettings"
-                           Style="{StaticResource SubtitleTextBlockStyle}"
-                           FontSize="16"
-                           HorizontalAlignment="Left"
-                           Margin="3,20,0,0"/>
+                           Style="{StaticResource FormSectionTitleStyle}"/>
                 <!-- Hotkey Name, Comment, Input -->
                 <Border Background="{ThemeResource AppCardBackgroundBrush}"
                         BorderBrush="{ThemeResource AppCardBorderBrush}"
@@ -87,10 +84,7 @@
 
                 <!-- Regex Chain Label -->
                 <TextBlock x:Uid="RegexPage_Title_RegexChain"
-                           Style="{StaticResource SubtitleTextBlockStyle}"
-                           FontSize="16"
-                           HorizontalAlignment="Left"
-                           Margin="3,20,0,0"/>
+                           Style="{StaticResource FormSectionTitleStyle}"/>
                 <!-- Additional Regex Items -->
                 <Border Background="{ThemeResource AppCardBackgroundBrush}"
                         BorderBrush="{ThemeResource AppCardBorderBrush}"
@@ -222,9 +216,7 @@
 
             <!-- Test Regex Chain Label -->
             <TextBlock x:Uid="RegexPage_Title_TestRegexChain"
-                       Style="{StaticResource SubtitleTextBlockStyle}"
-                       FontSize="16"
-                       HorizontalAlignment="Left"
+                       Style="{StaticResource FormSectionTitleStyle}"
                        Margin="3,20,0,2"/>
 
             <!-- Regex Example Group within a Border -->

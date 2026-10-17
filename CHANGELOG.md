@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Center the fixed-width regex profile grid so unused horizontal space is shared equally on both sides, while preserving card dimensions and text layout during resizing.
+- Align Text capture with the regex editor's page margins, content width, and compact section headings. Move the introduction into the capture card and use the standard control height for Start capture.
+- Share form layout and heading styles between capture and regex editing to keep their spacing and typography consistent.
+
 ## 3.2.0 — 2026-10-18
 
 This release keeps text cleanup as the main workflow and improves the reliability of regex processing, optional OCR, and local MCP access.
