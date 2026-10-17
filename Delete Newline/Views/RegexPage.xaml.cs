@@ -20,6 +20,11 @@ public sealed partial class RegexPage : Page
         DataContext = ViewModel;
     }
 
+    private void TestInput_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+    {
+        ViewModel?.UpdateTestInput(sender.Text);
+    }
+
     private void TextBox_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
         var pointer = e.GetCurrentPoint(this);

@@ -27,6 +27,8 @@
     <Compile Include="..\Delete Newline\Contracts\Structures\HotkeyStructure.cs" Link="Linked\Contracts\Structures\HotkeyStructure.cs" />
     <Compile Include="..\Delete Newline\Contracts\Structures\RegexChainStructure.cs" Link="Linked\Contracts\Structures\RegexChainStructure.cs" />
     <Compile Include="..\Delete Newline\Contracts\Structures\RegexPageStructure.cs" Link="Linked\Contracts\Structures\RegexPageStructure.cs" />
+    <Compile Include="..\Delete Newline\Contracts\Structures\TestInputLineEnding.cs" Link="Linked\Contracts\Structures\TestInputLineEnding.cs" />
+    <Compile Include="..\Delete Newline\Helpers\RegexTestInput.cs" Link="Linked\Helpers\RegexTestInput.cs" />
     <Compile Include="..\Delete Newline\Helpers\Hotkeys\HotkeyFomatter.cs" Link="Linked\Helpers\HotkeyFomatter.cs" />
     <Compile Include="..\Delete Newline\Helpers\OcrCaptureOverlayLayoutHelper.cs" Link="Linked\Helpers\OcrCaptureOverlayLayoutHelper.cs" />
     <Compile Include="..\Delete Newline\Helpers\OcrLanguageInstallHelper.cs" Link="Linked\Helpers\OcrLanguageInstallHelper.cs" />

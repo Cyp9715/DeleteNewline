@@ -17,6 +17,7 @@ public partial class RegexViewModel : ObservableRecipient
     private readonly INavigationService _navigationService;
     private CancellationTokenSource? _previewCancellation;
     private readonly HashSet<ChainItem> _subscribedItems = [];
+    private bool _synchronizingTestInput;
 
     [ObservableProperty]
     private RegexPageStructure? _currentRegexConfig;
@@ -26,6 +27,21 @@ public partial class RegexViewModel : ObservableRecipient
 
     [ObservableProperty]
     private string? _regexOutputText;
+
+    private int _testInputLineEndingIndex;
+
+    public int TestInputLineEndingIndex
+    {
+        get => _testInputLineEndingIndex;
+        set
+        {
+            if (!Enum.IsDefined((TestInputLineEnding)value)) return;
+            if (SetProperty(ref _testInputLineEndingIndex, value)) OnTestInputLineEndingIndexChanged(value);
+        }
+    }
+
+    // Keep TextBox's CR-only representation out of the saved sample and regex engine.
+    public string TestInputText => RegexTestInput.ToEditor(CurrentRegexConfig?.InputText ?? string.Empty);
 
     public RegexViewModel(
         InAppNotificationService inAppNotificationService,
@@ -99,16 +115,81 @@ public partial class RegexViewModel : ObservableRecipient
                 newValue.RegexChain.ChainItems.CollectionChanged += RegexChain_CollectionChanged;
             }
         }
+        SynchronizeTestInput();
         UpdateDisplayHotkey();
         UpdateRegexOutput();
     }
 
     private void CurrentRegexConfig_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (_synchronizingTestInput) return;
+
+        if (e.PropertyName == nameof(RegexPageStructure.TestInputLineEnding))
+        {
+            SynchronizeTestInput();
+        }
         if (e.PropertyName == nameof(RegexPageStructure.InputText))
         {
+            SynchronizeTestInput();
             UpdateRegexOutput();
         }
+    }
+
+    private void SynchronizeTestInput()
+    {
+        if (CurrentRegexConfig is not { } config)
+        {
+            OnPropertyChanged(nameof(TestInputText));
+            return;
+        }
+
+        _synchronizingTestInput = true;
+        try
+        {
+            string input = config.InputText ?? string.Empty;
+            bool legacy = config.TestInputLineEnding == null;
+            TestInputLineEnding lineEnding = config.TestInputLineEnding is { } saved && Enum.IsDefined(saved)
+                ? saved
+                : RegexTestInput.Detect(input, legacyTextBox: true);
+            TestInputLineEndingIndex = (int)lineEnding;
+            config.TestInputLineEnding = lineEnding;
+
+            // Repair CR-only samples saved by the old TextBox binding once. Explicit CR
+            // samples (including those supplied by MCP) retain their selected format.
+            if (legacy && input.Contains('\r') && !input.Contains('\n'))
+            {
+                config.InputText = RegexTestInput.Normalize(input, lineEnding);
+            }
+        }
+        finally
+        {
+            _synchronizingTestInput = false;
+        }
+        OnPropertyChanged(nameof(TestInputText));
+    }
+
+    public void UpdateTestInput(string editorText)
+    {
+        if (CurrentRegexConfig is not { } config || editorText == TestInputText) return;
+        config.InputText = RegexTestInput.Normalize(editorText, (TestInputLineEnding)TestInputLineEndingIndex);
+    }
+
+    private void OnTestInputLineEndingIndexChanged(int value)
+    {
+        if (_synchronizingTestInput || !Enum.IsDefined((TestInputLineEnding)value) || CurrentRegexConfig is not { } config) return;
+
+        _synchronizingTestInput = true;
+        try
+        {
+            config.TestInputLineEnding = (TestInputLineEnding)value;
+            config.InputText = RegexTestInput.Normalize(config.InputText ?? string.Empty, (TestInputLineEnding)value);
+        }
+        finally
+        {
+            _synchronizingTestInput = false;
+        }
+        OnPropertyChanged(nameof(TestInputText));
+        UpdateRegexOutput();
     }
 
     private void RegexChain_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -154,7 +235,6 @@ public partial class RegexViewModel : ObservableRecipient
         DisplayHotkey = HotkeyFormatter.GetDisplayText(CurrentRegexConfig.Hotkey.Modifiers, CurrentRegexConfig.Hotkey.Key);
     }
 
-    // https://github.com/microsoft/microsoft-ui-xaml/issues/1826
     private void UpdateRegexOutput()
     {
         _previewCancellation?.Cancel();

@@ -241,16 +241,22 @@
                                TextWrapping="Wrap"
                                Margin="5,0,0,10"/>
 
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    <TextBlock x:Uid="RegexPage_Description_LineEndings"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                FontSize="12"
                                TextWrapping="Wrap"
-                               Margin="5,0,0,10">
-                        <Run x:Uid="RegexPage_Text_linebreak_Prefix" />
-                        <Hyperlink NavigateUri="https://github.com/microsoft/microsoft-ui-xaml/issues/1826">
-                            <Run x:Uid="RegexPage_Hyperlink_linebreak" />
-                        </Hyperlink>
-                        <Run x:Uid="RegexPage_Text_linebreak_Suffix" />
-                    </TextBlock>
+                               Margin="5,0,0,10" />
+
+                    <ComboBox x:Name="TestInputLineEndingComboBox" x:Uid="RegexPage_Input_LineEnding"
+                              SelectedIndex="{Binding TestInputLineEndingIndex, Mode=TwoWay}"
+                              HorizontalAlignment="Left" MinWidth="220" Margin="0,0,0,10">
+                        <ComboBox.Header>
+                            <TextBlock x:Uid="RegexPage_Label_LineEnding" />
+                        </ComboBox.Header>
+                        <ComboBoxItem x:Uid="RegexPage_LineEnding_CrLf" />
+                        <ComboBoxItem x:Uid="RegexPage_LineEnding_Lf" />
+                        <ComboBoxItem x:Uid="RegexPage_LineEnding_Cr" />
+                    </ComboBox>
 
                         <Grid x:Name="Grid_RegexExample">
                     <Grid.RowDefinitions>
@@ -259,7 +265,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <!-- Input TextBox -->
-                    <TextBox x:Name="TextBox_regexInput"
+                    <TextBox x:Name="TextBox_regexInput" x:Uid="RegexPage_Input_TestText"
                              Grid.Row="0"
                              Margin="0,0,0,5"
                              Height="300"
@@ -267,7 +273,9 @@
                              TextWrapping="NoWrap"
                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
                              PointerWheelChanged="TextBox_PointerWheelChanged"
-                             Text="{Binding CurrentRegexConfig.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"
+                             TextChanging="TestInput_TextChanging"
+                             Text="{Binding TestInputText, Mode=OneWay}" />
 
                     <!-- Downward Arrow Icon -->
                     <FontIcon Grid.Row="1"

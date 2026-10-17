@@ -8,6 +8,7 @@ This release keeps text cleanup as the main workflow and improves the reliabilit
 
 - Bound regex execution with a 250 ms match timeout and a two-second chain budget. Invalid patterns, replacement escapes, and timeouts stop the chain without replacing copied text with an error message.
 - Run transformations and debounced editor previews off the UI thread. Ignore stale previews and preserve newer clipboard content that arrives during processing.
+- Fix the regex test editor's CR-only Enter behavior with explicit CRLF, LF, and CR input modes. Preserve the selected mode per profile, repair legacy CR-only samples when opened, and remove the obsolete workaround warning. Clipboard and MCP transformations continue to use their exact input.
 - Support transformations whose valid result is an empty string. Leave unchanged clipboard data alone, including its other formats.
 - Expire pending hotkey copy requests so failed copies do not transform unrelated clipboard changes later.
 - Serialize settings writes and replace files atomically. Coalesce rapid profile edits and flush them before exiting from the tray.

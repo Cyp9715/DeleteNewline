@@ -62,6 +62,8 @@ This handles Windows, Unix, and classic Mac line endings without removing litera
 
 Rules run in order with .NET multiline regex semantics. Replacements support capture groups such as `$1` and escapes such as `\n` and `\t`. Each regex has a 250 ms match timeout, and chains have a two-second processing budget. Invalid patterns, invalid replacement escapes, and timeouts stop the whole transformation and leave the copied text intact. A valid empty result clears the clipboard text. The editor updates its preview after a short typing delay.
 
+In **Test Regex Chain**, choose **Windows — CRLF**, **Unix — LF**, or **CR** to match the text you want to test. The editor converts typed line breaks to that format and remembers it per profile, so `\n` and `\r\n` can be tested directly. Legacy samples containing only the TextBox's CR line breaks are repaired to CRLF when opened. This conversion is limited to the test editor; hotkeys and MCP process the supplied text unchanged.
+
 ### 🔗 Strip tracking parameters from URLs
 Remove `utm_*`, `fbclid`, `gclid`, and other junk before sharing a link. This is a great example of **chained rules** - three small rules combine into a robust cleaner:
 

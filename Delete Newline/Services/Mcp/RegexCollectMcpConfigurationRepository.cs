@@ -89,6 +89,7 @@ public sealed class RegexCollectMcpConfigurationRepository : IMcpRegexConfigurat
 
             existing.HotkeyName = source.HotkeyName;
             existing.HotkeyComment = source.HotkeyComment;
+            existing.TestInputLineEnding = source.TestInputLineEnding;
             existing.InputText = source.InputText;
             existing.Hotkey.Modifiers = source.Hotkey.Modifiers;
             existing.Hotkey.Key = source.Hotkey.Key;

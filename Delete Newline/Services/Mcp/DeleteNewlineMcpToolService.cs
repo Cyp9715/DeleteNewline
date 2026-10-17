@@ -451,6 +451,9 @@ public sealed class DeleteNewlineMcpToolService
             HotkeyComment = comment,
             Hotkey = hotkey,
             InputText = inputText,
+            TestInputLineEnding = GetProperty(arguments, "inputText").HasValue || GetProperty(arguments, "input").HasValue
+                ? RegexTestInput.Detect(inputText)
+                : existing?.TestInputLineEnding,
             RegexChain = new RegexChainStructure()
         };
 
@@ -904,6 +907,7 @@ public sealed class DeleteNewlineMcpToolService
             HotkeyComment = source.HotkeyComment,
             Hotkey = CloneHotkey(source.Hotkey),
             InputText = source.InputText,
+            TestInputLineEnding = source.TestInputLineEnding,
             IsRegistrationFailed = source.IsRegistrationFailed,
             RegexChain = new RegexChainStructure
             {

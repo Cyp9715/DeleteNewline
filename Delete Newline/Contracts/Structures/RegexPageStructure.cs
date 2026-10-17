@@ -21,6 +21,9 @@ public partial class RegexPageStructure : ObservableObject
     public string _inputText = "";
 
     [ObservableProperty]
+    private TestInputLineEnding? _testInputLineEnding;
+
+    [ObservableProperty]
     private bool _isRegistrationFailed = false;
 
     public bool ShouldSerializeIsRegistrationFailed()
