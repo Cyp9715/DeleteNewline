@@ -28,18 +28,6 @@ public sealed partial class RegexCollectPage : Page
         SynchronizeRegexSearchOverlayWithViewModel();
     }
 
-    private void RegexConfigItemsPanel_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        if (sender is ItemsWrapGrid panel && e.NewSize.Width > 0)
-        {
-            // Size complete card slots, leaving one physical pixel per column for
-            // layout rounding so the second card still fits at fractional DPI scales.
-            double scale = panel.XamlRoot.RasterizationScale;
-            double halfWidthInPixels = Math.Floor(e.NewSize.Width * scale / 2) - 1;
-            panel.ItemWidth = Math.Min(320, Math.Max(1, halfWidthInPixels / scale));
-        }
-    }
-
     private void SearchKeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         if (ViewModel.IsSearchVisible)
