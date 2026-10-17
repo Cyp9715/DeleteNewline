@@ -6,171 +6,175 @@
       xmlns:behaviors="using:Delete_Newline.Behaviors"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="800" Margin="24,20,24,24" Spacing="12">
-            <StackPanel Spacing="4" Margin="0,0,0,4">
-                <TextBlock x:Uid="OCRPage_Title_Capture" Style="{ThemeResource TitleTextBlockStyle}" />
-                <TextBlock x:Uid="OCRPage_Description_Capture" TextWrapping="Wrap"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
-
-            <!-- Primary capture action and the language used for this capture. -->
-            <Border x:Name="CaptureCard" CornerRadius="8" Padding="20,16" BorderThickness="1"
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                <StackPanel Spacing="16">
-                    <Grid ColumnSpacing="20">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center" Spacing="4">
-                            <TextBlock x:Uid="OCRPage_Title_SelectRegion" FontSize="16"
-                                       FontWeight="SemiBold" TextWrapping="Wrap" />
-                            <TextBlock x:Uid="OCRPage_Description_SelectRegion" FontSize="12" TextWrapping="Wrap"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        </StackPanel>
-                        <Button x:Name="CaptureTextButton" x:Uid="OCRPage_Button_Capture" Grid.Column="1"
-                                MinWidth="152" Height="44" VerticalAlignment="Center"
-                                Style="{StaticResource AccentButtonStyle}"
-                                Command="{x:Bind ViewModel.LaunchOcrCommand}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE7C5;" FontSize="18" IsHitTestVisible="False" />
-                                <TextBlock x:Uid="OCRPage_Action_StartCapture" FontWeight="SemiBold" />
-                            </StackPanel>
-                        </Button>
-                    </Grid>
-                    <Rectangle Height="1" Fill="{ThemeResource CardStrokeColorDefaultBrush}" />
-
-                    <!-- OCR Language Settings -->
-                    <Grid ColumnSpacing="20">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center" Spacing="4">
-                            <TextBlock x:Uid="OCRPage_Title_LanguageSettings" FontWeight="SemiBold" />
-                            <TextBlock x:Uid="OCRPage_Description_LanguageSettings" FontSize="12" TextWrapping="Wrap"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        </StackPanel>
-                        <ComboBox x:Name="LanguageComboBox" x:Uid="OCRPage_Input_Language" Grid.Column="1"
-                                  Width="248" VerticalAlignment="Center"
-                                  ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
-                                  SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </Grid>
-                    <InfoBar x:Uid="OCRPage_NoLanguage" IsClosable="False" Severity="Informational"
-                             IsOpen="{x:Bind ViewModel.IsOcrLanguageMissing, Mode=OneWay}">
-                        <InfoBar.ActionButton>
-                            <Button x:Uid="OCRPage_Button_ManageLanguages" Click="ShowLanguageManagement_Click" />
-                        </InfoBar.ActionButton>
-                    </InfoBar>
+    <ScrollViewer HorizontalContentAlignment="Stretch"
+                  HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <Grid Padding="24,20,24,24" HorizontalAlignment="Stretch">
+            <StackPanel MaxWidth="800" HorizontalAlignment="Stretch" Spacing="12">
+                <StackPanel Spacing="4" Margin="0,0,0,4">
+                    <TextBlock x:Uid="OCRPage_Title_Capture" Style="{ThemeResource TitleTextBlockStyle}" />
+                    <TextBlock x:Uid="OCRPage_Description_Capture" TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 </StackPanel>
-            </Border>
 
-            <!-- OCR Hotkey Settings -->
-            <Border x:Name="HotkeyCard" CornerRadius="8" Padding="20,16" BorderThickness="1"
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                <Grid ColumnSpacing="16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <FontIcon Glyph="&#xE765;" FontSize="20" VerticalAlignment="Center"
-                              Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
-                        <TextBlock x:Uid="OCRPage_Title_HotkeySettings" FontWeight="SemiBold" />
-                        <TextBlock x:Uid="OCRPage_Description_HotkeySettings" FontSize="12" TextWrapping="Wrap"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <!-- Primary capture action and the language used for this capture. -->
+                <Border x:Name="CaptureCard" CornerRadius="8" Padding="20,16" BorderThickness="1"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                    <StackPanel Spacing="16">
+                        <Grid ColumnSpacing="20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Uid="OCRPage_Title_SelectRegion" FontSize="16"
+                                           FontWeight="SemiBold" TextWrapping="Wrap" />
+                                <TextBlock x:Uid="OCRPage_Description_SelectRegion" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <Button x:Name="CaptureTextButton" x:Uid="OCRPage_Button_Capture" Grid.Column="1"
+                                    MinWidth="152" Height="44" VerticalAlignment="Center"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Command="{x:Bind ViewModel.LaunchOcrCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE7C5;" FontSize="18" IsHitTestVisible="False" />
+                                    <TextBlock x:Uid="OCRPage_Action_StartCapture" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                        <Rectangle Height="1" Fill="{ThemeResource CardStrokeColorDefaultBrush}" />
+
+                        <!-- OCR Language Settings -->
+                        <Grid ColumnSpacing="20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Uid="OCRPage_Title_LanguageSettings" FontWeight="SemiBold" />
+                                <TextBlock x:Uid="OCRPage_Description_LanguageSettings" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ComboBox x:Name="LanguageComboBox" x:Uid="OCRPage_Input_Language" Grid.Column="1"
+                                      Width="248" VerticalAlignment="Center"
+                                      ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+                        <InfoBar x:Uid="OCRPage_NoLanguage" IsClosable="False" Severity="Informational"
+                                 IsOpen="{x:Bind ViewModel.IsOcrLanguageMissing, Mode=OneWay}">
+                            <InfoBar.ActionButton>
+                                <Button x:Uid="OCRPage_Button_ManageLanguages" Click="ShowLanguageManagement_Click" />
+                            </InfoBar.ActionButton>
+                        </InfoBar>
                     </StackPanel>
-                    <Grid Grid.Column="2" ColumnSpacing="8" VerticalAlignment="Center" Width="248">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBox x:Name="TextBox_OcrHotkey" x:Uid="OCRPage_Input_Hotkey"
-                                 Text="{Binding DisplayHotkey}" TextAlignment="Center"
-                                 HorizontalAlignment="Stretch" IsReadOnly="True">
-                            <interactivity:Interaction.Behaviors>
-                                <behaviors:KeyboardInputBehavior CommandName="ProcessKeyInputCommand" />
-                                <core:EventTriggerBehavior EventName="GotFocus">
-                                    <core:InvokeCommandAction Command="{x:Bind ViewModel.GotFocusHotkeyTextBoxCommand}" />
-                                </core:EventTriggerBehavior>
-                                <core:EventTriggerBehavior EventName="LostFocus">
-                                    <core:InvokeCommandAction Command="{x:Bind ViewModel.LostFocusHotkeyTextBoxCommand}" />
-                                </core:EventTriggerBehavior>
-                            </interactivity:Interaction.Behaviors>
-                        </TextBox>
-                        <Button x:Uid="OCRPage_Button_ClearHotkey" Grid.Column="1" Width="32" Height="32"
-                                Padding="0" VerticalAlignment="Center"
-                                Visibility="{x:Bind ViewModel.ClearHotkeyVisibility, Mode=OneWay}"
-                                Command="{x:Bind ViewModel.ClearOcrHotkeyCommand}">
-                            <FontIcon Glyph="&#xE711;" FontSize="12" />
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Border>
+                </Border>
 
-            <!-- OCR Language Management -->
-            <Expander x:Name="LanguageManagementExpander" IsExpanded="False"
-                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                <Expander.Header>
-                    <Grid ColumnSpacing="16" Margin="4,0">
+                <!-- OCR Hotkey Settings -->
+                <Border x:Name="HotkeyCard" CornerRadius="8" Padding="20,16" BorderThickness="1"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                    <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Glyph="&#xE8F2;" FontSize="20" VerticalAlignment="Center"
+                        <FontIcon Glyph="&#xE765;" FontSize="20" VerticalAlignment="Center"
                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
-                            <TextBlock x:Uid="OCRPage_Title_LanguageManagement" FontWeight="SemiBold" />
-                            <TextBlock x:Uid="OCRPage_Description_ManageLanguages" FontSize="12" TextWrapping="Wrap"
+                            <TextBlock x:Uid="OCRPage_Title_HotkeySettings" FontWeight="SemiBold" />
+                            <TextBlock x:Uid="OCRPage_Description_HotkeySettings" FontSize="12" TextWrapping="Wrap"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
+                        <Grid Grid.Column="2" ColumnSpacing="8" VerticalAlignment="Center" Width="248">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="TextBox_OcrHotkey" x:Uid="OCRPage_Input_Hotkey"
+                                     Text="{Binding DisplayHotkey}" TextAlignment="Center"
+                                     HorizontalAlignment="Stretch" IsReadOnly="True">
+                                <interactivity:Interaction.Behaviors>
+                                    <behaviors:KeyboardInputBehavior CommandName="ProcessKeyInputCommand" />
+                                    <core:EventTriggerBehavior EventName="GotFocus">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.GotFocusHotkeyTextBoxCommand}" />
+                                    </core:EventTriggerBehavior>
+                                    <core:EventTriggerBehavior EventName="LostFocus">
+                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.LostFocusHotkeyTextBoxCommand}" />
+                                    </core:EventTriggerBehavior>
+                                </interactivity:Interaction.Behaviors>
+                            </TextBox>
+                            <Button x:Uid="OCRPage_Button_ClearHotkey" Grid.Column="1" Width="32" Height="32"
+                                    Padding="0" VerticalAlignment="Center"
+                                    Visibility="{x:Bind ViewModel.ClearHotkeyVisibility, Mode=OneWay}"
+                                    Command="{x:Bind ViewModel.ClearOcrHotkeyCommand}">
+                                <FontIcon Glyph="&#xE711;" FontSize="12" />
+                            </Button>
+                        </Grid>
                     </Grid>
-                </Expander.Header>
-                <StackPanel Spacing="12" Margin="4,0">
-                    <TextBlock x:Uid="OCRPage_Description_LanguageManagement" FontSize="12" TextWrapping="Wrap"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <Grid x:Name="ManageLanguageRow" ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <ComboBox x:Name="ManageLanguageComboBox" x:Uid="OCRPage_Input_ManageLanguage"
-                                  HorizontalAlignment="Stretch"
-                                  ItemsSource="{x:Bind ViewModel.ManageableLanguages}"
-                                  SelectedItem="{x:Bind ViewModel.SelectedManageLanguage, Mode=TwoWay}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding DisplayText}" TextTrimming="CharacterEllipsis" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <Button x:Name="InstallManagedLanguageButton" x:Uid="OCRPage_Button_InstallLanguage"
-                                Grid.Column="1" Width="160" HorizontalAlignment="Right"
-                                Command="{x:Bind ViewModel.InstallManagedOcrLanguageCommand}"
-                                Visibility="{x:Bind ViewModel.InstallManagedLanguageButtonVisibility, Mode=OneWay}" />
-                        <Button x:Name="DeleteManagedLanguageButton" x:Uid="OCRPage_Button_DeleteLanguage"
-                                Grid.Column="1" Width="160" HorizontalAlignment="Right"
-                                Click="DeleteManagedLanguageButton_Click"
-                                IsEnabled="{x:Bind ViewModel.CanDeleteManagedLanguage, Mode=OneWay}"
-                                Visibility="{x:Bind ViewModel.DeleteManagedLanguageButtonVisibility, Mode=OneWay}" />
-                        <Button x:Name="CurrentManagedLanguageButton" x:Uid="OCRPage_Button_CurrentLanguage"
-                                Grid.Column="1" Width="160" HorizontalAlignment="Right" IsEnabled="False"
-                                Visibility="{x:Bind ViewModel.CurrentManagedLanguageButtonVisibility, Mode=OneWay}" />
-                    </Grid>
-                    <ProgressBar IsIndeterminate="{x:Bind ViewModel.IsManagingLanguage, Mode=OneWay}"
-                                 Visibility="{x:Bind ViewModel.LanguageManagementProgressVisibility, Mode=OneWay}" />
-                </StackPanel>
-            </Expander>
-        </StackPanel>
+                </Border>
+
+                <!-- OCR Language Management -->
+                <Expander x:Name="LanguageManagementExpander" IsExpanded="False"
+                          HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <Grid ColumnSpacing="16" Margin="4,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="&#xE8F2;" FontSize="20" VerticalAlignment="Center"
+                                      Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Uid="OCRPage_Title_LanguageManagement" FontWeight="SemiBold" />
+                                <TextBlock x:Uid="OCRPage_Description_ManageLanguages" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </Grid>
+                    </Expander.Header>
+                    <StackPanel Spacing="12" Margin="4,0">
+                        <TextBlock x:Uid="OCRPage_Description_LanguageManagement" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <Grid x:Name="ManageLanguageRow" ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox x:Name="ManageLanguageComboBox" x:Uid="OCRPage_Input_ManageLanguage"
+                                      HorizontalAlignment="Stretch"
+                                      ItemsSource="{x:Bind ViewModel.ManageableLanguages}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedManageLanguage, Mode=TwoWay}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayText}" TextTrimming="CharacterEllipsis" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <Button x:Name="InstallManagedLanguageButton" x:Uid="OCRPage_Button_InstallLanguage"
+                                    Grid.Column="1" Width="160" HorizontalAlignment="Right"
+                                    Command="{x:Bind ViewModel.InstallManagedOcrLanguageCommand}"
+                                    Visibility="{x:Bind ViewModel.InstallManagedLanguageButtonVisibility, Mode=OneWay}" />
+                            <Button x:Name="DeleteManagedLanguageButton" x:Uid="OCRPage_Button_DeleteLanguage"
+                                    Grid.Column="1" Width="160" HorizontalAlignment="Right"
+                                    Click="DeleteManagedLanguageButton_Click"
+                                    IsEnabled="{x:Bind ViewModel.CanDeleteManagedLanguage, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.DeleteManagedLanguageButtonVisibility, Mode=OneWay}" />
+                            <Button x:Name="CurrentManagedLanguageButton" x:Uid="OCRPage_Button_CurrentLanguage"
+                                    Grid.Column="1" Width="160" HorizontalAlignment="Right" IsEnabled="False"
+                                    Visibility="{x:Bind ViewModel.CurrentManagedLanguageButtonVisibility, Mode=OneWay}" />
+                        </Grid>
+                        <ProgressBar IsIndeterminate="{x:Bind ViewModel.IsManagingLanguage, Mode=OneWay}"
+                                     Visibility="{x:Bind ViewModel.LanguageManagementProgressVisibility, Mode=OneWay}" />
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </Grid>
     </ScrollViewer>
 </Page>

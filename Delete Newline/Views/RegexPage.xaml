@@ -13,7 +13,8 @@
       xmlns:core="using:Microsoft.Xaml.Interactions.Core"
       mc:Ignorable="d">
 
-    <ScrollViewer Margin="0">
+    <ScrollViewer Margin="0" HorizontalContentAlignment="Stretch"
+                  HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
         <Grid Padding="20,0,20,0">
             <StackPanel MaxWidth="900">
                 <!-- Hotkey Settings Label -->

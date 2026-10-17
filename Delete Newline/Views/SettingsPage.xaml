@@ -4,7 +4,8 @@
       xmlns:behaviors="using:Microsoft.Xaml.Interactivity"
       xmlns:core="using:Microsoft.Xaml.Interactions.Core">
 
-    <ScrollViewer>
+    <ScrollViewer HorizontalContentAlignment="Stretch"
+                  HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
         <Grid Padding="12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -333,7 +334,7 @@
                   Grid.Row="1"
                   MaxWidth="800"
                   Margin="0,20,0,0"
-                  HorizontalAlignment="Center">
+                  HorizontalAlignment="Stretch">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -343,7 +344,6 @@
                 <!-- button container -->
                 <StackPanel x:Name="ButtonContainer"
                             Grid.Column="0"
-                            Width="800"
                             Orientation="Horizontal"
                             Spacing="10"
                             HorizontalAlignment="Left"
