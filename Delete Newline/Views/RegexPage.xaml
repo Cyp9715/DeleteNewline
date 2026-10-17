@@ -234,23 +234,6 @@
                                TextWrapping="Wrap"
                                Margin="5,0,0,10"/>
 
-                    <TextBlock x:Uid="RegexPage_Description_LineEndings"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                               FontSize="12"
-                               TextWrapping="Wrap"
-                               Margin="5,0,0,10" />
-
-                    <ComboBox x:Name="TestInputLineEndingComboBox" x:Uid="RegexPage_Input_LineEnding"
-                              SelectedIndex="{Binding TestInputLineEndingIndex, Mode=TwoWay}"
-                              HorizontalAlignment="Left" MinWidth="220" Margin="0,0,0,10">
-                        <ComboBox.Header>
-                            <TextBlock x:Uid="RegexPage_Label_LineEnding" />
-                        </ComboBox.Header>
-                        <ComboBoxItem x:Uid="RegexPage_LineEnding_CrLf" />
-                        <ComboBoxItem x:Uid="RegexPage_LineEnding_Lf" />
-                        <ComboBoxItem x:Uid="RegexPage_LineEnding_Cr" />
-                    </ComboBox>
-
                         <Grid x:Name="Grid_RegexExample">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />

@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 3.2.1 — 2026-10-18
 
+- Restore the original input/output layout in Test Regex Chain. Remove the line-ending selector and its extra guidance while keeping automatic newline correction and existing sample formats.
 - Center the fixed-width regex profile grid so unused horizontal space is shared equally on both sides, while preserving card dimensions and text layout during resizing.
 - Align Text capture with the regex editor's page margins, content width, and compact section headings. Move the introduction into the capture card and use the standard control height for Start capture.
 - Share form layout and heading styles between capture and regex editing to keep their spacing and typography consistent.

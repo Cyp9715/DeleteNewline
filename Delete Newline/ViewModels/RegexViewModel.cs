@@ -28,18 +28,6 @@ public partial class RegexViewModel : ObservableRecipient
     [ObservableProperty]
     private string? _regexOutputText;
 
-    private int _testInputLineEndingIndex;
-
-    public int TestInputLineEndingIndex
-    {
-        get => _testInputLineEndingIndex;
-        set
-        {
-            if (!Enum.IsDefined((TestInputLineEnding)value)) return;
-            if (SetProperty(ref _testInputLineEndingIndex, value)) OnTestInputLineEndingIndexChanged(value);
-        }
-    }
-
     // Keep TextBox's CR-only representation out of the saved sample and regex engine.
     public string TestInputText => RegexTestInput.ToEditor(CurrentRegexConfig?.InputText ?? string.Empty);
 
@@ -151,7 +139,6 @@ public partial class RegexViewModel : ObservableRecipient
             TestInputLineEnding lineEnding = config.TestInputLineEnding is { } saved && Enum.IsDefined(saved)
                 ? saved
                 : RegexTestInput.Detect(input, legacyTextBox: true);
-            TestInputLineEndingIndex = (int)lineEnding;
             config.TestInputLineEnding = lineEnding;
 
             // Repair CR-only samples saved by the old TextBox binding once. Explicit CR
@@ -171,25 +158,7 @@ public partial class RegexViewModel : ObservableRecipient
     public void UpdateTestInput(string editorText)
     {
         if (CurrentRegexConfig is not { } config || editorText == TestInputText) return;
-        config.InputText = RegexTestInput.Normalize(editorText, (TestInputLineEnding)TestInputLineEndingIndex);
-    }
-
-    private void OnTestInputLineEndingIndexChanged(int value)
-    {
-        if (_synchronizingTestInput || !Enum.IsDefined((TestInputLineEnding)value) || CurrentRegexConfig is not { } config) return;
-
-        _synchronizingTestInput = true;
-        try
-        {
-            config.TestInputLineEnding = (TestInputLineEnding)value;
-            config.InputText = RegexTestInput.Normalize(config.InputText ?? string.Empty, (TestInputLineEnding)value);
-        }
-        finally
-        {
-            _synchronizingTestInput = false;
-        }
-        OnPropertyChanged(nameof(TestInputText));
-        UpdateRegexOutput();
+        config.InputText = RegexTestInput.Normalize(editorText, config.TestInputLineEnding ?? TestInputLineEnding.CrLf);
     }
 
     private void RegexChain_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

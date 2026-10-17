@@ -514,12 +514,6 @@
   <data name="RegexService_InvalidRegex_Message" xml:space="preserve">
     <value>유효하지 않은 정규표현식</value>
   </data>
-  <data name="RegexPage_Description_LineEndings.Text" xml:space="preserve"><value>선택한 줄바꿈으로 입력을 테스트합니다. 실제 단축키는 복사한 원문의 줄바꿈을 그대로 사용합니다.</value></data>
-  <data name="RegexPage_Label_LineEnding.Text" xml:space="preserve"><value>테스트 입력의 줄바꿈</value></data>
-  <data name="RegexPage_Input_LineEnding.AutomationProperties.Name" xml:space="preserve"><value>테스트 입력의 줄바꿈</value></data>
-  <data name="RegexPage_LineEnding_CrLf.Content" xml:space="preserve"><value>Windows — CRLF (\r\n)</value></data>
-  <data name="RegexPage_LineEnding_Lf.Content" xml:space="preserve"><value>Unix — LF (\n)</value></data>
-  <data name="RegexPage_LineEnding_Cr.Content" xml:space="preserve"><value>CR (\r)</value></data>
   <data name="RegexPage_Input_TestText.AutomationProperties.Name" xml:space="preserve"><value>정규식 테스트 입력</value></data>
   <data name="Notification_TextNotModified_Title" xml:space="preserve">
     <value>텍스트 변경되지 않음</value>
