@@ -57,13 +57,14 @@
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="structures:RegexPageStructure">
                     <Border CornerRadius="5"
+                            BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1"
                             Margin="2"
-                            Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
+                            Background="{ThemeResource AppCardBackgroundBrush}">
                         <Grid Width="310"
                               Height="90"
                               Padding="12,8,12,8"
                               RightTapped="RegexConfigCard_RightTapped"
-                              Background="{ThemeResource SystemControlForegroundChromeMediumBrush}">
+                              Background="{ThemeResource AppCardBackgroundBrush}">
 
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />

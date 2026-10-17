@@ -95,6 +95,8 @@ public partial class OCRViewModel : ObservableRecipient
 
     public bool IsOcrLanguageMissing => SelectedLanguage == null;
 
+    public Visibility MissingLanguageVisibility => IsOcrLanguageMissing ? Visibility.Visible : Visibility.Collapsed;
+
     public Visibility ClearHotkeyVisibility => _ocrHotkey.Key == VirtualKey.None ? Visibility.Collapsed : Visibility.Visible;
 
     public Visibility LanguageManagementProgressVisibility => IsManagingLanguage ? Visibility.Visible : Visibility.Collapsed;
@@ -362,6 +364,7 @@ public partial class OCRViewModel : ObservableRecipient
     {
         LaunchOcrCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(IsOcrLanguageMissing));
+        OnPropertyChanged(nameof(MissingLanguageVisibility));
         if (value != null)
         {
             if (!_suppressLanguageAutoSave)

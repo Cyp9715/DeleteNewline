@@ -15,11 +15,7 @@
             <StackPanel Grid.Row="0" MaxWidth="800">
 
                 <!-- Startup Task Setting -->
-                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="15">
+                <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -30,11 +26,7 @@
                             <TextBlock x:Uid="Settings_StartupTask"
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap" />
-                            <TextBlock x:Uid="Settings_StartupTask_Description"
-                                       Opacity="0.6"
-                                       FontSize="12"
-                                       TextWrapping="Wrap"
-                                       Margin="0,4,0,0" />
+                            <TextBlock x:Uid="Settings_StartupTask_Description" Style="{StaticResource SettingsDescriptionStyle}" />
                         </StackPanel>
 
                         <ToggleSwitch Grid.Column="1"
@@ -54,11 +46,7 @@
                 </Border>
 
                 <!-- StartOnTray Setting -->
-                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="15">
+                <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -69,11 +57,7 @@
                             <TextBlock x:Uid="Settings_StartOnTray"
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap" />
-                            <TextBlock x:Uid="Settings_StartOnTray_Description"
-                                       Opacity="0.6"
-                                       FontSize="12"
-                                       TextWrapping="Wrap"
-                                       Margin="0,4,0,0" />
+                            <TextBlock x:Uid="Settings_StartOnTray_Description" Style="{StaticResource SettingsDescriptionStyle}" />
                         </StackPanel>
 
                         <ToggleSwitch Grid.Column="1"
@@ -93,11 +77,7 @@
                 </Border>
 
                 <!-- Theme Setting -->
-                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="15">
+                <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -108,11 +88,7 @@
                             <TextBlock x:Uid="Settings_Theme"
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap" />
-                            <TextBlock x:Uid="Settings_Theme_Description"
-                                       Opacity="0.6"
-                                       FontSize="12"
-                                       TextWrapping="Wrap"
-                                       Margin="0,4,0,0" />
+                            <TextBlock x:Uid="Settings_Theme_Description" Style="{StaticResource SettingsDescriptionStyle}" />
                         </StackPanel>
 
                         <ComboBox Grid.Column="1"
@@ -136,11 +112,7 @@
                 </Border>
 
                 <!-- Language Setting -->
-                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="15">
+                <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -151,11 +123,7 @@
                             <TextBlock x:Uid="Settings_Language"
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap" />
-                            <TextBlock x:Uid="Settings_Language_Description"
-                                       Opacity="0.6"
-                                       FontSize="12"
-                                       TextWrapping="Wrap"
-                                       Margin="0,4,0,0" />
+                            <TextBlock x:Uid="Settings_Language_Description" Style="{StaticResource SettingsDescriptionStyle}" />
                         </StackPanel>
 
                         <ComboBox Grid.Column="1"
@@ -177,11 +145,7 @@
                 </Border>
 
                 <!-- Notification Setting -->
-                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="15">
+                <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -192,11 +156,7 @@
                             <TextBlock x:Uid="Settings_Notification"
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap" />
-                            <TextBlock x:Uid="Settings_Notification_Description"
-                                       Opacity="0.6"
-                                       FontSize="12"
-                                       TextWrapping="Wrap"
-                                       Margin="0,4,0,0" />
+                            <TextBlock x:Uid="Settings_Notification_Description" Style="{StaticResource SettingsDescriptionStyle}" />
                         </StackPanel>
 
                         <ToggleSwitch Grid.Column="1"
@@ -216,11 +176,7 @@
                 </Border>
 
                 <!-- TopMost Setting -->
-                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="15">
+                <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -231,11 +187,7 @@
                             <TextBlock x:Uid="Settings_TopMost"
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap" />
-                            <TextBlock x:Uid="Settings_TopMost_Description"
-                                       Opacity="0.6"
-                                       FontSize="12"
-                                       TextWrapping="Wrap"
-                                       Margin="0,4,0,0" />
+                            <TextBlock x:Uid="Settings_TopMost_Description" Style="{StaticResource SettingsDescriptionStyle}" />
                         </StackPanel>
 
                         <ToggleSwitch Grid.Column="1"
@@ -255,11 +207,7 @@
                 </Border>
 
                 <!-- MCP Server Setting -->
-                <Border Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Margin="0,0,0,5"
-                        Padding="15">
+                <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -270,11 +218,7 @@
                             <TextBlock x:Uid="Settings_McpServer"
                                        FontWeight="SemiBold"
                                        TextWrapping="Wrap" />
-                            <TextBlock x:Uid="Settings_McpServer_Description"
-                                       Opacity="0.6"
-                                       FontSize="12"
-                                       TextWrapping="Wrap"
-                                       Margin="0,4,0,0" />
+                            <TextBlock x:Uid="Settings_McpServer_Description" Style="{StaticResource SettingsDescriptionStyle}" />
                         </StackPanel>
 
                         <Grid Grid.Column="1"
@@ -350,11 +294,11 @@
                             VerticalAlignment="Center">
                     <Button x:Uid="Settings_ImportSettings"
                             Command="{x:Bind ViewModel.ImportSettingsCommand}"
-                            Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
+                            Background="{ThemeResource AppCardBackgroundBrush}"
                             Content="Import" />
                     <Button x:Uid="Settings_ExportSettings"
                             Command="{x:Bind ViewModel.ExportSettingsCommand}"
-                            Background="{ThemeResource SystemControlForegroundChromeMediumBrush}"
+                            Background="{ThemeResource AppCardBackgroundBrush}"
                             Content="Export" />
                 </StackPanel>
 

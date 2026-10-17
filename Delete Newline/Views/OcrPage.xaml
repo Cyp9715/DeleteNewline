@@ -9,29 +9,26 @@
     <ScrollViewer HorizontalContentAlignment="Stretch"
                   HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
                   VerticalScrollBarVisibility="Auto">
-        <Grid Padding="24,20,24,24" HorizontalAlignment="Stretch">
-            <StackPanel MaxWidth="800" HorizontalAlignment="Stretch" Spacing="12">
-                <StackPanel Spacing="4" Margin="0,0,0,4">
+        <Grid Padding="12" HorizontalAlignment="Stretch">
+            <StackPanel MaxWidth="800" HorizontalAlignment="Stretch">
+                <StackPanel Spacing="4" Margin="0,8,0,15">
                     <TextBlock x:Uid="OCRPage_Title_Capture" Style="{ThemeResource TitleTextBlockStyle}" />
                     <TextBlock x:Uid="OCRPage_Description_Capture" TextWrapping="Wrap"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                               Foreground="{ThemeResource AppSecondaryTextBrush}" />
                 </StackPanel>
 
                 <!-- Primary capture action and the language used for this capture. -->
-                <Border x:Name="CaptureCard" CornerRadius="8" Padding="20,16" BorderThickness="1"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                    <StackPanel Spacing="16">
+                <Border x:Name="CaptureCard" Style="{StaticResource SettingsCardStyle}">
+                    <StackPanel Spacing="15">
                         <Grid ColumnSpacing="20">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel VerticalAlignment="Center" Spacing="4">
-                                <TextBlock x:Uid="OCRPage_Title_SelectRegion" FontSize="16"
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock x:Uid="OCRPage_Title_SelectRegion"
                                            FontWeight="SemiBold" TextWrapping="Wrap" />
-                                <TextBlock x:Uid="OCRPage_Description_SelectRegion" FontSize="12" TextWrapping="Wrap"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock x:Uid="OCRPage_Description_SelectRegion" Style="{StaticResource SettingsDescriptionStyle}" />
                             </StackPanel>
                             <Button x:Name="CaptureTextButton" x:Uid="OCRPage_Button_Capture" Grid.Column="1"
                                     MinWidth="152" Height="44" VerticalAlignment="Center"
@@ -51,10 +48,9 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <StackPanel VerticalAlignment="Center">
                                 <TextBlock x:Uid="OCRPage_Title_LanguageSettings" FontWeight="SemiBold" />
-                                <TextBlock x:Uid="OCRPage_Description_LanguageSettings" FontSize="12" TextWrapping="Wrap"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock x:Uid="OCRPage_Description_LanguageSettings" Style="{StaticResource SettingsDescriptionStyle}" />
                             </StackPanel>
                             <ComboBox x:Name="LanguageComboBox" x:Uid="OCRPage_Input_Language" Grid.Column="1"
                                       Width="248" VerticalAlignment="Center"
@@ -68,6 +64,7 @@
                             </ComboBox>
                         </Grid>
                         <InfoBar x:Uid="OCRPage_NoLanguage" IsClosable="False" Severity="Informational"
+                                 Visibility="{x:Bind ViewModel.MissingLanguageVisibility, Mode=OneWay}"
                                  IsOpen="{x:Bind ViewModel.IsOcrLanguageMissing, Mode=OneWay}">
                             <InfoBar.ActionButton>
                                 <Button x:Uid="OCRPage_Button_ManageLanguages" Click="ShowLanguageManagement_Click" />
@@ -77,9 +74,7 @@
                 </Border>
 
                 <!-- OCR Hotkey Settings -->
-                <Border x:Name="HotkeyCard" CornerRadius="8" Padding="20,16" BorderThickness="1"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Border x:Name="HotkeyCard" Style="{StaticResource SettingsCardStyle}">
                     <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -87,11 +82,10 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <FontIcon Glyph="&#xE765;" FontSize="20" VerticalAlignment="Center"
-                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                  Foreground="{ThemeResource AppSecondaryTextBrush}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock x:Uid="OCRPage_Title_HotkeySettings" FontWeight="SemiBold" />
-                            <TextBlock x:Uid="OCRPage_Description_HotkeySettings" FontSize="12" TextWrapping="Wrap"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock x:Uid="OCRPage_Description_HotkeySettings" Style="{StaticResource SettingsDescriptionStyle}" />
                         </StackPanel>
                         <Grid Grid.Column="2" ColumnSpacing="8" VerticalAlignment="Center" Width="248">
                             <Grid.ColumnDefinitions>
@@ -123,25 +117,24 @@
 
                 <!-- OCR Language Management -->
                 <Expander x:Name="LanguageManagementExpander" IsExpanded="False"
-                          HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                          Style="{StaticResource SettingsExpanderStyle}">
                     <Expander.Header>
-                        <Grid ColumnSpacing="16" Margin="4,0">
+                        <Grid ColumnSpacing="16">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <FontIcon Glyph="&#xE8F2;" FontSize="20" VerticalAlignment="Center"
-                                      Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                      Foreground="{ThemeResource AppSecondaryTextBrush}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock x:Uid="OCRPage_Title_LanguageManagement" FontWeight="SemiBold" />
-                                <TextBlock x:Uid="OCRPage_Description_ManageLanguages" FontSize="12" TextWrapping="Wrap"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock x:Uid="OCRPage_Description_ManageLanguages" Style="{StaticResource SettingsDescriptionStyle}" />
                             </StackPanel>
                         </Grid>
                     </Expander.Header>
-                    <StackPanel Spacing="12" Margin="4,0">
+                    <StackPanel Spacing="12">
                         <TextBlock x:Uid="OCRPage_Description_LanguageManagement" FontSize="12" TextWrapping="Wrap"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                   Foreground="{ThemeResource AppSecondaryTextBrush}" />
                         <Grid x:Name="ManageLanguageRow" ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />

@@ -13,6 +13,7 @@ This release keeps text cleanup as the main workflow and improves the reliabilit
 - Expire pending hotkey copy requests so failed copies do not transform unrelated clipboard changes later.
 - Serialize settings writes and replace files atomically. Coalesce rapid profile edits and flush them before exiting from the tray.
 - Keep page content centered when resizing the window. Restore the OCR page's viewport-sized Grid around its width-limited content, explicitly stretch vertical scroll content, and remove the settings footer's unnecessary fixed width.
+- Align OCR cards and the language manager with Settings: shared 15-pixel padding, five-pixel gaps, four-pixel corners, and matching dark surfaces. Hide closed language guidance from layout. Refresh light-theme page, card, input, and replacement-text colors throughout the app.
 
 ### OCR
 
