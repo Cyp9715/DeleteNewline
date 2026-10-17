@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -319,10 +319,10 @@
     <comment>Notification message when an error occurs managing startup task</comment>
   </data>
   <data name="OCRPage_Title_HotkeySettings.Text" xml:space="preserve">
-    <value>Hotkey Settings</value>
+    <value>Capture shortcut</value>
   </data>
   <data name="OCRPage_Description_HotkeySettings.Text" xml:space="preserve">
-    <value>Set a global hotkey to instantly extract text from images.</value>
+    <value>Start a capture without opening the app.</value>
     <comment>OCR page hotkey settings description</comment>
   </data>
   <data name="OCRPage_Label_Hotkey.Text" xml:space="preserve">
@@ -334,11 +334,11 @@
     <comment>Shared hotkey textbox placeholder</comment>
   </data>
   <data name="OCRPage_Title_LanguageSettings.Text" xml:space="preserve">
-    <value>Language Settings</value>
+    <value>Recognition language</value>
     <comment>OCR page language settings section title</comment>
   </data>
   <data name="OCRPage_Description_LanguageSettings.Text" xml:space="preserve">
-    <value>Choose the language for text recognition.</value>
+    <value>Choose the language of the text on screen.</value>
     <comment>OCR page language settings description</comment>
   </data>
   <data name="OCRPage_Title_LanguageManagement.Text" xml:space="preserve">
@@ -536,9 +536,23 @@
   </data>
   <data name="Notification_RegexFailed_Title" xml:space="preserve"><value>Text transformation failed</value></data>
   <data name="Notification_RegexFailed_Message" xml:space="preserve"><value>A rule is invalid or took too long. Your copied text has been kept unchanged.</value></data>
-  <data name="OCRPage_Description_Capture.Text" xml:space="preserve"><value>Capture text that cannot be selected. Drag over an area of your screen, then paste the recognized text. Press Esc to cancel.</value></data>
-  <data name="OCRPage_Button_Capture.Content" xml:space="preserve"><value>Capture text</value></data>
+  <data name="OCRPage_Description_Capture.Text" xml:space="preserve"><value>Turn text on your screen into text you can paste.</value></data>
   <data name="OCRPage_Button_Capture.AutomationProperties.Name" xml:space="preserve"><value>Capture text from the screen</value></data>
   <data name="Notification_SettingsSaveFailed_Title" xml:space="preserve"><value>Settings could not be saved</value></data>
   <data name="Notification_SettingsSaveFailed_Message" xml:space="preserve"><value>Your changes could not be saved. Check available disk space and try exiting again.</value></data>
+  <data name="OCRPage_Title_Capture.Text" xml:space="preserve"><value>Text capture</value></data>
+  <data name="OCRPage_Title_SelectRegion.Text" xml:space="preserve"><value>Capture a screen region</value></data>
+  <data name="OCRPage_Description_SelectRegion.Text" xml:space="preserve"><value>Drag to select an area. Press Esc to cancel.</value></data>
+  <data name="OCRPage_Action_StartCapture.Text" xml:space="preserve"><value>Start capture</value></data>
+  <data name="OCRPage_Description_ManageLanguages.Text" xml:space="preserve"><value>Add or remove Windows OCR languages.</value></data>
+  <data name="OCRPage_Input_Language.AutomationProperties.Name" xml:space="preserve"><value>Recognition language</value></data>
+  <data name="OCRPage_Input_Hotkey.PlaceholderText" xml:space="preserve"><value>Click to set a shortcut</value></data>
+  <data name="OCRPage_Input_Hotkey.AutomationProperties.Name" xml:space="preserve"><value>Capture shortcut</value></data>
+  <data name="OCRPage_Input_Hotkey.ToolTipService.ToolTip" xml:space="preserve"><value>Click here, then press a shortcut such as Ctrl+Shift+O.</value></data>
+  <data name="OCRPage_Button_ClearHotkey.AutomationProperties.Name" xml:space="preserve"><value>Clear capture shortcut</value></data>
+  <data name="OCRPage_Button_ClearHotkey.ToolTipService.ToolTip" xml:space="preserve"><value>Clear shortcut</value></data>
+  <data name="OCRPage_Input_ManageLanguage.AutomationProperties.Name" xml:space="preserve"><value>Manage OCR languages</value></data>
+  <data name="OCRPage_NoLanguage.Title" xml:space="preserve"><value>No recognition language installed</value></data>
+  <data name="OCRPage_NoLanguage.Message" xml:space="preserve"><value>Add a Windows OCR language before starting a capture.</value></data>
+  <data name="OCRPage_Button_ManageLanguages.Content" xml:space="preserve"><value>Manage languages</value></data>
 </root>

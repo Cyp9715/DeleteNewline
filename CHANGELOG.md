@@ -14,7 +14,8 @@ This release keeps text cleanup as the main workflow and improves the reliabilit
 
 ### OCR
 
-- Keep OCR as an optional local capture tool. Add a direct Capture text button and collapse Windows language management by default.
+- Keep OCR as an optional local capture tool. Give Start capture a prominent action button and group it with the recognition language. Keep shortcut settings compact and Windows language management collapsed by default.
+- Add a shortcut clear button, accessible control names, a missing-language explanation, and progress feedback for language management.
 - Recognize the selected area from the frozen screenshot, avoiding capture controls and changes to the live desktop.
 - Fit large captures within Windows OCR limits before recognition, avoid unnecessary second passes, and preserve Windows' language-aware spacing.
 - Keep screenshot ownership explicit and release it when capture ends. Ignore empty drag selections and use the final pointer position.

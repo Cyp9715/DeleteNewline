@@ -130,7 +130,7 @@ You normally don't need to check the MCP tools at all. But if you're a developer
 
 ## Optional OCR
 
-Use **OCR → Capture text** or assign an OCR hotkey. Drag a rectangle over the text, then paste the result. Press **Esc** to cancel. The language selector is also available in the capture overlay.
+Use **OCR → Start capture** or assign an OCR hotkey. Choose the recognition language in the capture card, drag a rectangle over the text, then paste the result. Press **Esc** to cancel. The language selector is also available in the capture overlay. To remove an OCR shortcut, use the clear button beside its field.
 
 OCR uses the same frozen screenshot you see while selecting. Recognition runs locally with the selected Windows language; images and recognized text are not uploaded. Large captures are resized to the Windows OCR engine's image limit, and Windows supplies language-specific word spacing. The OCR result is copied as recognized; use a cleanup profile afterward if needed.
 

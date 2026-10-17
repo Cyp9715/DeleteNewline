@@ -17,6 +17,13 @@ public sealed partial class OCRPage : Page
         DataContext = ViewModel;
     }
 
+    private void ShowLanguageManagement_Click(object sender, RoutedEventArgs e)
+    {
+        LanguageManagementExpander.IsExpanded = true;
+        LanguageManagementExpander.StartBringIntoView();
+        ManageLanguageComboBox.Focus(FocusState.Programmatic);
+    }
+
     private async void DeleteManagedLanguageButton_Click(object sender, RoutedEventArgs e)
     {
         if (ViewModel.SelectedManageLanguage is not { IsInstalled: true, IsCurrent: false } selectedLanguage)

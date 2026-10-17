@@ -1347,7 +1347,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
 
         string languageSettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Settings -->", "</Border>");
-        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Border>");
+        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Expander>");
 
         Assert.Contains("x:Uid=\"OCRPage_Description_LanguageSettings\"", languageSettingsBlock);
         Assert.DoesNotContain("OCRPage_Text_AutoInstallLanguageHelp", languageSettingsBlock);
@@ -1434,15 +1434,22 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void OcrPage_GroupsHotkeyLanguageAndLanguageManagementIntoSeparateCards()
+    public void OcrPage_GroupsCaptureWithLanguageAndKeepsManagementSeparate()
     {
         string ocrPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OCRPage.xaml"));
         XDocument englishResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "en-US", "Resources.resw"));
         XDocument koreanResources = XDocument.Load(LocateSourceFile("Delete Newline", "Strings", "ko-KR", "Resources.resw"));
 
+        XNamespace xamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml";
+        XDocument page = XDocument.Parse(ocrPageXaml);
+        XElement captureCard = page.Descendants().Single(element => (string?)element.Attribute(xamlNamespace + "Name") == "CaptureCard");
+        Assert.Contains(captureCard.Descendants(), element => (string?)element.Attribute(xamlNamespace + "Name") == "CaptureTextButton");
+        Assert.Contains(captureCard.Descendants(), element => (string?)element.Attribute(xamlNamespace + "Name") == "LanguageComboBox");
+        Assert.DoesNotContain(captureCard.Descendants(), element => (string?)element.Attribute(xamlNamespace + "Name") == "TextBox_OcrHotkey");
+
         string hotkeySettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Hotkey Settings -->", "</Border>");
         string languageSettingsBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Settings -->", "<!-- OCR Language Management -->");
-        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Border>");
+        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Expander>");
 
         Assert.Contains("x:Uid=\"OCRPage_Title_HotkeySettings\"", hotkeySettingsBlock);
         Assert.Contains("x:Uid=\"OCRPage_Title_LanguageSettings\"", languageSettingsBlock);
@@ -1466,7 +1473,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
     public void OcrPage_UsesEqualLanguageManagementActionButtonWidths()
     {
         string ocrPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "OCRPage.xaml"));
-        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Border>");
+        string languageManagementBlock = ExtractElementBlock(ocrPageXaml, "<!-- OCR Language Management -->", "</Expander>");
 
         string installButton = ExtractElementBlock(languageManagementBlock, "<Button x:Name=\"InstallManagedLanguageButton\"", "/>" );
         string deleteButton = ExtractElementBlock(languageManagementBlock, "<Button x:Name=\"DeleteManagedLanguageButton\"", "/>" );

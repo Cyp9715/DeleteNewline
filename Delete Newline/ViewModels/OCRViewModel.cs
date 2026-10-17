@@ -93,6 +93,12 @@ public partial class OCRViewModel : ObservableRecipient
 
     public bool CanDeleteManagedLanguage => SelectedManageLanguage is { IsInstalled: true, IsCurrent: false } && !IsManagingLanguage;
 
+    public bool IsOcrLanguageMissing => SelectedLanguage == null;
+
+    public Visibility ClearHotkeyVisibility => _ocrHotkey.Key == VirtualKey.None ? Visibility.Collapsed : Visibility.Visible;
+
+    public Visibility LanguageManagementProgressVisibility => IsManagingLanguage ? Visibility.Visible : Visibility.Collapsed;
+
     public HotkeyStructure CurrentHotkey => new()
     {
         Modifiers = _ocrHotkey.Modifiers,
@@ -316,7 +322,11 @@ public partial class OCRViewModel : ObservableRecipient
     private void UpdateDisplayHotkey()
     {
         DisplayHotkey = HotkeyFormatter.GetDisplayText(_ocrHotkey.Modifiers, _ocrHotkey.Key);
+        OnPropertyChanged(nameof(ClearHotkeyVisibility));
     }
+
+    [RelayCommand]
+    private Task ClearOcrHotkeyAsync() => SetOcrHotkeyAsync(new HotkeyStructure());
 
     private async Task SaveOcrHotkeyAsync()
     {
@@ -351,6 +361,7 @@ public partial class OCRViewModel : ObservableRecipient
     partial void OnSelectedLanguageChanged(Language? value)
     {
         LaunchOcrCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(IsOcrLanguageMissing));
         if (value != null)
         {
             if (!_suppressLanguageAutoSave)
@@ -369,6 +380,7 @@ public partial class OCRViewModel : ObservableRecipient
 
     partial void OnIsManagingLanguageChanged(bool value)
     {
+        OnPropertyChanged(nameof(LanguageManagementProgressVisibility));
         NotifyManagedLanguageActionStateChanged();
     }
 
