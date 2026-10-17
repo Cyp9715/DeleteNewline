@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — planned 3.2.0
+## 3.2.0 — 2026-10-18
 
 This release keeps text cleanup as the main workflow and improves the reliability of regex processing, optional OCR, and local MCP access.
 
@@ -36,4 +36,4 @@ This release keeps text cleanup as the main workflow and improves the reliabilit
 ### Maintenance
 
 - Correct the README's newline pattern, document optional OCR and MCP setup, and add Windows test/build CI for x64 and ARM64.
-- Preserve the existing package identity for updates. Release publication and Microsoft Store submission are pending.
+- Preserve the existing package identity for updates. Microsoft Store submission remains a separate distribution step.
