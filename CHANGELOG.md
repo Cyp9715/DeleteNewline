@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.3 — 2026-10-18
+
+- Add a localized Remove line breaks starter profile on first use, assigned to Alt+F1. Its `[\r\n]+` pattern replaces CRLF, LF, CR, and consecutive line breaks with a single space.
+- Create the starter only when no profile collection has been saved. Preserve existing profiles and explicitly empty collections, so deleting the starter remains effective after restarting.
+- Persist the starter before registering its shortcut and complete initialization before showing the app. Keep existing shortcut conflict handling when Alt+F1 is already in use.
+- Document the starter workflow and cover first use, saved edits, deletion, restart, and mixed line endings with regression tests.
+
 ## 3.2.2 — 2026-10-18
 
 - Restore global regex and OCR shortcuts when switching to another application while the shortcut recorder retains focus. Suspend shortcuts only while recording in the active app window, and restore them when the recorder unloads.

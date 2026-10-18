@@ -544,4 +544,6 @@
   <data name="OCRPage_NoLanguage.Title" xml:space="preserve"><value>No recognition language installed</value></data>
   <data name="OCRPage_NoLanguage.Message" xml:space="preserve"><value>Add a Windows OCR language before starting a capture.</value></data>
   <data name="OCRPage_Button_ManageLanguages.Content" xml:space="preserve"><value>Manage languages</value></data>
+  <data name="RegexDefaultProfile_Name" xml:space="preserve"><value>Remove line breaks</value></data>
+  <data name="RegexDefaultProfile_Comment" xml:space="preserve"><value>Replace line breaks with a single space.</value></data>
 </root>

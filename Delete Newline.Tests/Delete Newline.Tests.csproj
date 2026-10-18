@@ -52,6 +52,7 @@
     <Compile Include="..\Delete Newline\Services\Mcp\McpHttpRequestReader.cs" Link="Linked\Services\Mcp\McpHttpRequestReader.cs" />
     <Compile Include="..\Delete Newline\Services\PendingHotkeyCopy.cs" Link="Linked\Services\PendingHotkeyCopy.cs" />
     <Compile Include="..\Delete Newline\Services\ClipboardTextSnapshot.cs" Link="Linked\Services\ClipboardTextSnapshot.cs" />
+    <Compile Include="..\Delete Newline\Services\DefaultRegexProfile.cs" Link="Linked\Services\DefaultRegexProfile.cs" />
     <Compile Include="..\Delete Newline\Helpers\Hotkeys\HotkeyRegistrationManager.cs" Link="Linked\Helpers\Hotkeys\HotkeyRegistrationManager.cs" />
     <Compile Include="..\Delete Newline\Helpers\OcrImageSizing.cs" Link="Linked\Helpers\OcrImageSizing.cs" />
     <Compile Include="..\Delete Newline\Services\FileService.cs" Link="Linked\Services\FileService.cs" />

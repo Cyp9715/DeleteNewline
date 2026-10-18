@@ -17,7 +17,7 @@ public sealed class RegexCollectSaveService
     private readonly SettingsFileService _localSettingsService;
     private readonly InAppNotificationService _inAppNotificationService;
 
-    private const string RegexCollectionSettingsKey = "RegexCollection";
+    private const string RegexCollectionSettingsKey = DefaultRegexProfile.CollectionSettingsKey;
     private readonly SemaphoreSlim _saveLock = new SemaphoreSlim(1);
     private bool _suppressAutoSave;
     private CancellationTokenSource? _pendingSave;
@@ -31,8 +31,11 @@ public sealed class RegexCollectSaveService
         RegexConfigs = new ObservableCollection<RegexPageStructure>();
     }
 
-    public void Initialize()
+    public async Task InitializeAsync()
     {
+        await DefaultRegexProfile.EnsureCreatedAsync(_localSettingsService,
+            LocalizationHelper.GetLocalizedString("RegexDefaultProfile_Name"),
+            LocalizationHelper.GetLocalizedString("RegexDefaultProfile_Comment"));
         var savedRegexConfigs = _localSettingsService.ReadSetting<List<RegexPageStructure>>(RegexCollectionSettingsKey);
 
         if (savedRegexConfigs != null && savedRegexConfigs.Count > 0) // Ensure there are configs to process

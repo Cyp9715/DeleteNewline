@@ -32,6 +32,8 @@ No more *copy → open editor → paste → find/replace → copy → paste back
 
 Tell Delete Newline what you want to do. This setup is required only once per workflow.
 
+On first use, **Remove line breaks** is ready to use with **Alt+F1**. Its `[\r\n]+` rule replaces CRLF, LF, CR, and consecutive line breaks with a single space. You can edit or delete this starter profile; deleted profiles stay deleted after restarting. Existing saved profiles are kept as they are.
+
 1. **Create a rule chain** - add one or more regex rules that define your transformation
 2. **Assign a hotkey** - bind a unique keyboard shortcut to that rule chain
 

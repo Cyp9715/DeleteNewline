@@ -108,7 +108,7 @@ public sealed class ActivationService : IActivationService
         _localizationService.Initialize();
         _themeSelectorService.Initialize();
         _topMostService.Initialize();
-        _regexCollectSaveService.Initialize();
+        await _regexCollectSaveService.InitializeAsync();
         _ocrViewModel.Initialize();
         await _mcpAccessService.InitializeAsync();
     }

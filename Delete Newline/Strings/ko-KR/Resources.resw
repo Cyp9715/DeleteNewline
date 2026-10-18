@@ -545,4 +545,6 @@
   <data name="OCRPage_NoLanguage.Title" xml:space="preserve"><value>인식 언어가 설치되어 있지 않습니다</value></data>
   <data name="OCRPage_NoLanguage.Message" xml:space="preserve"><value>Windows OCR 언어를 추가한 뒤 캡처를 시작하세요.</value></data>
   <data name="OCRPage_Button_ManageLanguages.Content" xml:space="preserve"><value>언어 관리 열기</value></data>
+  <data name="RegexDefaultProfile_Name" xml:space="preserve"><value>줄바꿈 정리</value></data>
+  <data name="RegexDefaultProfile_Comment" xml:space="preserve"><value>줄바꿈을 공백 한 칸으로 바꿉니다.</value></data>
 </root>
