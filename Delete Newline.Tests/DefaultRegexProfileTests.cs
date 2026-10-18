@@ -16,17 +16,19 @@ public sealed class DefaultRegexProfileTests : IDisposable
         return settings;
     }
 
-    [Fact]
-    public async Task FirstUsePersistsOneLocalizedStarterWithAltF1()
+    [Theory]
+    [InlineData("Remove line breaks", "Replace line breaks with a single space.")]
+    [InlineData("줄바꿈 정리", "줄바꿈을 공백 한 칸으로 바꿉니다.")]
+    public async Task FirstUsePersistsOneLocalizedStarterWithAltF1(string name, string description)
     {
         var settings = await OpenSettingsAsync();
-        await DefaultRegexProfile.EnsureCreatedAsync(settings, "줄바꿈 정리", "줄바꿈을 공백 한 칸으로 바꿉니다.");
+        await DefaultRegexProfile.EnsureCreatedAsync(settings, name, description);
 
         var reopened = await OpenSettingsAsync();
         await DefaultRegexProfile.EnsureCreatedAsync(reopened, "different name", "different description");
         var profile = Assert.Single(reopened.ReadSetting<List<RegexPageStructure>>(DefaultRegexProfile.CollectionSettingsKey)!);
-        Assert.Equal("줄바꿈 정리", profile.HotkeyName);
-        Assert.Equal("줄바꿈을 공백 한 칸으로 바꿉니다.", profile.HotkeyComment);
+        Assert.Equal(name, profile.HotkeyName);
+        Assert.Equal(description, profile.HotkeyComment);
         Assert.Equal(VirtualKeyModifiers.Menu, profile.Hotkey.Modifiers);
         Assert.Equal(VirtualKey.F1, profile.Hotkey.Key);
         var rule = Assert.Single(profile.RegexChain.ChainItems);

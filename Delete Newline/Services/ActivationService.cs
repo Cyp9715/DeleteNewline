@@ -60,9 +60,9 @@ public sealed class ActivationService : IActivationService
     {
         try
         {            
+            await InitializeEssentialServicesAsync();
             InitializeUI();
             await HandleActivationAsync(activationArgs);
-            await InitializeEssentialServicesAsync();
             InitializeWindowDependentServices();
             await InitializeRemainingServicesAsync();
 
@@ -92,6 +92,7 @@ public sealed class ActivationService : IActivationService
     private async Task InitializeEssentialServicesAsync()
     {
         await _settingsService.InitializeAsync();
+        _localizationService.Initialize();
         await _notificationService.InitializeAsync();
     }
 
@@ -105,7 +106,6 @@ public sealed class ActivationService : IActivationService
 
     private async Task InitializeRemainingServicesAsync()
     {
-        _localizationService.Initialize();
         _themeSelectorService.Initialize();
         _topMostService.Initialize();
         await _regexCollectSaveService.InitializeAsync();

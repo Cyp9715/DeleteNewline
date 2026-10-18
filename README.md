@@ -34,6 +34,8 @@ Tell Delete Newline what you want to do. This setup is required only once per wo
 
 On first use, **Remove line breaks** is ready to use with **Alt+F1**. Its `[\r\n]+` rule replaces CRLF, LF, CR, and consecutive line breaks with a single space. You can edit or delete this starter profile; deleted profiles stay deleted after restarting. Existing saved profiles are kept as they are.
 
+On first use, the interface follows your Windows language, and the starter profile's name and description use that language. English is the fallback when the Windows language is unsupported. You can choose another interface language in Settings; your saved choice is used on subsequent launches.
+
 1. **Create a rule chain** - add one or more regex rules that define your transformation
 2. **Assign a hotkey** - bind a unique keyboard shortcut to that rule chain
 

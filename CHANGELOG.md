@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.4 — 2026-10-18
+
+- Follow Windows language preferences on first use, with English as the fallback for unsupported languages. Preserve an explicitly saved interface language.
+- Read Windows language preferences independently of the app's language override, so a previous override cannot change automatic system-language detection.
+- Apply the selected language before creating the first screen so navigation, guidance, notifications, and the first-use starter profile use the correct language from startup.
+- Keep the editable Alt+F1 starter and its `[\r\n]+` to single-space rule, including permanent deletion and saved-profile preservation.
+
 ## 3.2.3 — 2026-10-18
 
 - Add a localized Remove line breaks starter profile on first use, assigned to Alt+F1. Its `[\r\n]+` pattern replaces CRLF, LF, CR, and consecutive line breaks with a single space.

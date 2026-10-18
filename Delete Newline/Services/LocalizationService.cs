@@ -6,6 +6,7 @@ namespace Delete_Newline.Services;
 
 public sealed class LocalizationService : ILocalizationService
 {
+    private const string DefaultLanguageTag = "en-US";
     private const string LocalizationTagSettingsKey = "Localization";
     private readonly SettingsFileService _localSettingsService;
 
@@ -14,7 +15,7 @@ public sealed class LocalizationService : ILocalizationService
 
     public List<LanguageItem> Languages { get; } = new();
 
-    private LanguageItem _currentLanguageItem = new(Tag: "en-US", DisplayName: "English");
+    private LanguageItem _currentLanguageItem = new(Tag: DefaultLanguageTag, DisplayName: "English");
 
     public LocalizationService(SettingsFileService localSettingsService)
     {
@@ -29,16 +30,7 @@ public sealed class LocalizationService : ILocalizationService
 
         string? languageTag = _localSettingsService.ReadSetting<string>(LocalizationTagSettingsKey);
 
-        if (languageTag != null && GetLanguageItem(languageTag) is LanguageItem languageItem)
-        {
-            ApplyLanguage(languageItem);
-        }
-        else
-        {
-            // Detect system default language when no saved language setting exists
-            var systemLanguage = DetectSystemLanguage();
-            ApplyLanguage(systemLanguage);
-        }
+        ApplyLanguage(languageTag != null ? GetLanguageItem(languageTag) : DetectSystemLanguage());
     }
 
     public void ApplyLanguage(LanguageItem languageItem)
@@ -74,42 +66,31 @@ public sealed class LocalizationService : ILocalizationService
 
     private LanguageItem GetLanguageItem(string languageTag)
     {
-        return Languages.FirstOrDefault(item => item.Tag == languageTag)
-                ?? Languages.First(item => item.Tag == "en-US");
+        return Languages.FirstOrDefault(item => string.Equals(item.Tag, languageTag, StringComparison.OrdinalIgnoreCase))
+                ?? Languages.First(item => item.Tag == DefaultLanguageTag);
     }
 
     private LanguageItem DetectSystemLanguage()
     {
-        // Detect system default language
-        var systemLanguages = Windows.Globalization.ApplicationLanguages.Languages;
-        
-        foreach (var systemLang in systemLanguages)
+        // Read Windows preferences rather than the app's potentially saved language override.
+        foreach (string systemLanguage in Windows.System.UserProfile.GlobalizationPreferences.Languages)
         {
-            // Find matching language among supported languages
-            var matchingLanguage = Languages.FirstOrDefault(lang => lang.Tag == systemLang);
-            if (matchingLanguage != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"System language detected: {matchingLanguage.Tag} ({matchingLanguage.DisplayName})");
-                return matchingLanguage;
-            }
-            
-            // Check for partial match with language code only (e.g., ko-KR and ko)
-            var languageCode = systemLang.Split('-')[0];
-            var partialMatch = Languages.FirstOrDefault(lang => lang.Tag.StartsWith(languageCode + "-"));
-            if (partialMatch != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"System language partially detected: {partialMatch.Tag} ({partialMatch.DisplayName})");
-                return partialMatch;
-            }
+            LanguageItem? exactMatch = Languages.FirstOrDefault(item =>
+                string.Equals(item.Tag, systemLanguage, StringComparison.OrdinalIgnoreCase));
+            if (exactMatch != null) return exactMatch;
+
+            string languageCode = systemLanguage.Split('-')[0];
+            LanguageItem? languageMatch = Languages.FirstOrDefault(item =>
+                item.Tag.StartsWith(languageCode + "-", StringComparison.OrdinalIgnoreCase));
+            if (languageMatch != null) return languageMatch;
         }
-        
-        // Return default value if system language is not found
-        System.Diagnostics.Debug.WriteLine("System language not found, using default: en-US");
-        return _currentLanguageItem;
+
+        return GetLanguageItem(DefaultLanguageTag);
     }
 
     private void RegisterLanguageFromResource()
     {
+        Languages.Clear();
         ResourceMap resourceMap = _resourceManager.MainResourceMap.GetSubtree("LanguageList");
 
         for (uint i = 0; i < resourceMap.ResourceCount; ++i)
