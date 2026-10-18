@@ -96,12 +96,6 @@
                                      HorizontalAlignment="Stretch" IsReadOnly="True">
                                 <interactivity:Interaction.Behaviors>
                                     <behaviors:KeyboardInputBehavior CommandName="ProcessKeyInputCommand" />
-                                    <core:EventTriggerBehavior EventName="GotFocus">
-                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.GotFocusHotkeyTextBoxCommand}" />
-                                    </core:EventTriggerBehavior>
-                                    <core:EventTriggerBehavior EventName="LostFocus">
-                                        <core:InvokeCommandAction Command="{x:Bind ViewModel.LostFocusHotkeyTextBoxCommand}" />
-                                    </core:EventTriggerBehavior>
                                 </interactivity:Interaction.Behaviors>
                             </TextBox>
                             <Button x:Uid="OCRPage_Button_ClearHotkey" Grid.Column="1" Width="32" Height="32"

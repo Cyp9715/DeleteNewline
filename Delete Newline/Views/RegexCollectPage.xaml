@@ -54,17 +54,26 @@
                   AllowDrop="True"
                   ScrollViewer.HorizontalScrollMode="Disabled"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  SizeChanged="RegexConfigGridView_SizeChanged"
                   KeyDown="RegexConfigGridView_KeyDown">
+
+            <GridView.Resources>
+                <Thickness x:Key="GridViewItemSelectedBorderThickness">3</Thickness>
+                <CornerRadius x:Key="GridViewItemCornerRadius">5</CornerRadius>
+                <x:Boolean x:Key="GridViewItemSelectionCheckMarkVisualEnabled">False</x:Boolean>
+                <StaticResource x:Key="GridViewItemSelectedPointerOverBorderBrush" ResourceKey="AccentFillColorDefaultBrush" />
+                <StaticResource x:Key="GridViewItemSelectedPressedBorderBrush" ResourceKey="AccentFillColorDefaultBrush" />
+            </GridView.Resources>
 
             <GridView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Center"
-                                   ItemWidth="312" />
+                                   ItemWidth="312" Loaded="ProfilePanel_Loaded" />
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
 
             <GridView.ItemContainerStyle>
-                <Style TargetType="GridViewItem">
+                <Style TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="VerticalContentAlignment" Value="Stretch" />
                     <Setter Property="Padding" Value="0" />

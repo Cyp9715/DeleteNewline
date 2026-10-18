@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.2.2 — 2026-10-18
+
+- Restore global regex and OCR shortcuts when switching to another application while the shortcut recorder retains focus. Suspend shortcuts only while recording in the active app window, and restore them when the recorder unloads.
+- Track configured and active native hotkeys separately to avoid duplicate registrations, preserve conflict detection during recording, and retry failed registrations on recovery. Read current keyboard modifiers when recording a shortcut so app switches cannot leave stale modifier keys.
+- Fix clipboard transformations being skipped when another application's copied text is rendered on demand. Confirm the text against a stable clipboard version before transforming it, while retaining protection against overwriting a newer copy.
+- Keep a single profile and incomplete rows in the first available column. Center the complete column grid with balanced outer margins while preserving fixed card dimensions and text positions during resizing.
+- Restore the standard WinUI profile selection template and use a clear three-pixel accent border for multiple selection in both themes. Preserve native focus, drag, and reorder feedback.
+- Add regression coverage for shortcut recording, window activation, native registration bookkeeping, delayed clipboard rendering, and newer clipboard changes.
+
 ## 3.2.1 — 2026-10-18
 
 - Restore the original input/output layout in Test Regex Chain. Remove the line-ending selector and its extra guidance while keeping automatic newline correction and existing sample formats.

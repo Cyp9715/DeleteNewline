@@ -6,6 +6,9 @@ using System.Windows.Input;
 using Windows.System;
 
 using Delete_Newline.Contracts.Structures;
+using Delete_Newline.Helpers.Hotkeys;
+using Microsoft.UI.Input;
+using Windows.UI.Core;
 
 namespace Delete_Newline.Behaviors;
 
@@ -24,20 +27,23 @@ public class KeyboardInputBehavior : Behavior<UIElement>
             typeof(KeyboardInputBehavior),
             new PropertyMetadata(null));
 
-    private VirtualKeyModifiers _currentModifiers = VirtualKeyModifiers.None;
-
     protected override void OnAttached()
     {
         base.OnAttached();
         AssociatedObject.KeyDown += OnKeyDown;
-        AssociatedObject.KeyUp += OnKeyUp;
+        AssociatedObject.GotFocus += OnGotFocus;
+        AssociatedObject.LostFocus += OnLostFocus;
+        if (AssociatedObject is FrameworkElement element) element.Unloaded += OnUnloaded;
     }
 
     protected override void OnDetaching()
     {
         base.OnDetaching();
         AssociatedObject.KeyDown -= OnKeyDown;
-        AssociatedObject.KeyUp -= OnKeyUp;
+        AssociatedObject.GotFocus -= OnGotFocus;
+        AssociatedObject.LostFocus -= OnLostFocus;
+        if (AssociatedObject is FrameworkElement element) element.Unloaded -= OnUnloaded;
+        HotkeyRegister.SetRecording(this, false);
     }
 
     private void OnKeyDown(object sender, KeyRoutedEventArgs e)
@@ -49,24 +55,16 @@ public class KeyboardInputBehavior : Behavior<UIElement>
             return;
         }
 
-        UpdateModifiers(e.Key, true);
-
         // ignore modifierKey
         if (IsModifierKey(e.Key))
             return;
 
         // Execute command if any modifier is pressed
-        if (_currentModifiers != VirtualKeyModifiers.None)
+        if (CurrentModifiers != VirtualKeyModifiers.None)
         {
             ExecuteCommand(e);
             e.Handled = true;
         }
-    }
-
-    // KeyUp event only for updating modifier key status
-    private void OnKeyUp(object sender, KeyRoutedEventArgs e)
-    {
-        UpdateModifiers(e.Key, false);
     }
 
     private bool IsModifierKey(VirtualKey key)
@@ -84,45 +82,24 @@ public class KeyboardInputBehavior : Behavior<UIElement>
                key == VirtualKey.RightWindows;
     }
 
-    private void UpdateModifiers(VirtualKey key, bool isKeyDown)
+    private void OnGotFocus(object sender, RoutedEventArgs e) => HotkeyRegister.SetRecording(this, true);
+    private void OnLostFocus(object sender, RoutedEventArgs e) => HotkeyRegister.SetRecording(this, false);
+    private void OnUnloaded(object sender, RoutedEventArgs e) => HotkeyRegister.SetRecording(this, false);
+
+    private static VirtualKeyModifiers CurrentModifiers
     {
-        switch (key)
+        get
         {
-            case VirtualKey.Control:
-            case VirtualKey.LeftControl:
-            case VirtualKey.RightControl:
-                if (isKeyDown)
-                    _currentModifiers |= VirtualKeyModifiers.Control;
-                else
-                    _currentModifiers &= ~VirtualKeyModifiers.Control;
-                break;
-            case VirtualKey.Shift:
-            case VirtualKey.LeftShift:
-            case VirtualKey.RightShift:
-                if (isKeyDown)
-                    _currentModifiers |= VirtualKeyModifiers.Shift;
-                else
-                    _currentModifiers &= ~VirtualKeyModifiers.Shift;
-                break;
-            case VirtualKey.Menu:
-            case VirtualKey.LeftMenu:
-            case VirtualKey.RightMenu:
-                if (isKeyDown)
-                    _currentModifiers |= VirtualKeyModifiers.Menu;
-                else
-                    _currentModifiers &= ~VirtualKeyModifiers.Menu;
-                break;
-            case VirtualKey.LeftWindows:
-            case VirtualKey.RightWindows:
-                if (isKeyDown)
-                    _currentModifiers |= VirtualKeyModifiers.Windows;
-                else
-                    _currentModifiers &= ~VirtualKeyModifiers.Windows;
-                break;
-            default:
-                break;
+            VirtualKeyModifiers modifiers = VirtualKeyModifiers.None;
+            if (IsDown(VirtualKey.Control)) modifiers |= VirtualKeyModifiers.Control;
+            if (IsDown(VirtualKey.Shift)) modifiers |= VirtualKeyModifiers.Shift;
+            if (IsDown(VirtualKey.Menu)) modifiers |= VirtualKeyModifiers.Menu;
+            return modifiers;
         }
     }
+
+    private static bool IsDown(VirtualKey key) =>
+        (InputKeyboardSource.GetKeyStateForCurrentThread(key) & CoreVirtualKeyStates.Down) != 0;
 
     private void ExecuteCommand(KeyRoutedEventArgs e)
     {
@@ -146,7 +123,7 @@ public class KeyboardInputBehavior : Behavior<UIElement>
         // Create event arguments containing the current modifiers and the key pressed
         var args = new KeyboardInputEventArgs
         {
-            Modifiers = _currentModifiers,
+            Modifiers = CurrentModifiers,
             Key = e.Key
         };
 

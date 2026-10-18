@@ -917,15 +917,4 @@ public partial class OCRViewModel : ObservableRecipient
     }
 
 
-    [RelayCommand]
-    public void GotFocusHotkeyTextBox()
-    {
-        HotkeyRegister.DisableAllHotkeys();
-    }
-
-    [RelayCommand]
-    public void LostFocusHotkeyTextBox()
-    {
-        HotkeyRegister.EnableAllHotkeys();
-    }
 }

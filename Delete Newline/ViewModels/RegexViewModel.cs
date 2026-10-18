@@ -341,16 +341,5 @@ public partial class RegexViewModel : ObservableRecipient
         // The UI updates automatically because changing the Hotkey properties will trigger a PropertyChanged notification.
     }
 
-    [RelayCommand]
-    public void GotFocusHotkeyTextBox()
-    {
-        HotkeyRegister.DisableAllHotkeys();
-    }
-
-    [RelayCommand]
-    public void LostFocusHotkeyTextBox()
-    {
-        HotkeyRegister.EnableAllHotkeys();
-    }
 }
 

@@ -1,4 +1,5 @@
 using Delete_Newline.Services;
+using Delete_Newline.Helpers.Hotkeys;
 using Delete_Newline.Services.Mcp;
 using Delete_Newline.ViewModels;
 using Microsoft.UI.Dispatching;
@@ -51,6 +52,9 @@ public sealed partial class MainWindow : WindowEx
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
+        // TextBoxes can retain XAML focus when another app becomes active.
+        HotkeyRegister.SetWindowActive(args.WindowActivationState != WindowActivationState.Deactivated);
+
         // Ignore if handler is already attached or if the window is being deactivated
         if (_pointerPressedHandlerAttached || args.WindowActivationState == WindowActivationState.Deactivated)
         {

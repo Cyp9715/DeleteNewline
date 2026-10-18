@@ -77,14 +77,16 @@ public class ClipboardMonitorService
         {
             await _processingLock.WaitAsync();
             lockAcquired = true;
-            uint clipboardVersion = GetClipboardSequenceNumber();
-            beforeText = await TryReadClipboardTextAsync();
-            if (beforeText == null)
+            ClipboardTextSnapshot? snapshot = await ClipboardTextSnapshot.ReadAsync(
+                GetClipboardSequenceNumber, TryReadClipboardTextAsync);
+            if (snapshot == null)
             {
                 Debug.WriteLine($"[ClipboardMonitorService] Clipboard text read timed out for Hotkey ID: {triggeredHotkeyId}.");
                 return;
             }
 
+            beforeText = snapshot.Text;
+            uint clipboardVersion = snapshot.Version;
             Debug.WriteLine($"[ClipboardMonitorService] Clipboard change by Hotkey ID: {triggeredHotkeyId}. Applying regex rules.");
             if (GetClipboardSequenceNumber() != clipboardVersion) return;
             string afterText = await _regexService.ApplyRegexRulesAsync(beforeText, triggeredHotkeyId);
