@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<windowex:WindowEx  xmlns:windowex="using:WinUIEx"
-                    x:Class="Delete_Newline.Views.OcrCaptureWindow"
+<Window x:Class="Delete_Newline.Views.OcrCaptureWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="using:Delete_Newline"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="Text Grab"
-        Width="800"
-        Height="450"
-        IsAlwaysOnTop="True"
-        IsMaximizable="False"
-        IsMinimizable="False"
-        IsResizable="False"
         mc:Ignorable="d">
 
     <Grid x:Name="MainGrid"
@@ -96,4 +89,4 @@
             </Border>
         </Canvas>
     </Grid>
-</windowex:WindowEx> 
+</Window>

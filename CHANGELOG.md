@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.5 — 2026-10-20
+
+- Reduce memory use when repeatedly opening, cancelling, or completing text captures. Keep the frozen preview sharp and preserve OCR resolution.
+- Release closed capture windows and their images promptly, and copy image pixels directly instead of creating large BMP streams for preview and recognition.
+- Restore left-aligned regex profile cards with a consistent inset, as in 3.1.7. Keep their size and internal spacing stable when resizing, including fractional display scaling, and retain two columns at the minimum window width.
+- Reduce temporary memory allocations when reading MCP requests and sending JSON responses. Reject an invalid explicit profile index instead of testing a different profile through a legacy alias.
+- Clarify that MCP works with compatible AI clients, whether their models run locally or remotely.
+
 ## 3.2.4 — 2026-10-18
 
 - Follow Windows language preferences on first use, with English as the fallback for unsupported languages. Preserve an explicitly saved interface language.

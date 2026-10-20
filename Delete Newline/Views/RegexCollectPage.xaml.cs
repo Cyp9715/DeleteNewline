@@ -10,25 +10,6 @@ namespace Delete_Newline.Views;
 public sealed partial class RegexCollectPage : Page
 {
     private bool _isHidingSearch;
-    private const double ProfileColumnWidth = 312;
-
-    private void ProfilePanel_Loaded(object sender, RoutedEventArgs e) => UpdateProfileGridColumns();
-
-    private void RegexConfigGridView_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateProfileGridColumns();
-
-    private void UpdateProfileGridColumns()
-    {
-        // Center complete column slots, not the number of items. A single profile
-        // and an incomplete final row therefore keep their first slot on the left.
-        double available = Math.Max(0, RegexConfigGridView.ActualWidth - 24);
-        int columns = Math.Max(1, (int)Math.Floor(available / ProfileColumnWidth));
-        if (RegexConfigGridView.ItemsPanelRoot is ItemsWrapGrid panel)
-        {
-            // An explicit column-band width prevents ItemsWrapGrid from shrinking
-            // to the number of items or reflowing after rounded page margins.
-            panel.Width = columns * ProfileColumnWidth;
-        }
-    }
 
     public RegexCollectViewModel ViewModel
     {

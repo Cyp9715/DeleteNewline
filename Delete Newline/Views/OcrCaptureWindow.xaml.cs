@@ -4,16 +4,16 @@ using Delete_Newline.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Windowing;
 using Windows.Globalization;
 using Windows.System;
-using WinUIEx;
 using WinRT.Interop;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Delete_Newline.Views;
 
-public sealed partial class OcrCaptureWindow : WindowEx
+public sealed partial class OcrCaptureWindow : Window
 {
     private static class NativeMethods
     {
@@ -79,7 +79,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
     private bool _isOverlayContentLoaded;
     private bool _isOverlayRevealQueued;
     private bool _isOverlayRevealed;
-    private Microsoft.UI.Xaml.Media.Imaging.BitmapImage? backgroundImage;
+    private Microsoft.UI.Xaml.Media.Imaging.SoftwareBitmapSource? backgroundImage;
     private Bitmap? _desktopScreenshot;
     private Windows.Foundation.Point startPoint = new();
     private Windows.Foundation.Point currentPoint = new();
@@ -105,6 +105,15 @@ public sealed partial class OcrCaptureWindow : WindowEx
     public OcrCaptureWindow()
     {
         InitializeComponent();
+        // This short-lived overlay needs no WindowEx manager. Its older window
+        // event subscriptions retain closed windows in Windows App SDK 1.6.
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.IsAlwaysOnTop = true;
+            presenter.IsMaximizable = false;
+            presenter.IsMinimizable = false;
+            presenter.IsResizable = false;
+        }
         _notificationService = App.GetService<NotificationService>();
         MainGrid.Loaded += OnOverlayContentLoaded;
         MainGrid.Loaded += OnMainGridLoaded;
@@ -151,10 +160,12 @@ public sealed partial class OcrCaptureWindow : WindowEx
         }
 
         BackgroundImage.Source = null;
+        backgroundImage?.Dispose();
         backgroundImage = null;
         _desktopScreenshot?.Dispose();
         _desktopScreenshot = null;
         CaptureLanguageComboBox.ItemsSource = null;
+        CaptureLanguageComboBox.SelectionChanged -= CaptureLanguageComboBox_SelectionChanged;
         _languageChanged = null;
     }
 
@@ -279,7 +290,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
         BottomOverlay.Opacity = opacity;
     }
 
-    public void SetupFullscreen(
+    public async Task<bool> SetupFullscreenAsync(
         Bitmap preloadedBackground,
         Language? selectedLanguage = null,
         IReadOnlyList<Language>? availableLanguages = null,
@@ -289,7 +300,13 @@ public sealed partial class OcrCaptureWindow : WindowEx
         currentLanguage = selectedLanguage ?? new Language("en");
         _languageChanged = languageChanged;
         _desktopScreenshot = preloadedBackground;
-        backgroundImage = ImageHelper.BitmapToImageSource(preloadedBackground);
+        var preview = await ImageHelper.BitmapToImageSourceAsync(preloadedBackground);
+        if (_isClosing)
+        {
+            preview.Dispose();
+            return false;
+        }
+        backgroundImage = preview;
         _overlayHwnd = hwnd;
         RemoveWindowFrames(hwnd);
         ApplyOverlayWindowExStyle(hwnd);
@@ -308,7 +325,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
             NativeMethods.SWP_NOACTIVATE);
         
         System.Diagnostics.Debug.WriteLine($"Window positioned: {virtualScreen}");
-        System.Diagnostics.Debug.WriteLine($"Background image size: {backgroundImage?.PixelWidth}x{backgroundImage?.PixelHeight}");
+        System.Diagnostics.Debug.WriteLine($"Background image size: {preloadedBackground.Width}x{preloadedBackground.Height}");
         System.Diagnostics.Debug.WriteLine("Initializing OCR capture window");
 
         BackgroundImage.Source = backgroundImage;
@@ -317,6 +334,7 @@ public sealed partial class OcrCaptureWindow : WindowEx
         PositionLanguageToolbar();
         SetupCanvasEvents();
         SetupKeyHandling();
+        return true;
     }
 
     private void SetupLanguageSelector(IReadOnlyList<Language>? availableLanguages, Language selectedLanguage)
@@ -633,19 +651,44 @@ public sealed partial class OcrCaptureWindow : WindowEx
                 new SizeF((float)RegionClickCanvas.ActualWidth, (float)RegionClickCanvas.ActualHeight),
                 _desktopScreenshot.Size);
             if (screenRect.Width < 1 || screenRect.Height < 1) return;
-            using Bitmap cropped = _desktopScreenshot.Clone(screenRect, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            var regionBitmap = ImageHelper.PadImage(cropped);
-            System.Diagnostics.Debug.WriteLine($"Captured bitmap: {regionBitmap.Width}x{regionBitmap.Height}");
-
-            IsOcrProcessing = true;
-            CloseCaptureOverlay();
-
-            _ = Task.Run(() => ProcessAndDisposeRegionBitmapAsync(regionBitmap));
+            RecognizeRegion(screenRect);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error during OCR: {ex.Message}");
             System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
+    }
+
+    private void RecognizeRegion(Rectangle screenRect)
+    {
+        if (_isClosing || _desktopScreenshot == null || IsOcrProcessing) return;
+
+        Bitmap? regionBitmap = _desktopScreenshot.Clone(screenRect, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        try
+        {
+            if (regionBitmap.Width < 64 || regionBitmap.Height < 64)
+            {
+                Bitmap padded = ImageHelper.PadImage(regionBitmap);
+                regionBitmap.Dispose();
+                regionBitmap = padded;
+            }
+
+            IsOcrProcessing = true;
+            CloseCaptureOverlay();
+
+            Bitmap capturedRegion = regionBitmap;
+            _ = Task.Run(() => ProcessAndDisposeRegionBitmapAsync(capturedRegion));
+            regionBitmap = null; // The background operation now owns this image.
+        }
+        catch
+        {
+            NotifyOcrProcessingCompleted();
+            throw;
+        }
+        finally
+        {
+            regionBitmap?.Dispose();
         }
     }
 

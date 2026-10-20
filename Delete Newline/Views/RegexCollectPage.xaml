@@ -54,7 +54,6 @@
                   AllowDrop="True"
                   ScrollViewer.HorizontalScrollMode="Disabled"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  SizeChanged="RegexConfigGridView_SizeChanged"
                   KeyDown="RegexConfigGridView_KeyDown">
 
             <GridView.Resources>
@@ -67,8 +66,8 @@
 
             <GridView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Center"
-                                   ItemWidth="312" Loaded="ProfilePanel_Loaded" />
+                    <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Left"
+                                   ItemWidth="312" UseLayoutRounding="True" />
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
 

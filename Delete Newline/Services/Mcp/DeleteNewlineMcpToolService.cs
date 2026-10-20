@@ -606,13 +606,11 @@ public sealed class DeleteNewlineMcpToolService
         {
             chain = ParseChain(inlineChain.Value).ToArray();
         }
-        else if (TryGetInt32(arguments, "profileIndex", out int profileIndex) && profileIndex >= 0 && profileIndex < _regexRepository.RegexConfigs.Count)
+        else if (GetProperty(arguments, "profileIndex").HasValue || GetProperty(arguments, "index").HasValue)
         {
-            chain = _regexRepository.RegexConfigs[profileIndex].RegexChain.ChainItems.ToArray();
-        }
-        else if (TryGetInt32(arguments, "index", out int index) && index >= 0 && index < _regexRepository.RegexConfigs.Count)
-        {
-            chain = _regexRepository.RegexConfigs[index].RegexChain.ChainItems.ToArray();
+            string indexKey = GetProperty(arguments, "profileIndex").HasValue ? "profileIndex" : "index";
+            int profileIndex = GetRequiredInt32(arguments, indexKey);
+            chain = GetRegexProfileOrThrow(profileIndex).RegexChain.ChainItems.ToArray();
         }
         else
         {

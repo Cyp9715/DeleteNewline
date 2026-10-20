@@ -398,7 +398,7 @@ public partial class OCRViewModel : ObservableRecipient
     private bool CanLaunchOcr() => SelectedLanguage != null && Volatile.Read(ref _ocrSessionActive) == 0;
 
     [RelayCommand(CanExecute = nameof(CanLaunchOcr))]
-    public void LaunchOcr()
+    public async Task LaunchOcrAsync()
     {
         if (SelectedLanguage == null || AvailableLanguages.Count == 0)
         {
@@ -427,9 +427,12 @@ public partial class OCRViewModel : ObservableRecipient
             ocrWindow.OcrProcessingCompleted += OcrWindow_OcrProcessingCompleted;
 
             // Setup fullscreen capture with preloaded background and selected language
-            ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged);
+            Task<bool> preparation = ocrWindow.SetupFullscreenAsync(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged);
             backgroundImage = null; // The capture window owns and disposes the snapshot.
-            ocrWindow.Activate();
+            if (await preparation)
+            {
+                ocrWindow.Activate();
+            }
         }
         catch (Exception ex)
         {

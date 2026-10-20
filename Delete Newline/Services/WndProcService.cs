@@ -50,7 +50,7 @@ public sealed class WndProcService
                 {
                     // Process OCR Hotkey - OCR hotkey doesn't follow normal hotkey processing
                     Debug.WriteLine("Processing OCR Hotkey - launching OCR capture");
-                    App.GetService<OCRViewModel>().LaunchOcr();
+                    _ = App.GetService<OCRViewModel>().LaunchOcrAsync();
                     break;
                 }
 

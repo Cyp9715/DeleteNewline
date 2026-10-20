@@ -1005,7 +1005,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("currentLanguage = selectedLanguage", ocrCaptureWindowCodeBehind);
         Assert.Contains("_languageChanged?.Invoke(currentLanguage)", ocrCaptureWindowCodeBehind);
 
-        Assert.Contains("SetupFullscreen(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged)", ocrViewModel);
+        Assert.Contains("SetupFullscreenAsync(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged)", ocrViewModel);
         Assert.Contains("private void OnCaptureLanguageChanged(Language language)", ocrViewModel);
         Assert.Contains("SelectedLanguage = language", ocrViewModel);
 
@@ -1111,10 +1111,10 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         string setupFullscreenBlock = ExtractElementBlock(
             ocrCaptureWindowCodeBehind,
-            "    public void SetupFullscreen(",
+            "    public async Task<bool> SetupFullscreenAsync(",
             "    private void SetupLanguageSelector");
 
-        int setupIndex = ocrViewModel.IndexOf("ocrWindow.SetupFullscreen(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged);", StringComparison.Ordinal);
+        int setupIndex = ocrViewModel.IndexOf("ocrWindow.SetupFullscreenAsync(backgroundImage, SelectedLanguage, AvailableLanguages.ToArray(), OnCaptureLanguageChanged);", StringComparison.Ordinal);
         int activateIndex = ocrViewModel.IndexOf("ocrWindow.Activate();", StringComparison.Ordinal);
         Assert.True(setupIndex >= 0 && activateIndex >= 0 && setupIndex < activateIndex,
             "The capture window must be fully prepared before Activate can display the first frame.");
@@ -1132,7 +1132,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
 
         string setupFullscreenBlock = ExtractElementBlock(
             ocrCaptureWindowCodeBehind,
-            "    public void SetupFullscreen(",
+            "    public async Task<bool> SetupFullscreenAsync(",
             "    private void SetupLanguageSelector");
         string revealBlock = ExtractElementBlock(
             ocrCaptureWindowCodeBehind,
@@ -1161,53 +1161,26 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
-    public void OcrHelper_DisposesNativeBitmapAndStreamWrappersDuringRepeatedOcr()
+    public void OcrHelper_ReleasesPixelBuffersWithoutRetainingEncodedScreenshots()
     {
-        string ocrHelper = File.ReadAllText(LocateSourceFile("Delete Newline", "Helpers", "OcrHelper.cs"));
-
-        string getRegionsTextBlock = ExtractElementBlock(
-            ocrHelper,
-            "    public static async Task<string> GetRegionsTextAsync(",
-            "    public static async Task<string> GetTextFromBitmapAsync");
-        string getOcrResultBlock = ExtractElementBlock(
-            ocrHelper,
-            "    public static async Task<OcrResult> GetOcrResultFromBitmapAsync(",
-            "    private static string GetTextFromOcrResult");
-        string getClickedWordBlock = ExtractElementBlock(
-            ocrHelper,
-            "    public static async Task<string> GetClickedWordAsync(",
-            "public static class ImageHelper");
-        string getRegionBitmapBlock = ExtractElementBlock(
-            ocrHelper,
-            "    public static Bitmap GetRegionOfScreenAsBitmap(",
-            "    public static Bitmap GetFullDesktopScreenshot()");
-        string padImageBlock = ExtractElementBlock(
-            ocrHelper,
-            "    public static Bitmap PadImage(",
-            "    public static Bitmap GetWindowsBoundsBitmap");
-        string bitmapToImageSourceBlock = ExtractElementBlock(
-            ocrHelper,
-            "    public static BitmapImage BitmapToImageSource(",
+        string helper = File.ReadAllText(LocateSourceFile("Delete Newline", "Helpers", "OcrHelper.cs"));
+        string preview = ExtractElementBlock(helper,
+            "    public static async Task<SoftwareBitmapSource> BitmapToImageSourceAsync(",
             "    public static Bitmap ScaleBitmapUniform");
-        string bitmapToSoftwareBitmapBlock = ExtractElementBlock(
-            ocrHelper,
-            "    public static async Task<SoftwareBitmap> BitmapToSoftwareBitmapAsync(",
-            "    public static BitmapImage GetWindowBoundsImage");
-
-        Assert.Contains("using Bitmap bmp = ImageHelper.GetRegionOfScreenAsBitmap(correctedRegion)", getRegionsTextBlock);
-        Assert.Contains("using Bitmap bmp = ImageHelper.GetWindowsBoundsBitmap(window)", getClickedWordBlock);
-        Assert.Contains("using Bitmap bmp = new(region.Width, region.Height, PixelFormat.Format32bppArgb)", getRegionBitmapBlock);
-        Assert.Contains("return PadImage(bmp)", getRegionBitmapBlock);
-        Assert.Contains("return new Bitmap(image)", padImageBlock);
-        Assert.DoesNotContain("return image;", padImageBlock);
-        Assert.Contains("using var randomAccessStream = stream.AsRandomAccessStream()", getOcrResultBlock);
-        Assert.Contains("BitmapDecoder.CreateAsync(randomAccessStream)", getOcrResultBlock);
-        Assert.Contains("using var randomAccessStream = memory.AsRandomAccessStream()", bitmapToImageSourceBlock);
-        Assert.Contains("bitmapImage.SetSource(randomAccessStream)", bitmapToImageSourceBlock);
-        Assert.Contains("using var randomAccessStream = stream.AsRandomAccessStream()", bitmapToSoftwareBitmapBlock);
-        Assert.Contains("BitmapDecoder.CreateAsync(randomAccessStream)", bitmapToSoftwareBitmapBlock);
+        string pixels = ExtractElementBlock(helper,
+            "    public static unsafe SoftwareBitmap BitmapToSoftwareBitmap(",
+            "    [ComImport]");
+        Assert.DoesNotContain("MemoryStream", helper);
+        Assert.DoesNotContain("BitmapDecoder", helper);
+        Assert.Contains("using var softwareBitmap = ImageHelper.BitmapToSoftwareBitmap(bitmap)", helper);
+        Assert.Contains("using var pixels = BitmapToSoftwareBitmap(bitmap)", preview);
+        Assert.Contains("await source.SetBitmapAsync(pixels)", preview);
+        Assert.Contains("source.Dispose()", preview);
+        Assert.Contains("using var buffer = pixels.LockBuffer", pixels);
+        Assert.Contains("using var reference = buffer.CreateReference()", pixels);
+        Assert.Contains("bitmap.UnlockBits(source)", pixels);
+        Assert.Contains("pixels.Dispose()", pixels);
     }
-
     [Fact]
     public void OcrCaptureWindow_ReleasesPreviewHandlersAndSessionAfterBackgroundOcrCompletes()
     {
@@ -1237,6 +1210,7 @@ public sealed class DeleteNewlineMcpToolServiceTests
         Assert.Contains("StopOverlayFadeTimer()", cleanupBlock);
         Assert.Contains("StopOverlayRevealFallbackTimer()", cleanupBlock);
         Assert.Contains("BackgroundImage.Source = null", cleanupBlock);
+        Assert.Contains("backgroundImage?.Dispose()", cleanupBlock);
         Assert.Contains("backgroundImage = null", cleanupBlock);
         Assert.Contains("CaptureLanguageComboBox.ItemsSource = null", cleanupBlock);
         Assert.Contains("_languageChanged = null", cleanupBlock);

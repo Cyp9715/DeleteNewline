@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Globalization;
 using System.Net;
 using System.Text;
@@ -16,6 +17,7 @@ internal sealed class McpHttpRequestReader(Stream stream, CancellationToken canc
 {
     private const int MaxHeaderBytes = 16_384;
     private const int MaxBodyBytes = 1_048_576;
+    private static readonly UTF8Encoding StrictUtf8 = new(false, true);
     private readonly byte[] _buffer = new byte[8192];
     private int _position;
     private int _length;
@@ -51,14 +53,14 @@ internal sealed class McpHttpRequestReader(Stream stream, CancellationToken canc
             }
         }
 
-        byte[] body;
+        string body;
         if (headers.TryGetValue("Transfer-Encoding", out string? transferEncoding))
         {
             if (headers.ContainsKey("Content-Length") || !transferEncoding.Equals("chunked", StringComparison.OrdinalIgnoreCase))
             {
                 throw BadRequest("Unsupported HTTP body framing.");
             }
-            using MemoryStream chunks = new();
+            var chunks = new ArrayBufferWriter<byte>();
             while (true)
             {
                 string sizeLine = await ReadLineAsync() ?? throw BadRequest("Incomplete HTTP chunk.");
@@ -72,16 +74,15 @@ internal sealed class McpHttpRequestReader(Stream stream, CancellationToken canc
                     while ((await ReadLineAsync() ?? throw BadRequest("Incomplete HTTP trailers.")).Length > 0) { }
                     break;
                 }
-                if (size > MaxBodyBytes - chunks.Length) throw TooLarge();
-                byte[] chunk = new byte[size];
-                await ReadExactlyAsync(chunk);
-                chunks.Write(chunk);
+                if (size > MaxBodyBytes - chunks.WrittenCount) throw TooLarge();
+                await ReadExactlyAsync(chunks.GetMemory(size)[..size]);
+                chunks.Advance(size);
                 if (await ReadByteAsync() != '\r' || await ReadByteAsync() != '\n')
                 {
                     throw BadRequest("Invalid HTTP chunk delimiter.");
                 }
             }
-            body = chunks.ToArray();
+            body = DecodeBody(chunks.WrittenSpan);
         }
         else
         {
@@ -92,14 +93,17 @@ internal sealed class McpHttpRequestReader(Stream stream, CancellationToken canc
                 throw BadRequest("Invalid Content-Length.");
             }
             if (contentLength > MaxBodyBytes) throw TooLarge();
-            body = new byte[contentLength];
-            await ReadExactlyAsync(body);
+            byte[] bytes = new byte[contentLength];
+            await ReadExactlyAsync(bytes);
+            body = DecodeBody(bytes);
         }
 
-        try
-        {
-            return new McpHttpRequest(requestLine[0], requestLine[1], headers, new UTF8Encoding(false, true).GetString(body));
-        }
+        return new McpHttpRequest(requestLine[0], requestLine[1], headers, body);
+    }
+
+    private static string DecodeBody(ReadOnlySpan<byte> bytes)
+    {
+        try { return StrictUtf8.GetString(bytes); }
         catch (DecoderFallbackException)
         {
             throw BadRequest("MCP JSON must be valid UTF-8.");
@@ -131,25 +135,25 @@ internal sealed class McpHttpRequestReader(Stream stream, CancellationToken canc
         }
     }
 
-    private async Task ReadExactlyAsync(byte[] target)
+    private async Task ReadExactlyAsync(Memory<byte> target)
     {
         for (int offset = 0; offset < target.Length;)
         {
             if (_position == _length && !await FillAsync()) throw BadRequest("Incomplete HTTP body.");
             int count = Math.Min(_length - _position, target.Length - offset);
-            _buffer.AsSpan(_position, count).CopyTo(target.AsSpan(offset));
+            _buffer.AsMemory(_position, count).CopyTo(target[offset..]);
             _position += count;
             offset += count;
         }
     }
 
-    private async Task<int> ReadByteAsync()
+    private async ValueTask<int> ReadByteAsync()
     {
         if (_position == _length && !await FillAsync()) return -1;
         return _buffer[_position++];
     }
 
-    private async Task<bool> FillAsync()
+    private async ValueTask<bool> FillAsync()
     {
         _position = 0;
         _length = await stream.ReadAsync(_buffer, cancellationToken);

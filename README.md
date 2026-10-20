@@ -108,7 +108,7 @@ Specifying complex regular expressions is incredibly tricky - and asking an AI t
 
 1. Open **Settings** in Delete Newline.
 2. Toggle **MCP server** on. (The default port is `39333`; change it while MCP is disabled if you need to.)
-3. Chat with your AI! (Only MCP-capable clients work - Claude Code, GPT Codex, or other local LLMs.)
+3. Connect an MCP-compatible AI client, such as Claude Code or Codex, and ask it to manage your profiles or settings.
 
 That's it - your assistant can now read and write Delete Newline state through the same surface the GUI uses. Hotkey changes are re-registered the moment they're saved, so transformations are usable on the next keystroke.
 

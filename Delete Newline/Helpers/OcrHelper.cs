@@ -7,6 +7,7 @@ using Windows.Globalization;
 using Windows.Graphics.Imaging;
 using Windows.Media.Ocr;
 using WinUIEx;
+using WinRT;
 
 namespace Delete_Newline.Helpers;
 
@@ -29,7 +30,8 @@ public static class OcrHelper
     {
         OcrEngine engine = CreateEngine(language);
         Size initialSize = OcrImageSizing.Fit(bitmap.Width, bitmap.Height, 1, (int)OcrEngine.MaxImageDimension);
-        using Bitmap initial = ImageHelper.ScaleBitmap(bitmap, initialSize);
+        using Bitmap? fitted = initialSize == bitmap.Size ? null : ImageHelper.ScaleBitmap(bitmap, initialSize);
+        Bitmap initial = fitted ?? bitmap;
         OcrResult result = await RecognizeAsync(initial, engine);
         double scale = GetIdealScaleFactorForOcrResult(result, initial.Height, initial.Width);
         Size scaledSize = OcrImageSizing.Fit(initial.Width, initial.Height, scale, (int)OcrEngine.MaxImageDimension);
@@ -46,8 +48,8 @@ public static class OcrHelper
     {
         OcrEngine engine = CreateEngine(language);
         Size size = OcrImageSizing.Fit(bitmap.Width, bitmap.Height, 1, (int)OcrEngine.MaxImageDimension);
-        using Bitmap fitted = ImageHelper.ScaleBitmap(bitmap, size);
-        return await RecognizeAsync(fitted, engine);
+        using Bitmap? fitted = size == bitmap.Size ? null : ImageHelper.ScaleBitmap(bitmap, size);
+        return await RecognizeAsync(fitted ?? bitmap, engine);
     }
 
     private static OcrEngine CreateEngine(Language language) =>
@@ -56,14 +58,7 @@ public static class OcrHelper
 
     private static async Task<OcrResult> RecognizeAsync(Bitmap bitmap, OcrEngine engine)
     {
-        using var stream = new MemoryStream();
-        bitmap.Save(stream, ImageFormat.Bmp);
-        stream.Position = 0;
-
-        using var randomAccessStream = stream.AsRandomAccessStream();
-        var decoder = await BitmapDecoder.CreateAsync(randomAccessStream);
-        using var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
-
+        using var softwareBitmap = ImageHelper.BitmapToSoftwareBitmap(bitmap);
         return await engine.RecognizeAsync(softwareBitmap);
     }
 
@@ -87,21 +82,21 @@ public static class OcrHelper
 
     private static double GetIdealScaleFactorForOcrResult(OcrResult ocrResult, int height, int width)
     {
-        var heightsList = new List<double>();
-        double scaleFactor = 1.5;
+        double totalHeight = 0;
+        int wordCount = 0;
 
         foreach (OcrLine ocrLine in ocrResult.Lines)
             foreach (OcrWord ocrWord in ocrLine.Words)
-                heightsList.Add(ocrWord.BoundingRect.Height);
+            {
+                totalHeight += ocrWord.BoundingRect.Height;
+                wordCount++;
+            }
 
-        double lineHeight = 10;
-
-        if (heightsList.Count > 0)
-            lineHeight = heightsList.Average();
+        double lineHeight = wordCount > 0 ? totalHeight / wordCount : 10;
 
         // Ideal Line Height is 40px
         const double idealLineHeight = 40.0;
-        scaleFactor = idealLineHeight / lineHeight;
+        double scaleFactor = idealLineHeight / lineHeight;
 
         if (width * scaleFactor > OcrEngine.MaxImageDimension || height * scaleFactor > OcrEngine.MaxImageDimension)
         {
@@ -192,16 +187,17 @@ public static class ImageHelper
         Rectangle bounds = new(left, top, width, height);
 
         Bitmap screenshot = new(bounds.Width, bounds.Height, PixelFormat.Format32bppArgb);
-        using Graphics g = Graphics.FromImage(screenshot);
-        g.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
-
-        return screenshot;
-    }
-
-    public static BitmapImage GetFullDesktopScreenshotAsImageSource()
-    {
-        using var bitmap = GetFullDesktopScreenshot();
-        return BitmapToImageSource(bitmap);
+        try
+        {
+            using Graphics g = Graphics.FromImage(screenshot);
+            g.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
+            return screenshot;
+        }
+        catch
+        {
+            screenshot.Dispose();
+            throw;
+        }
     }
 
     public static Rectangle GetVirtualScreenBounds()
@@ -262,17 +258,20 @@ public static class ImageHelper
         return new Rectangle(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
     }
 
-    public static BitmapImage BitmapToImageSource(Bitmap bitmap)
+    public static async Task<SoftwareBitmapSource> BitmapToImageSourceAsync(Bitmap bitmap)
     {
-        using MemoryStream memory = new();
-        bitmap.Save(memory, ImageFormat.Bmp);
-        memory.Position = 0;
-
-        using var randomAccessStream = memory.AsRandomAccessStream();
-        var bitmapImage = new BitmapImage();
-        bitmapImage.SetSource(randomAccessStream);
-
-        return bitmapImage;
+        using var pixels = BitmapToSoftwareBitmap(bitmap);
+        var source = new SoftwareBitmapSource();
+        try
+        {
+            await source.SetBitmapAsync(pixels);
+            return source;
+        }
+        catch
+        {
+            source.Dispose();
+            throw;
+        }
     }
 
     public static Bitmap ScaleBitmapUniform(Bitmap passedBitmap, double scale)
@@ -291,20 +290,49 @@ public static class ImageHelper
         return scaledBitmap;
     }
 
-    public static async Task<SoftwareBitmap> BitmapToSoftwareBitmapAsync(Bitmap bitmap)
+    public static unsafe SoftwareBitmap BitmapToSoftwareBitmap(Bitmap bitmap)
     {
-        using var stream = new MemoryStream();
-        bitmap.Save(stream, ImageFormat.Bmp);
-        stream.Position = 0;
+        // Screenshots and OCR use opaque BGRA pixels. Copy rows directly instead of
+        // retaining a full-screen encoded BMP stream in the XAML image decoder.
+        var pixels = new SoftwareBitmap(BitmapPixelFormat.Bgra8, bitmap.Width, bitmap.Height, BitmapAlphaMode.Ignore);
+        try
+        {
+            using var buffer = pixels.LockBuffer(BitmapBufferAccessMode.Write);
+            using var reference = buffer.CreateReference();
+            reference.As<IMemoryBufferByteAccess>().GetBuffer(out byte* destination, out uint capacity);
+            BitmapPlaneDescription plane = buffer.GetPlaneDescription(0);
+            int rowBytes = checked(bitmap.Width * 4);
+            long end = (long)plane.StartIndex + (long)(bitmap.Height - 1) * plane.Stride + rowBytes;
+            if (plane.StartIndex < 0 || plane.Stride < rowBytes || end > capacity)
+                throw new InvalidOperationException("The bitmap pixel buffer is smaller than the image.");
 
-        using var randomAccessStream = stream.AsRandomAccessStream();
-        var decoder = await BitmapDecoder.CreateAsync(randomAccessStream);
-        return await decoder.GetSoftwareBitmapAsync();
+            BitmapData source = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            try
+            {
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    Buffer.MemoryCopy((byte*)source.Scan0 + (long)y * source.Stride,
+                        destination + plane.StartIndex + (long)y * plane.Stride, rowBytes, rowBytes);
+                }
+            }
+            finally
+            {
+                bitmap.UnlockBits(source);
+            }
+            return pixels;
+        }
+        catch
+        {
+            pixels.Dispose();
+            throw;
+        }
     }
 
-    public static BitmapImage GetWindowBoundsImage(WindowEx window)
+    [ComImport]
+    [Guid("5B0D3235-4DBA-4D44-865E-8F1D0E4FD04D")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private unsafe interface IMemoryBufferByteAccess
     {
-        using var bitmap = GetWindowsBoundsBitmap(window);
-        return BitmapToImageSource(bitmap);
+        void GetBuffer(out byte* buffer, out uint capacity);
     }
 }
