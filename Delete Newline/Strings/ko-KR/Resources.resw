@@ -169,7 +169,7 @@
     <value>MCP 서버 주소</value>
   </data>
   <data name="Settings_McpEndpoint_Hint.Text" xml:space="preserve">
-    <value>AI 클라이언트 연결 주소입니다. 서버를 켜면 복사할 수 있습니다.</value>
+    <value>같은 PC의 AI 클라이언트에서 정규표현식과 앱 설정을 관리할 수 있습니다. 서버를 켠 뒤 아래 주소를 복사해 클라이언트에 등록하세요.</value>
   </data>
   <data name="Settings_CopyMcpEndpoint.AutomationProperties.Name" xml:space="preserve">
     <value>주소 복사</value>

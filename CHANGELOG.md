@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.7 — 2026-11-05
+
+- Match the MCP title, description, and right-side controls to the other Settings cards, with the copyable URL below the description.
+- Use the shared description spacing and expand the English and Korean guidance for connecting an AI client on the same PC.
+- Add regression coverage for the MCP card alignment and spacing.
+
 ## 3.2.6 — 2026-11-05
 
 - Show the configured MCP server URL in a compact Settings card with a copy icon.

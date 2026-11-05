@@ -169,7 +169,7 @@
     <value>MCP server URL</value>
   </data>
   <data name="Settings_McpEndpoint_Hint.Text" xml:space="preserve">
-    <value>Use this URL to connect your AI client. Turn on the server to copy it.</value>
+    <value>Manage regex profiles and app settings from an AI client on this PC. Turn on the server, then copy the URL below into your client.</value>
   </data>
   <data name="Settings_CopyMcpEndpoint.AutomationProperties.Name" xml:space="preserve">
     <value>Copy URL</value>

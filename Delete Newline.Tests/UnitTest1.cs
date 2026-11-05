@@ -722,6 +722,24 @@ public sealed class DeleteNewlineMcpToolServiceTests
     }
 
     [Fact]
+    public void SettingsPage_UsesSharedHeaderLayoutAboveMcpEndpoint()
+    {
+        string settingsPageXaml = File.ReadAllText(LocateSourceFile("Delete Newline", "Views", "SettingsPage.xaml"));
+        string mcpServerBlock = ExtractElementBlock(settingsPageXaml, "<!-- MCP Server Setting -->", "</Border>");
+        string topMostBlock = ExtractElementBlock(settingsPageXaml, "<!-- TopMost Setting -->", "</Border>");
+        string header = ExtractElementBlock(mcpServerBlock, "<StackPanel Grid.Column=\"0\"", "</StackPanel>");
+        string topMostHeader = ExtractElementBlock(topMostBlock, "<StackPanel Grid.Column=\"0\"", "</StackPanel>");
+
+        Assert.Contains("Style=\"{StaticResource SettingsCardStyle}\"", mcpServerBlock);
+        Assert.Equal(topMostHeader[..topMostHeader.IndexOf('>')], header[..header.IndexOf('>')]);
+        Assert.Contains("x:Uid=\"Settings_McpServer\"", header);
+        Assert.Contains("x:Uid=\"Settings_McpEndpoint_Hint\" Style=\"{StaticResource SettingsDescriptionStyle}\"", header);
+        Assert.Contains("<Grid Grid.Row=\"1\" Grid.ColumnSpan=\"2\" Margin=\"0,12,0,0\" ColumnSpacing=\"8\">", mcpServerBlock);
+        Assert.True(mcpServerBlock.IndexOf("Settings_McpEndpoint_Hint", StringComparison.Ordinal)
+            < mcpServerBlock.IndexOf("McpEndpointTextBox", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void McpPortPolicy_DefaultsMcpServerOffAndUsesBlankPortDisplayUntilExplicitlyConfigured()
     {
         Assert.False(McpPortPolicy.DefaultEnabled);
