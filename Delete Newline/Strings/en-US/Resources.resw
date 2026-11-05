@@ -165,26 +165,20 @@
   <data name="Settings_Notification_Description.Text" xml:space="preserve">
     <value>Shows Windows notifications when hotkey-triggered regex and OCR tasks complete.</value>
   </data>
-  <data name="Settings_McpServer_Description.Text" xml:space="preserve">
-    <value>Lets MCP-compatible AI clients read and edit app settings. Turn off to block access.</value>
-  </data>
-  <data name="Settings_McpEndpoint_Label.Text" xml:space="preserve">
-    <value>MCP server URL (Streamable HTTP)</value>
-  </data>
   <data name="Settings_McpEndpoint.AutomationProperties.Name" xml:space="preserve">
     <value>MCP server URL</value>
   </data>
-  <data name="Settings_CopyMcpEndpoint.Content" xml:space="preserve">
+  <data name="Settings_CopyMcpEndpoint.AutomationProperties.Name" xml:space="preserve">
     <value>Copy URL</value>
   </data>
-  <data name="Settings_McpEndpoint_Description.Text" xml:space="preserve">
-    <value>Turn on the MCP server, then paste this URL into your AI client's Streamable HTTP connection settings. Connect from this PC. To change the port, turn off the server first.</value>
+  <data name="Settings_CopyMcpEndpoint.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Copy URL</value>
   </data>
   <data name="Notification_McpEndpoint_Copied_Title" xml:space="preserve">
     <value>MCP server URL copied</value>
   </data>
   <data name="Notification_McpEndpoint_Copied_Message" xml:space="preserve">
-    <value>Paste it into your AI client's Streamable HTTP connection settings.</value>
+    <value>{0}</value>
   </data>
   <data name="Notification_McpEndpoint_CopyError_Title" xml:space="preserve">
     <value>Could not copy MCP server URL</value>

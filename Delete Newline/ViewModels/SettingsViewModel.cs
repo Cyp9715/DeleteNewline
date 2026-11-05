@@ -53,6 +53,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private bool _enableStartupTask;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CopyMcpEndpointCommand))]
     private bool _enableMcpServer;
 
     [ObservableProperty]
@@ -127,6 +128,7 @@ public partial class SettingsViewModel : ObservableRecipient
         {
             EnableMcpServer = isEnabled;
             McpPort = GetMcpPortDisplayValue();
+            CopyMcpEndpointCommand.NotifyCanExecuteChanged();
         }
         else
         {
@@ -134,6 +136,7 @@ public partial class SettingsViewModel : ObservableRecipient
             {
                 EnableMcpServer = isEnabled;
                 McpPort = GetMcpPortDisplayValue();
+                CopyMcpEndpointCommand.NotifyCanExecuteChanged();
             });
         }
     }
@@ -157,9 +160,16 @@ public partial class SettingsViewModel : ObservableRecipient
         }
     }
 
-    [RelayCommand]
+    private bool CanCopyMcpEndpoint() => EnableMcpServer && _mcpAccessService.GetEnableMcp();
+
+    [RelayCommand(CanExecute = nameof(CanCopyMcpEndpoint))]
     private void CopyMcpEndpoint()
     {
+        if (!CanCopyMcpEndpoint())
+        {
+            return;
+        }
+
         try
         {
             var dataPackage = new DataPackage();
@@ -168,7 +178,8 @@ public partial class SettingsViewModel : ObservableRecipient
             _inAppNotificationService.ShowInAppNotification(
                 "Notification_McpEndpoint_Copied_Title",
                 "Notification_McpEndpoint_Copied_Message",
-                InfoBarSeverity.Success);
+                InfoBarSeverity.Success,
+                McpEndpointUrl);
         }
         catch (Exception ex)
         {

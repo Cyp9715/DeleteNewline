@@ -110,7 +110,7 @@ Specifying complex regular expressions is incredibly tricky - and asking an AI t
 
 1. Open **Settings** in Delete Newline.
 2. Toggle **MCP server** on. (The default port is `39333`; change it while MCP is disabled if you need to.)
-3. Click **Copy URL** below **MCP server URL (Streamable HTTP)**. The displayed URL uses your configured port.
+3. Click the **copy icon** next to the server URL. The icon is enabled while the MCP server is on, and the displayed URL uses your configured port.
 4. Paste the URL into an MCP-compatible AI client's **Streamable HTTP** connection settings, then ask it to manage your profiles or settings.
 
 That's it - your assistant can now read and write Delete Newline state through the same surface the GUI uses. Hotkey changes are re-registered the moment they're saved, so transformations are usable on the next keystroke.

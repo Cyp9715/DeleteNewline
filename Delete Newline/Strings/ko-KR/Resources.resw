@@ -165,26 +165,20 @@
   <data name="Settings_Notification_Description.Text" xml:space="preserve">
     <value>단축키를 통해 시작된 정규표현식, OCR 작업이 완료되면 Windows 알림을 보냅니다.</value>
   </data>
-  <data name="Settings_McpServer_Description.Text" xml:space="preserve">
-    <value>MCP를 지원하는 AI 클라이언트가 앱 설정을 조회하고 수정할 수 있습니다. 끄면 접근을 차단합니다.</value>
-  </data>
-  <data name="Settings_McpEndpoint_Label.Text" xml:space="preserve">
-    <value>MCP 서버 주소 (Streamable HTTP)</value>
-  </data>
   <data name="Settings_McpEndpoint.AutomationProperties.Name" xml:space="preserve">
     <value>MCP 서버 주소</value>
   </data>
-  <data name="Settings_CopyMcpEndpoint.Content" xml:space="preserve">
+  <data name="Settings_CopyMcpEndpoint.AutomationProperties.Name" xml:space="preserve">
     <value>주소 복사</value>
   </data>
-  <data name="Settings_McpEndpoint_Description.Text" xml:space="preserve">
-    <value>MCP 서버를 켠 뒤 AI 클라이언트의 Streamable HTTP 연결 설정에 이 주소를 붙여넣으세요. 이 PC에서 연결할 수 있습니다. 포트를 변경하려면 먼저 서버를 끄세요.</value>
+  <data name="Settings_CopyMcpEndpoint.ToolTipService.ToolTip" xml:space="preserve">
+    <value>주소 복사</value>
   </data>
   <data name="Notification_McpEndpoint_Copied_Title" xml:space="preserve">
-    <value>MCP 서버 주소를 복사했습니다</value>
+    <value>MCP 주소 복사 완료</value>
   </data>
   <data name="Notification_McpEndpoint_Copied_Message" xml:space="preserve">
-    <value>AI 클라이언트의 Streamable HTTP 연결 설정에 붙여넣으세요.</value>
+    <value>{0}</value>
   </data>
   <data name="Notification_McpEndpoint_CopyError_Title" xml:space="preserve">
     <value>MCP 서버 주소를 복사하지 못했습니다</value>
