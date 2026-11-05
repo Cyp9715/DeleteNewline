@@ -212,19 +212,18 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Uid="Settings_McpServer"
-                                   Grid.Column="0"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,20,0"
-                                   FontWeight="SemiBold"
-                                   TextWrapping="Wrap" />
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
+                            <TextBlock x:Uid="Settings_McpServer"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap" />
+                            <TextBlock x:Uid="Settings_McpEndpoint_Hint" Style="{StaticResource SettingsDescriptionStyle}" />
+                        </StackPanel>
 
                         <Grid Grid.Column="1"
                               Width="125"
@@ -275,7 +274,7 @@
                             </ToggleSwitch>
                         </Grid>
 
-                        <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,8,0,0" ColumnSpacing="8">
+                        <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,12,0,0" ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -296,10 +295,6 @@
                                 <FontIcon Glyph="&#xE8C8;" FontSize="16" />
                             </Button>
                         </Grid>
-                        <TextBlock x:Uid="Settings_McpEndpoint_Hint"
-                                   Grid.Row="2" Grid.ColumnSpan="2"
-                                   Style="{StaticResource SettingsDescriptionStyle}"
-                                   Margin="0,6,0,0" />
                     </Grid>
                 </Border>
             </StackPanel>
