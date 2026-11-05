@@ -168,6 +168,9 @@
   <data name="Settings_McpEndpoint.AutomationProperties.Name" xml:space="preserve">
     <value>MCP 서버 주소</value>
   </data>
+  <data name="Settings_McpEndpoint_Hint.Text" xml:space="preserve">
+    <value>AI 클라이언트 연결 주소입니다. 서버를 켜면 복사할 수 있습니다.</value>
+  </data>
   <data name="Settings_CopyMcpEndpoint.AutomationProperties.Name" xml:space="preserve">
     <value>주소 복사</value>
   </data>

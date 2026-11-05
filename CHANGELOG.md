@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.6 — 2026-11-05
+
+- Show the configured MCP server URL in a compact Settings card with a copy icon.
+- Enable copying while the MCP server is on and show a disabled gray icon when it is off, including state changes made through MCP.
+- Update the displayed URL when the port changes, tighten the card spacing, and provide a short connection hint in English and Korean.
+
 ## 3.2.5 — 2026-10-20
 
 - Reduce memory use when repeatedly opening, cancelling, or completing text captures. Keep the frozen preview sharp and preserve OCR resolution.
