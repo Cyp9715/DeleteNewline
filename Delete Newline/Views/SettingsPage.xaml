@@ -209,17 +209,22 @@
                 <!-- MCP Server Setting -->
                 <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
-                            <TextBlock x:Uid="Settings_McpServer"
-                                       FontWeight="SemiBold"
-                                       TextWrapping="Wrap" />
-                            <TextBlock x:Uid="Settings_McpServer_Description" Style="{StaticResource SettingsDescriptionStyle}" />
-                        </StackPanel>
+                        <TextBlock x:Uid="Settings_McpServer"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,20,0"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap" />
 
                         <Grid Grid.Column="1"
                               Width="125"
@@ -269,6 +274,32 @@
                                 </behaviors:Interaction.Behaviors>
                             </ToggleSwitch>
                         </Grid>
+
+                        <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,8,0,0" ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Uid="Settings_McpEndpoint"
+                                     x:Name="McpEndpointTextBox"
+                                     Text="{x:Bind ViewModel.McpEndpointUrl, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     FontFamily="Consolas"
+                                     VerticalAlignment="Center" />
+                            <Button x:Uid="Settings_CopyMcpEndpoint"
+                                    x:Name="CopyMcpEndpointButton"
+                                    Grid.Column="1"
+                                    Width="32" Height="32" Padding="0"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Command="{x:Bind ViewModel.CopyMcpEndpointCommand}"
+                                    VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE8C8;" FontSize="16" />
+                            </Button>
+                        </Grid>
+                        <TextBlock x:Uid="Settings_McpEndpoint_Hint"
+                                   Grid.Row="2" Grid.ColumnSpan="2"
+                                   Style="{StaticResource SettingsDescriptionStyle}"
+                                   Margin="0,6,0,0" />
                     </Grid>
                 </Border>
             </StackPanel>

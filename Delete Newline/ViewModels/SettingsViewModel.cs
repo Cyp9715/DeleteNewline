@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Diagnostics;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.DataTransfer;
 using Microsoft.UI.Xaml;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -52,6 +53,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private bool _enableStartupTask;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CopyMcpEndpointCommand))]
     private bool _enableMcpServer;
 
     [ObservableProperty]
@@ -59,6 +61,8 @@ public partial class SettingsViewModel : ObservableRecipient
 
     [ObservableProperty]
     private bool _isMcpPortEditable;
+
+    public string McpEndpointUrl => _mcpAccessService.EndpointUrl;
 
     public SettingsViewModel(ILocalizationService localizationService, 
         IThemeSelectorService themeSelectorService,
@@ -124,6 +128,7 @@ public partial class SettingsViewModel : ObservableRecipient
         {
             EnableMcpServer = isEnabled;
             McpPort = GetMcpPortDisplayValue();
+            CopyMcpEndpointCommand.NotifyCanExecuteChanged();
         }
         else
         {
@@ -131,6 +136,7 @@ public partial class SettingsViewModel : ObservableRecipient
             {
                 EnableMcpServer = isEnabled;
                 McpPort = GetMcpPortDisplayValue();
+                CopyMcpEndpointCommand.NotifyCanExecuteChanged();
             });
         }
     }
@@ -142,10 +148,46 @@ public partial class SettingsViewModel : ObservableRecipient
         if (dispatcherQueue.HasThreadAccess)
         {
             McpPort = GetMcpPortDisplayValue();
+            OnPropertyChanged(nameof(McpEndpointUrl));
         }
         else
         {
-            dispatcherQueue.TryEnqueue(() => McpPort = GetMcpPortDisplayValue());
+            dispatcherQueue.TryEnqueue(() =>
+            {
+                McpPort = GetMcpPortDisplayValue();
+                OnPropertyChanged(nameof(McpEndpointUrl));
+            });
+        }
+    }
+
+    private bool CanCopyMcpEndpoint() => EnableMcpServer && _mcpAccessService.GetEnableMcp();
+
+    [RelayCommand(CanExecute = nameof(CanCopyMcpEndpoint))]
+    private void CopyMcpEndpoint()
+    {
+        if (!CanCopyMcpEndpoint())
+        {
+            return;
+        }
+
+        try
+        {
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(McpEndpointUrl);
+            Clipboard.SetContent(dataPackage);
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_McpEndpoint_Copied_Title",
+                "Notification_McpEndpoint_Copied_Message",
+                InfoBarSeverity.Success,
+                McpEndpointUrl);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to copy MCP server URL: {ex}");
+            _inAppNotificationService.ShowInAppNotification(
+                "Notification_McpEndpoint_CopyError_Title",
+                "Notification_McpEndpoint_CopyError_Message",
+                InfoBarSeverity.Error);
         }
     }
 

@@ -165,8 +165,29 @@
   <data name="Settings_Notification_Description.Text" xml:space="preserve">
     <value>Shows Windows notifications when hotkey-triggered regex and OCR tasks complete.</value>
   </data>
-  <data name="Settings_McpServer_Description.Text" xml:space="preserve">
-    <value>Lets MCP-compatible AI clients read and edit app settings. Turn off to block access.</value>
+  <data name="Settings_McpEndpoint.AutomationProperties.Name" xml:space="preserve">
+    <value>MCP server URL</value>
+  </data>
+  <data name="Settings_McpEndpoint_Hint.Text" xml:space="preserve">
+    <value>Use this URL to connect your AI client. Turn on the server to copy it.</value>
+  </data>
+  <data name="Settings_CopyMcpEndpoint.AutomationProperties.Name" xml:space="preserve">
+    <value>Copy URL</value>
+  </data>
+  <data name="Settings_CopyMcpEndpoint.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Copy URL</value>
+  </data>
+  <data name="Notification_McpEndpoint_Copied_Title" xml:space="preserve">
+    <value>MCP server URL copied</value>
+  </data>
+  <data name="Notification_McpEndpoint_Copied_Message" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="Notification_McpEndpoint_CopyError_Title" xml:space="preserve">
+    <value>Could not copy MCP server URL</value>
+  </data>
+  <data name="Notification_McpEndpoint_CopyError_Message" xml:space="preserve">
+    <value>Try again, or select the URL and press Ctrl+C.</value>
   </data>
   <data name="Settings_TopMost_Description.Text" xml:space="preserve">
     <value>Keeps the application window on top of other windows.</value>
