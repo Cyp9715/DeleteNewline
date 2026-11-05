@@ -209,6 +209,10 @@
                 <!-- MCP Server Setting -->
                 <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -269,6 +273,32 @@
                                 </behaviors:Interaction.Behaviors>
                             </ToggleSwitch>
                         </Grid>
+
+                        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,16,0,0" Spacing="8">
+                            <TextBlock x:Uid="Settings_McpEndpoint_Label"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap" />
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Uid="Settings_McpEndpoint"
+                                         x:Name="McpEndpointTextBox"
+                                         Text="{x:Bind ViewModel.McpEndpointUrl, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         FontFamily="Consolas"
+                                         VerticalAlignment="Center" />
+                                <Button x:Uid="Settings_CopyMcpEndpoint"
+                                        Grid.Column="1"
+                                        Style="{StaticResource AccentButtonStyle}"
+                                        Command="{x:Bind ViewModel.CopyMcpEndpointCommand}"
+                                        VerticalAlignment="Center" />
+                            </Grid>
+                            <TextBlock x:Uid="Settings_McpEndpoint_Description"
+                                       Style="{StaticResource SettingsDescriptionStyle}"
+                                       Margin="0" />
+                        </StackPanel>
                     </Grid>
                 </Border>
             </StackPanel>
